@@ -105,11 +105,9 @@ stock FAC_ResetVariables(playerid)
 #include <YSI\y_iterate>
 #include <YSI\y_va>
 #include <YSI\y_hooks>
-#include "libraries/macros.pwn"
 #include <YSI\y_inline>
 //#include <YSI\y_dialog>
 #include <easyDialog>
-#include "libraries/als.pwn"
 #include <a_mysql>
 #include <a_mysql_inline>
 #include <sscanf2>
@@ -117,25 +115,26 @@ stock FAC_ResetVariables(playerid)
 #include <md5>
 #include <geolocation>
 #include <strlib>
-//#include <FCNPC>
 #include <zones>
 #include <streamer>
 #include <callbacks>
 #include <arrow>
 #include <evi>
 #include <gvar>
-#include "colandreas"
-//#include "mapandreas"
-// #include "profiler"
-#include "timestamp"
-#include "timerfix"
+#include <colandreas>
+#include <timestamp>
+#include <timerfix>
 #include <streamer_td>
 #include <mSelection>
 #include <screen>
 #include <requests>
 #include <garage_block>
-#include "core/string.pwn"
-#include "core/streamer.pwn"
+
+#include "libraries/string.pwn"
+#include "libraries/streamer.pwn"
+
+#include "libraries/macros.pwn"
+#include "libraries/als.pwn"
 #include "libraries/debug.pwn"
 #include "libraries/dialog.pwn"
 native WP_Hash(buffer[], len, const str[]);
@@ -1964,7 +1963,6 @@ new
 	MuteListPM[MAX_PLAYERS][MAX_PLAYERS],
 	//SellVehicleZone,
 	BankPickup,
-	bool:player_DownloadSent[MAX_PLAYERS],
 	Text3D:BankLabel,
 	Text3D:AdLabel,
 	stats_police_calls,
@@ -4104,16 +4102,17 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core\map\deja_vu.pwn"
 #include "core\map\idlewood_park.pwn"
 
-#include "modules/graffiti.pwn"
-#include "modules/thief.pwn"
-//#include "modules/gifts.pwn"
-#include "modules/boombox.pwn"
-#include "modules/taxi.pwn"
-#include "modules/trace.pwn"
-#include "modules/paynspray.pwn"
+#include "modules\server/graffiti.pwn"
+#include "modules\server/thief.pwn"
+#include "modules\server/boombox.pwn"
+#include "modules\server/taxi.pwn"
+#include "modules\server/trace.pwn"
+#include "modules\server/paynspray.pwn"
+//#include "modules\server/gifts.pwn"
 
 /** Player modules */
 #include "modules\player/proxy.pwn"
+#include "modules\player/ipspam.pwn"
 
 main()
 {
@@ -8058,41 +8057,6 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 	return 1;
 }
 
-
- 
-#if !defined MAX_JOIN_LOGS
-        #define MAX_JOIN_LOGS (30)
-#endif
- 
-#if !defined MAX_THRESHOLD
-        #define MAX_THRESHOLD (8000) // The amount of time in which all joins are valid and counted
-#endif
- 
-enum e_JoinLog {
-        e_iIP,
-        e_iTimeStamp
-};
- 
-static stock
-        g_eaJoinLog[MAX_JOIN_LOGS][e_JoinLog]
-;
-
-static stock IpToInt(const s_szIP[]) {
-        new
-                aiBytes[1],
-                iPos = 0
-        ;
-        aiBytes{0} = strval(s_szIP[iPos]);
-        while(iPos < 15 && s_szIP[iPos++] != '.') {}
-        aiBytes{1} = strval(s_szIP[iPos]);
-        while(iPos < 15 && s_szIP[iPos++] != '.') {}
-        aiBytes{2} = strval(s_szIP[iPos]);
-        while(iPos < 15 && s_szIP[iPos++] != '.') {}
-        aiBytes{3} = strval(s_szIP[iPos]);
-       
-        return aiBytes[0];
-}
-
 public OnPlayerConnect(playerid)
 {
 	#if SERVER_DEBUG_LEVEL >= 2
@@ -8116,89 +8080,47 @@ public OnPlayerConnect(playerid)
 		}
         return 1;
 	}
- 	static
-            joinIndex,
-            joinArray[16]
-    ;
-    GetPlayerIp(playerid, joinArray, sizeof(joinArray));
-   
-    g_eaJoinLog[joinIndex][e_iIP] = joinArray[0] = IpToInt(joinArray);
-    g_eaJoinLog[joinIndex][e_iTimeStamp] = GetTickCount();
-   
-    joinIndex = ++joinIndex % MAX_JOIN_LOGS;
-   
-    joinArray[1] = joinArray[2] = 0;
-   
-    for(new i = 0; i < (MAX_JOIN_LOGS - 1); ++i) 
-    {
-            if(g_eaJoinLog[i][e_iIP] != joinArray[0]) 
-            {
-                    continue;
-            }
-            joinArray[3] = GetTickCount();
 
-            if(floatround(floatabs(joinArray[3] - g_eaJoinLog[i][e_iTimeStamp])) < MAX_THRESHOLD) 
-            {
-                    if(floatround(floatabs(joinArray[3] - g_eaJoinLog[i + 1][e_iTimeStamp])) < MAX_THRESHOLD) 
-                    {
-                           	joinArray[1] ++;
-                            joinArray[2] += floatround(floatabs(g_eaJoinLog[i][e_iTimeStamp] - g_eaJoinLog[i + 1][e_iTimeStamp]));
-                    }
-            }
-    }
-
-	if(joinArray[1] >= 2 && joinArray[2] <= 8000)
+	SetPlayerColor(playerid, 0xffffffFF);
+	gConnectedPlayers++;
+	ResetData(playerid);
+	ResetPlayerInventory(playerid);
+	ClearChat(playerid, 15);
+	TogglePlayerSpectating(playerid, true);
+	InterpolateCameraPos(playerid, 		2102.66, -1032.10, 133.01, 2265.64, -1543.05, 131.90, 15000, CAMERA_MOVE);
+	InterpolateCameraLookAt(playerid, 	1753.92, -1247.18, 131.90, 1967.84, -1197.94, 33.61, 15000, CAMERA_MOVE);
+	if(!CheckBan(playerid))
 	{
-		printf("%d banned: IP_FLOOD", playerid);
-		BanEx(playerid, "IP_Flood");
-		Kick(playerid);
-		return 1;
-	}
-	else
-	{
-		// onplayerfinisheddownloading
-		player_DownloadSent[playerid] = false;
-		SetPlayerColor(playerid, 0xffffffFF);
-		gConnectedPlayers++;
-		ResetData(playerid);
-		ResetPlayerInventory(playerid);
-		ClearChat(playerid, 15);
-		TogglePlayerSpectating(playerid, true);
-		InterpolateCameraPos(playerid, 		2102.66, -1032.10, 133.01, 2265.64, -1543.05, 131.90, 15000, CAMERA_MOVE);
-		InterpolateCameraLookAt(playerid, 	1753.92, -1247.18, 131.90, 1967.84, -1197.94, 33.61, 15000, CAMERA_MOVE);
-		if(!CheckBan(playerid))
+		if(PlayerInfo[playerid][pConnection] == CONNECTION_STATE_CONNECTED)
 		{
-			if(PlayerInfo[playerid][pConnection] == CONNECTION_STATE_CONNECTED)
-			{
-				KickEx(playerid);
-			}
-			DMV_Create_Player(playerid);
-			FurnitureTd_Create_Player(playerid);
-			TipBox_Create_Player(playerid);
-			LoadBar_Create_Player(playerid);
-			JailTimeTD_Create_Player(playerid);
-			MechTune_Create_Player(playerid);
-			VLTextdraw_Create_Player(playerid);
-			VShop_Create_Player(playerid);
-			WarningTD_Create_Player(playerid);
-			SpamBarTD_Create_Player(playerid);
-			PhoneTD_Create_Player(playerid);
-			JobGuiTD_Create_Player(playerid);
-			InfoBar_Create_Player(playerid);
-			Speedo_Create_Player(playerid);
-			DeathScreen_Create_Player(playerid);
-			MDC_CreatePlayerTextdraws(playerid);
-			PayPhoneTD_Create_Player(playerid);
-			CharListTD_Create_Player(playerid);
-			CharCreateTD_Create_Player(playerid);
-			PreparePlayerData(playerid);
-			SetTimerEx("LoginHalt", 3000, false, "d", playerid); // reikia palaukt, kol viska surenkam tada siunciam tquery viduje
+			KickEx(playerid);
 		}
+		DMV_Create_Player(playerid);
+		FurnitureTd_Create_Player(playerid);
+		TipBox_Create_Player(playerid);
+		LoadBar_Create_Player(playerid);
+		JailTimeTD_Create_Player(playerid);
+		MechTune_Create_Player(playerid);
+		VLTextdraw_Create_Player(playerid);
+		VShop_Create_Player(playerid);
+		WarningTD_Create_Player(playerid);
+		SpamBarTD_Create_Player(playerid);
+		PhoneTD_Create_Player(playerid);
+		JobGuiTD_Create_Player(playerid);
+		InfoBar_Create_Player(playerid);
+		Speedo_Create_Player(playerid);
+		DeathScreen_Create_Player(playerid);
+		MDC_CreatePlayerTextdraws(playerid);
+		PayPhoneTD_Create_Player(playerid);
+		CharListTD_Create_Player(playerid);
+		CharCreateTD_Create_Player(playerid);
+		PreparePlayerData(playerid);
+		SetTimerEx("LoginHalt", 3000, false, "d", playerid); // reikia palaukt, kol viska surenkam tada siunciam tquery viduje
 	}
 	return 1;
 }
 
-public OnProxyResult(index, result)
+hook OnProxyResult(index, result)
 {
 	if(result == 1)
 	{
@@ -8213,6 +8135,31 @@ public LoginHalt(playerid)
 	#if SERVER_DEBUG_LEVEL >= 3
 		printf("[debug] LoginHalt(%s)", GetPlayerNameEx(playerid));
 	#endif
+
+	new country[56];
+	GetIPCountry(GetPlayerIpEx(playerid), country, 56);
+	/*
+	 * Checkinam, ar gali jungtis is isvis 
+	 */
+	if(	!isequal(country, "Lithuania") && 
+		!isequal(GetPlayerIpEx(playerid), "127.0.0.1") &&
+		!isequal(GetPlayerIpEx(playerid), "Unknown"))
+	{
+		// IP ne master, ne unknown ir ne LT
+		new string[256];
+		mysql_format(chandler, string, sizeof string, "\
+			SELECT NULL FROM `server_whitelist` WHERE IP = '%e' OR Name = '%e' OR Country = '%e'",
+			GetPlayerIpEx(playerid), GetPlayerNameEx(playerid), country);
+
+		new Cache:result = mysql_query(chandler, string, true);
+		if(!cache_num_rows())
+		{
+			SendFormat(playerid, 0xC43939FF, "Ðiuo IP negalite prisijungti á serverá. (%s, %s)", GetPlayerIpEx(playerid), country);
+			KickEx(playerid);
+		}
+		cache_delete(result);
+	}
+	SendFormat(playerid, 0xBABABAFF, "Jungiatës ið %s IP:%s", country, GetPlayerIpEx(playerid));
 
 	/*
 	 * Tikrinam ar isvis yra toks useris

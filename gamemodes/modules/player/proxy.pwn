@@ -8,7 +8,6 @@ static
 static 
     Request:player_RequestId[MAX_PLAYERS];
 
-forward OnProxyResult(index, result);
 
 hook OnGameModeInit()
 {
@@ -82,7 +81,7 @@ static _Proxy_SendResult(index, result, bool:add_to_blacklist)
 {
     new 
         string[256];
-    CallLocalFunction("OnProxyResult", "dd", index, result);
+    call OnProxyResult(index, result);
 
     if(result == 1 && add_to_blacklist)
     {

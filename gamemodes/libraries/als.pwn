@@ -14,3 +14,4 @@
 #define ALS_DO_NewDay<%0> %0<NewDay,>(none:)
 #define ALS_DO_MysqlEstablished<%0> %0<MysqlEstablished,>(none:)
 #define ALS_DO_PlayerEngineTurning<%0> %0<PlayerEngineTurning,iii>(more:playerid,more:vehicleid,end:have_permission)
+#define ALS_DO_ProxyResult<%0> %0<ProxyResult,ii>(more:playerid,end:result)
