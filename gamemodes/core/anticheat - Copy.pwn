@@ -317,7 +317,7 @@ stock sd_RepairVehicle(vehicleid)
 	return RepairVehicle(vehicleid);
 }
 
-stock sd_SetPlayerSkin(playerid, skinid, bool:save_to_var = true)
+stock SetPlayerSkin(playerid, skinid, bool:save_to_var = true)
 {
 	new _state = GetPlayerAnimationIndex(playerid);
 	if(_state == 1044 || _state == 1027) return false;

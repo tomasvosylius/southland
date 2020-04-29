@@ -70,6 +70,8 @@ stock sd_RepairVehicle(vehicleid)
 	return RepairVehicle(vehicleid);
 }
 
+
+/*
 stock sd_SetPlayerSkin(playerid, skinid, bool:save_to_var = true)
 {
 	new _state = GetPlayerAnimationIndex(playerid);
@@ -101,7 +103,7 @@ stock sd_GetPlayerSkin(playerid)
 	if(GetPlayerCustomSkin(playerid) != 0) skin = GetPlayerCustomSkin(playerid);
 	else skin = GetPlayerSkin(playerid);
 	return skin;
-}
+}*/
 
 /* 
 	Money

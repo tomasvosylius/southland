@@ -4480,19 +4480,6 @@ public OnGameModeInit()
 	return 1;
 }
 
-public OnPlayerRequestDownload(playerid, type, crc)
-{
-	if(!player_DownloadSent[playerid])
-	{
-		SendFormat(playerid, 0xBABABAFF, "Sveiki atvykæ á CommunityRP.lt!");
-		SendFormat(playerid, 0xBABABAFF, "Vykdomas naujø failø atsiuntimas á jûsø kompiuterá.");
-		SendFormat(playerid, 0xBABABAFF, "Nenuleiskite þaidimo, kadangi siuntimas bus sustabdomas.");
-		SendFormat(playerid, 0xBABABAFF, "Siuntimas uþtruks iki 5 minuèiø ir truks tik vienà kartà.");
-		player_DownloadSent[playerid] = true;
-	}
-	return 1;
-}
-
 
 
 thread(JailReset);
@@ -7769,7 +7756,7 @@ public OnPlayerSpawn(playerid)
 forward SetSkinSpawn(playerid, unfreeze);
 public SetSkinSpawn(playerid, unfreeze)
 {
-	sd_SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin], true);
+	SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 	if(unfreeze >= 1) TogglePlayerControllable(playerid, 1);
 	return 1;
 }
@@ -8437,12 +8424,6 @@ public OnPlayerConnect(playerid)
 			SetTimerEx("LoginHalt", 3000, false, "d", playerid); // reikia palaukt, kol viska surenkam tada siunciam tquery viduje
 		}
 	}
-	return 1;
-}
-
-
-public OnPlayerFinishedDownloading(playerid, virtualworld)
-{
 	return 1;
 }
 
@@ -9807,7 +9788,7 @@ Dialog:DialogCharChangeSkin(playerid, response, listitem, inputtext[])
 			online = FindPlayerBySql(id);
 		if(online != INVALID_PLAYER_ID)
 		{
-			sd_SetPlayerSkin(online, skin);
+			SetPlayerSkin(online, skin);
 			SaveAccountIntEx(online, "Skin", skin);
 		}
 		else
@@ -22788,7 +22769,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 	{
 		if(response)
 		{
-			sd_SetPlayerSkin(playerid, modelid, true);
+			SetPlayerSkin(playerid, modelid);
 		}
 	}
 	return 1;
@@ -32190,8 +32171,8 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					PlayerInfo[playerid][pJobActionTime] = 30;
 					SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_REPAIR, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
 				}
-				new __tmpskin = sd_GetPlayerSkin(playerid);
-				sd_SetPlayerSkin(playerid, __tmpskin, false);
+				new __tmpskin = GetPlayerSkin(playerid);
+				SetPlayerSkin(playerid, __tmpskin);
 				PlayerTextDrawTextSize(playerid, SpamBarTD_Load[playerid], 0.000000, 14.000000);
 				PlayerTextDrawSetString(playerid, SpamBarTD_Value[playerid], "0%%");
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
@@ -32228,8 +32209,8 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					PlayerInfo[playerid][pJobActionTime] = 30;
 					SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_WHEELS, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
 				}
-				new __tmpskin = sd_GetPlayerSkin(playerid);
-				sd_SetPlayerSkin(playerid, __tmpskin, false);
+				new __tmpskin = GetPlayerSkin(playerid);
+				SetPlayerSkin(playerid, __tmpskin);
 				PlayerTextDrawTextSize(playerid, SpamBarTD_Load[playerid], 0.000000, 14.000000);
 				PlayerTextDrawSetString(playerid, SpamBarTD_Value[playerid], "0%%");
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
@@ -32256,8 +32237,8 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				VehicleInfo[jobvehicleid][vEngineStatus] = 100.0;
 				SaveVehicleFloatEx(jobvehicleid, "EngineStatus", 100.0);
 
-				new __tmpskin = sd_GetPlayerSkin(playerid);
-				sd_SetPlayerSkin(playerid, __tmpskin, false);
+				new __tmpskin = GetPlayerSkin(playerid);
+				SetPlayerSkin(playerid, __tmpskin);
 				PlayerTextDrawTextSize(playerid, SpamBarTD_Load[playerid], 0.000000, 14.000000);
 				PlayerTextDrawSetString(playerid, SpamBarTD_Value[playerid], "0%%");
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
@@ -32283,8 +32264,8 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				VehicleInfo[jobvehicleid][vBatteryStatus] = 100.0;
 				SaveVehicleFloatEx(jobvehicleid, "BatteryStatus", 100.0);
 
-				new __tmpskin = sd_GetPlayerSkin(playerid);
-				sd_SetPlayerSkin(playerid, __tmpskin, false);
+				new __tmpskin = GetPlayerSkin(playerid);
+				SetPlayerSkin(playerid, __tmpskin);
 				PlayerTextDrawTextSize(playerid, SpamBarTD_Load[playerid], 0.000000, 14.000000);
 				PlayerTextDrawSetString(playerid, SpamBarTD_Value[playerid], "0%%");
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
@@ -32311,8 +32292,8 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				VehicleInfo[jobvehicleid][vEngineStatus] = 100.0;
 				SaveVehicleFloatEx(jobvehicleid, "EngineStatus", 100.0);
 
-				new __tmpskin = sd_GetPlayerSkin(playerid);
-				sd_SetPlayerSkin(playerid, __tmpskin, false);
+				new __tmpskin = GetPlayerSkin(playerid);
+				SetPlayerSkin(playerid, __tmpskin);
 				PlayerTextDrawTextSize(playerid, SpamBarTD_Load[playerid], 0.000000, 14.000000);
 				PlayerTextDrawSetString(playerid, SpamBarTD_Value[playerid], "0%%");
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
@@ -32338,8 +32319,8 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				VehicleInfo[jobvehicleid][vBatteryStatus] = 100.0;
 				SaveVehicleFloatEx(jobvehicleid, "BatteryStatus", 100.0);
 
-				new __tmpskin = sd_GetPlayerSkin(playerid);
-				sd_SetPlayerSkin(playerid, __tmpskin, false);
+				new __tmpskin = GetPlayerSkin(playerid);
+				SetPlayerSkin(playerid, __tmpskin);
 				PlayerTextDrawTextSize(playerid, SpamBarTD_Load[playerid], 0.000000, 14.000000);
 				PlayerTextDrawSetString(playerid, SpamBarTD_Value[playerid], "0%%");
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
@@ -33647,7 +33628,7 @@ public php_setskin(string[])
 	if(sscanf(string,"p<|>dd", playerid, skin)) return printf("[remote function] Use php_setskin playerid|skin");
 	if(CheckPlayerid(playerid))
 	{
-		sd_SetPlayerSkin(playerid, skin);
+		SetPlayerSkin(playerid, skin);
 		MsgSuccess(playerid, "IÐ VVP", "Jûsø iðvaizda buvo pakeista.");
 		return 1;
 	}
@@ -34170,7 +34151,7 @@ CMD:setskin(playerid, params[])
 	new receiverid, skin;
 	if(sscanf(params,"ud",receiverid,skin)) return SendUsage(playerid, "/setskin [þaidëjas] [skin ID]");
 	if(!CheckPlayerid(receiverid)) return InfoBox(playerid, IB_WRONG_PLAYER);
-	sd_SetPlayerSkin(receiverid, skin, true);
+	SetPlayerSkin(receiverid, skin);
 	return 1;
 }
 flags:aqu(CMD_TYPE_ADMIN);
@@ -35900,7 +35881,7 @@ CMD:spec(playerid, params[])
 	if(SpectateOn[playerid] != INVALID_PLAYER_ID)
 	{
 		TogglePlayerSpectating(playerid, 0);
-		sd_SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin], true);
+		SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 		SetPlayerPos(playerid, PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ]);
 		SetPlayerVirtualWorld(playerid, 0);
 		SetPlayerInterior(playerid, 0);
@@ -38139,7 +38120,7 @@ CMD:cuff(playerid, params[])
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 4.0) || IsPlayerInAnyVehicle(playerid) || IsPlayerInAnyVehicle(receiverid) || !CheckPlayerid(receiverid)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
 	PlayerExtra[receiverid][peCuffed] = !PlayerExtra[receiverid][peCuffed];
 	new 
-		skin = sd_GetPlayerSkin(receiverid);
+		skin = GetPlayerSkin(receiverid);
 	if(skin >= sizeof CuffObjectOffsets) skin = 10;
 	rp_me(playerid, _, "%s antrankius %s.", PlayerExtra[receiverid][peCuffed] ? ("uþdeda") : ("nuima"), GetPlayerNameEx(receiverid, true));
 	SetPlayerSpecialAction(receiverid, PlayerExtra[receiverid][peCuffed] ? SPECIAL_ACTION_CUFFED : SPECIAL_ACTION_NONE);
@@ -39130,7 +39111,7 @@ CMD:leavejob(playerid, params[])
 	}
 	if(PlayerInfo[playerid][pJobDuty] > 0 && PlayerInfo[playerid][pJob] == JOB_MECHANIC)
 	{
-		sd_SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
+		SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 	}
 	PlayerInfo[playerid][pJob] =
 	PlayerInfo[playerid][pJobLevel] =
@@ -42343,7 +42324,7 @@ CMD:duty(playerid, params[])
 							sd_GivePlayerWeapon(playerid, wep_data[i][0], wep_data[i][1], WEAPON_GIVE_TYPE_NORMAL, wep_data[i][2]);
 						}
 					}
-					sd_SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin], true);
+					SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 				}
 				RemovePlayerAttachedObject(playerid, 9);
 				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
@@ -42469,8 +42450,8 @@ CMD:duty(playerid, params[])
 					case JOB_MECHANIC:
 					{
 						if(!IsPlayerInRangeOfPoint(playerid, 50.0, Jobs[jobid][jobX], Jobs[jobid][jobY], Jobs[jobid][jobZ])) return InfoBox(playerid, IB_NOT_IN_MECHANICS);
-						PlayerInfo[playerid][pSkin] = sd_GetPlayerSkin(playerid);
-						sd_SetPlayerSkin(playerid, 50, false);
+						PlayerInfo[playerid][pSkin] = GetPlayerSkin(playerid);
+						SetPlayerSkin(playerid, 50);
 						SendFormat(playerid, 0xBABABAFF, "Pradëjote darbà, komandas rasite /help job.");
 						PlayerInfo[playerid][pJobDuty] = 1;
 					}
