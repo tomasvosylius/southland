@@ -3,7 +3,7 @@
 	Ðià SA-MP þaidimo modifikacijà sukûrë Tomas "f0cus" Vosylius.
 	Kûrimo data: pradþia 2016 vasaris.
 
-	Modifikacija skirta County Roleplay projektui (CRP.lt); (Vëliau ir Southland.lt(2017-2018) bei CommunityRP.lt(2020) projektams)
+	Modifikacija skirta County Roleplay projektui (CRP.lt); (Vëliau ir Southland.lt(2017-2018) bei Southland.lt(2020) projektams)
 	Modifikacijà galima naudoti su sàlyga, jei paliekami kreditai kûrëjui;
 
 	Ðie programiniai kodai ir failai yra kuriami atsakingai, stengiantis sukurti
@@ -1025,7 +1025,7 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-#define USING_VIRTUAL_PRIVATE_SERVER
+// #define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -1065,7 +1065,7 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 
 // ==============================================================================
 // Projekto pavadinimas ir pns
-#define PROJECT_NAME								"CommunityRP"
+#define PROJECT_NAME								"Southland"
 #define PROJECT_DOMAIN								"lt"
 #define DEFAULT_IBAN_PREFIX 						SA
 #define DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX 		FAC
@@ -4205,7 +4205,7 @@ public OnGameModeInit()
 	MDC_Init();
 	//MapAndreas_Init(MAP_ANDREAS_MODE_FULL);
 	ZonesPrepare();
-	SetGameModeText("C-RP "#CODE_VERSION"");
+	SetGameModeText("S-RP "#CODE_VERSION"");
 	// Krovimai
 	// ==============================================================================
 	LoadMapIcons();
@@ -4230,13 +4230,6 @@ public OnGameModeInit()
 
 	CreateDynamic3DTextLabel("Þvejybos vieta\nNaudokite /fishing", 0xFFFFFFFF, 2938.95, -1996.96, 3.07, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
 	CreateDynamic3DTextLabel("Þuvø supirktuvë\nNaudokite /sellfishes", 0xBABABAFF, 2900.65, -1934.49, 11.91, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
-	// Papildoma3
-	// -5591.14, 1529.32, 6.0 METAGAME
-	// -5585.80, 1526.22, 6.35 POWERGAME
-	// -5582.80, 1528.17, 6.597 KAS YRA RP
-	
-	// -5596.95, 1522.35, 5.28 SPAWN
-
 	// AddStaticVehicle(538, 1902.83, -1953.91, 13.50, 0.0, 0, 0);
 
 	Iter_Init(PlayerDamages);
@@ -4244,232 +4237,6 @@ public OnGameModeInit()
 	// ==============================================================================
 	CreateGlobalTextdraws();
 	BlockGarages(.text = "DRAUDZIAMA");
-	// Custom
-	printf("Adding custom models..");
-
-	//AddCharModel(117, 20002, "azijietis.dff", "azijietis.txd");
-	/*AddCharModel(118, 20003, "azijietis2.dff", "azijietis2.txd");
-	AddCharModel(73, 20004, "civilis.dff", "civilis.txd");
-	AddCharModel(72, 20005, "civilis2.dff", "civilis2.txd");
-	AddCharModel(107, 20006, "civilis3.dff", "civilis3.txd");
-	AddCharModel(121, 20007, "civilis4.dff", "civilis4.txd");
-	AddCharModel(119, 20008, "civilis5.dff", "civilis5.txd");
-	AddCharModel(5, 20009, "gangsterisjuodaodis.dff", "gangsterisjuodaodis.txd"); // storas
-	AddCharModel(25, 20010, "gangsterisjuodaodis2.dff", "gangsterisjuodaodis2.txd");
-	AddCharModel(272, 20011, "mafijozas.dff", "mafijozas.txd");
-	AddCharModel(109, 20012, "mexikietis.dff", "mexikietis.txd");
-	AddCharModel(110, 20013, "mexikietis2.dff", "mexikietis2.txd");
-	AddCharModel(108, 20014, "mexikietis3.dff", "mexikietis3.txd");
-	AddCharModel(310, 20015, "pareigunas.dff", "pareigunas.txd");
-	AddCharModel(310, 20016, "pareigunas1.dff", "pareigunas1.txd");
-	AddCharModel(310, 20017, "pareigunas2.dff", "pareigunas2.txd"); 
-	AddCharModel(310, 20018, "pareigunas3.dff", "pareigunas3.txd");
-	AddCharModel(310, 20019, "pareigunas4.dff", "pareigunas4.txd");
-	AddCharModel(310, 20020, "pareigunas5.dff", "pareigunas5.txd");
-	AddCharModel(307, 20021, "pareigune.dff", "pareigune.txd");
-	AddCharModel(285, 20022, "swatpareigune.dff", "swatpareigune.txd");
-	AddCharModel(285, 20023, "swatpareigunas.dff", "swatpareigunas.txd");
-	AddCharModel(274, 20024, "africanmedic.dff", "africanmedic.txd");
-    AddCharModel(274, 20025, "asianfemalemedic.dff", "asianfemalemedic.txd");
-    AddCharModel(100, 20026, "baikeris_dzinsofke.dff", "baikeris_dzinsofke.txd");
-    AddCharModel(4, 20027, "bb_sukapisonu.dff", "bb_sukapisonu.txd");
-    AddCharModel(308, 20028, "blackfemalemedic.dff", "blackfemalemedic.txd");
-    AddCharModel(106, 20029, "bmyri_blue.dff", "bmyri_blue.txd");
-    AddCharModel(59, 20030, "civilis10.dff", "civilis10.txd");
-    AddCharModel(60, 20031, "civilis11.dff", "civilis11.txd");
-    AddCharModel(308, 20032, "darkhairfemalemedic.dff", "darkhairfemalemedic.txd");
-    AddCharModel(22, 20033, "dredas_sortai.dff", "dredas_sortai.txd");
-    AddCharModel(104, 20034, "ds_ogloc.dff", "ds_ogloc.txd");
-    //AddCharModel(65, 20035, "gangstagirl.dff", "gangstagirl.txd");
-    AddCharModel(102, 20036, "gangsteris10.dff", "gangsteris10.txd");
-    AddCharModel(103, 20037, "gangsteris11.dff", "gangsteris11.txd");
-    AddCharModel(104, 20038, "gangsteris13.dff", "gangsteris13.txd");
-    AddCharModel(105, 20039, "gangsteris14.dff", "gangsteris14.txd");
-    AddCharModel(106, 20040, "gangsteris15.dff", "gangsteris15.txd");
-    AddCharModel(107, 20041, "gangsteris16.dff", "gangsteris16.txd");
-    AddCharModel(108, 20042, "gangsteris17.dff", "gangsteris17.txd");
-    AddCharModel(12, 20043, "girl_tattoo.dff", "girl_tattoo.txd");
-    AddCharModel(275, 20044, "hispanicmedic.dff", "hispanicmedic.txd");
-    AddCharModel(276, 20045, "italianmedic.dff", "italianmedic.txd");
-    AddCharModel(112, 20046, "kapisonas_kauke.dff", "kapisonas_kauke.txd");
-    AddCharModel(26, 20047, "keliautojas.dff", "keliautojas.txd");
-    AddCharModel(275, 20048, "lightskinnedafricanmedic.dff", "lightskinnedafricanmedic.txd");
-    AddCharModel(111, 20049, "mafijozas5.dff", "mafijozas5.txd");
-    AddCharModel(112, 20050, "mafijozas6.dff", "mafijozas6.txd");
-    AddCharModel(113, 20051, "mafijozas7.dff", "mafijozas7.txd");
-    AddCharModel(111, 20052, "mafijozas_kozha.dff", "mafijozas_kozha.txd");
-    AddCharModel(112, 20053, "mafukas_treningaj.dff", "mafukas_treningaj.txd");
-    AddCharModel(275, 20054, "medicwtf.dff", "medicwtf.txd");
-    AddCharModel(276, 20055, "medicwtf2.dff", "medicwtf2.txd");
-    AddCharModel(295, 20056, "meras.dff", "meras.txd");
-    AddCharModel(12, 20057, "merga_plika.dff", "merga_plika.txd");
-    AddCharModel(115, 20058, "mexas_18st.dff", "mexas_18st.txd");
-    AddCharModel(114, 20059, "mex_lsv1.dff", "mex_lsv1.txd");
-    AddCharModel(115, 20060, "mex_lsv2.dff", "mex_lsv2.txd");
-    AddCharModel(116, 20061, "mex_lsv3.dff", "mex_lsv3.txd");
-    AddCharModel(114, 20062, "mex_sfr2.dff", "mex_sfr2.txd");
-    AddCharModel(115, 20063, "mex_sfr3.dff", "mex_sfr3.txd");
-    AddCharModel(116, 20064, "mex_vla1.dff", "mex_vla1.txd");
-    AddCharModel(114, 20065, "mex_vla3.dff", "mex_vla3.txd");
-    AddCharModel(270, 20066, "negras_kasytes.dff", "negras_kasytes.txd");
-    AddCharModel(271, 20067, "negras_maikejuoda.dff", "negras_maikejuoda.txd");
-    AddCharModel(13, 20068, "negre_gangstere.dff", "negre_gangstere.txd");
-    AddCharModel(268, 20069, "plonas_baltaodis.dff", "plonas_baltaodis.txd");
-    AddCharModel(100, 20070, "baikeris_senas.dff","baikeris_senas.txd"); // 12.30
-    AddCharModel(66, 20071, "barzdotas_muscle.dff","barzdotas_muscle.txd");
-    AddCharModel(66, 20072, "biznierius_swmyhp.dff","biznierius_swmyhp.txd");
-    AddCharModel(102, 20073, "bludsas_negras.dff","bludsas_negras.txd");
-    AddCharModel(310, 20074, "policinikaspareigunas.dff", "policinikaspareigunas.txd"); // 12.29
-    AddCharModel(310, 20075, "policinikaspareigunas2.dff", "policinikaspareigunas2.txd");
-    AddCharModel(310, 20076, "policinikaspareigunas3.dff", "policinikaspareigunas3.txd");
-    AddCharModel(310, 20077, "policinikaspareigunas4.dff", "policinikaspareigunas4.txd");
-    AddCharModel(310, 20078, "policininkasjuodaodis.dff", "policininkasjuodaodis.txd");
-    AddCharModel(178, 20079, "punker_chick.dff", "punker_chick.txd");
-    AddCharModel(262, 20080, "raudoni_marskiniai.dff", "raudoni_marskiniai.txd");
-    AddCharModel(262, 20081, "rudi_marskiniai.dff", "rudi_marskiniai.txd");
-    AddCharModel(5, 20082, "storas_bemaikes.dff", "storas_bemaikes.txd");
-    AddCharModel(5, 20083, "storuliukas_negras.dff", "storuliukas_negras.txd");
-    AddCharModel(277, 20084, "tan_lafd1.dff", "tan_lafd1.txd");
-    AddCharModel(278, 20085, "tan_lvfd1.dff", "tan_lvfd1.txd");
-    AddCharModel(279, 20086, "tan_sffd1.dff", "tan_sffd1.txd");
-    AddCharModel(133, 20087, "valytojas.dff", "valytojas.txd");
-    AddCharModel(299, 20088, "zalia_kozha.dff", "zalia_kozha.txd");
-    AddCharModel(100, 20089, "jaunas_baikeris.dff","jaunas_baikeris.txd"); // 12.30
-    AddCharModel(23, 20090, "jaunas_zmogus.dff","jaunas_zmogus.txd");
-    AddCharModel(120, 20091, "kinietis_turtingas.dff","kinietis_turtingas.txd");
-    AddCharModel(126, 20092, "mafijozas_marskiniai.dff","mafijozas_marskiniai.txd");
-    AddCharModel(272, 20093, "mafukas_fat.dff","mafukas_fat.txd");
-    AddCharModel(242, 20094, "skinhedas_storas.dff","skinhedas_storas.txd");
-	AddCharModel(299, 20095, "claude_maike_dzinsai.dff","claude_maike_dzinsai.txd"); // 12.30 century/shvag is discord
-    AddCharModel(250, 20096, "yale_baltaodis.dff","yale_baltaodis.txd"); // 12.30 century/shvag is discord
-    AddCharModel(299, 20097, "juodas_sortaibalionke.dff","juodas_sortaibalionke.txd"); // 12.30 century/shvag is discord
-    AddCharModel(102, 20098, "ballasbeta1.dff","ballasbeta1.txd"); // 12.30 amd ballas
-    AddCharModel(103, 20099, "ballasbeta2.dff","ballasbeta2.txd"); // 12.30 amd ballas
-    AddCharModel(104, 20100, "ballasbeta3.dff","ballasbeta3.txd"); // 12.30 amd ballas
-    
-    // 01.10 Turbo
-    //AddCharModel(103, 20101, "juodasdzempas.dff", "juodasdzempas.txd");
-    AddCharModel(102, 20101, "oranzinis_negras.dff", "oranzinis_negras.txd");
-    AddCharModel(291, 20102, "paul_odinestriuke.dff", "paul_odinestriuke.txd");
-    AddCharModel(292, 20103, "tofoskinofke.dff", "tofoskinofke.txd");
-    AddCharModel(289, 20104, "zebriukasdryzius.dff", "zebriukasdryzius.txd");
-    AddCharModel(250, 20105, "civilis_paprastas.dff", "civilis_paprastas.txd");
-    AddCharModel(105, 20106, "fam1_kapisonas.dff", "fam1_kapisonas.txd");
-    AddCharModel(108, 20107, "bemaikesrimta.dff", "bemaikesrimta.txd");
-
-	// oxis boba
-    AddCharModel(41, 20108, "oxis.dff", "oxis.txd"); 
-
-    // 01.24 Turbo cops
-    AddCharModel(310, 20109, "New_Cops/sadoc_pirmas.dff", "New_Cops/sadoc_pirmas.txd");
-    AddCharModel(310, 20110, "New_Cops/sadoc_antras.dff", "New_Cops/sadoc_antras.txd");
-    AddCharModel(285, 20111, "New_Cops/swat_geras.dff", "New_Cops/swat_geras.txd");
-
-    AddCharModel(310, 20112, "Leather_Cops/kozhapd_baltas.dff", "Leather_Cops/kozhapd_baltas.txd");
-    AddCharModel(310, 20113, "Leather_Cops/kozhapd_barzdele.dff", "Leather_Cops/kozhapd_barzdele.txd");
-    AddCharModel(310, 20114, "Leather_Cops/kozhapd_mexas.dff", "Leather_Cops/kozhapd_mexas.txd");
-    AddCharModel(310, 20115, "Leather_Cops/kozhapd_negras.dff", "Leather_Cops/kozhapd_negras.txd");
-    AddCharModel(310, 20116, "Leather_Cops/kozhapd_usai.dff", "Leather_Cops/kozhapd_usai.txd");
-
-	AddCharModel(280, 20117, "0222_Police/pd_asian.dff", "0222_Police/pd_asian.txd");
-    AddCharModel(280, 20118, "0222_Police/pd_baltasrimtas.dff", "0222_Police/pd_baltasrimtas.txd");
-    AddCharModel(280, 20119, "0222_Police/pd_ilgaisplaukais.dff", "0222_Police/pd_ilgaisplaukais.txd");
-    AddCharModel(280, 20120, "0222_Police/pd_ilgomrankovem.dff", "0222_Police/pd_ilgomrankovem.txd");
-    AddCharModel(280, 20121, "0222_Police/pd_metrojaunas.dff", "0222_Police/pd_metrojaunas.txd");    
-    AddCharModel(280, 20122, "0222_Police/pd_metrosenas.dff", "0222_Police/pd_metrosenas.txd");
-    AddCharModel(280, 20123, "0222_Police/pd_negrasjaunas.dff", "0222_Police/pd_negrasjaunas.txd");
-    AddCharModel(280, 20124, "0222_Police/pd_negrasrimtas.dff", "0222_Police/pd_negrasrimtas.txd");
-    AddCharModel(280, 20125, "0222_Police/pd_usas.dff", "0222_Police/pd_usas.txd");
-    AddCharModel(280, 20126, "0222_Police/pd_zachcleveland.dff", "0222_Police/pd_zachcleveland.txd");    
-    AddCharModel(280, 20127, "0222_Police/pd_usas.dff", "0222_Police/pd_usas.txd");
-    AddCharModel(280, 20128, "0222_Police/swat_antras.dff", "0222_Police/swat_antras.txd");    
-    AddCharModel(280, 20129, "0222_Police/swat_pirmas.dff", "0222_Police/swat_pirmas.txd");    */
-
-
-    // lovefist
-    //AddCharModel(248, 25000, "lovefist1.dff", "lovefist1.txd"); // 01.06 amd lovefist
-    //AddCharModel(248, 25001, "lovefist2.dff", "lovefist2.txd"); // 01.06 amd lovefist
-    //AddCharModel(248, 25002, "lovefist3.dff", "lovefist3.txd"); // 01.06 amd lovefist
-
-    /* 
-		Private skins
-    */
-
-	// Poweris/Tomas
-	/*AddCharModel(233, 26000, "Poweris/wfyst.dff", "Poweris/wfyst.txd");
-	AddCharModel(240, 26001, "Poweris/wmyri.dff", "Poweris/wmyri.txd");
-	AddCharModel(188, 26012, "Poweris/0222/swmyst.dff", "Poweris/0222/swmyst.txd");
-	AddCharModel(126, 26013, "Poweris/0222/vmaff3.dff", "Poweris/0222/vmaff3.txd");
-
-
-	// Blieka
-	AddCharModel(93, 26002, "Blieka/BliekaF.dff", "Blieka/BliekaF.txd");
-	AddCharModel(298, 26003, "Blieka/BliekaM.dff", "Blieka/BliekaM.txd");	
-
-	// Cup
-	AddCharModel(250, 26004, "Cupas/swmycr.dff", "Cupas/swmycr.txd");	
-
-	// Domantas & Century
-	AddCharModel(126, 26005, "Domantas/vmaff3.dff", "Domantas/vmaff3.txd");	
-	AddCharModel(295, 26006, "Domantas/torino.dff", "Domantas/torino.txd");	
-
-	// Pauliukas
-	AddCharModel(117, 26007, "Pauliukas/triada.dff", "Pauliukas/triada.txd");	
-	AddCharModel(117, 26008, "Pauliukas/triadanew.dff", "Pauliukas/triadanew.txd");	
-	AddCharModel(118, 26010, "Pauliukas/triadb.dff", "Pauliukas/triadb.txd");	
-
-	// Tadzius
-	AddCharModel(14, 26009, "Tadzius/bmori.dff", "Tadzius/bmori.txd");
-
-	// Gibaldi
-	AddCharModel(192, 26011, "Gibaldi/mecgrl3.dff", "Gibaldi/mecgrl3.txd");	*/
-
-
-    /*
-     * 	27000 - 27010 (27020 atsargai) Bee Hives oficiali frakcija
-     */
-    
-    // AddCharModel(106, 27000, "beehives_1.dff", "beehives_1.txd"); 
-    // AddCharModel(106, 27001, "beehives_2.dff", "beehives_2.txd"); 
-    // AddCharModel(107, 27002, "beehives_3.dff", "beehives_3.txd"); 
-    // AddCharModel(41, 27003, "beehives_4girl.dff", "beehives_4girl.txd"); 
-    // AddCharModel(105, 27004, "beehives_5fat.dff", "beehives_5fat.txd"); 
-    // AddCharModel(105, 27005, "beehives_6fat.dff", "beehives_6fat.txd"); 
-    // AddCharModel(107, 27006, "beehives_7.dff", "beehives_7.txd"); 
-    // AddCharModel(41, 27007, "beehives_8girl.dff", "beehives_8girl.txd"); 
-    // AddCharModel(41, 27008, "beehives_9girl.dff", "beehives_9girl.txd"); 
-    // AddCharModel(107, 27009, "beehives_10.dff", "beehives_10.txd"); 
-
-
-    /*
-     * 	27020 - 27030 (27040 atsargai) Volkogradov Connections oficiali frakcija
-     */
-    /* AddCharModel(188, 27020, "volko_vidoje.dff", "volko_vidoje.txd");
-    AddCharModel(125, 27021, "volko_sergei.dff", "volko_sergei.txd");
-    AddCharModel(3, 27022, "volko_modest.dff", "volko_modest.txd");
-    AddCharModel(186, 27023, "volko_lev.dff", "volko_lev.txd");
-    AddCharModel(127, 27024, "volko_kazimir.dff", "volko_kazimir.txd");
-    AddCharModel(304, 27025, "volko_ivan.dff", "volko_ivan.txd");
-    AddCharModel(112, 27026, "volko_evgeni.dff", "volko_evgeni.txd");
-    AddCharModel(240, 27027, "volko_agap.dff", "volko_agap.txd");
-    AddCharModel(125, 27028, "volko_borisbashkirov.dff", "volko_borisbashkirov.txd"); */
-
-    /*
-     * 	27050 - 27060 (27070 atsargai) White Lotus oficiali frakcija
-     */
-    /* AddCharModel(299, 27050, "White_Lotus/claude.dff", "White_Lotus/claude.txd");
-    AddCharModel(123, 27051, "White_Lotus/dnb3.dff", "White_Lotus/dnb3.txd");
-    AddCharModel(259, 27052, "White_Lotus/heck2.dff", "White_Lotus/heck2.txd");
-    AddCharModel(169, 27053, "White_Lotus/sofyri.dff", "White_Lotus/sofyri.txd");
-    AddCharModel(186, 27054, "White_Lotus/somyri.dff", "White_Lotus/somyri.txd");
-    AddCharModel(170, 27055, "White_Lotus/somyst.dff", "White_Lotus/somyst.txd");
-    AddCharModel(120, 27056, "White_Lotus/triboss.dff", "White_Lotus/triboss.txd");
-    AddCharModel(294, 27057, "White_Lotus/wuzimu.dff", "White_Lotus/wuzimu.txd"); */
-
-   	
-
-
-    // AddCharModel(112, 27021, "volko_shestyorka.dff", "volko_shestyorka.txd");
 
 	// Timers
 	// ==============================================================================
@@ -8511,7 +8278,7 @@ public CheckUserName(playerid)
 hook OnPlayerRegister(playerid)
 {
 	dialog_SetHeader("");
-	dialog_SetBody("{ffffff}Sëkmingai uþsiregistravote á CommunityRP.lt!\nDabar bûsite perkeltas á veikëjo kûrimà.");
+	dialog_SetBody("{ffffff}Sëkmingai uþsiregistravote á southland.lt!\nDabar bûsite perkeltas á veikëjo kûrimà.");
 	Dialog_Show(playerid, DialogRegisterInfo, DIALOG_STYLE_MSGBOX, "Registracija", dialog_GetBody(), "Gerai", "");
 	return 1;
 }
@@ -8548,7 +8315,7 @@ hook OnPlayerSpawnChar(playerid, selected)
 		SendFormat(playerid, 0xFF7300FF, "* {FFAD69}Rekomenduojame perskaityti sistemø apraðymus forume www."#PROJECT_NAME"."#PROJECT_DOMAIN"");
 		//if(Audio_IsClientConnected(playerid) == 0)
 		//{
-		//	SendFormat(playerid, 0xEA7F7FFF, "Jûs nenaudojate audio papildinio, kuris reikalingas þaidþiant mûsø serveryje. Já parsisiøsti galite ið www.CommunityRP.lt");
+		//	SendFormat(playerid, 0xEA7F7FFF, "Jûs nenaudojate audio papildinio, kuris reikalingas þaidþiant mûsø serveryje. Já parsisiøsti galite ið www.Southland.lt");
 		//}
 		SendFormat(playerid, 0xBABABAFF, "Norëdami valdyti ekrane rodomus langus, raðykite /screen");
 		/*if(GiftsEnabled)
@@ -9316,7 +9083,7 @@ Dialog:DialogDonatorMenuMain(playerid, response, listitem, inputtext[])
 					string[512];
 				strcat(string, "Remëjo statusà gauna kiekvienas þmogus remiantis projektà.\n");
 				strcat(string, "Remëjo statusas yra uþdedamas vartotojui ir já galima naudoti su visais veikëjais.\n");
-				strcat(string, "Informacijà apie paramà, remëjø privilegijas rasite www.CommunityRP.lt > Parama");
+				strcat(string, "Informacijà apie paramà, remëjø privilegijas rasite www.southland.lt > Parama");
 				Dialog_Show(playerid, DialogDonatorAbout, DIALOG_STYLE_MSGBOX, "Remëjo meniu > Informacija", string, "Uþdaryti", "");
 				player_charList_GUIShown[playerid] = true;
 			}
@@ -10204,7 +9971,7 @@ stock User_Register_Show(playerid)
 		string[512];
 	strcat(string, "{adcf70}Sveikas atvykæs á Community roleplay!\n\n\
 		{f9f9f9}Tai yra roleplay tipo serveris, kuriame atkartojama realybë.\n\
-		Jei tokiame serveryje lankotës pirmà kartà, perskaitykite informacijà {a9d659}www.CommunityRP.lt\n");
+		Jei tokiame serveryje lankotës pirmà kartà, perskaitykite informacijà {a9d659}www.southland.lt\n");
 
 	strcat(string, "\nATSIMINKITE: Tai nëra jûsø veikëjas! Tai yra jûsø UCP vartotojas, prie kurio\n\
 		Prisijungus galësite kurti atskirus veikëjus ir juos valdyti!\n");
@@ -10803,7 +10570,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// garsas
 						//if(Audio_IsClientConnected(playerid) == 0)
 						//{
-						//	SendFormat(playerid, 0xEA7F7FFF, "Jûs nenaudojate audio papildinio, kurá rekomenduojame naudoti, þaidþiant mûsø serveryje. Já parsisiøsti galite ið www.CommunityRP.lt");
+						//	SendFormat(playerid, 0xEA7F7FFF, "Jûs nenaudojate audio papildinio, kurá rekomenduojame naudoti, þaidþiant mûsø serveryje. Já parsisiøsti galite ið www.southland.lt");
 						//	return pc_cmd_vradio(playerid, "");
 						//}
 						//else
@@ -30263,7 +30030,7 @@ public AccountLoad(playerid)
 		if(last_version != CODE_VERSION_P)
 		{
 			SendFormat(playerid, 0xF06C38FF, "Serveris buvo atnaujintas nuo to laiko, kai Jûs paskutiná kartà prisijungëte!");
-			SendFormat(playerid, 0xF06C38FF, "Atnaujinimus rasite www.CommunityRP.lt forume. Dabartinë versija: "#CODE_VERSION"");
+			SendFormat(playerid, 0xF06C38FF, "Atnaujinimus rasite www.southland.lt forume. Dabartinë versija: "#CODE_VERSION"");
 			SaveAccountIntEx(playerid, "LastVersion_Server", CODE_VERSION_P);
 		}
 
@@ -31295,7 +31062,7 @@ stock sd_MySQL()
 	if(mysql_errno() != 0)
 	{
 		#if SERVER_DEBUG_LEVEL >= 1
-			print("\n\n[debug] Can't connect to main MySQL database!\n\n");
+			print("\n\n[debug] Can't connect to main MySQL database ("MYSQL_HOSTNAME" at "MYSQL_DATABASE")!\n\n");
 		#endif
 		SendRconCommand("exit");
 		return 0;
@@ -31305,7 +31072,7 @@ stock sd_MySQL()
 	if(mysql_errno() != 0)
 	{
 		#if SERVER_DEBUG_LEVEL >= 1
-			print("\n\n[debug] Can't connect to log MySQL database!\n\n");
+			print("\n\n[debug] Can't connect to log MySQL database ("MYSQL_HOSTNAME" at "MYSQL_DATABASE")!\n\n");
 		#endif
 		SendRconCommand("exit");
 		return 0;
