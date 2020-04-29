@@ -8200,8 +8200,11 @@ public OnPlayerConnect(playerid)
 
 public OnProxyResult(index, result)
 {
-	SendError(index, "Þaidimas su VPN yra draudþiamas.");
-	KickEx(index);
+	if(result == 1)
+	{
+		SendError(index, "Þaidimas su VPN yra draudþiamas.");
+		KickEx(index);
+	}
 }
 
 forward LoginHalt(playerid);
