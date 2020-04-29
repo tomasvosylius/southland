@@ -130,8 +130,9 @@ stock FAC_ResetVariables(playerid)
 #include "timestamp"
 #include "timerfix"
 #include <streamer_td>
-#include "mSelection"
+#include <mSelection>
 #include <screen>
+#include <requests>
 #include <garage_block>
 #include "core/string.pwn"
 #include "core/streamer.pwn"
@@ -4110,6 +4111,9 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules/taxi.pwn"
 #include "modules/trace.pwn"
 #include "modules/paynspray.pwn"
+
+/** Player modules */
+#include "modules\player/proxy.pwn"
 
 main()
 {
@@ -8194,31 +8198,18 @@ public OnPlayerConnect(playerid)
 	return 1;
 }
 
+public OnProxyResult(index, result)
+{
+	SendError(index, "Þaidimas su VPN yra draudþiamas.");
+	KickEx(index);
+}
+
 forward LoginHalt(playerid);
 public LoginHalt(playerid)
 {
 	#if SERVER_DEBUG_LEVEL >= 3
 		printf("[debug] LoginHalt(%s)", GetPlayerNameEx(playerid));
 	#endif
-	new country[56];
-	GetIPCountry(GetPlayerIpEx(playerid), country, 56);
-	/*
-	 * Checkinam, ar gali jungtis is isvis 
-	 */
-	if(!isequal(country, "Lithuania") && !isequal(GetPlayerIpEx(playerid), "127.0.0.1") && !isequal(GetPlayerIpEx(playerid), "Unknown"))
-	{
-		// IP ne master, ne unknown ir ne LT
-		new string[256];
-		mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `server_whitelist` WHERE IP = '%e' OR Name = '%e'", GetPlayerIpEx(playerid), GetPlayerNameEx(playerid));
-		new Cache:result = mysql_query(chandler, string, true);
-		if(!cache_num_rows())
-		{
-			SendFormat(playerid, 0xC43939FF, "Ðiuo IP negalite prisijungti á serverá. (%s, %s)", GetPlayerIpEx(playerid), country);
-			KickEx(playerid);
-		}
-		cache_delete(result);
-	}
-	SendFormat(playerid, 0xBABABAFF, "Jungiatës ið %s IP:%s", country, GetPlayerIpEx(playerid));
 
 	/*
 	 * Tikrinam ar isvis yra toks useris
