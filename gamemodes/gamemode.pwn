@@ -27683,18 +27683,6 @@ stock SetEngineParams(vehicleid, params)
 	return SetVehicleParamsEx(vehicleid, params, lights, alarm, doors, bonnet, boot, objective);
 }
 
-stock StartLoadBar(playerid, type, time)
-{
-	if(LoadBarInfo[playerid][barValue] != 0) return 0;
-	LoadBarInfo[playerid][barType] = type;
-	LoadBarInfo[playerid][barValue] = 0;
-	PlayerTextDrawShow(playerid, LoadBar_Base[playerid]);
-	PlayerTextDrawShow(playerid, LoadBar_LoadFull[playerid]);
-	PlayerTextDrawShow(playerid, LoadBar_Loaded[playerid]);
-	PlayerTextDrawShow(playerid, LoadBar_Text[playerid]);
-	return LoadBarInfo[playerid][barTimer] = SetTimerEx("UpdateLoadBar", time/50, true, "d", playerid);
-}
-
 forward UpdateSpamBar(playerid, type);
 public UpdateSpamBar(playerid, type)
 {
@@ -27715,10 +27703,22 @@ public UpdateSpamBar(playerid, type)
 	return 1;
 }
 
+stock StartLoadBar(playerid, type, time)
+{
+	if(LoadBarInfo[playerid][barValue] != 0) return 0;
+	LoadBarInfo[playerid][barType] = type;
+	LoadBarInfo[playerid][barValue] = 0;
+	PlayerTextDrawShow(playerid, LoadBar_Base[playerid]);
+	PlayerTextDrawShow(playerid, LoadBar_LoadFull[playerid]);
+	PlayerTextDrawShow(playerid, LoadBar_Loaded[playerid]);
+	PlayerTextDrawShow(playerid, LoadBar_Text[playerid]);
+	return LoadBarInfo[playerid][barTimer] = SetTimerEx("UpdateLoadBar", time/10, true, "d", playerid);
+}
+
 forward UpdateLoadBar(playerid);
 public UpdateLoadBar(playerid)
 {
-	LoadBarInfo[playerid][barValue] += 2;
+	LoadBarInfo[playerid][barValue] += 10;
 	PlayerTextDrawHide(playerid, LoadBar_Loaded[playerid]);
 	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], LoadBarInfo[playerid][barValue]*2.65, 3.0);
 	PlayerTextDrawShow(playerid, LoadBar_Loaded[playerid]);
