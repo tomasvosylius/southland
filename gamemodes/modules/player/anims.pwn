@@ -146,7 +146,6 @@ stock ApplyAnimation_Back(playerid, animlib[], animname[], Float:speed, bool:loo
 
 hook OnPlayerSpawnFirstTime(playerid)
 {
-    SendFormat(playerid, -1, "Preloading anims");
     PreloadAnimsForPlayer(playerid);
     return 1;
 }
@@ -169,6 +168,7 @@ stock PreloadAnimsForPlayer(playerid)
 	PreloadAnimLib(playerid,"COACH");
 	PreloadAnimLib(playerid,"COLT45");
 	PreloadAnimLib(playerid,"DANCING");
+	PreloadAnimLib(playerid,"DEALER");
 	PreloadAnimLib(playerid,"DILDO");
 	PreloadAnimLib(playerid,"FAT");
 	PreloadAnimLib(playerid,"FIGHT_B");
@@ -216,7 +216,6 @@ stock PreloadAnimsForPlayer(playerid)
 	PreloadAnimLib(playerid,"BEACH");
 	PreloadAnimLib(playerid,"SMOKING");
 	PreloadAnimLib(playerid,"ON_LOOKERS");
-	PreloadAnimLib(playerid,"DEALER");
 	PreloadAnimLib(playerid,"CRACK");
 	PreloadAnimLib(playerid,"CARRY");
 	PreloadAnimLib(playerid,"COP_AMBIENT");
@@ -227,6 +226,7 @@ stock PreloadAnimsForPlayer(playerid)
 stock PreloadAnimLib(playerid, animlib[])
 {
     ApplyAnimation(playerid, animlib, "null", 0.0, 0, 0, 0, 0, 0);
+	return 1;
 }
 
 /*
