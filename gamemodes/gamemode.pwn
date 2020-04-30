@@ -155,7 +155,7 @@ native gpci(playerid, serial[], len);
 #endif
 #define INVALID_3DTEXT_ID Text3D:0xFFFF
 
-#if SERVER_DEBUG_LEVEL >= 3
+#if SERVER_DEBUG_LEVEL >= 5
 	new STREAMER_TAG_OBJECT __furnitureObjects[1000];
 #endif
 
@@ -4201,6 +4201,7 @@ ptask PT_VehicleSpeedo[200](playerid)
 
 	if((Recalculate_Mileage[playerid] += 1) >= 5)
 	{
+		Recalculate_Mileage[playerid] = 0;
 		/**
 		 * Praejo pilna viena sekunde
 		 */
@@ -26212,6 +26213,7 @@ stock HidePlayerTip(playerid)
 
 stock ShowPlayerTip(playerid, seconds, text[], bool:forceshow = false)
 {
+	#pragma unused text
 	if(PlayerInfo[playerid][pConnection] != CONNECTION_STATE_LOGGED) return 1;
 	if(TextdrawDisabled_Tips{playerid} && !forceshow) return 1;
 	if(PlayerTip[playerid] == 0)
