@@ -4037,6 +4037,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player/proxy.pwn"
 #include "modules\player/ipspam.pwn"
 #include "modules\player\ui/speedo.pwn"
+#include "modules\player\ui/leftbox.pwn"
 
 main()
 {
@@ -23916,6 +23917,7 @@ stock ApplyAnimation_Loop(playerid, animlib[], animname[], Float:speed, bool:loo
 {
 	ApplyAnimation(playerid, animlib, animname, speed, loop, lockx, locky, freeze, time, forcesync);
 	UsingLoopAnim{playerid} = true;
+	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim", .time = 3);
 	return 1;
 }
 
@@ -23923,6 +23925,7 @@ stock ApplyAnimation_Single(playerid, animlib[], animname[], Float:speed, bool:l
 {
 	ApplyAnimation(playerid, animlib, animname, speed, loop, lockx, locky, freeze, time, forcesync);
 	UsingSingleAnim{playerid} = true;
+	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim", .time = 3);
 	return 1;
 }
 
@@ -23930,6 +23933,7 @@ stock ApplyAnimation_Back(playerid, animlib[], animname[], Float:speed, bool:loo
 {
 	ApplyAnimation(playerid, animlib, animname, speed, loop, lockx, locky, freeze, time, forcesync);
 	UsingBackAnim[playerid] = back;
+	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim", .time = 3);
 	return 1;
 }
 
@@ -31959,26 +31963,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				SpamBarTD_Hide(playerid);
 			}
 		}
-		if(UsingSingleAnim{playerid} == true)
-		{
-			ClearAnimations(playerid);
-			UsingSingleAnim{playerid} = false;
-		}
-		else if(UsingLoopAnim{playerid} == true)
-		{
-			StopLoopAnim(playerid);
-		}
-		else if(UsingBackAnim[playerid] != 0)
-		{
-			switch(UsingBackAnim[playerid])
-			{
-				case 1:
-				{
-					ApplyAnimation(playerid,"PED","seat_up",3.0,0,0,0,0,0);
-				}
-			}
-			UsingBackAnim[playerid] = 0;
-		}
 	}
 	return 1;
 }
@@ -33445,6 +33429,31 @@ CMD:saveaccount(playerid, params[])
 {
 	SaveAccount(playerid, true);
 	MsgSuccess(playerid, "Þaidëjas", "Duomenys iðsaugoti.");
+	return 1;
+}
+alias:stopanim("sa");
+CMD:stopanim(playerid, params[])
+{
+	if(UsingSingleAnim{playerid} == true)
+	{
+		ClearAnimations(playerid);
+		UsingSingleAnim{playerid} = false;
+	}
+	else if(UsingLoopAnim{playerid} == true)
+	{
+		StopLoopAnim(playerid);
+	}
+	else if(UsingBackAnim[playerid] != 0)
+	{
+		switch(UsingBackAnim[playerid])
+		{
+			case 1:
+			{
+				ApplyAnimation(playerid,"PED","seat_up",3.0,0,0,0,0,0);
+			}
+		}
+		UsingBackAnim[playerid] = 0;
+	}
 	return 1;
 }
 CMD:stop(playerid, params[])
