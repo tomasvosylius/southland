@@ -105,11 +105,9 @@ stock FAC_ResetVariables(playerid)
 #include <YSI\y_iterate>
 #include <YSI\y_va>
 #include <YSI\y_hooks>
-#include "libraries/macros.pwn"
 #include <YSI\y_inline>
 //#include <YSI\y_dialog>
 #include <easyDialog>
-#include "libraries/als.pwn"
 #include <a_mysql>
 #include <a_mysql_inline>
 #include <sscanf2>
@@ -117,24 +115,26 @@ stock FAC_ResetVariables(playerid)
 #include <md5>
 #include <geolocation>
 #include <strlib>
-//#include <FCNPC>
 #include <zones>
 #include <streamer>
 #include <callbacks>
 #include <arrow>
 #include <evi>
 #include <gvar>
-#include "colandreas"
-//#include "mapandreas"
-// #include "profiler"
-#include "timestamp"
-#include "timerfix"
+#include <colandreas>
+#include <timestamp>
+#include <timerfix>
 #include <streamer_td>
-#include "mSelection"
+#include <mSelection>
 #include <screen>
+#include <requests>
 #include <garage_block>
-#include "core/string.pwn"
-#include "core/streamer.pwn"
+
+#include "libraries/string.pwn"
+#include "libraries/streamer.pwn"
+
+#include "libraries/macros.pwn"
+#include "libraries/als.pwn"
 #include "libraries/debug.pwn"
 #include "libraries/dialog.pwn"
 native WP_Hash(buffer[], len, const str[]);
@@ -263,6 +263,12 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define MAX_GFURNITURE_BRONZE 			100
 #define MAX_GFURNITURE_SILVER 			200
 #define MAX_GFURNITURE_GOLD 			300
+// Donators, remejai
+#define MAX_AFK_TIME_NO_DONATOR			10
+#define MAX_AFK_TIME_SILVER_USER		15	
+#define MAX_AFK_TIME_GOLD_USER			20
+#define TIME_TO_RESET_DONATOR 			2592000 // 30days
+
 // Inventorius
 #define MAX_INVENTORY_SLOTS 				15
 #define MAX_HOUSE_INVENTORY_SLOTS 			15
@@ -291,7 +297,6 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define WARNS_TO_BAN 					3
 #define TIP_EVERY_MINUTE				2 // kas kiek minuciu tip rodomas visiems random
 #define TIME_TO_DELETE_DROPS			18000 // 5val.  	60sec= 1mmin // kas kiek UNIX sec issitrins visi objektai
-#define TIME_TO_RESET_DONATOR 			2592000 // 30days
 #define MINUTES_TO_PAYDAY 				15 // kiek minuciu reik prazaist, kad gautum payday
 #define ADMIN_PERMISSIONS_PER_PAGE		18 // kiek permisionu per page rodyt ( << >> )
 #define MAX_FURNITURE_PER_PAGE 			180
@@ -1110,20 +1115,23 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define reset(%0,%1,%2) 				new _rV_%0[%2];\
 										%1 = _rV_%0
 #define KickEx(%0)						SetTimerEx("Kicker", 100, false, "d", %0)
+/** Server vars **/
+#define SetGVarFloatEx(%0,%1,%2)		SetGVarFloat(%0,%1,%2) , SaveServerFloatEx(%0,%1)
+#define SetGVarIntEx(%0,%1,%2)			SetGVarInt(%0,%1,%2) , SaveServerIntEx(%0,%1)
+/** Chat **/
 #define SendFormat						va_SendClientMessage
 #define SendFormatToAll					va_SendClientMessageToAll
 #define SendUsage(%0,%1)				SendFormat(%0,0xBABABAFF,"Naudojimas: {E4E4E4}"%1)
-#define SendWarning(%0,%1) 				MsgWarning(%0,"PERSPËJIMAS", %1)
-#define SendError(%0,%1)				MsgError(%0,"KLAIDA",%1)
+#define SendWarning(%0,%1) 				MsgWarning(%0,"Perspëjimas", %1)
+#define SendError(%0,%1)				MsgError(%0,"Klaida",%1)
 #define SendCommands(%0,%1)				SendFormat(%0,0xBABABAFF,"Komandos: {E4E4E4}"%1)
-#define SetGVarFloatEx(%0,%1,%2)		SetGVarFloat(%0,%1,%2) , SaveServerFloatEx(%0,%1)
-#define SetGVarIntEx(%0,%1,%2)			SetGVarInt(%0,%1,%2) , SaveServerIntEx(%0,%1)
-#define MsgDefault(%0,%1,%2)			SendFormat(%0,0x2A8AD8FF,"["%1"] {66A8DF}"%2)
-#define MsgSuccess(%0,%1,%2)			SendFormat(%0,0x8BCF16FF,"["%1"] {9ED83A}"%2)
-#define MsgWarning(%0,%1,%2)			SendFormat(%0,0xE46911FF,"["%1"] {E5823B}"%2)
-#define MsgError(%0,%1,%2)				SendFormat(%0,0xDC1515FF,"["%1"] {E23D3D}"%2)
-#define MsgInfo(%0,%1,%2)				SendFormat(%0,0xE4E4E4FF,"["%1"] {DDDDDD}"%2)
-#define MsgImportant(%0,%1,%2)			SendFormat(%0,0xAAD715FF,"["%1"] {C0E055}"%2)
+#define MsgDefault(%0,%1,%2)			SendFormat(%0,0x2A8AD8FF,%1": {66A8DF}"%2)
+#define MsgSuccess(%0,%1,%2)			SendFormat(%0,0x8BCF16FF,%1": {9ED83A}"%2)
+#define MsgWarning(%0,%1,%2)			SendFormat(%0,0xD7864BFF,%1": {E5A170}"%2)
+#define MsgError(%0,%1,%2)				SendFormat(%0,0xD94848FF,%1": {E86F6F}"%2)
+#define MsgInfo(%0,%1,%2)				SendFormat(%0,0xE4E4E4FF,%1": {DDDDDD}"%2)
+#define MsgImportant(%0,%1,%2)			SendFormat(%0,0xB0CF4CFF,%1": {C5DE74}"%2)
+/** Others **/
 #define TOS(%0,%1,%2) 					(%0 ? (%1) : (%2))
 #define ClearChat(%0,%1)				for(new c=0;c<%1;c++) SendClientMessage(%0,-1,"")
 #define mysql_fquery(%0,%1,%2)			mysql_tquery(%0,%1,"sdev__"%2)
@@ -1963,7 +1971,6 @@ new
 	MuteListPM[MAX_PLAYERS][MAX_PLAYERS],
 	//SellVehicleZone,
 	BankPickup,
-	bool:player_DownloadSent[MAX_PLAYERS],
 	Text3D:BankLabel,
 	Text3D:AdLabel,
 	stats_police_calls,
@@ -4074,42 +4081,47 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core\map\willowfield_garage.pwn"
 #include "core\map\idlewood_basket.pwn"
 
-#include "core\map\empty_houses.pwn"
-#include "core\map\misc.pwn"
+// #include "core\map\empty_houses.pwn"
+// #include "core\map\misc.pwn"
 #include "core\map\china.pwn"
 #include "core\map\prison.pwn"
 #include "core\map\government.pwn"
-#include "core\map\ls_bus_station.pwn"
-#include "core\map\corona_small.pwn"
-#include "core\map\corona_big.pwn"
-#include "core\map\ls_dump.pwn"
-#include "core\map\taxi.pwn"
-#include "core\map\park.pwn"
-#include "core\map\mall.pwn"
 #include "core\map\mechanics.pwn"
-#include "core\map\ls_logistics.pwn"
-#include "core\map\lspd.pwn"
-#include "core\map\downtown_parking.pwn"
-#include "core\map\mall_parking.pwn"
 #include "core\map\train_ganton.pwn"
 #include "core\map\train_jefferson.pwn"
-#include "core\map\interiors.pwn"
-#include "core\map\laundry.pwn"
-#include "core\map\prieplauka.pwn"
-#include "core\map\bank.pwn"
-#include "core\map\grove.pwn"
-#include "core\map\dmv_change.pwn"
-#include "core\map\hospital.pwn"
-#include "core\map\deja_vu.pwn"
-#include "core\map\idlewood_park.pwn"
+// #include "core\map\ganghood_details.pwn"
+// #include "core\map\taxi.pwn"
+// #include "core\map\ls_bus_station.pwn"
+// #include "core\map\corona_small.pwn"
+// #include "core\map\corona_big.pwn"
+// #include "core\map\ls_dump.pwn"
+// #include "core\map\park.pwn"
+// #include "core\map\mall.pwn"
+// #include "core\map\ls_logistics.pwn"
+// #include "core\map\lspd.pwn"
+// #include "core\map\downtown_parking.pwn"
+// #include "core\map\mall_parking.pwn"
+// #include "core\map\interiors.pwn"
+// #include "core\map\laundry.pwn"
+// #include "core\map\prieplauka.pwn"
+// #include "core\map\bank.pwn"
+// #include "core\map\grove.pwn"
+// #include "core\map\dmv_change.pwn"
+// #include "core\map\hospital.pwn"
+// #include "core\map\deja_vu.pwn"
+// #include "core\map\idlewood_park.pwn"
 
-#include "modules/graffiti.pwn"
-#include "modules/thief.pwn"
-//#include "modules/gifts.pwn"
-#include "modules/boombox.pwn"
-#include "modules/taxi.pwn"
-#include "modules/trace.pwn"
-#include "modules/paynspray.pwn"
+#include "modules\server/graffiti.pwn"
+#include "modules\server/thief.pwn"
+#include "modules\server/boombox.pwn"
+#include "modules\server/taxi.pwn"
+#include "modules\server/trace.pwn"
+#include "modules\server/paynspray.pwn"
+//#include "modules\server/gifts.pwn"
+
+/** Player modules */
+#include "modules\player/proxy.pwn"
+#include "modules\player/ipspam.pwn"
 
 main()
 {
@@ -8054,41 +8066,6 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 	return 1;
 }
 
-
- 
-#if !defined MAX_JOIN_LOGS
-        #define MAX_JOIN_LOGS (30)
-#endif
- 
-#if !defined MAX_THRESHOLD
-        #define MAX_THRESHOLD (8000) // The amount of time in which all joins are valid and counted
-#endif
- 
-enum e_JoinLog {
-        e_iIP,
-        e_iTimeStamp
-};
- 
-static stock
-        g_eaJoinLog[MAX_JOIN_LOGS][e_JoinLog]
-;
-
-static stock IpToInt(const s_szIP[]) {
-        new
-                aiBytes[1],
-                iPos = 0
-        ;
-        aiBytes{0} = strval(s_szIP[iPos]);
-        while(iPos < 15 && s_szIP[iPos++] != '.') {}
-        aiBytes{1} = strval(s_szIP[iPos]);
-        while(iPos < 15 && s_szIP[iPos++] != '.') {}
-        aiBytes{2} = strval(s_szIP[iPos]);
-        while(iPos < 15 && s_szIP[iPos++] != '.') {}
-        aiBytes{3} = strval(s_szIP[iPos]);
-       
-        return aiBytes[0];
-}
-
 public OnPlayerConnect(playerid)
 {
 	#if SERVER_DEBUG_LEVEL >= 2
@@ -8112,86 +8089,53 @@ public OnPlayerConnect(playerid)
 		}
         return 1;
 	}
- 	static
-            joinIndex,
-            joinArray[16]
-    ;
-    GetPlayerIp(playerid, joinArray, sizeof(joinArray));
-   
-    g_eaJoinLog[joinIndex][e_iIP] = joinArray[0] = IpToInt(joinArray);
-    g_eaJoinLog[joinIndex][e_iTimeStamp] = GetTickCount();
-   
-    joinIndex = ++joinIndex % MAX_JOIN_LOGS;
-   
-    joinArray[1] = joinArray[2] = 0;
-   
-    for(new i = 0; i < (MAX_JOIN_LOGS - 1); ++i) 
-    {
-            if(g_eaJoinLog[i][e_iIP] != joinArray[0]) 
-            {
-                    continue;
-            }
-            joinArray[3] = GetTickCount();
 
-            if(floatround(floatabs(joinArray[3] - g_eaJoinLog[i][e_iTimeStamp])) < MAX_THRESHOLD) 
-            {
-                    if(floatround(floatabs(joinArray[3] - g_eaJoinLog[i + 1][e_iTimeStamp])) < MAX_THRESHOLD) 
-                    {
-                           	joinArray[1] ++;
-                            joinArray[2] += floatround(floatabs(g_eaJoinLog[i][e_iTimeStamp] - g_eaJoinLog[i + 1][e_iTimeStamp]));
-                    }
-            }
-    }
-
-	if(joinArray[1] >= 2 && joinArray[2] <= 8000)
+	SetPlayerColor(playerid, 0xffffffFF);
+	gConnectedPlayers++;
+	ResetData(playerid);
+	ResetPlayerInventory(playerid);
+	ClearChat(playerid, 15);
+	TogglePlayerSpectating(playerid, true);
+	InterpolateCameraPos(playerid, 		2102.66, -1032.10, 133.01, 2265.64, -1543.05, 131.90, 15000, CAMERA_MOVE);
+	InterpolateCameraLookAt(playerid, 	1753.92, -1247.18, 131.90, 1967.84, -1197.94, 33.61, 15000, CAMERA_MOVE);
+	if(!CheckBan(playerid))
 	{
-		printf("%d banned: IP_FLOOD", playerid);
-		BanEx(playerid, "IP_Flood");
-		Kick(playerid);
-		return 1;
-	}
-	else
-	{
-		// onplayerfinisheddownloading
-		player_DownloadSent[playerid] = false;
-		SetPlayerColor(playerid, 0xffffffFF);
-		gConnectedPlayers++;
-		ResetData(playerid);
-		ResetPlayerInventory(playerid);
-		ClearChat(playerid, 15);
-		TogglePlayerSpectating(playerid, true);
-		InterpolateCameraPos(playerid, 		2102.66, -1032.10, 133.01, 2265.64, -1543.05, 131.90, 15000, CAMERA_MOVE);
-		InterpolateCameraLookAt(playerid, 	1753.92, -1247.18, 131.90, 1967.84, -1197.94, 33.61, 15000, CAMERA_MOVE);
-		if(!CheckBan(playerid))
+		if(PlayerInfo[playerid][pConnection] == CONNECTION_STATE_CONNECTED)
 		{
-			if(PlayerInfo[playerid][pConnection] == CONNECTION_STATE_CONNECTED)
-			{
-				KickEx(playerid);
-			}
-			DMV_Create_Player(playerid);
-			FurnitureTd_Create_Player(playerid);
-			TipBox_Create_Player(playerid);
-			LoadBar_Create_Player(playerid);
-			JailTimeTD_Create_Player(playerid);
-			MechTune_Create_Player(playerid);
-			VLTextdraw_Create_Player(playerid);
-			VShop_Create_Player(playerid);
-			WarningTD_Create_Player(playerid);
-			SpamBarTD_Create_Player(playerid);
-			PhoneTD_Create_Player(playerid);
-			JobGuiTD_Create_Player(playerid);
-			InfoBar_Create_Player(playerid);
-			Speedo_Create_Player(playerid);
-			DeathScreen_Create_Player(playerid);
-			MDC_CreatePlayerTextdraws(playerid);
-			PayPhoneTD_Create_Player(playerid);
-			CharListTD_Create_Player(playerid);
-			CharCreateTD_Create_Player(playerid);
-			PreparePlayerData(playerid);
-			SetTimerEx("LoginHalt", 3000, false, "d", playerid); // reikia palaukt, kol viska surenkam tada siunciam tquery viduje
+			KickEx(playerid);
 		}
+		DMV_Create_Player(playerid);
+		FurnitureTd_Create_Player(playerid);
+		TipBox_Create_Player(playerid);
+		LoadBar_Create_Player(playerid);
+		JailTimeTD_Create_Player(playerid);
+		MechTune_Create_Player(playerid);
+		VLTextdraw_Create_Player(playerid);
+		VShop_Create_Player(playerid);
+		WarningTD_Create_Player(playerid);
+		SpamBarTD_Create_Player(playerid);
+		PhoneTD_Create_Player(playerid);
+		JobGuiTD_Create_Player(playerid);
+		InfoBar_Create_Player(playerid);
+		Speedo_Create_Player(playerid);
+		DeathScreen_Create_Player(playerid);
+		MDC_CreatePlayerTextdraws(playerid);
+		PayPhoneTD_Create_Player(playerid);
+		CharListTD_Create_Player(playerid);
+		CharCreateTD_Create_Player(playerid);
+		PreparePlayerData(playerid);
+		SetTimerEx("LoginHalt", 3000, false, "d", playerid); // reikia palaukt, kol viska surenkam tada siunciam tquery viduje
 	}
 	return 1;
+}
+
+hook OnProxyResult(index, result)
+{
+	if(result == 1)
+	{
+		SendError(index, "Þaidimas su VPN yra draudþiamas.");
+		KickEx(index);
+	}
 }
 
 forward LoginHalt(playerid);
@@ -8200,16 +8144,22 @@ public LoginHalt(playerid)
 	#if SERVER_DEBUG_LEVEL >= 3
 		printf("[debug] LoginHalt(%s)", GetPlayerNameEx(playerid));
 	#endif
+
 	new country[56];
 	GetIPCountry(GetPlayerIpEx(playerid), country, 56);
 	/*
 	 * Checkinam, ar gali jungtis is isvis 
 	 */
-	if(!isequal(country, "Lithuania") && !isequal(GetPlayerIpEx(playerid), "127.0.0.1") && !isequal(GetPlayerIpEx(playerid), "Unknown"))
+	if(	!isequal(country, "Lithuania") && 
+		!isequal(GetPlayerIpEx(playerid), "127.0.0.1") &&
+		!isequal(GetPlayerIpEx(playerid), "Unknown"))
 	{
 		// IP ne master, ne unknown ir ne LT
 		new string[256];
-		mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `server_whitelist` WHERE IP = '%e' OR Name = '%e'", GetPlayerIpEx(playerid), GetPlayerNameEx(playerid));
+		mysql_format(chandler, string, sizeof string, "\
+			SELECT NULL FROM `server_whitelist` WHERE IP = '%e' OR Name = '%e' OR Country = '%e'",
+			GetPlayerIpEx(playerid), GetPlayerNameEx(playerid), country);
+
 		new Cache:result = mysql_query(chandler, string, true);
 		if(!cache_num_rows())
 		{
@@ -26596,6 +26546,17 @@ stock ShowVehicleList(playerid, ...)
 	SelectTextDraw(playerid, 0xDBDBDBFF);
 }
 
+stock IsAdminGroupExisting(sqlid)
+{
+	foreach(new groupid : Group)
+	{
+		if(GroupsInfo[groupid][groupId] == sqlid)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
 stock GetGroupName(sqlid, bool:bysql = true)
 {
@@ -31078,7 +31039,7 @@ stock sd_MySQL()
 		return 0;
 	}
 	call OnMysqlEstablished();
-	mysql_log(ERROR | WARNING);
+	mysql_log(ERROR);
 	return 1;
 }
 
@@ -33579,6 +33540,7 @@ CMD:pickupdrugs(playerid, params[])
 CMD:saveaccount(playerid, params[])
 {
 	SaveAccount(playerid, true);
+	MsgSuccess(playerid, "Þaidëjas", "Duomenys iðsaugoti.");
 	return 1;
 }
 CMD:stop(playerid, params[])
@@ -34087,7 +34049,6 @@ stock Admin_NewChars_ShowMain(playerid)
 	Dialog_Show(playerid, DialogAdminNewCharsMain, DIALOG_STYLE_LIST, "Nepatvirtinti veikëjai", dialog_GetBody(), "Tæsti", "Atðaukti");
 	return 1;
 }
-
 Dialog:DialogAdminNewCharsMain(playerid, response, listitem, inputtext[])
 {
 	if(response)
@@ -34102,10 +34063,18 @@ Dialog:DialogAdminNewCharsMain(playerid, response, listitem, inputtext[])
 
 stock Admin_NewChars_ShowList(playerid)
 {
-	mysql_tquery(chandler, "SELECT players_new.id pid,players_new.Date,players_new.Name pname,players_new.Reviewed,users_data.Name uname,users_data.id uid FROM players_new INNER JOIN users_data ON users_data.id = players_new.UserId AND players_new.Status = '0' ORDER BY players_new.Date DESC", "AdminNewCharsLoad", "d", playerid);
+	mysql_tquery(chandler, "\
+		SELECT players_new.id pid,players_new.Date,players_new.Name pname,players_new.Reviewed,users_data.Name uname,users_data.id uid \
+		FROM players_new INNER JOIN users_data \
+		ON users_data.id = players_new.UserId AND players_new.Status = '0' \
+		ORDER BY players_new.Date DESC", "AdminNewCharsLoad", "d", playerid);
 	return 1;
 }
 
+/*
+	================================================================================================
+	Uzkrauname visa lista.
+*/
 forward AdminNewCharsLoad(playerid);
 public AdminNewCharsLoad(playerid)
 {
@@ -34134,12 +34103,11 @@ public AdminNewCharsLoad(playerid)
 			format(string, sizeof string, "%s%d. %s [%d]\t%s [%d]\t%s\n", string, i + 1, pname, pid, uname, uid, aname);
 		}
 	}
-	else format(string, sizeof string, "Nepatvirtintø veikëjø nëra");
+	else format(string, sizeof string, "Nepatvirtintø veikëjø nëra\nNëra");
 
 	Dialog_Show(playerid, DialogAdminNewCharsList, DIALOG_STYLE_TABLIST_HEADERS, "Nepatvirtinti veikëjai", string, "Tæsti", "Atðaukti");
 	return 1;
 }
-
 Dialog:DialogAdminNewCharsList(playerid, response, listitem, inputtext[])
 {
 	if(response)
@@ -34150,17 +34118,21 @@ Dialog:DialogAdminNewCharsList(playerid, response, listitem, inputtext[])
 	return 1;
 }
 
+/*
+	================================================================================================
+	Pasirinkto veikejo informacija uzkrauname:
+*/
 stock Admin_NewChars_ShowDetails(playerid, listitem)
 {
 	new 
 		string[1024];
 
-	mysql_format(chandler, string, 126, "SELECT id,Answer1,Answer2,Answer3,Name,Date,UserId FROM `players_new` WHERE Status = '0' ORDER BY Date DESC LIMIT 1 OFFSET %d", listitem);
+	mysql_format(chandler, string, 256, "\
+		SELECT id,Answer1,Answer2,Answer3,Name,Date,UserId FROM `players_new` \
+		WHERE Status = '0' ORDER BY Date DESC LIMIT 1 OFFSET %d", listitem);
 	mysql_tquery(chandler, string, "ShowNewChars", "d", playerid);
 	return 1;
 }
-thread(NewCharUpdate);
-
 forward ShowNewChars(playerid);
 public ShowNewChars(playerid)
 {
@@ -34182,12 +34154,16 @@ public ShowNewChars(playerid)
 		mysql_fquery(chandler, string, "NewCharUpdate");
 
 		format(string, sizeof string, "Veikëjo vardas: %s\nData: %s\nVartotojas: %s\n\n1. %s\n%s\n\n2. %s\n%s\n\n3. %s\n%s", 
-			name, date, GetUserNameById(player_NewCharUserId[playerid]), NewCharQuestions[0][ncq_Lt], Dialog_PrepareAnswer(answer1), NewCharQuestions[1][ncq_Lt], Dialog_PrepareAnswer(answer2), NewCharQuestions[2][ncq_Lt], Dialog_PrepareAnswer(answer3));
+			name, date, GetUserNameById(player_NewCharUserId[playerid]),
+			NewCharQuestions[0][ncq_Lt], Dialog_PrepareAnswer(answer1),
+			NewCharQuestions[1][ncq_Lt], Dialog_PrepareAnswer(answer2), 
+			NewCharQuestions[2][ncq_Lt], Dialog_PrepareAnswer(answer3));
 
 		Dialog_Show(playerid, DialogAdminNewCharDetail, DIALOG_STYLE_MSGBOX, "Naujo veikëjo patvirtinimas", string, "Priimti", "Atmesti");
 	}
 	else Admin_NewChars_ShowMain(playerid);
 }
+thread(NewCharUpdate);
 
 Dialog:DialogAdminNewCharDetail(playerid, response, listitem, inputtext[])
 {
@@ -34283,8 +34259,6 @@ hook OnCharAccepted(charid, charuserid, adminid)
 			break;
 		}
 	}
-	/*mysql_format(chandler, string, sizeof string, "UPDATE `players_new` SET Status = '%d' WHERE id = '%d'", (playerid == INVALID_PLAYER_ID ? 1 : 3), charid);
-	mysql_fquery(chandler, string, "NewCharUpdate");*/
 
 	mysql_format(chandler, string, sizeof string, "UPDATE `players_new` SET Status = '%d', AdminId = '%d' WHERE id = '%d'", (playerid == INVALID_PLAYER_ID ? 1 : 3), PlayerInfo[adminid][pUserId], charid);
 	mysql_tquery(chandler, string, "CharAcceptUpdate", "dd", charid, playerid);
@@ -34945,6 +34919,7 @@ CMD:setgroup(playerid, params[])
 	new groupsql, receiverid;
 	if(sscanf(params,"ud",receiverid,groupsql)) return SendUsage(playerid, "/setgroup [þaidëjas] [grupës MySQL ID (/groupslist)]");
 	if(IsPlayerNPC(receiverid)) return InfoBox(playerid, IB_WRONG_PLAYER);
+	if(!IsAdminGroupExisting(groupsql)) return SendError(playerid, "Tokios grupës(%d) nëra. Patikrinkite /groupslist", groupsql);
 	if(IsPlayerInAdminGroup(receiverid, groupsql)) return SendWarning(playerid, "Þaidëjas jau yra ðioje grupëje.");
 	for(new i = 0; i < MAX_PLAYER_GROUPS; i++)
 	{
@@ -38736,38 +38711,37 @@ CMD:inventory(playerid, params[])
 CMD:invweapon(playerid, params[])
 {
 	new weaponid = GetPlayerWeapon(playerid);
-	if(IsPlayerInAnyVehicle(playerid)) return SendWarning(playerid, "Negalite padëti ginklo tr. priemonëje.");
-	if(weaponid != 0)
+	// if(IsPlayerInAnyVehicle(playerid)) return SendWarning(playerid, "Negalite padëti ginklo tr. priemonëje.");
+	if(weaponid == 0) return SendError(playerid, "Neturite ginklo rankose.");
+
+	sd_CheckWeaponCheat(playerid, weaponid, false);
+	new wepslot = sd_GetWeaponSlot(weaponid);
+	if(sd_GetWeaponType(playerid, weaponid) == WEAPON_GIVE_TYPE_NO_INVENTORY)
 	{
-		sd_CheckWeaponCheat(playerid, weaponid, false);
-		new wepslot = sd_GetWeaponSlot(weaponid);
-		if(sd_GetWeaponType(playerid, weaponid) == WEAPON_GIVE_TYPE_NO_INVENTORY)
+		SendWarning(playerid, "Ðio ginklo pasidëti á inventoriø negalima.");
+		return 1;
+	}
+	if(sd_CheckIfSlotUsed(playerid, wepslot))
+	{
+		new slot = GetPlayerFreeInventorySlot(playerid);
+		if(slot != -1)
 		{
-			SendWarning(playerid, "Ðio ginklo pasidëti á inventoriø negalima.");
-			return 1;
+			new unused, ammo;
+			sd_GetPlayerWeaponData(playerid, wepslot, unused, ammo);
+			GivePlayerInventoryItem(playerid, weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid), .slotid = slot);
+
+			log_init(true);
+			log_set_table("logs_inventory");
+			log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
+			log_set_values("'%d','%e','-1','Padejo ginkla i inventoriu','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid));
+			log_push();
+
+			sd_ClearWeaponSlot(playerid, wepslot);
+			SendFormat(playerid, 0xBABABAFF, "Ginklas padëtas á inventoriø.");
 		}
-		if(sd_CheckIfSlotUsed(playerid, wepslot))
+		else
 		{
-			new slot = GetPlayerFreeInventorySlot(playerid);
-			if(slot != -1)
-			{
-				new unused, ammo;
-				sd_GetPlayerWeaponData(playerid, wepslot, unused, ammo);
-				GivePlayerInventoryItem(playerid, weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid), .slotid = slot);
-
-				log_init(true);
-				log_set_table("logs_inventory");
-				log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
-				log_set_values("'%d','%e','-1','Padejo ginkla i inventoriu','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid));
-				log_push();
-
-				sd_ClearWeaponSlot(playerid, wepslot);
-				SendFormat(playerid, 0xBABABAFF, "Ginklas padëtas á inventoriø.");
-			}
-			else
-			{
-				SendWarning(playerid, "Nëra vietos inventoriuje.");
-			}
+			SendWarning(playerid, "Nëra vietos inventoriuje.");
 		}
 	}
 	return 1;

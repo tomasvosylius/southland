@@ -1,2 +1,4 @@
 gamemodes/gamemode.amx
 server_log.txt
+logs/errors.log
+logs/warnings.log

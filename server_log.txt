@@ -7,199 +7,472 @@ SA-MP Dedicated Server
 ----------------------
 v0.3.7-R2, (C)2005-2015 SA-MP Team
 
-[21:54:51] filterscripts = ""  (string)
-[2020/04/29 21:54:51] 
-[2020/04/29 21:54:51] Server Plugins
-[2020/04/29 21:54:51] --------------
-[2020/04/29 21:54:51]  Loading plugin: crashdetect
-[2020/04/29 21:54:51]   CrashDetect v4.18.1 is OK.
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: profiler
-[2020/04/29 21:54:51]   Profiler v2.13 is OK.
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: filemanager
-[2020/04/29 21:54:51] ******************
-[2020/04/29 21:54:51] ** FILE MANAGER **
-[2020/04/29 21:54:51] **    Loaded    **
-[2020/04/29 21:54:51] ** Version 1.4 **
-[2020/04/29 21:54:51] ******************
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: mysql
-[2020/04/29 21:54:51]  >> plugin.mysql: R41-4 successfully loaded.
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: streamer
-[2020/04/29 21:54:51] 
+[23:56:27] filterscripts = ""  (string)
+[2020/04/29 23:56:27] 
+[2020/04/29 23:56:27] Server Plugins
+[2020/04/29 23:56:27] --------------
+[2020/04/29 23:56:27]  Loading plugin: crashdetect
+[2020/04/29 23:56:27]   CrashDetect v4.18.1 is OK.
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: profiler
+[2020/04/29 23:56:27]   Profiler v2.13 is OK.
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: filemanager
+[2020/04/29 23:56:27] ******************
+[2020/04/29 23:56:27] ** FILE MANAGER **
+[2020/04/29 23:56:27] **    Loaded    **
+[2020/04/29 23:56:27] ** Version 1.4 **
+[2020/04/29 23:56:27] ******************
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: mysql
+[2020/04/29 23:56:27]  >> plugin.mysql: R41-4 successfully loaded.
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: streamer
+[2020/04/29 23:56:27] 
 
 *** Streamer Plugin v2.9.2 by Incognito loaded ***
 
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: sscanf
-[2020/04/29 21:54:51] 
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: sscanf
+[2020/04/29 23:56:27] 
 
-[2020/04/29 21:54:51]  ===============================
+[2020/04/29 23:56:27]  ===============================
 
-[2020/04/29 21:54:51]       sscanf plugin loaded.     
+[2020/04/29 23:56:27]       sscanf plugin loaded.     
 
-[2020/04/29 21:54:51]          Version:  2.8.2        
+[2020/04/29 23:56:27]          Version:  2.8.2        
 
-[2020/04/29 21:54:51]    (c) 2012 Alex "Y_Less" Cole  
+[2020/04/29 23:56:27]    (c) 2012 Alex "Y_Less" Cole  
 
-[2020/04/29 21:54:51]  ===============================
+[2020/04/29 23:56:27]  ===============================
 
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: Whirlpool
-[2020/04/29 21:54:51]  
-[2020/04/29 21:54:51]  ==================
-[2020/04/29 21:54:51]  
-[2020/04/29 21:54:51]   Whirlpool loaded
-[2020/04/29 21:54:51]  
-[2020/04/29 21:54:51]  ==================
-[2020/04/29 21:54:51]  
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: timerfix
-[2020/04/29 21:54:51]   >> TimerFix v1.5 successfully loaded.
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: gvar
-[2020/04/29 21:54:51] 
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: Whirlpool
+[2020/04/29 23:56:27]  
+[2020/04/29 23:56:27]  ==================
+[2020/04/29 23:56:27]  
+[2020/04/29 23:56:27]   Whirlpool loaded
+[2020/04/29 23:56:27]  
+[2020/04/29 23:56:27]  ==================
+[2020/04/29 23:56:27]  
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: timerfix
+[2020/04/29 23:56:27]   >> TimerFix v1.5 successfully loaded.
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: gvar
+[2020/04/29 23:56:27] 
 
 *** GVar Plugin v1.3 by Incognito loaded ***
 
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: pawncmd
-[2020/04/29 21:54:51] Pawn.CMD plugin v3.1.4 by urShadow loaded
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: audio
-[2020/04/29 21:54:51] 
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: pawncmd
+[2020/04/29 23:56:27] Pawn.CMD plugin v3.1.4 by urShadow loaded
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: audio
+[2020/04/29 23:56:27] 
 
 *** Audio Plugin v0.5 R2 by Incognito loaded ***
 
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: FCNPC
-[2020/04/29 21:54:51] 
-[2020/04/29 21:54:51] -------------------------------------------------
-[2020/04/29 21:54:51]      FCNPC - Fully Controllable NPC v1.1.2
-[2020/04/29 21:54:51]            Windows 0.3.7 R2-1
-[2020/04/29 21:54:51]           Aug  3 2016 at 12:01:36
-[2020/04/29 21:54:51] 
-[2020/04/29 21:54:51]   Author:       OrMisicL (2013 - 2015)
-[2020/04/29 21:54:51]   Continued by: ziggi (2016 - present)
-[2020/04/29 21:54:51]   Contributors: kurta999, Neutralneu
-[2020/04/29 21:54:51] -------------------------------------------------
-[2020/04/29 21:54:51] 
-[2020/04/29 21:54:51] Loading...
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loading plugin: ColAndreas
-[2020/04/29 21:54:51] *********************
-[2020/04/29 21:54:51] ** Created By:     **
-[2020/04/29 21:54:51] ** [uL]Chris42O    **
-[2020/04/29 21:54:51] ** [uL]Slice       **
-[2020/04/29 21:54:51] ** [uL]Pottus      **
-[2020/04/29 21:54:51] *********************
-[2020/04/29 21:54:51] No collision data found.
-[2020/04/29 21:54:51] *********************
-[2020/04/29 21:54:51]   ColAndreas Loaded
-[2020/04/29 21:54:51]    v1.3.0
-[2020/04/29 21:54:51] *********************
-[2020/04/29 21:54:51]   Loaded.
-[2020/04/29 21:54:51]  Loaded 13 plugins.
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: FCNPC
+[2020/04/29 23:56:27] 
+[2020/04/29 23:56:27] -------------------------------------------------
+[2020/04/29 23:56:27]      FCNPC - Fully Controllable NPC v1.1.2
+[2020/04/29 23:56:27]            Windows 0.3.7 R2-1
+[2020/04/29 23:56:27]           Aug  3 2016 at 12:01:36
+[2020/04/29 23:56:27] 
+[2020/04/29 23:56:27]   Author:       OrMisicL (2013 - 2015)
+[2020/04/29 23:56:27]   Continued by: ziggi (2016 - present)
+[2020/04/29 23:56:27]   Contributors: kurta999, Neutralneu
+[2020/04/29 23:56:27] -------------------------------------------------
+[2020/04/29 23:56:27] 
+[2020/04/29 23:56:27] Loading...
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: ColAndreas
+[2020/04/29 23:56:27] *********************
+[2020/04/29 23:56:27] ** Created By:     **
+[2020/04/29 23:56:27] ** [uL]Chris42O    **
+[2020/04/29 23:56:27] ** [uL]Slice       **
+[2020/04/29 23:56:27] ** [uL]Pottus      **
+[2020/04/29 23:56:27] *********************
+[2020/04/29 23:56:27] No collision data found.
+[2020/04/29 23:56:27] *********************
+[2020/04/29 23:56:27]   ColAndreas Loaded
+[2020/04/29 23:56:27]    v1.3.0
+[2020/04/29 23:56:27] *********************
+[2020/04/29 23:56:27]   Loaded.
+[2020/04/29 23:56:27]  Loading plugin: requests
+[2020/04/29 23:56:27]   Failed.
+[2020/04/29 23:56:27]  Loaded 13 plugins.
 
-[2020/04/29 21:54:51] 
-[2020/04/29 21:54:51] Filterscripts
-[2020/04/29 21:54:51] ---------------
-[2020/04/29 21:54:51]   Loaded 0 filterscripts.
+[2020/04/29 23:56:27] 
+[2020/04/29 23:56:27] Filterscripts
+[2020/04/29 23:56:27] ---------------
+[2020/04/29 23:56:27]   Loaded 0 filterscripts.
 
-[2020/04/29 21:54:51]  
-[2020/04/29 21:54:51]  
-[2020/04/29 21:54:51]  
-[2020/04/29 21:54:51]  ======================================= 
-[2020/04/29 21:54:51]  |                                     | 
-[2020/04/29 21:54:51]  |        YSI version 4.00.0001        | 
-[2020/04/29 21:54:51]  |        By Alex "Y_Less" Cole        | 
-[2020/04/29 21:54:51]  |                                     | 
-[2020/04/29 21:54:51]  ======================================= 
-[2020/04/29 21:54:51]  
-[2020/04/29 21:55:14] [debug] Taxi module enabled
-[2020/04/29 21:55:14] Hash 05535C21
-[2020/04/29 21:55:14] 
-
-[debug] Can't connect to main MySQL database!
-
-
-[2020/04/29 21:55:14] [0]: (3037) 0, 9514, 711_sfw, sw_sheddoor2
-[2020/04/29 21:55:14] [0]: Setting 1txd
-[2020/04/29 21:55:14] [1]: (968) 0, 0, , 
-[2020/04/29 21:55:14] [2]: (968) 0, 0, , 
-[2020/04/29 21:55:14] [3]: (3055) 0, 0, , 
-[2020/04/29 21:55:14] [4]: (3089) 1, 5774, garag3_lawn, bluestucco1
-[2020/04/29 21:55:14] [4]: Setting 1txd
-[2020/04/29 21:55:14] [4]: Setting 2txd
-[2020/04/29 21:55:14] [5]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [6]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [7]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [8]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [9]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [10]: (19302) 0, 0, , 
-[2020/04/29 21:55:14] [11]: (3089) 1, 1675, wshxrefhse, greygreensubuild_128
-[2020/04/29 21:55:14] [11]: Setting 1txd
-[2020/04/29 21:55:14] [11]: Setting 2txd
-[2020/04/29 21:55:14] [12]: (3089) 1, 1675, wshxrefhse, greygreensubuild_128
-[2020/04/29 21:55:14] [12]: Setting 1txd
-[2020/04/29 21:55:14] [12]: Setting 2txd
-[2020/04/29 21:55:14] [13]: (19795) 0, 0, , 
-[2020/04/29 21:55:14] [14]: (19795) 0, 0, , 
-[2020/04/29 21:55:14] [15]: (19795) 0, 0, , 
-[2020/04/29 21:55:14] [16]: (19795) 0, 0, , 
-[2020/04/29 21:55:14] [17]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [18]: (19302) 0, 0, , 
-[2020/04/29 21:55:14] [19]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [20]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [21]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [22]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [23]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [24]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] [25]: (1495) 0, 0, , 
-[2020/04/29 21:55:14] Adding custom models..
-[2020/04/29 21:55:14]  ===================================================
-[2020/04/29 21:55:14] |     Modifikacija programavo: Tomas Vosylius      |
-[2020/04/29 21:55:14] |  	  Skirta CommunityRP.lt projektui 		   |
-[2020/04/29 21:55:14]  ===================================================
-[2020/04/29 21:55:14] Number of vehicle models: 0
-[2020/04/29 21:55:14] --- Server Shutting Down.
-[2020/04/29 21:55:14] plugin.mysql: Unloading plugin...
-[2020/04/29 21:55:14] plugin.mysql: Plugin unloaded.
-[2020/04/29 21:55:14] 
-
-*** Streamer Plugin v2.9.2 by Incognito unloaded ***
-
-[2020/04/29 21:55:14] 
-
-[2020/04/29 21:55:14]  ===============================
-
-[2020/04/29 21:55:14]      sscanf plugin unloaded.    
-
-[2020/04/29 21:55:14]  ===============================
-
-[2020/04/29 21:55:14]  
-[2020/04/29 21:55:14]  ====================
-[2020/04/29 21:55:14]  
-[2020/04/29 21:55:14]   Whirlpool unloaded
-[2020/04/29 21:55:14]  
-[2020/04/29 21:55:14]  ====================
-[2020/04/29 21:55:14]  
-[2020/04/29 21:55:14] [plugin.timerfix] Plugsin successfully unloaded!
-[2020/04/29 21:55:14] 
-
-*** GVar Plugin v1.3 by Incognito unloaded ***
-
-[2020/04/29 21:55:14] Pawn.CMD plugin v3.1.4 by urShadow unloaded
-[2020/04/29 21:55:14] 
-
-*** Audio Plugin v0.5 R2 by Incognito unloaded ***
-
-[2020/04/29 21:55:14] FCNPC Unloaded.
-[2020/04/29 21:55:14] *********************
-[2020/04/29 21:55:14] *ColAndreas Unloaded*
-[2020/04/29 21:55:14] *********************
+[2020/04/29 23:56:27] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:27] [debug]  RequestsClient
+[2020/04/29 23:56:27] [debug]  RequestHeaders
+[2020/04/29 23:56:27] [debug]  Request
+[2020/04/29 23:56:27] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:27] [debug]  RequestsClient
+[2020/04/29 23:56:27] [debug]  RequestHeaders
+[2020/04/29 23:56:27] [debug]  Request
+[2020/04/29 23:56:27] Script[gamemodes/gamemode.amx]: Run time error 19: "File or function is not found"
+[2020/04/29 23:56:27] Number of vehicle models: 0
+[2020/04/29 23:56:27] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:27] [debug]  RequestsClient
+[2020/04/29 23:56:27] [debug]  RequestHeaders
+[2020/04/29 23:56:27] [debug]  Request
+[2020/04/29 23:56:27] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:27] [debug]  RequestsClient
+[2020/04/29 23:56:27] [debug]  RequestHeaders
+[2020/04/29 23:56:27] [debug]  Request
+[2020/04/29 23:56:27] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:27] [debug]  RequestsClient
+[2020/04/29 23:56:27] [debug]  RequestHeaders
+[2020/04/29 23:56:27] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
+[2020/04/29 23:56:28] [debug]  RequestHeaders
+[2020/04/29 23:56:28] [debug]  Request
+[2020/04/29 23:56:28] [sampgdk:error] Too many callback arguments (at most 32 allowed)
+[2020/04/29 23:56:28] [debug] Run time error 19: "File or function is not found"
+[2020/04/29 23:56:28] [debug]  RequestsClient
 
 ----------
 Loaded log file: "server_log.txt".
@@ -209,1178 +482,815 @@ SA-MP Dedicated Server
 ----------------------
 v0.3.7-R2, (C)2005-2015 SA-MP Team
 
-[21:55:34] filterscripts = ""  (string)
-[2020/04/29 21:55:34] 
-[2020/04/29 21:55:34] Server Plugins
-[2020/04/29 21:55:34] --------------
-[2020/04/29 21:55:34]  Loading plugin: crashdetect
-[2020/04/29 21:55:34]   CrashDetect v4.18.1 is OK.
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: profiler
-[2020/04/29 21:55:34]   Profiler v2.13 is OK.
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: filemanager
-[2020/04/29 21:55:34] ******************
-[2020/04/29 21:55:34] ** FILE MANAGER **
-[2020/04/29 21:55:34] **    Loaded    **
-[2020/04/29 21:55:34] ** Version 1.4 **
-[2020/04/29 21:55:34] ******************
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: mysql
-[2020/04/29 21:55:34]  >> plugin.mysql: R41-4 successfully loaded.
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: streamer
-[2020/04/29 21:55:34] 
+[23:57:40] filterscripts = ""  (string)
+[2020/04/29 23:57:40] 
+[2020/04/29 23:57:40] Server Plugins
+[2020/04/29 23:57:40] --------------
+[2020/04/29 23:57:40]  Loading plugin: crashdetect
+[2020/04/29 23:57:40]   CrashDetect v4.18.1 is OK.
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: profiler
+[2020/04/29 23:57:40]   Profiler v2.13 is OK.
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: filemanager
+[2020/04/29 23:57:40] ******************
+[2020/04/29 23:57:40] ** FILE MANAGER **
+[2020/04/29 23:57:40] **    Loaded    **
+[2020/04/29 23:57:40] ** Version 1.4 **
+[2020/04/29 23:57:40] ******************
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: mysql
+[2020/04/29 23:57:40]  >> plugin.mysql: R41-4 successfully loaded.
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: streamer
+[2020/04/29 23:57:40] 
 
 *** Streamer Plugin v2.9.2 by Incognito loaded ***
 
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: sscanf
-[2020/04/29 21:55:34] 
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: sscanf
+[2020/04/29 23:57:40] 
 
-[2020/04/29 21:55:34]  ===============================
+[2020/04/29 23:57:40]  ===============================
 
-[2020/04/29 21:55:34]       sscanf plugin loaded.     
+[2020/04/29 23:57:40]       sscanf plugin loaded.     
 
-[2020/04/29 21:55:34]          Version:  2.8.2        
+[2020/04/29 23:57:40]          Version:  2.8.2        
 
-[2020/04/29 21:55:34]    (c) 2012 Alex "Y_Less" Cole  
+[2020/04/29 23:57:40]    (c) 2012 Alex "Y_Less" Cole  
 
-[2020/04/29 21:55:34]  ===============================
+[2020/04/29 23:57:40]  ===============================
 
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: Whirlpool
-[2020/04/29 21:55:34]  
-[2020/04/29 21:55:34]  ==================
-[2020/04/29 21:55:34]  
-[2020/04/29 21:55:34]   Whirlpool loaded
-[2020/04/29 21:55:34]  
-[2020/04/29 21:55:34]  ==================
-[2020/04/29 21:55:34]  
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: timerfix
-[2020/04/29 21:55:34]   >> TimerFix v1.5 successfully loaded.
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: gvar
-[2020/04/29 21:55:34] 
-
-*** GVar Plugin v1.3 by Incognito loaded ***
-
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: pawncmd
-[2020/04/29 21:55:34] Pawn.CMD plugin v3.1.4 by urShadow loaded
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: audio
-[2020/04/29 21:55:34] 
-
-*** Audio Plugin v0.5 R2 by Incognito loaded ***
-
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: FCNPC
-[2020/04/29 21:55:34] 
-[2020/04/29 21:55:34] -------------------------------------------------
-[2020/04/29 21:55:34]      FCNPC - Fully Controllable NPC v1.1.2
-[2020/04/29 21:55:34]            Windows 0.3.7 R2-1
-[2020/04/29 21:55:34]           Aug  3 2016 at 12:01:36
-[2020/04/29 21:55:34] 
-[2020/04/29 21:55:34]   Author:       OrMisicL (2013 - 2015)
-[2020/04/29 21:55:34]   Continued by: ziggi (2016 - present)
-[2020/04/29 21:55:34]   Contributors: kurta999, Neutralneu
-[2020/04/29 21:55:34] -------------------------------------------------
-[2020/04/29 21:55:34] 
-[2020/04/29 21:55:34] Loading...
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loading plugin: ColAndreas
-[2020/04/29 21:55:34] *********************
-[2020/04/29 21:55:34] ** Created By:     **
-[2020/04/29 21:55:34] ** [uL]Chris42O    **
-[2020/04/29 21:55:34] ** [uL]Slice       **
-[2020/04/29 21:55:34] ** [uL]Pottus      **
-[2020/04/29 21:55:34] *********************
-[2020/04/29 21:55:34] No collision data found.
-[2020/04/29 21:55:34] *********************
-[2020/04/29 21:55:34]   ColAndreas Loaded
-[2020/04/29 21:55:34]    v1.3.0
-[2020/04/29 21:55:34] *********************
-[2020/04/29 21:55:34]   Loaded.
-[2020/04/29 21:55:34]  Loaded 13 plugins.
-
-[2020/04/29 21:55:34] 
-[2020/04/29 21:55:34] Filterscripts
-[2020/04/29 21:55:34] ---------------
-[2020/04/29 21:55:34]   Loaded 0 filterscripts.
-
-[2020/04/29 21:55:35]  
-[2020/04/29 21:55:35]  
-[2020/04/29 21:55:35]  
-[2020/04/29 21:55:35]  ======================================= 
-[2020/04/29 21:55:35]  |                                     | 
-[2020/04/29 21:55:35]  |        YSI version 4.00.0001        | 
-[2020/04/29 21:55:35]  |        By Alex "Y_Less" Cole        | 
-[2020/04/29 21:55:35]  |                                     | 
-[2020/04/29 21:55:35]  ======================================= 
-[2020/04/29 21:55:35]  
-[2020/04/29 21:55:56] [debug] Taxi module enabled
-[2020/04/29 21:55:56] Hash 05535C21
-[2020/04/29 21:55:56] 
-
-[debug] Can't connect to main MySQL database!
-
-
-[2020/04/29 21:55:57] [0]: (3037) 0, 9514, 711_sfw, sw_sheddoor2
-[2020/04/29 21:55:57] [0]: Setting 1txd
-[2020/04/29 21:55:57] [1]: (968) 0, 0, , 
-[2020/04/29 21:55:57] [2]: (968) 0, 0, , 
-[2020/04/29 21:55:57] [3]: (3055) 0, 0, , 
-[2020/04/29 21:55:57] [4]: (3089) 1, 5774, garag3_lawn, bluestucco1
-[2020/04/29 21:55:57] [4]: Setting 1txd
-[2020/04/29 21:55:57] [4]: Setting 2txd
-[2020/04/29 21:55:57] [5]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [6]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [7]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [8]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [9]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [10]: (19302) 0, 0, , 
-[2020/04/29 21:55:57] [11]: (3089) 1, 1675, wshxrefhse, greygreensubuild_128
-[2020/04/29 21:55:57] [11]: Setting 1txd
-[2020/04/29 21:55:57] [11]: Setting 2txd
-[2020/04/29 21:55:57] [12]: (3089) 1, 1675, wshxrefhse, greygreensubuild_128
-[2020/04/29 21:55:57] [12]: Setting 1txd
-[2020/04/29 21:55:57] [12]: Setting 2txd
-[2020/04/29 21:55:57] [13]: (19795) 0, 0, , 
-[2020/04/29 21:55:57] [14]: (19795) 0, 0, , 
-[2020/04/29 21:55:57] [15]: (19795) 0, 0, , 
-[2020/04/29 21:55:57] [16]: (19795) 0, 0, , 
-[2020/04/29 21:55:57] [17]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [18]: (19302) 0, 0, , 
-[2020/04/29 21:55:57] [19]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [20]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [21]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [22]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [23]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [24]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] [25]: (1495) 0, 0, , 
-[2020/04/29 21:55:57] Adding custom models..
-[2020/04/29 21:55:57]  ===================================================
-[2020/04/29 21:55:57] |     Modifikacija programavo: Tomas Vosylius      |
-[2020/04/29 21:55:57] |  	  Skirta CommunityRP.lt projektui 		   |
-[2020/04/29 21:55:57]  ===================================================
-[2020/04/29 21:55:57] Number of vehicle models: 0
-[2020/04/29 21:55:57] --- Server Shutting Down.
-[2020/04/29 21:55:57] plugin.mysql: Unloading plugin...
-[2020/04/29 21:55:57] plugin.mysql: Plugin unloaded.
-[2020/04/29 21:55:57] 
-
-*** Streamer Plugin v2.9.2 by Incognito unloaded ***
-
-[2020/04/29 21:55:57] 
-
-[2020/04/29 21:55:57]  ===============================
-
-[2020/04/29 21:55:57]      sscanf plugin unloaded.    
-
-[2020/04/29 21:55:57]  ===============================
-
-[2020/04/29 21:55:57]  
-[2020/04/29 21:55:57]  ====================
-[2020/04/29 21:55:57]  
-[2020/04/29 21:55:57]   Whirlpool unloaded
-[2020/04/29 21:55:57]  
-[2020/04/29 21:55:57]  ====================
-[2020/04/29 21:55:57]  
-[2020/04/29 21:55:57] [plugin.timerfix] Plugsin successfully unloaded!
-[2020/04/29 21:55:57] 
-
-*** GVar Plugin v1.3 by Incognito unloaded ***
-
-[2020/04/29 21:55:57] Pawn.CMD plugin v3.1.4 by urShadow unloaded
-[2020/04/29 21:55:57] 
-
-*** Audio Plugin v0.5 R2 by Incognito unloaded ***
-
-[2020/04/29 21:55:57] FCNPC Unloaded.
-[2020/04/29 21:55:57] *********************
-[2020/04/29 21:55:57] *ColAndreas Unloaded*
-[2020/04/29 21:55:57] *********************
-
-----------
-Loaded log file: "server_log.txt".
-----------
-
-SA-MP Dedicated Server
-----------------------
-v0.3.7-R2, (C)2005-2015 SA-MP Team
-
-[22:04:08] filterscripts = ""  (string)
-[2020/04/29 22:04:08] 
-[2020/04/29 22:04:08] Server Plugins
-[2020/04/29 22:04:08] --------------
-[2020/04/29 22:04:08]  Loading plugin: crashdetect
-[2020/04/29 22:04:08]   CrashDetect v4.18.1 is OK.
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: profiler
-[2020/04/29 22:04:08]   Profiler v2.13 is OK.
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: filemanager
-[2020/04/29 22:04:08] ******************
-[2020/04/29 22:04:08] ** FILE MANAGER **
-[2020/04/29 22:04:08] **    Loaded    **
-[2020/04/29 22:04:08] ** Version 1.4 **
-[2020/04/29 22:04:08] ******************
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: mysql
-[2020/04/29 22:04:08]  >> plugin.mysql: R41-4 successfully loaded.
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: streamer
-[2020/04/29 22:04:08] 
-
-*** Streamer Plugin v2.9.2 by Incognito loaded ***
-
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: sscanf
-[2020/04/29 22:04:08] 
-
-[2020/04/29 22:04:08]  ===============================
-
-[2020/04/29 22:04:08]       sscanf plugin loaded.     
-
-[2020/04/29 22:04:08]          Version:  2.8.2        
-
-[2020/04/29 22:04:08]    (c) 2012 Alex "Y_Less" Cole  
-
-[2020/04/29 22:04:08]  ===============================
-
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: Whirlpool
-[2020/04/29 22:04:08]  
-[2020/04/29 22:04:08]  ==================
-[2020/04/29 22:04:08]  
-[2020/04/29 22:04:08]   Whirlpool loaded
-[2020/04/29 22:04:08]  
-[2020/04/29 22:04:08]  ==================
-[2020/04/29 22:04:08]  
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: timerfix
-[2020/04/29 22:04:08]   >> TimerFix v1.5 successfully loaded.
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: gvar
-[2020/04/29 22:04:08] 
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: Whirlpool
+[2020/04/29 23:57:40]  
+[2020/04/29 23:57:40]  ==================
+[2020/04/29 23:57:40]  
+[2020/04/29 23:57:40]   Whirlpool loaded
+[2020/04/29 23:57:40]  
+[2020/04/29 23:57:40]  ==================
+[2020/04/29 23:57:40]  
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: timerfix
+[2020/04/29 23:57:40]   >> TimerFix v1.5 successfully loaded.
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: gvar
+[2020/04/29 23:57:40] 
 
 *** GVar Plugin v1.3 by Incognito loaded ***
 
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: pawncmd
-[2020/04/29 22:04:08] Pawn.CMD plugin v3.1.4 by urShadow loaded
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: audio
-[2020/04/29 22:04:08] 
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: pawncmd
+[2020/04/29 23:57:40] Pawn.CMD plugin v3.1.4 by urShadow loaded
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: audio
+[2020/04/29 23:57:40] 
 
 *** Audio Plugin v0.5 R2 by Incognito loaded ***
 
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: FCNPC
-[2020/04/29 22:04:08] 
-[2020/04/29 22:04:08] -------------------------------------------------
-[2020/04/29 22:04:08]      FCNPC - Fully Controllable NPC v1.1.2
-[2020/04/29 22:04:08]            Windows 0.3.7 R2-1
-[2020/04/29 22:04:08]           Aug  3 2016 at 12:01:36
-[2020/04/29 22:04:08] 
-[2020/04/29 22:04:08]   Author:       OrMisicL (2013 - 2015)
-[2020/04/29 22:04:08]   Continued by: ziggi (2016 - present)
-[2020/04/29 22:04:08]   Contributors: kurta999, Neutralneu
-[2020/04/29 22:04:08] -------------------------------------------------
-[2020/04/29 22:04:08] 
-[2020/04/29 22:04:08] Loading...
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loading plugin: ColAndreas
-[2020/04/29 22:04:08] *********************
-[2020/04/29 22:04:08] ** Created By:     **
-[2020/04/29 22:04:08] ** [uL]Chris42O    **
-[2020/04/29 22:04:08] ** [uL]Slice       **
-[2020/04/29 22:04:08] ** [uL]Pottus      **
-[2020/04/29 22:04:08] *********************
-[2020/04/29 22:04:08] No collision data found.
-[2020/04/29 22:04:08] *********************
-[2020/04/29 22:04:08]   ColAndreas Loaded
-[2020/04/29 22:04:08]    v1.3.0
-[2020/04/29 22:04:08] *********************
-[2020/04/29 22:04:08]   Loaded.
-[2020/04/29 22:04:08]  Loaded 13 plugins.
+[2020/04/29 23:57:40]   Loaded.
+[2020/04/29 23:57:40]  Loading plugin: FCNPC
+[2020/04/29 23:57:40] 
+[2020/04/29 23:57:40] -------------------------------------------------
+[2020/04/29 23:57:41]      FCNPC - Fully Controllable NPC v1.1.2
+[2020/04/29 23:57:41]            Windows 0.3.7 R2-1
+[2020/04/29 23:57:41]           Aug  3 2016 at 12:01:36
+[2020/04/29 23:57:41] 
+[2020/04/29 23:57:41]   Author:       OrMisicL (2013 - 2015)
+[2020/04/29 23:57:41]   Continued by: ziggi (2016 - present)
+[2020/04/29 23:57:41]   Contributors: kurta999, Neutralneu
+[2020/04/29 23:57:41] -------------------------------------------------
+[2020/04/29 23:57:41] 
+[2020/04/29 23:57:41] Loading...
+[2020/04/29 23:57:41]   Loaded.
+[2020/04/29 23:57:41]  Loading plugin: ColAndreas
+[2020/04/29 23:57:41] *********************
+[2020/04/29 23:57:41] ** Created By:     **
+[2020/04/29 23:57:41] ** [uL]Chris42O    **
+[2020/04/29 23:57:41] ** [uL]Slice       **
+[2020/04/29 23:57:41] ** [uL]Pottus      **
+[2020/04/29 23:57:41] *********************
+[2020/04/29 23:57:43] Loaded collision data.
+[2020/04/29 23:57:43] *********************
+[2020/04/29 23:57:43]   ColAndreas Loaded
+[2020/04/29 23:57:43]    v1.3.0
+[2020/04/29 23:57:43] *********************
+[2020/04/29 23:57:43]   Loaded.
+[2020/04/29 23:57:43]  Loading plugin: requests
+[2020/04/29 23:57:44]   Loaded.
+[2020/04/29 23:57:44]  Loaded 14 plugins.
 
-[2020/04/29 22:04:08] 
-[2020/04/29 22:04:08] Filterscripts
-[2020/04/29 22:04:08] ---------------
-[2020/04/29 22:04:08]   Loaded 0 filterscripts.
+[2020/04/29 23:57:44] 
+[2020/04/29 23:57:44] Filterscripts
+[2020/04/29 23:57:44] ---------------
+[2020/04/29 23:57:44]   Loaded 0 filterscripts.
 
-[2020/04/29 22:04:08]  
-[2020/04/29 22:04:08]  
-[2020/04/29 22:04:08]  
-[2020/04/29 22:04:08]  ======================================= 
-[2020/04/29 22:04:08]  |                                     | 
-[2020/04/29 22:04:08]  |        YSI version 4.00.0001        | 
-[2020/04/29 22:04:08]  |        By Alex "Y_Less" Cole        | 
-[2020/04/29 22:04:08]  |                                     | 
-[2020/04/29 22:04:08]  ======================================= 
-[2020/04/29 22:04:08]  
-[2020/04/29 22:04:30] [debug] Taxi module enabled
-[2020/04/29 22:04:30] Hash 05535C21
-[2020/04/29 22:04:30] [0]: (3037) 0, 9514, 711_sfw, sw_sheddoor2
-[2020/04/29 22:04:30] [0]: Setting 1txd
-[2020/04/29 22:04:30] [1]: (968) 0, 0, , 
-[2020/04/29 22:04:30] [2]: (968) 0, 0, , 
-[2020/04/29 22:04:30] [3]: (3055) 0, 0, , 
-[2020/04/29 22:04:30] [4]: (3089) 1, 5774, garag3_lawn, bluestucco1
-[2020/04/29 22:04:30] [4]: Setting 1txd
-[2020/04/29 22:04:30] [4]: Setting 2txd
-[2020/04/29 22:04:30] [5]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [6]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [7]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [8]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [9]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [10]: (19302) 0, 0, , 
-[2020/04/29 22:04:30] [11]: (3089) 1, 1675, wshxrefhse, greygreensubuild_128
-[2020/04/29 22:04:30] [11]: Setting 1txd
-[2020/04/29 22:04:30] [11]: Setting 2txd
-[2020/04/29 22:04:30] [12]: (3089) 1, 1675, wshxrefhse, greygreensubuild_128
-[2020/04/29 22:04:30] [12]: Setting 1txd
-[2020/04/29 22:04:30] [12]: Setting 2txd
-[2020/04/29 22:04:30] [13]: (19795) 0, 0, , 
-[2020/04/29 22:04:30] [14]: (19795) 0, 0, , 
-[2020/04/29 22:04:30] [15]: (19795) 0, 0, , 
-[2020/04/29 22:04:30] [16]: (19795) 0, 0, , 
-[2020/04/29 22:04:30] [17]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [18]: (19302) 0, 0, , 
-[2020/04/29 22:04:30] [19]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [20]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [21]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [22]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [23]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [24]: (1495) 0, 0, , 
-[2020/04/29 22:04:30] [25]: (1495) 0, 0, , 
-[2020/04/29 22:04:30]  ===================================================
-[2020/04/29 22:04:30] |     Modifikacija programavo: Tomas Vosylius      |
-[2020/04/29 22:04:30] |  	  Skirta Southland.lt projektui 		   |
-[2020/04/29 22:04:30]  ===================================================
-[2020/04/29 22:04:30] Number of vehicle models: 0
-[2020/04/29 22:04:31] OnGraffitiLoad()
-[2020/04/29 22:04:31] Graffiti: 0 [1]
-[2020/04/29 22:04:31] 1856.849975, -1873.199951, 15.212800
+[2020/04/29 23:57:44]  
+[2020/04/29 23:57:44]  
+[2020/04/29 23:57:44]  
+[2020/04/29 23:57:44]  ======================================= 
+[2020/04/29 23:57:44]  |                                     | 
+[2020/04/29 23:57:44]  |        YSI version 4.00.0001        | 
+[2020/04/29 23:57:44]  |        By Alex "Y_Less" Cole        | 
+[2020/04/29 23:57:44]  |                                     | 
+[2020/04/29 23:57:44]  ======================================= 
+[2020/04/29 23:57:44]  
+[2020/04/29 23:58:04] [debug] Taxi module enabled
+[2020/04/29 23:58:04] Hash 05535C21
+[2020/04/29 23:58:04] Loading Map.
+[2020/04/29 23:58:04] Loaded Map.                             
+[2020/04/29 23:58:04] [0]: (3037) 0, 9514, 711_sfw, sw_sheddoor2
+[2020/04/29 23:58:04] [0]: Setting 1txd
+[2020/04/29 23:58:04] [1]: (968) 0, 0, , 
+[2020/04/29 23:58:04] [2]: (968) 0, 0, , 
+[2020/04/29 23:58:04] [3]: (3055) 0, 0, , 
+[2020/04/29 23:58:04] [4]: (3089) 1, 5774, garag3_lawn, bluestucco1
+[2020/04/29 23:58:04] [4]: Setting 1txd
+[2020/04/29 23:58:04] [4]: Setting 2txd
+[2020/04/29 23:58:04] [5]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [6]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [7]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [8]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [9]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [10]: (19302) 0, 0, , 
+[2020/04/29 23:58:04] [11]: (3089) 1, 1675, wshxrefhse, greygreensubuild_128
+[2020/04/29 23:58:04] [11]: Setting 1txd
+[2020/04/29 23:58:04] [11]: Setting 2txd
+[2020/04/29 23:58:04] [12]: (3089) 1, 1675, wshxrefhse, greygreensubuild_128
+[2020/04/29 23:58:04] [12]: Setting 1txd
+[2020/04/29 23:58:04] [12]: Setting 2txd
+[2020/04/29 23:58:04] [13]: (19795) 0, 0, , 
+[2020/04/29 23:58:04] [14]: (19795) 0, 0, , 
+[2020/04/29 23:58:04] [15]: (19795) 0, 0, , 
+[2020/04/29 23:58:04] [16]: (19795) 0, 0, , 
+[2020/04/29 23:58:04] [17]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [18]: (19302) 0, 0, , 
+[2020/04/29 23:58:04] [19]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [20]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [21]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [22]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [23]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [24]: (1495) 0, 0, , 
+[2020/04/29 23:58:04] [25]: (1495) 0, 0, , 
+[2020/04/29 23:58:04]  ===================================================
+[2020/04/29 23:58:04] |     Modifikacija programavo: Tomas Vosylius      |
+[2020/04/29 23:58:04] |  	  Skirta Southland.lt projektui 		   |
+[2020/04/29 23:58:04]  ===================================================
+[2020/04/29 23:58:04] Number of vehicle models: 0
+[2020/04/29 23:58:04] OnGraffitiLoad()
+[2020/04/29 23:58:04] Graffiti: 0 [1]
+[2020/04/29 23:58:04] 1856.849975, -1873.199951, 15.212800
 String: {000000} W/SPLAYBOYSX3
-[2020/04/29 22:04:31] Graffiti: 1 [2]
-[2020/04/29 22:04:31] 1951.880004, -1908.849975, 14.576899
+[2020/04/29 23:58:04] Graffiti: 1 [2]
+[2020/04/29 23:58:04] 1951.880004, -1908.849975, 14.576899
 String: {0000FF} 35ST W/S PBS 
  {000000} MOST HATED 
-[2020/04/29 22:04:31] Graffiti: 2 [3]
-[2020/04/29 22:04:31] 1971.630004, -1969.319946, 14.479299
+[2020/04/29 23:58:04] Graffiti: 2 [3]
+[2020/04/29 23:58:04] 1971.630004, -1969.319946, 14.479299
 String: {0000FF}  PBSRIFAX3 
  {FFFFFF} SAD EYES
-[2020/04/29 22:04:31] Graffiti: 3 [5]
-[2020/04/29 22:04:31] 1971.660034, -1967.790039, 14.087499
+[2020/04/29 23:58:04] Graffiti: 3 [5]
+[2020/04/29 23:58:04] 1971.660034, -1967.790039, 14.087499
 String: {0000FF}WSPBS35st{0000FF}
 {0000FF}RABBIT GANG{0000FF}
-[2020/04/29 22:04:31] Graffiti: 4 [6]
-[2020/04/29 22:04:31] 1873.750000, -1889.280029, 13.983699
+[2020/04/29 23:58:04] Graffiti: 4 [6]
+[2020/04/29 23:58:04] 1873.750000, -1889.280029, 13.983699
 String: {0000FF}~.:RABBIT GANG:.~
 {0000FF}TINYDUKEROS35st{0000FF}
 ~~HEKTIK~~{0000FF}
-[2020/04/29 22:04:31] Graffiti: 5 [7]
-[2020/04/29 22:04:31] 1861.400024, -1847.699951, 13.939900
+[2020/04/29 23:58:04] Graffiti: 5 [7]
+[2020/04/29 23:58:04] 1861.400024, -1847.699951, 13.939900
 String: {0000FF}cKant st0p
 cWont st0p
 ~lils1cko:.
-[2020/04/29 22:04:31] Graffiti: 6 [8]
-[2020/04/29 22:04:31] 1861.390014, -1844.349975, 14.077199
+[2020/04/29 23:58:04] Graffiti: 6 [8]
+[2020/04/29 23:58:04] 1861.390014, -1844.349975, 14.077199
 String: {0000FF} .:SAD EYES SOZA:. 
  {FFFFFF} PBSX3
-[2020/04/29 22:04:31] Graffiti: 7 [9]
-[2020/04/29 22:04:31] 1913.030029, -2068.689941, 13.544400
+[2020/04/29 23:58:04] Graffiti: 7 [9]
+[2020/04/29 23:58:04] 1913.030029, -2068.689941, 13.544400
 String: {0000FF}DKS35STZR
-[2020/04/29 22:04:31] Graffiti: 8 [10]
-[2020/04/29 22:04:31] 1913.089965, -2064.360107, 14.029299
+[2020/04/29 23:58:04] Graffiti: 8 [10]
+[2020/04/29 23:58:04] 1913.089965, -2064.360107, 14.029299
 String: {000000} PBS 
  MY HOOD
-[2020/04/29 22:04:31] Graffiti: 9 [11]
-[2020/04/29 22:04:31] 1913.000000, -2068.689941, 14.057399
+[2020/04/29 23:58:04] Graffiti: 9 [11]
+[2020/04/29 23:58:04] 1913.000000, -2068.689941, 14.057399
 String: {0000FF} PBS 
  MY HOOD
-[2020/04/29 22:04:31] Graffiti: 10 [12]
-[2020/04/29 22:04:31] 1943.550048, -2062.479980, 13.916899
+[2020/04/29 23:58:04] Graffiti: 10 [12]
+[2020/04/29 23:58:04] 1943.550048, -2062.479980, 13.916899
 String: {000000} S {0000FF} A {FFFFFF} D {000000} BOY INK
-[2020/04/29 22:04:31] Graffiti: 11 [13]
-[2020/04/29 22:04:31] 1946.489990, -2062.310058, 14.046899
+[2020/04/29 23:58:04] Graffiti: 11 [13]
+[2020/04/29 23:58:04] 1946.489990, -2062.310058, 14.046899
 String: {000000} PBS
-[2020/04/29 22:04:31] Graffiti: 12 [14]
-[2020/04/29 22:04:31] 1943.459960, -2062.469970, 13.516900
+[2020/04/29 23:58:04] Graffiti: 12 [14]
+[2020/04/29 23:58:04] 1943.459960, -2062.469970, 13.516900
 String: {000000} 09AM-6PM
-[2020/04/29 22:04:31] Graffiti: 13 [15]
-[2020/04/29 22:04:31] 1946.290039, -2062.459960, 13.446900
+[2020/04/29 23:58:04] Graffiti: 13 [15]
+[2020/04/29 23:58:04] 1946.290039, -2062.459960, 13.446900
 String: {000000} MY HOOD
-[2020/04/29 22:04:31] Graffiti: 14 [16]
-[2020/04/29 22:04:31] 1943.380004, -2062.449951, 12.996899
+[2020/04/29 23:58:04] Graffiti: 14 [16]
+[2020/04/29 23:58:04] 1943.380004, -2062.449951, 12.996899
 String: {000000} 111570
-[2020/04/29 22:04:31] Graffiti: 15 [17]
-[2020/04/29 22:04:31] 1961.390014, -1575.770019, 14.091099
+[2020/04/29 23:58:04] Graffiti: 15 [17]
+[2020/04/29 23:58:04] 1961.390014, -1575.770019, 14.091099
 String: TEST
-[2020/04/29 22:04:31] Graffiti: 16 [18]
-[2020/04/29 22:04:31] 1854.680053, -1889.619995, 14.877799
+[2020/04/29 23:58:04] Graffiti: 16 [18]
+[2020/04/29 23:58:04] 1854.680053, -1889.619995, 14.877799
 String: {FFFFFF} PBS
-[2020/04/29 22:04:31] Graffiti: 17 [19]
-[2020/04/29 22:04:31] 2070.419921, -1794.030029, 15.426899
+[2020/04/29 23:58:04] Graffiti: 17 [19]
+[2020/04/29 23:58:04] 2070.419921, -1794.030029, 15.426899
 String: {FF8B00}Grand Royal Casino
-[2020/04/29 22:04:31] Graffiti: 18 [20]
-[2020/04/29 22:04:31] 2070.389892, -1794.349975, 15.646900
+[2020/04/29 23:58:04] Graffiti: 18 [20]
+[2020/04/29 23:58:04] 2070.389892, -1794.349975, 15.646900
 String: {FF8B00}Grand Royal Casino
-[2020/04/29 22:04:31] Graffiti: 19 [26]
-[2020/04/29 22:04:31] 1876.239990, -1952.420043, 19.010299
+[2020/04/29 23:58:04] Graffiti: 19 [26]
+[2020/04/29 23:58:04] 1876.239990, -1952.420043, 19.010299
 String: v{0000FF}DKS35sT
-[2020/04/29 22:04:31] Graffiti: 20 [28]
-[2020/04/29 22:04:31] -1978.959960, 122.036003, 29.007499
+[2020/04/29 23:58:04] Graffiti: 20 [28]
+[2020/04/29 23:58:04] -1978.959960, 122.036003, 29.007499
 String: {FF8B00}Community{FF0000}RP.lt
-[2020/04/29 22:04:31] Graffiti: 21 [30]
-[2020/04/29 22:04:31] 1394.010009, -1570.180053, 15.634099
+[2020/04/29 23:58:04] Graffiti: 21 [30]
+[2020/04/29 23:58:04] 1394.010009, -1570.180053, 15.634099
 String: {0000FF} Cop O'Coffee
-[2020/04/29 22:04:31] Graffiti: 22 [31]
-[2020/04/29 22:04:31] 1934.489990, -2078.659912, 14.057999
+[2020/04/29 23:58:04] Graffiti: 22 [31]
+[2020/04/29 23:58:04] 1934.489990, -2078.659912, 14.057999
 String: {0000FF} :PBSRIFA: 
  {FFFFFF} ZOO RYDERS
-[2020/04/29 22:04:31] Graffiti: 23 [32]
-[2020/04/29 22:04:31] -1978.969970, 121.981002, 29.184000
+[2020/04/29 23:58:04] Graffiti: 23 [32]
+[2020/04/29 23:58:04] -1978.969970, 121.981002, 29.184000
 String: {FFFFFF}communityrp.lt
-[2020/04/29 22:04:31] Graffiti: 24 [34]
-[2020/04/29 22:04:31] 1942.880004, -1971.170043, 14.046899
+[2020/04/29 23:58:04] Graffiti: 24 [34]
+[2020/04/29 23:58:04] 1942.880004, -1971.170043, 14.046899
 String: {0000FF} .PBSX3. 
  {FFFFFF} RABBITGANG
-[2020/04/29 22:04:31] Graffiti: 25 [42]
-[2020/04/29 22:04:31] 1971.619995, -1775.589965, 15.316900
+[2020/04/29 23:58:04] Graffiti: 25 [42]
+[2020/04/29 23:58:04] 1971.619995, -1775.589965, 15.316900
 String: {0000FF} PLAYBOYS13 
  {0000FF} ZRSxTDS
-[2020/04/29 22:04:31] Graffiti: 26 [43]
-[2020/04/29 22:04:31] 1971.640014, -1766.540039, 14.046899
+[2020/04/29 23:58:04] Graffiti: 26 [43]
+[2020/04/29 23:58:04] 1971.640014, -1766.540039, 14.046899
 String: {0000FF}PB{FFFFFF}${0000FF}35sT
-[2020/04/29 22:04:31] Graffiti: 27 [49]
-[2020/04/29 22:04:31] 1861.380004, -1862.069946, 14.042900
+[2020/04/29 23:58:04] Graffiti: 27 [49]
+[2020/04/29 23:58:04] 1861.380004, -1862.069946, 14.042900
 String: Lo{008000}$
 {008000}${FFFFFF}candalou
-[2020/04/29 22:04:31] Graffiti: 28 [59]
-[2020/04/29 22:04:31] 1855.780029, -1942.280029, 14.003800
+[2020/04/29 23:58:04] Graffiti: 28 [59]
+[2020/04/29 23:58:04] 1855.780029, -1942.280029, 14.003800
 String: PlaY8oy$
 RIFA
 lil$ick?ø:.
-[2020/04/29 22:04:31] Graffiti: 29 [65]
-[2020/04/29 22:04:31] 2219.360107, -1196.900024, 25.506900
+[2020/04/29 23:58:04] Graffiti: 29 [65]
+[2020/04/29 23:58:04] 2219.360107, -1196.900024, 25.506900
 String: {FF8B00} HGC
-[2020/04/29 22:04:31] Graffiti: 30 [70]
-[2020/04/29 22:04:31] 2186.889892, -1242.900024, 24.476600
+[2020/04/29 23:58:04] Graffiti: 30 [70]
+[2020/04/29 23:58:04] 2186.889892, -1242.900024, 24.476600
 String: {FF8B00} Hoover
-[2020/04/29 22:04:31] Graffiti: 31 [72]
-[2020/04/29 22:04:31] 2186.889892, -1244.390014, 24.836599
+[2020/04/29 23:58:04] Graffiti: 31 [72]
+[2020/04/29 23:58:04] 2186.889892, -1244.390014, 24.836599
 String: {FF8B00} Crip
-[2020/04/29 22:04:31] Graffiti: 32 [75]
-[2020/04/29 22:04:31] 2161.429931, -1247.099975, 26.041200
+[2020/04/29 23:58:04] Graffiti: 32 [75]
+[2020/04/29 23:58:04] 2161.429931, -1247.099975, 26.041200
 String: {FF8B00} HGC 
  {0000FF} EBK
-[2020/04/29 22:04:31] Graffiti: 33 [76]
-[2020/04/29 22:04:31] 2213.010009, -1240.540039, 24.247499
+[2020/04/29 23:58:04] Graffiti: 33 [76]
+[2020/04/29 23:58:04] 2213.010009, -1240.540039, 24.247499
 String: {FF8B00} 12Free
-[2020/04/29 22:04:31] Graffiti: 34 [77]
-[2020/04/29 22:04:31] 2211.659912, -1240.540039, 24.279600
+[2020/04/29 23:58:04] Graffiti: 34 [77]
+[2020/04/29 23:58:04] 2211.659912, -1240.540039, 24.279600
 String: {FF8B00} zone
-[2020/04/29 22:04:31] Graffiti: 35 [79]
-[2020/04/29 22:04:31] 2260.979980, -1236.310058, 25.156600
+[2020/04/29 23:58:04] Graffiti: 35 [79]
+[2020/04/29 23:58:04] 2260.979980, -1236.310058, 25.156600
 String: {0000FF} 5-2
-[2020/04/29 22:04:31] Graffiti: 36 [81]
-[2020/04/29 22:04:31] 2260.949951, -1236.219970, 24.576599
+[2020/04/29 23:58:04] Graffiti: 36 [81]
+[2020/04/29 23:58:04] 2260.949951, -1236.219970, 24.576599
 String: {0000FF} Hoover
-[2020/04/29 22:04:31] Graffiti: 37 [82]
-[2020/04/29 22:04:31] 2165.479980, -1188.020019, 24.074600
+[2020/04/29 23:58:04] Graffiti: 37 [82]
+[2020/04/29 23:58:04] 2165.479980, -1188.020019, 24.074600
 String: {FF8B00} HGC 
  {000000} EAST
-[2020/04/29 22:04:31] Graffiti: 38 [83]
-[2020/04/29 22:04:31] 2261.010009, -1236.219970, 24.146600
+[2020/04/29 23:58:04] Graffiti: 38 [83]
+[2020/04/29 23:58:04] 2261.010009, -1236.219970, 24.146600
 String: {0000FF} Gangsta
-[2020/04/29 22:04:31] Graffiti: 39 [84]
-[2020/04/29 22:04:31] 2165.540039, -1186.239990, 23.967100
+[2020/04/29 23:58:04] Graffiti: 39 [84]
+[2020/04/29 23:58:04] 2165.540039, -1186.239990, 23.967100
 String: {000000} SIDE
-[2020/04/29 22:04:31] Graffiti: 40 [85]
-[2020/04/29 22:04:31] 2260.989990, -1236.219970, 23.676500
+[2020/04/29 23:58:04] Graffiti: 40 [85]
+[2020/04/29 23:58:04] 2260.989990, -1236.219970, 23.676500
 String: {0000FF} Crips
-[2020/04/29 22:04:31] Graffiti: 41 [86]
-[2020/04/29 22:04:31] 2250.959960, -1257.780029, 24.457799
+[2020/04/29 23:58:04] Graffiti: 41 [86]
+[2020/04/29 23:58:04] 2250.959960, -1257.780029, 24.457799
 String: {0000FF} HOOVER 
  STREET 
  {000000} EBK
-[2020/04/29 22:04:31] Graffiti: 42 [88]
-[2020/04/29 22:04:31] 1946.300048, -1889.359985, 14.042900
+[2020/04/29 23:58:04] Graffiti: 42 [88]
+[2020/04/29 23:58:04] 1946.300048, -1889.359985, 14.042900
 String: {0000FF} ~PBSX3~ 
  {0000FF} CK BK CHAPK 
  {0000FF} SNOOVAK 
  {0000FF} FAKETEENK
-[2020/04/29 22:04:31] Graffiti: 43 [89]
-[2020/04/29 22:04:31] 1946.319946, -1866.439941, 14.061900
+[2020/04/29 23:58:04] Graffiti: 43 [89]
+[2020/04/29 23:58:04] 1946.319946, -1866.439941, 14.061900
 String: {0000FF} snoovaK 
  {FFFFFF} chapK 
  {0000FF} faketeenK
-[2020/04/29 22:04:31] Graffiti: 44 [91]
-[2020/04/29 22:04:31] 2066.199951, -1825.229980, 23.623100
+[2020/04/29 23:58:04] Graffiti: 44 [91]
+[2020/04/29 23:58:04] 2066.199951, -1825.229980, 23.623100
 String: {0000FF}PBSXII.v
 3AZYXFUCKSNOOVA
-[2020/04/29 22:04:31] Graffiti: 45 [92]
-[2020/04/29 22:04:31] 2068.070068, -1827.890014, 23.893100
+[2020/04/29 23:58:04] Graffiti: 45 [92]
+[2020/04/29 23:58:04] 2068.070068, -1827.890014, 23.893100
 String: {0000FF}PBSXII.v
 3AZYX
 FUCKSNOOVA
-[2020/04/29 22:04:31] Graffiti: 46 [93]
-[2020/04/29 22:04:31] 1942.829956, -1971.250000, 14.046899
+[2020/04/29 23:58:04] Graffiti: 46 [93]
+[2020/04/29 23:58:04] 1942.829956, -1971.250000, 14.046899
 String: {008000}93T.B4CK 2 M3X1C0! 
 {FF8B00}sH1th3adZ taC05!
-[2020/04/29 22:04:31] Graffiti: 47 [94]
-[2020/04/29 22:04:31] 311.394989, 310.618011, 1003.900024
+[2020/04/29 23:58:04] Graffiti: 47 [94]
+[2020/04/29 23:58:04] 311.394989, 310.618011, 1003.900024
 String: welcome
-[2020/04/29 22:04:31] Graffiti: 48 [95]
-[2020/04/29 22:04:31] 311.420989, 310.626007, 1002.739990
+[2020/04/29 23:58:04] Graffiti: 48 [95]
+[2020/04/29 23:58:04] 311.420989, 310.626007, 1002.739990
 String: {FF8B00}to
 {FFFFFF}paradise
-[2020/04/29 22:04:31] Graffiti: 49 [99]
-[2020/04/29 22:04:31] 446.822998, -1799.270019, 6.516870
+[2020/04/29 23:58:04] Graffiti: 49 [99]
+[2020/04/29 23:58:04] 446.822998, -1799.270019, 6.516870
 String: {0000FF}MARINA
 BEACH
 {FF0000}BBQ PARTY
-[2020/04/29 22:04:31] Graffiti: 50 [102]
-[2020/04/29 22:04:31] 2186.949951, -1242.839965, 24.476600
+[2020/04/29 23:58:04] Graffiti: 50 [102]
+[2020/04/29 23:58:04] 2186.949951, -1242.839965, 24.476600
 String: {0000FF}----LAME HOOD----------------
 ---crabK--------------------------
-[2020/04/29 22:04:31] Graffiti: 51 [103]
-[2020/04/29 22:04:31] 2186.949951, -1240.819946, 24.476600
+[2020/04/29 23:58:04] Graffiti: 51 [103]
+[2020/04/29 23:58:04] 2186.949951, -1240.819946, 24.476600
 String: {0000FF}------LAME
 crabK
 pDKSx35
-[2020/04/29 22:04:31] Graffiti: 52 [104]
-[2020/04/29 22:04:31] 1825.130004, -1942.219970, 14.046299
+[2020/04/29 23:58:04] Graffiti: 52 [104]
+[2020/04/29 23:58:04] 1825.130004, -1942.219970, 14.046299
 String: No
 {FF8B00}LAMES
 {FFFFFF}Z0N3
-[2020/04/29 22:04:31] Graffiti: 53 [105]
-[2020/04/29 22:04:31] 1872.199951, -1942.310058, 14.046899
+[2020/04/29 23:58:04] Graffiti: 53 [105]
+[2020/04/29 23:58:04] 1872.199951, -1942.310058, 14.046899
 String: {0000FF}R3551T
 GangK
-[2020/04/29 22:04:31] Graffiti: 54 [106]
-[2020/04/29 22:04:31] 2186.909912, -1241.119995, 24.476600
+[2020/04/29 23:58:04] Graffiti: 54 [106]
+[2020/04/29 23:58:04] 2186.909912, -1241.119995, 24.476600
 String: {000000} ____________
-[2020/04/29 22:04:31] Graffiti: 55 [107]
-[2020/04/29 22:04:31] 2186.820068, -1240.979980, 24.472499
+[2020/04/29 23:58:04] Graffiti: 55 [107]
+[2020/04/29 23:58:04] 2186.820068, -1240.979980, 24.472499
 String: {000000} _________________
-[2020/04/29 22:04:31] Graffiti: 56 [117]
-[2020/04/29 22:04:31] 2068.340087, -1773.760009, 15.298399
+[2020/04/29 23:58:04] Graffiti: 56 [117]
+[2020/04/29 23:58:04] 2068.340087, -1773.760009, 15.298399
 String: 
 {FF0000}KAZINO
-[2020/04/29 22:04:31] Graffiti: 57 [118]
-[2020/04/29 22:04:31] 2068.320068, -1770.839965, 15.119400
+[2020/04/29 23:58:04] Graffiti: 57 [118]
+[2020/04/29 23:58:04] 2068.320068, -1770.839965, 15.119400
 String: 
 {FF0000}BLACKJACK
-[2020/04/29 22:04:31] Graffiti: 58 [120]
-[2020/04/29 22:04:31] 2195.370117, -1249.290039, 24.428499
+[2020/04/29 23:58:04] Graffiti: 58 [120]
+[2020/04/29 23:58:04] 2195.370117, -1249.290039, 24.428499
 String: {0000FF} PLAYBOY 
  {0000FF} GANG 
-[2020/04/29 22:04:31] Graffiti: 59 [127]
-[2020/04/29 22:04:31] 1918.359985, -1766.150024, 14.318200
+[2020/04/29 23:58:04] Graffiti: 59 [127]
+[2020/04/29 23:58:04] 1918.359985, -1766.150024, 14.318200
 String: mr Dawson Shits
-[2020/04/29 22:04:31] Graffiti: 60 [128]
-[2020/04/29 22:04:31] 2041.310058, -1909.739990, 14.487899
+[2020/04/29 23:58:04] Graffiti: 60 [128]
+[2020/04/29 23:58:04] 2041.310058, -1909.739990, 14.487899
 String: {0000FF} N0 W4RN1NG SH0TS 
  {0000FF} v.PBSXIII
-[2020/04/29 22:04:31] Graffiti: 61 [129]
-[2020/04/29 22:04:31] 2053.260009, -1907.890014, 14.127900
+[2020/04/29 23:58:04] Graffiti: 61 [129]
+[2020/04/29 23:58:04] 2053.260009, -1907.890014, 14.127900
 String: {0000FF} PlayBoys 
  {0000FF} SURXIII
-[2020/04/29 22:04:31] Graffiti: 62 [130]
-[2020/04/29 22:04:31] 2049.250000, -1909.750000, 14.147899
+[2020/04/29 23:58:04] Graffiti: 62 [130]
+[2020/04/29 23:58:04] 2049.250000, -1909.750000, 14.147899
 String: {0000FF}MYH00D
 35ST:ZR
-[2020/04/29 22:04:31] Graffiti: 63 [131]
-[2020/04/29 22:04:31] 2036.849975, -1909.859985, 14.127900
+[2020/04/29 23:58:04] Graffiti: 63 [131]
+[2020/04/29 23:58:04] 2036.849975, -1909.859985, 14.127900
 String: {0000FF}TINY DUKES35st{0000FF}
 {0000FF}~~:.HEKTIK.:~~{0000FF}
-[2020/04/29 22:04:31] Graffiti: 64 [132]
-[2020/04/29 22:04:31] 2053.290039, -1900.329956, 14.127900
+[2020/04/29 23:58:04] Graffiti: 64 [132]
+[2020/04/29 23:58:04] 2053.290039, -1900.329956, 14.127900
 String: {0000FF} ___________
-[2020/04/29 22:04:31] Graffiti: 65 [133]
-[2020/04/29 22:04:31] 2046.290039, -1909.760009, 14.129599
+[2020/04/29 23:58:04] Graffiti: 65 [133]
+[2020/04/29 23:58:04] 2046.290039, -1909.760009, 14.129599
 String: PBS
  Don't fuck
  round
-[2020/04/29 22:04:31] Graffiti: 66 [134]
-[2020/04/29 22:04:31] 2053.290039, -1887.900024, 14.057000
+[2020/04/29 23:58:04] Graffiti: 66 [134]
+[2020/04/29 23:58:04] 2053.290039, -1887.900024, 14.057000
 String: PL4Y80YS
-[2020/04/29 22:04:31] Graffiti: 67 [135]
-[2020/04/29 22:04:31] 2053.290039, -1895.189941, 14.127900
+[2020/04/29 23:58:04] Graffiti: 67 [135]
+[2020/04/29 23:58:04] 2053.290039, -1895.189941, 14.127900
 String: {0000FF} PAY 
  {0000FF} YOUR 
  {0000FF} TAXES 
  {008000} BITCH
-[2020/04/29 22:04:31] Graffiti: 68 [136]
-[2020/04/29 22:04:31] 2053.370117, -1897.479980, 14.127900
+[2020/04/29 23:58:04] Graffiti: 68 [136]
+[2020/04/29 23:58:04] 2053.370117, -1897.479980, 14.127900
 String: {0000FF} PBSX3 
  {FFFFFF} BUNNIES 
  {FFFFFF} DUKEROS
-[2020/04/29 22:04:31] Graffiti: 69 [137]
-[2020/04/29 22:04:31] 2053.260009, -1886.619995, 13.597000
+[2020/04/29 23:58:04] Graffiti: 69 [137]
+[2020/04/29 23:58:04] 2053.260009, -1886.619995, 13.597000
 String: {0000FF}DUK35{FFFFFF}$t
-[2020/04/29 22:04:31] Graffiti: 70 [138]
-[2020/04/29 22:04:31] 1810.930053, -1909.640014, 14.069800
+[2020/04/29 23:58:04] Graffiti: 70 [138]
+[2020/04/29 23:58:04] 1810.930053, -1909.640014, 14.069800
 String: {0000FF} N0 
  {0000FF} W4RN1NG 
  {0000FF} SH0TS
-[2020/04/29 22:04:31] Graffiti: 71 [139]
-[2020/04/29 22:04:31] 2195.360107, -1249.310058, 24.847900
+[2020/04/29 23:58:04] Graffiti: 71 [139]
+[2020/04/29 23:58:04] 2195.360107, -1249.310058, 24.847900
 String: {FF8B00} _________________
-[2020/04/29 22:04:31] Graffiti: 72 [140]
-[2020/04/29 22:04:31] 2195.320068, -1249.319946, 24.628000
+[2020/04/29 23:58:04] Graffiti: 72 [140]
+[2020/04/29 23:58:04] 2195.320068, -1249.319946, 24.628000
 String: {FF8B00} _________________
-[2020/04/29 22:04:31] Graffiti: 73 [141]
-[2020/04/29 22:04:31] 1855.920043, -1942.219970, 14.234600
+[2020/04/29 23:58:04] Graffiti: 73 [141]
+[2020/04/29 23:58:04] 1855.920043, -1942.219970, 14.234600
 String: {FF8B00} _________________
-[2020/04/29 22:04:31] Graffiti: 74 [142]
-[2020/04/29 22:04:31] 1852.739990, -1942.229980, 14.045000
+[2020/04/29 23:58:04] Graffiti: 74 [142]
+[2020/04/29 23:58:04] 1852.739990, -1942.229980, 14.045000
 String: {FF8B00} 52HGC
-[2020/04/29 22:04:31] Graffiti: 75 [143]
-[2020/04/29 22:04:31] 1898.469970, -1922.369995, 13.616900
+[2020/04/29 23:58:04] Graffiti: 75 [143]
+[2020/04/29 23:58:04] 1898.469970, -1922.369995, 13.616900
 String: {FF8B00} Fake
-[2020/04/29 22:04:31] Graffiti: 76 [144]
-[2020/04/29 22:04:31] 1899.599975, -1922.400024, 13.676899
+[2020/04/29 23:58:04] Graffiti: 76 [144]
+[2020/04/29 23:58:04] 1899.599975, -1922.400024, 13.676899
 String: {FF8B00} Hood
-[2020/04/29 22:04:31] Graffiti: 77 [150]
-[2020/04/29 22:04:31] 2186.850097, -1247.359985, 24.680000
+[2020/04/29 23:58:04] Graffiti: 77 [150]
+[2020/04/29 23:58:04] 2186.850097, -1247.359985, 24.680000
 String: {FF8B00} _____________
-[2020/04/29 22:04:31] Graffiti: 78 [151]
-[2020/04/29 22:04:31] 2193.760009, -1249.229980, 24.734600
+[2020/04/29 23:58:04] Graffiti: 78 [151]
+[2020/04/29 23:58:04] 2193.760009, -1249.229980, 24.734600
 String: {FF8B00} pbsK
-[2020/04/29 22:04:31] Graffiti: 79 [156]
-[2020/04/29 22:04:31] 1836.670043, -1842.750000, 17.577999
+[2020/04/29 23:58:04] Graffiti: 79 [156]
+[2020/04/29 23:58:04] 1836.670043, -1842.750000, 17.577999
 String: {0000FF} PLAYBOYS 
  {0000FF} 35stTDS
-[2020/04/29 22:04:31] Graffiti: 80 [157]
-[2020/04/29 22:04:31] 1852.770019, -1942.260009, 13.135199
+[2020/04/29 23:58:04] Graffiti: 80 [157]
+[2020/04/29 23:58:04] 1852.770019, -1942.260009, 13.135199
 String: {FF8B00}^LAMES
-[2020/04/29 22:04:31] Graffiti: 81 [158]
-[2020/04/29 22:04:31] 1852.739990, -1942.300048, 14.743700
+[2020/04/29 23:58:04] Graffiti: 81 [158]
+[2020/04/29 23:58:04] 1852.739990, -1942.300048, 14.743700
 String: {FF8B00}FUCK
-[2020/04/29 22:04:31] Graffiti: 82 [161]
-[2020/04/29 22:04:31] 2260.919921, -1233.920043, 24.236600
+[2020/04/29 23:58:04] Graffiti: 82 [161]
+[2020/04/29 23:58:04] 2260.919921, -1233.920043, 24.236600
 String: {0000FF}=LAME
 GANG
-[2020/04/29 22:04:31] Graffiti: 83 [162]
-[2020/04/29 22:04:31] 2261.030029, -1242.569946, 24.476600
+[2020/04/29 23:58:04] Graffiti: 83 [162]
+[2020/04/29 23:58:04] 2261.030029, -1242.569946, 24.476600
 String: {0000FF}huggiesK
 crabK
 TDKS35
-[2020/04/29 22:04:31] Graffiti: 84 [163]
-[2020/04/29 22:04:31] 2260.939941, -1246.739990, 24.476600
+[2020/04/29 23:58:04] Graffiti: 84 [163]
+[2020/04/29 23:58:04] 2260.939941, -1246.739990, 24.476600
 String: {0000FF}Levas
 craPz:.
-[2020/04/29 22:04:31] Graffiti: 85 [164]
-[2020/04/29 22:04:31] 2252.570068, -1257.719970, 24.462699
+[2020/04/29 23:58:04] Graffiti: 85 [164]
+[2020/04/29 23:58:04] 2252.570068, -1257.719970, 24.462699
 String: :.LAME
 .:STREET
-[2020/04/29 22:04:31] Graffiti: 86 [165]
-[2020/04/29 22:04:31] 2258.149902, -1263.689941, 24.460399
+[2020/04/29 23:58:04] Graffiti: 86 [165]
+[2020/04/29 23:58:04] 2258.149902, -1263.689941, 24.460399
 String: :5LAMES2:
-[2020/04/29 22:04:31] Graffiti: 87 [166]
-[2020/04/29 22:04:31] 2260.929931, -1250.930053, 24.476600
+[2020/04/29 23:58:04] Graffiti: 87 [166]
+[2020/04/29 23:58:04] 2260.929931, -1250.930053, 24.476600
 String: welcome
 to$nitch
 h00d
-[2020/04/29 22:04:31] Graffiti: 88 [170]
-[2020/04/29 22:04:31] 2177.139892, -1653.180053, 16.146299
+[2020/04/29 23:58:04] Graffiti: 88 [170]
+[2020/04/29 23:58:04] 2177.139892, -1653.180053, 16.146299
 String: {0000FF} C.C.C
-[2020/04/29 22:04:31] Graffiti: 89 [171]
-[2020/04/29 22:04:31] 1910.969970, -1887.810058, 14.010999
+[2020/04/29 23:58:04] Graffiti: 89 [171]
+[2020/04/29 23:58:04] 1910.969970, -1887.810058, 14.010999
 String: {FF8B00} 52HGC
-[2020/04/29 22:04:31] Graffiti: 90 [172]
-[2020/04/29 22:04:31] 1925.020019, -1889.260009, 14.154100
+[2020/04/29 23:58:04] Graffiti: 90 [172]
+[2020/04/29 23:58:04] 1925.020019, -1889.260009, 14.154100
 String: {0000FF} 52HCG 
  pK
-[2020/04/29 22:04:31] Graffiti: 91 [173]
-[2020/04/29 22:04:31] 1910.880004, -1887.810058, 13.520199
+[2020/04/29 23:58:04] Graffiti: 91 [173]
+[2020/04/29 23:58:04] 1910.880004, -1887.810058, 13.520199
 String: {0000FF} pbsK
-[2020/04/29 22:04:31] Graffiti: 92 [176]
-[2020/04/29 22:04:31] 1910.810058, -1887.800048, 13.380000
+[2020/04/29 23:58:04] Graffiti: 92 [176]
+[2020/04/29 23:58:04] 1910.810058, -1887.800048, 13.380000
 String: {000000} HGC
-[2020/04/29 22:04:31] Graffiti: 93 [177]
-[2020/04/29 22:04:31] 1910.390014, -1887.819946, 14.010199
+[2020/04/29 23:58:04] Graffiti: 93 [177]
+[2020/04/29 23:58:04] 1910.390014, -1887.819946, 14.010199
 String: {0000FF} K 
  snoovaK
-[2020/04/29 22:04:31] Graffiti: 94 [178]
-[2020/04/29 22:04:31] 1925.310058, -1889.250000, 14.343099
+[2020/04/29 23:58:04] Graffiti: 94 [178]
+[2020/04/29 23:58:04] 1925.310058, -1889.250000, 14.343099
 String: {0000FF} XXXXXXXXXX
-[2020/04/29 22:04:31] Graffiti: 95 [179]
-[2020/04/29 22:04:31] 1925.140014, -1889.250000, 13.603899
+[2020/04/29 23:58:04] Graffiti: 95 [179]
+[2020/04/29 23:58:04] 1925.140014, -1889.250000, 13.603899
 String: {0000FF} HCGK 
  {FFFFFF} BOOVERK
-[2020/04/29 22:04:31] Graffiti: 96 [180]
-[2020/04/29 22:04:31] 2260.959960, -1250.760009, 24.665700
+[2020/04/29 23:58:04] Graffiti: 96 [180]
+[2020/04/29 23:58:04] 2260.959960, -1250.760009, 24.665700
 String: {FF8B00} ___________________
-[2020/04/29 22:04:31] Graffiti: 97 [181]
-[2020/04/29 22:04:31] 2260.979980, -1250.969970, 24.719900
+[2020/04/29 23:58:04] Graffiti: 97 [181]
+[2020/04/29 23:58:04] 2260.979980, -1250.969970, 24.719900
 String: {FF8B00} ____________
-[2020/04/29 22:04:31] Graffiti: 98 [182]
-[2020/04/29 22:04:31] 2261.090087, -1242.589965, 24.675600
+[2020/04/29 23:58:04] Graffiti: 98 [182]
+[2020/04/29 23:58:04] 2261.090087, -1242.589965, 24.675600
 String: {FF8B00} _______________
-[2020/04/29 22:04:31] Graffiti: 99 [183]
-[2020/04/29 22:04:31] 2260.939941, -1235.000000, 24.486600
+[2020/04/29 23:58:04] Graffiti: 99 [183]
+[2020/04/29 23:58:04] 2260.939941, -1235.000000, 24.486600
 String: {0000FF} PBS
-[2020/04/29 22:04:31] Graffiti: 100 [184]
-[2020/04/29 22:04:31] 2252.729980, -1257.750000, 24.503099
+[2020/04/29 23:58:04] Graffiti: 100 [184]
+[2020/04/29 23:58:04] 2252.729980, -1257.750000, 24.503099
 String: {0000FF} __________________
-[2020/04/29 22:04:31] Graffiti: 101 [185]
-[2020/04/29 22:04:31] 2258.159912, -1263.609985, 24.650999
+[2020/04/29 23:58:04] Graffiti: 101 [185]
+[2020/04/29 23:58:04] 2258.159912, -1263.609985, 24.650999
 String: {0000FF} _______________
-[2020/04/29 22:04:31] Graffiti: 102 [187]
-[2020/04/29 22:04:31] 2238.040039, -1265.199951, 24.870000
+[2020/04/29 23:58:04] Graffiti: 102 [187]
+[2020/04/29 23:58:04] 2238.040039, -1265.199951, 24.870000
 String: {FF8B00} Hoovers
-[2020/04/29 22:04:31] Graffiti: 103 [188]
-[2020/04/29 22:04:31] 2260.949951, -1246.640014, 24.653799
+[2020/04/29 23:58:04] Graffiti: 103 [188]
+[2020/04/29 23:58:04] 2260.949951, -1246.640014, 24.653799
 String: {FF8B00} ____________________
-[2020/04/29 22:04:31] Graffiti: 104 [189]
-[2020/04/29 22:04:31] 2227.120117, -1263.670043, 24.417299
+[2020/04/29 23:58:04] Graffiti: 104 [189]
+[2020/04/29 23:58:04] 2227.120117, -1263.670043, 24.417299
 String: {FF8B00} 5 Hoovers
-[2020/04/29 22:04:31] Graffiti: 105 [190]
-[2020/04/29 22:04:31] 2228.060058, -1263.670043, 23.925600
+[2020/04/29 23:58:04] Graffiti: 105 [190]
+[2020/04/29 23:58:04] 2228.060058, -1263.670043, 23.925600
 String: {FF8B00} 2
-[2020/04/29 22:04:31] Graffiti: 106 [192]
-[2020/04/29 22:04:31] 2205.310058, -1257.859985, 23.755399
+[2020/04/29 23:58:04] Graffiti: 106 [192]
+[2020/04/29 23:58:04] 2205.310058, -1257.859985, 23.755399
 String: {FF8B00} Killers
-[2020/04/29 22:04:31] Graffiti: 107 [193]
-[2020/04/29 22:04:31] 2204.129882, -1257.790039, 23.783300
+[2020/04/29 23:58:04] Graffiti: 107 [193]
+[2020/04/29 23:58:04] 2204.129882, -1257.790039, 23.783300
 String: {FF8B00} pbs
-[2020/04/29 22:04:31] Graffiti: 108 [197]
-[2020/04/29 22:04:31] 2123.439941, -1742.449951, 14.054699
+[2020/04/29 23:58:04] Graffiti: 108 [197]
+[2020/04/29 23:58:04] 2123.439941, -1742.449951, 14.054699
 String: {FFFFFF} slobK  
-[2020/04/29 22:04:31] Graffiti: 109 [201]
-[2020/04/29 22:04:31] 2194.860107, -1739.810058, 14.046899
+[2020/04/29 23:58:04] Graffiti: 109 [201]
+[2020/04/29 23:58:04] 2194.860107, -1739.810058, 14.046899
 String: {000000}c blocc
 187 24/7
 {FFFFFF}fucc 12
-[2020/04/29 22:04:31] Graffiti: 110 [202]
-[2020/04/29 22:04:31] 2170.909912, -1729.800048, 14.041399
+[2020/04/29 23:58:04] Graffiti: 110 [202]
+[2020/04/29 23:58:04] 2170.909912, -1729.800048, 14.041399
 String: {0000FF}x r.i.p x
 smokey
 k-loc
 dee
-[2020/04/29 22:04:31] Graffiti: 111 [203]
-[2020/04/29 22:04:31] 2172.250000, -1713.979980, 15.349599
+[2020/04/29 23:58:04] Graffiti: 111 [203]
+[2020/04/29 23:58:04] 2172.250000, -1713.979980, 15.349599
 String: {000000}no warning
 sh0ts
 {5B3F01}x_x
-[2020/04/29 22:04:31] Graffiti: 112 [207]
-[2020/04/29 22:04:31] 2116.020019, -1632.339965, 13.901100
+[2020/04/29 23:58:04] Graffiti: 112 [207]
+[2020/04/29 23:58:04] 2116.020019, -1632.339965, 13.901100
 String: {0000FF}CR4ZY
 C4R3L3SS
 CR1PS
-[2020/04/29 22:04:31] Graffiti: 113 [208]
-[2020/04/29 22:04:31] 1830.930053, -1825.030029, 13.498100
+[2020/04/29 23:58:04] Graffiti: 113 [208]
+[2020/04/29 23:58:04] 1830.930053, -1825.030029, 13.498100
 String: PL4YB0Y$-
-[2020/04/29 22:04:31] Graffiti: 114 [209]
-[2020/04/29 22:04:31] 2120.840087, -1633.500000, 13.984999
+[2020/04/29 23:58:04] Graffiti: 114 [209]
+[2020/04/29 23:58:04] 2120.840087, -1633.500000, 13.984999
 String: {000000}FUCC
 marks
-[2020/04/29 22:04:31] Graffiti: 115 [210]
-[2020/04/29 22:04:31] 1881.040039, -1854.589965, 12.587400
+[2020/04/29 23:58:04] Graffiti: 115 [210]
+[2020/04/29 23:58:04] 1881.040039, -1854.589965, 12.587400
 String: {0000FF}PBSX3
 35STR33T
-[2020/04/29 22:04:31] Graffiti: 116 [211]
-[2020/04/29 22:04:31] 2175.870117, -1620.859985, 15.013400
+[2020/04/29 23:58:04] Graffiti: 116 [211]
+[2020/04/29 23:58:04] 2175.870117, -1620.859985, 15.013400
 String: {0000FF}cr1p
 BLOCC
-[2020/04/29 22:04:31] Graffiti: 117 [213]
-[2020/04/29 22:04:31] 2211.669921, -1626.719970, 16.567600
+[2020/04/29 23:58:04] Graffiti: 117 [213]
+[2020/04/29 23:58:04] 2211.669921, -1626.719970, 16.567600
 String: {0000FF}FUCC
-[2020/04/29 22:04:31] Graffiti: 118 [214]
-[2020/04/29 22:04:31] 2211.070068, -1626.300048, 16.594299
+[2020/04/29 23:58:04] Graffiti: 118 [214]
+[2020/04/29 23:58:04] 2211.070068, -1626.300048, 16.594299
 String: {0000FF}YOU
-[2020/04/29 22:04:31] Graffiti: 119 [215]
-[2020/04/29 22:04:31] 1874.099975, -1889.250000, 14.183799
+[2020/04/29 23:58:04] Graffiti: 119 [215]
+[2020/04/29 23:58:04] 1874.099975, -1889.250000, 14.183799
 String: {FF8B00} BITCH
-[2020/04/29 22:04:31] Graffiti: 120 [216]
-[2020/04/29 22:04:31] 1874.040039, -1889.290039, 13.774000
+[2020/04/29 23:58:04] Graffiti: 120 [216]
+[2020/04/29 23:58:04] 1874.040039, -1889.290039, 13.774000
 String: {FF8B00} HOOD
-[2020/04/29 22:04:31] Graffiti: 121 [217]
-[2020/04/29 22:04:31] 1951.869995, -1908.800048, 14.806900
+[2020/04/29 23:58:04] Graffiti: 121 [217]
+[2020/04/29 23:58:04] 1951.869995, -1908.800048, 14.806900
 String: {FF8B00} ______________
-[2020/04/29 22:04:31] Graffiti: 122 [218]
-[2020/04/29 22:04:31] 1951.949951, -1908.819946, 14.737199
+[2020/04/29 23:58:04] Graffiti: 122 [218]
+[2020/04/29 23:58:04] 1951.949951, -1908.819946, 14.737199
 String: {FF8B00} ______________
-[2020/04/29 22:04:31] Graffiti: 123 [220]
-[2020/04/29 22:04:31] 1987.189941, -1922.369995, 14.046899
+[2020/04/29 23:58:04] Graffiti: 123 [220]
+[2020/04/29 23:58:04] 1987.189941, -1922.369995, 14.046899
 String: {0000FF} Snitch
-[2020/04/29 22:04:31] Graffiti: 124 [221]
-[2020/04/29 22:04:31] 1987.189941, -1922.369995, 13.606900
+[2020/04/29 23:58:04] Graffiti: 124 [221]
+[2020/04/29 23:58:04] 1987.189941, -1922.369995, 13.606900
 String: {0000FF} Territory
-[2020/04/29 22:04:31] Graffiti: 125 [222]
-[2020/04/29 22:04:31] 1971.579956, -1905.109985, 14.466899
+[2020/04/29 23:58:04] Graffiti: 125 [222]
+[2020/04/29 23:58:04] 1971.579956, -1905.109985, 14.466899
 String: {FF8B00} Hooverz
-[2020/04/29 22:04:31] Graffiti: 126 [223]
-[2020/04/29 22:04:31] 1971.599975, -1905.150024, 14.006899
+[2020/04/29 23:58:04] Graffiti: 126 [223]
+[2020/04/29 23:58:04] 1971.599975, -1905.150024, 14.006899
 String: {FF8B00} Owns
-[2020/04/29 22:04:31] Graffiti: 127 [224]
-[2020/04/29 22:04:31] 1971.550048, -1905.189941, 13.576899
+[2020/04/29 23:58:04] Graffiti: 127 [224]
+[2020/04/29 23:58:04] 1971.550048, -1905.189941, 13.576899
 String: {FF8B00} This
-[2020/04/29 22:04:31] Graffiti: 128 [225]
-[2020/04/29 22:04:31] 1971.609985, -1903.819946, 14.486900
+[2020/04/29 23:58:04] Graffiti: 128 [225]
+[2020/04/29 23:58:04] 1971.609985, -1903.819946, 14.486900
 String: {0000FF} 52
-[2020/04/29 22:04:31] Graffiti: 129 [229]
-[2020/04/29 22:04:31] 2177.860107, -1272.390014, 24.476600
+[2020/04/29 23:58:04] Graffiti: 129 [229]
+[2020/04/29 23:58:04] 2177.860107, -1272.390014, 24.476600
 String: {FF8B00} five
-[2020/04/29 22:04:31] Graffiti: 130 [230]
-[2020/04/29 22:04:31] 2177.860107, -1273.369995, 24.476600
+[2020/04/29 23:58:04] Graffiti: 130 [230]
+[2020/04/29 23:58:04] 2177.860107, -1273.369995, 24.476600
 String: {FF8B00} deuce
-[2020/04/29 22:04:31] Graffiti: 131 [231]
-[2020/04/29 22:04:31] 2177.870117, -1272.890014, 23.946599
+[2020/04/29 23:58:04] Graffiti: 131 [231]
+[2020/04/29 23:58:04] 2177.870117, -1272.890014, 23.946599
 String: {0000FF} crip
-[2020/04/29 22:04:31] Graffiti: 132 [232]
-[2020/04/29 22:04:31] 1971.589965, -1905.209960, 13.932600
+[2020/04/29 23:58:04] Graffiti: 132 [232]
+[2020/04/29 23:58:04] 1971.589965, -1905.209960, 13.932600
 String: {0000FF}________________{0000FF}
-[2020/04/29 22:04:31] Graffiti: 133 [233]
-[2020/04/29 22:04:31] 1971.510009, -1904.989990, 13.826999
+[2020/04/29 23:58:04] Graffiti: 133 [233]
+[2020/04/29 23:58:04] 1971.510009, -1904.989990, 13.826999
 String: {0000FF}_________________________{0000FF}
-[2020/04/29 22:04:31] Graffiti: 134 [234]
-[2020/04/29 22:04:31] 1971.469970, -1905.010009, 14.196900
+[2020/04/29 23:58:04] Graffiti: 134 [234]
+[2020/04/29 23:58:04] 1971.469970, -1905.010009, 14.196900
 String: {0000FF}_________________{0000FF}
-[2020/04/29 22:04:31] Graffiti: 135 [235]
-[2020/04/29 22:04:31] 1971.609985, -1907.020019, 14.046899
+[2020/04/29 23:58:04] Graffiti: 135 [235]
+[2020/04/29 23:58:04] 1971.609985, -1907.020019, 14.046899
 String: {0000FF}snoochieK{0000FF}
 {0000FF}FUcK HUGGIES{0000FF}
-[2020/04/29 22:04:31] Graffiti: 136 [236]
-[2020/04/29 22:04:31] 1987.239990, -1922.500000, 13.963299
+[2020/04/29 23:58:04] Graffiti: 136 [236]
+[2020/04/29 23:58:04] 1987.239990, -1922.500000, 13.963299
 String: {FF0000}_____________________________{FF0000}
-[2020/04/29 22:04:31] SIMPLE CARS [0 free] :
-[2020/04/29 22:04:31] thief_Spot[spotCars][0]: Bravura [2] [0$]
-[2020/04/29 22:04:31] thief_Spot[spotCars][1]: Sadler [2] [0$]
-[2020/04/29 22:04:31] thief_Spot[spotCars][2]: Nebula [2] [0$]
-[2020/04/29 22:04:31] thief_Spot[spotCars][3]: Regina [1] [0$]
-[2020/04/29 22:04:31] thief_Spot[spotCars][4]: Manana [1] [0$]
-[2020/04/29 22:04:31] thief_Spot[spotCars][5]: Admiral [1] [0$]
-[2020/04/29 22:04:31] thief_Spot[spotCars][6]: Sentinel [1] [0$]
-[2020/04/29 22:04:31] [load] 10 map ikonu.
-[2020/04/29 22:04:31] [load] 3 garazu
-[2020/04/29 22:04:31] [debug] OptionsLoad
-[2020/04/29 22:04:31] [debug] PreparePoliceWaresUsage
-[2020/04/29 22:04:31] [load] bus pridedama 15120 i frakcijos sandeli.
-[2020/04/29 22:04:31] [load] 2 darbu
-[2020/04/29 22:04:31] [load] 4 frakciju
-[2020/04/29 22:04:31] [load] 6 grupiu
-[2020/04/29 22:04:31] [load] 19 galimu prekiu sarase.
-[2020/04/29 22:04:31] [load] 9 bankomatu
-[2020/04/29 22:04:31] [load] 15 taksofonu
-[2020/04/29 22:04:31] [load] 37 namu baldu
-[2020/04/29 22:04:31] [load] 479 verslu baldu
-[2020/04/29 22:04:31] [load] 11 garazu baldu
-[2020/04/29 22:04:31] [create] CreateVehicle(507) called, ID: 1
-[2020/04/29 22:04:31] [create] CreateVehicle(507) called, ID: 2
-[2020/04/29 22:04:31] [create] CreateVehicle(507) called, ID: 3
-[2020/04/29 22:04:31] [create] CreateVehicle(463) called, ID: 4
-[2020/04/29 22:04:31] [create] CreateVehicle(463) called, ID: 5
-[2020/04/29 22:04:31] [create] CreateVehicle(463) called, ID: 6
-[2020/04/29 22:04:31] [create] CreateVehicle(463) called, ID: 7
-[2020/04/29 22:04:31] [create] CreateVehicle(507) called, ID: 8
-[2020/04/29 22:04:31] [create] CreateVehicle(507) called, ID: 9
-[2020/04/29 22:04:31] [create] CreateVehicle(507) called, ID: 10
-[2020/04/29 22:04:31] [create] CreateVehicle(596) called, ID: 11
-[2020/04/29 22:04:31] [create] CreateVehicle(596) called, ID: 12
-[2020/04/29 22:04:31] [create] CreateVehicle(596) called, ID: 13
-[2020/04/29 22:04:31] [create] CreateVehicle(596) called, ID: 14
-[2020/04/29 22:04:31] [create] CreateVehicle(596) called, ID: 15
-[2020/04/29 22:04:31] [create] CreateVehicle(596) called, ID: 16
-[2020/04/29 22:04:31] [create] CreateVehicle(426) called, ID: 17
-[2020/04/29 22:04:31] [create] CreateVehicle(490) called, ID: 18
-[2020/04/29 22:04:31] [create] CreateVehicle(426) called, ID: 19
-[2020/04/29 22:04:31] [create] CreateVehicle(490) called, ID: 20
-[2020/04/29 22:04:31] [create] CreateVehicle(579) called, ID: 21
-[2020/04/29 22:04:31] [create] CreateVehicle(523) called, ID: 22
-[2020/04/29 22:04:31] [create] CreateVehicle(523) called, ID: 23
-[2020/04/29 22:04:31] [create] CreateVehicle(426) called, ID: 24
-[2020/04/29 22:04:31] [create] CreateVehicle(596) called, ID: 25
-[2020/04/29 22:04:31] [create] CreateVehicle(596) called, ID: 26
-[2020/04/29 22:04:31] [create] CreateVehicle(560) called, ID: 27
-[2020/04/29 22:04:31] [create] CreateVehicle(430) called, ID: 28
-[2020/04/29 22:04:31] [create] CreateVehicle(599) called, ID: 29
-[2020/04/29 22:04:31] [create] CreateVehicle(597) called, ID: 30
-[2020/04/29 22:04:31] [create] CreateVehicle(413) called, ID: 31
-[2020/04/29 22:04:31] [create] CreateVehicle(414) called, ID: 32
-[2020/04/29 22:04:31] [create] CreateVehicle(413) called, ID: 33
-[2020/04/29 22:04:31] [create] CreateVehicle(414) called, ID: 34
-[2020/04/29 22:04:31] [create] CreateVehicle(414) called, ID: 35
-[2020/04/29 22:04:31] [create] CreateVehicle(413) called, ID: 36
-[2020/04/29 22:04:31] [create] CreateVehicle(525) called, ID: 37
-[2020/04/29 22:04:31] [create] CreateVehicle(493) called, ID: 38
-[2020/04/29 22:04:31] [create] CreateVehicle(541) called, ID: 39
-[2020/04/29 22:04:31] [create] CreateVehicle(404) called, ID: 40
-[2020/04/29 22:04:31] [create] CreateVehicle(401) called, ID: 41
-[2020/04/29 22:04:31] [create] CreateVehicle(401) called, ID: 42
-[2020/04/29 22:04:31] [create] CreateVehicle(404) called, ID: 43
-[2020/04/29 22:04:31] [create] CreateVehicle(462) called, ID: 44
-[2020/04/29 22:04:31] [create] CreateVehicle(462) called, ID: 45
-[2020/04/29 22:04:31] [create] CreateVehicle(462) called, ID: 46
-[2020/04/29 22:04:31] [create] CreateVehicle(478) called, ID: 47
-[2020/04/29 22:04:31] [create] CreateVehicle(516) called, ID: 48
-[2020/04/29 22:04:31] [create] CreateVehicle(423) called, ID: 49
-[2020/04/29 22:04:31] [create] CreateVehicle(588) called, ID: 50
-[2020/04/29 22:04:31] [create] CreateVehicle(424) called, ID: 51
-[2020/04/29 22:04:31] [create] CreateVehicle(588) called, ID: 52
-[2020/04/29 22:04:31] [create] CreateVehicle(454) called, ID: 53
-[2020/04/29 22:04:31] [create] CreateVehicle(493) called, ID: 54
-[2020/04/29 22:04:31] [load] 54 serverio tr. priemoniu
-[2020/04/29 22:04:31] i: 0
-[2020/04/29 22:04:31] i: 1
-[2020/04/29 22:04:31] i: 2
-[2020/04/29 22:04:31] i: 3
-[2020/04/29 22:04:31] i: 4
-[2020/04/29 22:04:31] i: 5
-[2020/04/29 22:04:31] i: 6
-[2020/04/29 22:04:31] i: 7
-[2020/04/29 22:04:31] i: 8
-[2020/04/29 22:04:31] i: 9
-[2020/04/29 22:04:31] i: 10
-[2020/04/29 22:04:31] i: 11
-[2020/04/29 22:04:31] i: 12
-[2020/04/29 22:04:31] i: 13
-[2020/04/29 22:04:31] i: 14
-[2020/04/29 22:04:31] i: 15
-[2020/04/29 22:04:31] i: 16
-[2020/04/29 22:04:31] i: 17
-[2020/04/29 22:04:31] i: 18
-[2020/04/29 22:04:31] i: 19
-[2020/04/29 22:04:31] i: 20
-[2020/04/29 22:04:31] i: 21
-[2020/04/29 22:04:31] i: 22
-[2020/04/29 22:04:31] i: 23
-[2020/04/29 22:04:31] i: 24
-[2020/04/29 22:04:31] i: 25
-[2020/04/29 22:04:31] i: 26
-[2020/04/29 22:04:31] i: 27
-[2020/04/29 22:04:31] i: 28
-[2020/04/29 22:04:31] i: 29
-[2020/04/29 22:04:31] i: 30
-[2020/04/29 22:04:31] i: 31
-[2020/04/29 22:04:31] i: 32
-[2020/04/29 22:04:31] i: 33
-[2020/04/29 22:04:31] i: 34
-[2020/04/29 22:04:31] i: 35
-[2020/04/29 22:04:31] i: 36
-[2020/04/29 22:04:31] i: 37
-[2020/04/29 22:04:31] i: 38
-[2020/04/29 22:04:31] i: 39
-[2020/04/29 22:04:31] i: 40
-[2020/04/29 22:04:31] i: 41
-[2020/04/29 22:04:31] i: 42
-[2020/04/29 22:04:31] i: 43
-[2020/04/29 22:04:31] i: 44
-[2020/04/29 22:04:31] i: 45
-[2020/04/29 22:04:31] i: 46
-[2020/04/29 22:04:31] i: 47
-[2020/04/29 22:04:31] i: 48
-[2020/04/29 22:04:31] i: 49
-[2020/04/29 22:04:31] [load] 50 iejimu/isejimu
-[2020/04/29 22:04:31] SPECIAL CARS [7 free]:
-[2020/04/29 22:04:31] thief_Spot[spotCars][7]: Savanna [1] [1$]
-[2020/04/29 22:04:31] thief_Spot[spotCars][8]: Taxi [1] [1$]
-[2020/04/29 22:04:31] thief_Spot[spotCars][9]: Admiral [1] [1$]
-[2020/04/29 22:04:31] [load] 0 ismestu daiktu.
-[2020/04/29 22:04:31] [load] 22 namu
-[2020/04/29 22:04:31] [load] 4 konspiraciniu namu
-[2020/04/29 22:04:31] [load] 24 verslu
-[2020/04/29 22:04:31] [load] 23 ranku frakcijai "LSPD"
-[2020/04/29 22:04:31] [load] 9 ranku frakcijai "San News"
-[2020/04/29 22:04:31] [load] 9 ranku frakcijai "LSMD & LSFD"
-[2020/04/29 22:04:31] [load] 13 ranku frakcijai "Government"
-Console input: password
-[2020/04/29 22:05:46] password = "randompsw"  (string)
-Console input: password southland
-[2020/04/29 22:06:52] Setting server password to: "southland"
-[2020/04/29 22:07:05] [connection] 127.0.0.1:58820 requests connection cookie.
-[2020/04/29 22:07:06] [connection] incoming connection: 127.0.0.1:58820 id: 0
-[2020/04/29 22:07:07] [join] f0cus has joined the server (0:127.0.0.1)
-[2020/04/29 22:07:07] [debug] OnPlayerConnect(f0cus)
-[2020/04/29 22:07:07] ResetData(, 1, 1)
-[2020/04/29 22:07:10] [debug] LoginHalt(f0cus)
-[2020/04/29 22:07:46] OnDialogPerformed(0, DialogUserLogin, 1, 1)
-[2020/04/29 22:07:48] [debug] OnPlayerClickTextDraw(f0cus, 241)
-[2020/04/29 22:07:49] [debug] OnPlayerClickTextDraw(f0cus, 251)
-[2020/04/29 22:07:50] [debug] OnPlayerClickTextDraw(f0cus, 235)
-[2020/04/29 22:07:50] OnPlayerSpawnChar(f0cus, 1)
-[2020/04/29 22:07:50] [debug] AccountLoad(Martin_Ayala)
-[2020/04/29 22:07:50] [debug] SpawnPlayerEx(Martin_Ayala, 1, appr: 1)
-[2020/04/29 22:07:50] [debug] OnPlayerClickTextDraw(Martin_Ayala, 65535)
-[2020/04/29 22:07:50] [debug] OnPlayerSpawn(Martin_Ayala, 1)
-[2020/04/29 22:07:50] [debug] OnPlayerSpawn(Martin_Ayala, 0)
-[2020/04/29 22:07:50] [debug] PlayerInventoryLoad(Martin_Ayala)
-[2020/04/29 22:07:50] [debug] PlayerClothesAttachedLoad(Martin_Ayala)
-[2020/04/29 22:07:52] [debug] WarningHide(Martin_Ayala)
-[2020/04/29 22:09:07] [debug] OnPlayerCommandReceived(Martin_Ayala,ao(d),)
-[2020/04/29 22:10:07] [debug] OnPlayerCommandReceived(Martin_Ayala,jetpack(),)
-[2020/04/29 22:10:07] [debug] OnPlayerCommandReceived(Martin_Ayala,ado(),)
-[2020/04/29 22:10:08] [debug] OnPlayerCommandReceived(Martin_Ayala,aod(),)
-[2020/04/29 22:10:09] [debug] OnPlayerCommandReceived(Martin_Ayala,jetpack(),)
-[2020/04/29 22:10:11] [debug] OnPlayerCommandReceived(Martin_Ayala,aod(),)
-[2020/04/29 22:10:13] [debug] OnPlayerCommandReceived(Martin_Ayala,aduty(),)
-[2020/04/29 22:10:14] [debug] OnPlayerCommandReceived(Martin_Ayala,jetpack(),)
-[2020/04/29 22:10:15] [debug] OnPlayerCommandReceived(Martin_Ayala,jetpack(),)
-[2020/04/29 22:10:15] [debug] OnPlayerCommandReceived(Martin_Ayala,jetpack(),)
-[2020/04/29 22:10:16] [debug] OnPlayerCommandReceived(Martin_Ayala,jetpack(),)
-[2020/04/29 22:12:38] [connection] 77.221.89.87:62321 requests connection cookie.
-[2020/04/29 22:12:39] [connection] incoming connection: 77.221.89.87:62321 id: 1
-[2020/04/29 22:12:39] [join] trb has joined the server (1:77.221.89.87)
-[2020/04/29 22:12:39] [debug] OnPlayerConnect(trb)
-[2020/04/29 22:12:39] ResetData(, 1, 1)
-[2020/04/29 22:12:42] [debug] LoginHalt(trb)
-[2020/04/29 22:12:42] [debug] Kicker(trb)
-[2020/04/29 22:12:42] [debug] OnPlayerDisconnect(trb,2,1)
-[2020/04/29 22:12:42] [part] trb has left the server (1:2)
-[2020/04/29 22:12:47] [debug] OnPlayerPickUpDynamicPickup(Martin_Ayala)
-[2020/04/29 22:12:49] [debug] OnPlayerCommandReceived(Martin_Ayala,takejob(),)
-[2020/04/29 22:12:49] [debug] OnPlayerPickUpDynamicPickup(Martin_Ayala)
-[2020/04/29 22:13:35] [connection] 77.221.89.87:62324 requests connection cookie.
-[2020/04/29 22:13:36] [connection] incoming connection: 77.221.89.87:62324 id: 1
-[2020/04/29 22:13:36] [join] trb has joined the server (1:77.221.89.87)
-[2020/04/29 22:13:36] [debug] OnPlayerConnect(trb)
-[2020/04/29 22:13:36] ResetData(trb, 1, 1)
-[2020/04/29 22:13:39] [debug] LoginHalt(trb)
-[2020/04/29 22:13:45] OnDialogPerformed(1, DialogRegisterPassword, 1, 1)
-[2020/04/29 22:13:46] OnDialogPerformed(1, DialogRegisterPassword, 1, 1)
-[2020/04/29 22:13:50] OnDialogPerformed(1, DialogRegisterPassword, 1, 1)
-[2020/04/29 22:13:51] OnDialogPerformed(1, DialogRegisterPassword, 1, 1)
-[2020/04/29 22:14:03] OnDialogPerformed(1, DialogRegisterPassword, 1, 1)
-[2020/04/29 22:14:05] OnDialogPerformed(1, DialogRegisterQuestion, 1, 1)
-[2020/04/29 22:14:06] OnDialogPerformed(1, DialogRegisterAnswer, 1, 1)
-[2020/04/29 22:14:07] OnDialogPerformed(1, DialogRegisterInfo, 1, 1)
-[2020/04/29 22:14:08] [debug] OnPlayerClickTextDraw(trb, 260)
-[2020/04/29 22:14:12] OnDialogPerformed(1, DialogNewCharNameInput, 1, 1)
-[2020/04/29 22:14:12] [debug] OnPlayerClickTextDraw(trb, 257)
-[2020/04/29 22:14:13] [debug] OnPlayerClickTextDraw(trb, 257)
-[2020/04/29 22:14:18] [debug] OnPlayerPickUpDynamicPickup(Martin_Ayala)
-[2020/04/29 22:14:20] OnDialogPerformed(1, DialogNewCharAgeInput, 1, 1)
-[2020/04/29 22:14:20] [debug] OnPlayerPickUpDynamicPickup(Martin_Ayala)
-[2020/04/29 22:14:20] [debug] OnPlayerClickTextDraw(trb, 260)
-[2020/04/29 22:14:21] [debug] OnPlayerClickTextDraw(trb, 260)
-[2020/04/29 22:14:22] [debug] OnPlayerClickTextDraw(trb, 266)
-[2020/04/29 22:14:27] OnDialogPerformed(1, DialogNewCharNameInput, 1, 1)
-[2020/04/29 22:14:28] [debug] OnPlayerClickTextDraw(trb, 255)
-[2020/04/29 22:14:29] [debug] OnPlayerClickTextDraw(trb, 255)
-[2020/04/29 22:14:30] OnDialogPerformed(1, DialogNewCharSkin, 1, 1)
-[2020/04/29 22:14:33] [debug] OnPlayerClickTextDraw(trb, 262)
-[2020/04/29 22:14:33] [debug] OnPlayerClickTextDraw(trb, 264)
-[2020/04/29 22:14:33] OnDialogPerformed(1, DialogNewCharOrigin, 1, 1)
-[2020/04/29 22:14:33] [debug] OnPlayerClickTextDraw(trb, 264)
-[2020/04/29 22:14:35] OnDialogPerformed(1, CharCreateAnswer, 1, 1)
-[2020/04/29 22:14:35] [debug] OnPlayerClickTextDraw(trb, 275)
-[2020/04/29 22:14:36] [debug] OnPlayerClickTextDraw(trb, 266)
-[2020/04/29 22:14:36] OnDialogPerformed(1, DialogNewCharGender, 1, 1)
-[2020/04/29 22:14:37] [debug] OnPlayerClickTextDraw(trb, 264)
-[2020/04/29 22:14:37] OnDialogPerformed(1, CharCreateAnswer, 1, 1)
-[2020/04/29 22:14:38] [debug] OnPlayerClickTextDraw(trb, 266)
-[2020/04/29 22:14:38] OnDialogPerformed(1, CharCreateAnswer, 1, 1)
-[2020/04/29 22:14:38] [debug] OnPlayerClickTextDraw(trb, 268)
-[2020/04/29 22:14:39] OnDialogPerformed(1, CharCreateAnswer, 1, 1)
-[2020/04/29 22:14:39] [debug] OnPlayerClickTextDraw(trb, 269)
-[2020/04/29 22:14:39] InsertNewChar: INSERT INTO `players_new` (`Name`,`UserId`,`Skin`,`Origin`,`Gender`,`Years`,`Answer1`,`Answer2`,`Answer3`,`gpci`) VALUES ('Trb_Trb','199','1','Latvis','1','1990','sdd_','d_','sd_','55A8D9EAD4D8D8FDC854AC09889C444D4CA8E90A')
-[2020/04/29 22:14:47] [debug] OnPlayerCommandReceived(Martin_Ayala,newchars(),)
-[2020/04/29 22:14:47] OnDialogPerformed(0, DialogAdminNewCharsMain, 1, 1)
-[2020/04/29 22:14:48] OnDialogPerformed(0, DialogAdminNewCharsList, 1, 1)
-[2020/04/29 22:14:48] OnDialogPerformed(0, DialogAdminNewCharDetail, 1, 1)
-[2020/04/29 22:14:48] INSERT INTO `players_data` (`Name`,`BirthDate`,`Skin`,`Gender`,`Origin`,`Money`,`LastVersion_Server`,`UserId`,`X`,`Y`,`Z`,`gpci`) VALUES ('Trb_Trb','1990','1','1','Latvis','5000','1147','199','1969.260010','-1680.478027','13.541938','55A8D9EAD4D8D8FDC854AC09889C444D4CA8E90A')
-[2020/04/29 22:14:49] [debug] OnPlayerClickTextDraw(trb, 250)
-[2020/04/29 22:14:50] [debug] OnPlayerClickTextDraw(trb, 235)
-[2020/04/29 22:14:50] OnPlayerSpawnChar(trb, 0)
-[2020/04/29 22:14:50] [debug] AccountLoad(Trb_Trb)
-[2020/04/29 22:14:50] [debug] SpawnPlayerEx(Trb_Trb, 1, appr: 1)
-[2020/04/29 22:14:50] [debug] OnPlayerClickTextDraw(Trb_Trb, 65535)
-[2020/04/29 22:14:50] [debug] OnPlayerSpawn(Trb_Trb, 1)
-[2020/04/29 22:14:50] [debug] OnPlayerSpawn(Trb_Trb, 0)
-[2020/04/29 22:14:50] [debug] PlayerInventoryLoad(Trb_Trb)
-[2020/04/29 22:14:52] [debug] WarningHide(Trb_Trb)
-[2020/04/29 22:15:09] [debug] OnPlayerCommandReceived(Martin_Ayala,setgroup(),)
-[2020/04/29 22:15:11] [debug] OnPlayerCommandReceived(Martin_Ayala,setgroup1(1),)
-[2020/04/29 22:15:12] [debug] OnPlayerCommandReceived(Martin_Ayala,setgroup(1 1),)
-[2020/04/29 22:15:17] [debug] OnPlayerCommandReceived(Trb_Trb,a(a),)
-[2020/04/29 22:15:21] [debug] OnPlayerCommandReceived(Trb_Trb,a(AAAAAAAAAAAAAAAAAAAAAAAAA),)
-[2020/04/29 22:15:23] [debug] OnPlayerPickUpDynamicPickup(Martin_Ayala)
-[2020/04/29 22:15:24] [debug] OnPlayerCommandReceived(Trb_Trb,amenu(),)
-[2020/04/29 22:15:24] [debug] OnPlayerClickTextDraw(Martin_Ayala, 67)
-[2020/04/29 22:15:25] [debug] OnPlayerClickTextDraw(Martin_Ayala, 82)
-[2020/04/29 22:15:25] [debug] OnPlayerPickUpDynamicPickup(Martin_Ayala)
-[2020/04/29 22:15:26] [debug] OnPlayerClickTextDraw(Martin_Ayala, 78)
-[2020/04/29 22:15:26] [debug] OnPlayerClickTextDraw(Martin_Ayala, 77)
-[2020/04/29 22:15:26] [debug] OnPlayerClickTextDraw(Martin_Ayala, 81)
-[2020/04/29 22:15:26] [debug] OnPlayerClickTextDraw(Martin_Ayala, 85)
-[2020/04/29 22:15:26] [debug] OnPlayerClickTextDraw(Martin_Ayala, 84)
-[2020/04/29 22:15:27] [debug] OnPlayerClickTextDraw(Martin_Ayala, 83)
-[2020/04/29 22:15:27] [debug] OnPlayerClickTextDraw(Martin_Ayala, 65535)
-[2020/04/29 22:15:27] [debug] OnPlayerClickTextDraw(Martin_Ayala, 65535)
-[2020/04/29 22:15:27] [debug] OnPlayerPickUpDynamicPickup(Martin_Ayala)
-[2020/04/29 22:15:30] [debug] OnPlayerClickTextDraw(Martin_Ayala, 65535)
-[2020/04/29 22:15:30] [debug] OnPlayerClickTextDraw(Martin_Ayala, 65535)
-[2020/04/29 22:15:31] [debug] OnPlayerCommandReceived(Trb_Trb,amenu(),)
-[2020/04/29 22:15:40] [create] CreateVehicle(411) called, ID: 55
-[2020/04/29 22:15:40] [debug] FactionVehicleAdd(80)
-[2020/04/29 22:15:45] [debug] OnPlayerCommandReceived(Trb_Trb,aduty(),)
-[2020/04/29 22:15:45] [debug] HaveVehicleKey(Trb_Trb, 55, 0, 0)
-[2020/04/29 22:15:46] [debug] HaveVehicleKey(Trb_Trb, 55, 0, 1)
-[2020/04/29 22:16:19] [debug] OnPlayerCommandReceived(Martin_Ayala,to(1),)
-[2020/04/29 22:16:20] [debug] OnPlayerCommandReceived(Martin_Ayala,goto(1),)
-[2020/04/29 22:16:34] [debug] OnPlayerCommandReceived(Trb_Trb,screen(),)
-[2020/04/29 22:16:37] [debug] OnPlayerCommandReceived(Martin_Ayala,screen(),)
-[2020/04/29 22:16:38] [debug] OnPlayerGiveDamage(Trb_Trb, Martin_Ayala, 1.3, 0)
-[2020/04/29 22:16:38] [debug] OnPlayerTakeDamage(Martin_Ayala, Trb_Trb, 1.3, 0, 3)
-[2020/04/29 22:16:39] [debug] OnPlayerGiveDamage(Trb_Trb, Martin_Ayala, 1.3, 0)
-[2020/04/29 22:16:39] [debug] OnPlayerTakeDamage(Martin_Ayala, Trb_Trb, 1.3, 0, 3)
-[2020/04/29 22:16:45] [debug] HaveVehicleKey(Trb_Trb, 55, 0, 0)
-[2020/04/29 22:18:37] [debug] OnPlayerCommandReceived(Trb_Trb,goto(0),)
-[2020/04/29 22:18:41] [debug] OnPlayerTakeDamage(Martin_Ayala, , 4.9, 54, 3)
-[2020/04/29 22:18:50] [debug] OnPlayerTakeDamage(Martin_Ayala, , 4.9, 54, 3)
-[2020/04/29 22:18:52] [debug] OnPlayerCommandReceived(Martin_Ayala,jetpack(),)
-[2020/04/29 22:18:56] [debug] OnPlayerCommandReceived(Martin_Ayala,to(1),)
-[2020/04/29 22:19:02] [debug] OnPlayerCommandReceived(Martin_Ayala,gethere(1),)
-[2020/04/29 22:19:02] [debug] OnPlayerTakeDamage(Trb_Trb, , 4.9, 54, 3)
-[2020/04/29 22:19:14] [debug] OnPlayerCommandReceived(Trb_Trb,jetpack(),)
-[2020/04/29 22:20:32] [debug] OnPlayerPickUpDynamicPickup(Martin_Ayala)
-[2020/04/29 22:25:02] [debug] OnPlayerCommandReceived(Martin_Ayala,goto(1/amenu),)
-[2020/04/29 22:25:03] [debug] OnPlayerCommandReceived(Martin_Ayala,amenu(),)
-[2020/04/29 22:25:04] [debug] WarningHide(Martin_Ayala)
-[2020/04/29 22:25:06] [debug] OnPlayerCommandReceived(Trb_Trb,amenu(),)
-[2020/04/29 22:25:11] [debug] OnPlayerCommandReceived(Martin_Ayala,amenu(),)
-[2020/04/29 22:25:13] [debug] OnPlayerGiveDamage(Trb_Trb, Martin_Ayala, 1.3, 0)
-[2020/04/29 22:28:02] [debug] OnPlayerCommandReceived(Martin_Ayala,weapon(324),)
-[2020/04/29 22:28:08] [debug] OnPlayerCommandReceived(Martin_Ayala,giveweapon(0 24 ),)
-[2020/04/29 22:28:10] [debug] OnPlayerCommandReceived(Martin_Ayala,giveweapon(0 24 100 0),)
-[2020/04/29 22:28:22] [debug] OnPlayerCommandReceived(Trb_Trb,amenu(),)
-[2020/04/29 22:28:37] [debug] OnPlayerCommandReceived(Trb_Trb,givegun(),)
-[2020/04/29 22:28:40] [debug] OnPlayerCommandReceived(Trb_Trb,amenu(),)
-[2020/04/29 22:28:48] OnDialogPerformed(1, Dialog_Am_Interiors, 1, 1)
-[2020/04/29 22:28:50] OnDialogPerformed(1, Dialog_Am_InteriorEdit, 1, 1)
-[2020/04/29 22:28:56] [debug] OnPlayerCommandReceived(Trb_Trb,gotols(),)
-[2020/04/29 22:29:06] [debug] OnPlayerTakeDamage(Martin_Ayala, , 4.9, 54, 3)
-[2020/04/29 22:29:06] [debug] OnPlayerCommandReceived(Trb_Trb,b(aaaaaaaaaaa),)
-[2020/04/29 22:29:15] [debug] OnPlayerCommandReceived(Trb_Trb,goto(0),)
-[2020/04/29 22:29:17] [debug] OnPlayerCommandReceived(Trb_Trb,goto(0),)
-[2020/04/29 22:29:18] [debug] OnPlayerCommandReceived(Trb_Trb,goto(0),)
-[2020/04/29 22:29:19] [debug] OnPlayerCommandReceived(Trb_Trb,goto(0),)
-[2020/04/29 22:29:20] [debug] OnPlayerCommandReceived(Trb_Trb,goto(0),)
-[2020/04/29 22:29:20] [debug] OnPlayerCommandReceived(Trb_Trb,goto(0),)
-[2020/04/29 22:29:21] [debug] OnPlayerTakeDamage(Trb_Trb, , 17.3, 54, 3)
-[2020/04/29 22:29:21] [debug] OnPlayerCommandReceived(Trb_Trb,goto(0),)
-[2020/04/29 22:29:24] [debug] OnPlayerCommandReceived(Trb_Trb,b(aaaaaaaaaaaaaa),)
-[2020/04/29 22:29:46] [debug] OnPlayerCommandReceived(Martin_Ayala,ado(///////////////// MAZE BANK /////////////////),)
-[2020/04/29 22:29:52] [debug] OnPlayerCommandReceived(Trb_Trb,ao(aa),)
-[2020/04/29 22:29:55] [debug] OnPlayerCommandReceived(Trb_Trb,aooc(),)
-[2020/04/29 22:29:57] [debug] OnPlayerCommandReceived(Trb_Trb,ado(),)
-[2020/04/29 22:29:58] [debug] OnPlayerCommandReceived(Trb_Trb,ado(aa),)
-[2020/04/29 22:30:02] [debug] OnPlayerCommandReceived(Trb_Trb,ado(zdarow :D ),)
-[2020/04/29 22:30:12] [debug] OnPlayerTakeDamage(Martin_Ayala, , 4.9, 54, 3)
-[2020/04/29 22:30:31] [debug] OnPlayerCommandReceived(Trb_Trb,ado(////// BANK OF LOS SANTOS //////),)
-[2020/04/29 22:31:02] [debug] OnPlayerCommandReceived(Trb_Trb,ado(/// [Gauta alga: $0] [Mokesèiai: $0] ///),)
-[2020/04/29 22:31:20] [debug] OnPlayerCommandReceived(Trb_Trb,ado(//////////// BANK OF LOS SANTOS ////////////),)
-[2020/04/29 22:31:25] [debug] OnPlayerCommandReceived(Trb_Trb,ado(/// [Gauta alga: $0] [Mokesèiai: $0] ///),)
-[2020/04/29 22:31:41] [debug] OnPlayerCommandReceived(Martin_Ayala,ado(••••••••••••••••••• BANK OF LOS SANTOS •••••••••••••••••••),)
-[2020/04/29 22:32:12] [debug] OnPlayerTakeDamage(Martin_Ayala, , 4.9, 54, 3)
-[2020/04/29 22:32:13] [debug] OnPlayerCommandReceived(Trb_Trb,ado(<<<<<<<BANK OF LOS SANTOS>>>>>>),)
-[2020/04/29 22:32:14] [debug] OnPlayerTakeDamage(Martin_Ayala, , 4.9, 54, 3)
-[2020/04/29 22:32:34] [debug] OnPlayerCommandReceived(Trb_Trb,ado(&&&&& BANK OF LOS SANTOS &&&&&),)
+[2020/04/29 23:58:04] SIMPLE CARS [0 free] :
+[2020/04/29 23:58:04] thief_Spot[spotCars][0]: Nebula [2] [0$]
+[2020/04/29 23:58:04] thief_Spot[spotCars][1]: Regina [1] [0$]
+[2020/04/29 23:58:04] thief_Spot[spotCars][2]: Vincent [1] [0$]
+[2020/04/29 23:58:04] thief_Spot[spotCars][3]: Manana [1] [0$]
+[2020/04/29 23:58:04] thief_Spot[spotCars][4]: Willard [1] [0$]
+[2020/04/29 23:58:04] thief_Spot[spotCars][5]: Admiral [1] [0$]
+[2020/04/29 23:58:04] thief_Spot[spotCars][6]: Sentinel [1] [0$]
+[2020/04/29 23:58:04] [load] 10 map ikonu.
+[2020/04/29 23:58:04] [load] 3 garazu
+[2020/04/29 23:58:04] [debug] OptionsLoad
+[2020/04/29 23:58:04] [debug] PreparePoliceWaresUsage
+[2020/04/29 23:58:04] [load] bus pridedama 15120 i frakcijos sandeli.
+[2020/04/29 23:58:04] [load] 2 darbu
+[2020/04/29 23:58:04] [load] 4 frakciju
+[2020/04/29 23:58:04] [load] 6 grupiu
+[2020/04/29 23:58:04] [load] 19 galimu prekiu sarase.
+[2020/04/29 23:58:04] [load] 9 bankomatu
+[2020/04/29 23:58:04] [load] 15 taksofonu
+[2020/04/29 23:58:04] [load] 37 namu baldu
+[2020/04/29 23:58:04] [load] 479 verslu baldu
+[2020/04/29 23:58:04] [load] 11 garazu baldu
+[2020/04/29 23:58:04] [create] CreateVehicle(507) called, ID: 1
+[2020/04/29 23:58:04] [create] CreateVehicle(507) called, ID: 2
+[2020/04/29 23:58:04] [create] CreateVehicle(507) called, ID: 3
+[2020/04/29 23:58:04] [create] CreateVehicle(463) called, ID: 4
+[2020/04/29 23:58:04] [create] CreateVehicle(463) called, ID: 5
+[2020/04/29 23:58:04] [create] CreateVehicle(463) called, ID: 6
+[2020/04/29 23:58:04] [create] CreateVehicle(463) called, ID: 7
+[2020/04/29 23:58:04] [create] CreateVehicle(507) called, ID: 8
+[2020/04/29 23:58:04] [create] CreateVehicle(507) called, ID: 9
+[2020/04/29 23:58:04] [create] CreateVehicle(507) called, ID: 10
+[2020/04/29 23:58:04] [create] CreateVehicle(596) called, ID: 11
+[2020/04/29 23:58:04] [create] CreateVehicle(596) called, ID: 12
+[2020/04/29 23:58:04] [create] CreateVehicle(596) called, ID: 13
+[2020/04/29 23:58:04] [create] CreateVehicle(596) called, ID: 14
+[2020/04/29 23:58:04] [create] CreateVehicle(596) called, ID: 15
+[2020/04/29 23:58:04] [create] CreateVehicle(596) called, ID: 16
+[2020/04/29 23:58:04] [create] CreateVehicle(426) called, ID: 17
+[2020/04/29 23:58:04] [create] CreateVehicle(490) called, ID: 18
+[2020/04/29 23:58:04] [create] CreateVehicle(426) called, ID: 19
+[2020/04/29 23:58:04] [create] CreateVehicle(490) called, ID: 20
+[2020/04/29 23:58:04] [create] CreateVehicle(579) called, ID: 21
+[2020/04/29 23:58:04] [create] CreateVehicle(523) called, ID: 22
+[2020/04/29 23:58:04] [create] CreateVehicle(523) called, ID: 23
+[2020/04/29 23:58:04] [create] CreateVehicle(426) called, ID: 24
+[2020/04/29 23:58:04] [create] CreateVehicle(596) called, ID: 25
+[2020/04/29 23:58:04] [create] CreateVehicle(596) called, ID: 26
+[2020/04/29 23:58:04] [create] CreateVehicle(560) called, ID: 27
+[2020/04/29 23:58:04] [create] CreateVehicle(430) called, ID: 28
+[2020/04/29 23:58:04] [create] CreateVehicle(599) called, ID: 29
+[2020/04/29 23:58:04] [create] CreateVehicle(597) called, ID: 30
+[2020/04/29 23:58:04] [create] CreateVehicle(413) called, ID: 31
+[2020/04/29 23:58:04] [create] CreateVehicle(414) called, ID: 32
+[2020/04/29 23:58:04] [create] CreateVehicle(413) called, ID: 33
+[2020/04/29 23:58:04] [create] CreateVehicle(414) called, ID: 34
+[2020/04/29 23:58:04] [create] CreateVehicle(414) called, ID: 35
+[2020/04/29 23:58:04] [create] CreateVehicle(413) called, ID: 36
+[2020/04/29 23:58:04] [create] CreateVehicle(525) called, ID: 37
+[2020/04/29 23:58:04] [create] CreateVehicle(493) called, ID: 38
+[2020/04/29 23:58:04] [create] CreateVehicle(541) called, ID: 39
+[2020/04/29 23:58:04] [create] CreateVehicle(404) called, ID: 40
+[2020/04/29 23:58:04] [create] CreateVehicle(401) called, ID: 41
+[2020/04/29 23:58:04] [create] CreateVehicle(401) called, ID: 42
+[2020/04/29 23:58:04] [create] CreateVehicle(404) called, ID: 43
+[2020/04/29 23:58:04] [create] CreateVehicle(462) called, ID: 44
+[2020/04/29 23:58:04] [create] CreateVehicle(462) called, ID: 45
+[2020/04/29 23:58:04] [create] CreateVehicle(462) called, ID: 46
+[2020/04/29 23:58:04] [create] CreateVehicle(478) called, ID: 47
+[2020/04/29 23:58:04] [create] CreateVehicle(516) called, ID: 48
+[2020/04/29 23:58:05] [create] CreateVehicle(423) called, ID: 49
+[2020/04/29 23:58:05] [create] CreateVehicle(588) called, ID: 50
+[2020/04/29 23:58:05] [create] CreateVehicle(424) called, ID: 51
+[2020/04/29 23:58:05] [create] CreateVehicle(588) called, ID: 52
+[2020/04/29 23:58:05] [create] CreateVehicle(454) called, ID: 53
+[2020/04/29 23:58:05] [create] CreateVehicle(493) called, ID: 54
+[2020/04/29 23:58:05] [create] CreateVehicle(411) called, ID: 55
+[2020/04/29 23:58:05] [load] 55 serverio tr. priemoniu
+[2020/04/29 23:58:05] i: 0
+[2020/04/29 23:58:05] i: 1
+[2020/04/29 23:58:05] i: 2
+[2020/04/29 23:58:05] i: 3
+[2020/04/29 23:58:05] i: 4
+[2020/04/29 23:58:05] i: 5
+[2020/04/29 23:58:05] i: 6
+[2020/04/29 23:58:05] i: 7
+[2020/04/29 23:58:05] i: 8
+[2020/04/29 23:58:05] i: 9
+[2020/04/29 23:58:05] i: 10
+[2020/04/29 23:58:05] i: 11
+[2020/04/29 23:58:05] i: 12
+[2020/04/29 23:58:05] i: 13
+[2020/04/29 23:58:05] i: 14
+[2020/04/29 23:58:05] i: 15
+[2020/04/29 23:58:05] i: 16
+[2020/04/29 23:58:05] i: 17
+[2020/04/29 23:58:05] i: 18
+[2020/04/29 23:58:05] i: 19
+[2020/04/29 23:58:05] i: 20
+[2020/04/29 23:58:05] i: 21
+[2020/04/29 23:58:05] i: 22
+[2020/04/29 23:58:05] i: 23
+[2020/04/29 23:58:05] i: 24
+[2020/04/29 23:58:05] i: 25
+[2020/04/29 23:58:05] i: 26
+[2020/04/29 23:58:05] i: 27
+[2020/04/29 23:58:05] i: 28
+[2020/04/29 23:58:05] i: 29
+[2020/04/29 23:58:05] i: 30
+[2020/04/29 23:58:05] i: 31
+[2020/04/29 23:58:05] i: 32
+[2020/04/29 23:58:05] i: 33
+[2020/04/29 23:58:05] i: 34
+[2020/04/29 23:58:05] i: 35
+[2020/04/29 23:58:05] i: 36
+[2020/04/29 23:58:05] i: 37
+[2020/04/29 23:58:05] i: 38
+[2020/04/29 23:58:05] i: 39
+[2020/04/29 23:58:05] i: 40
+[2020/04/29 23:58:05] i: 41
+[2020/04/29 23:58:05] i: 42
+[2020/04/29 23:58:05] i: 43
+[2020/04/29 23:58:05] i: 44
+[2020/04/29 23:58:05] i: 45
+[2020/04/29 23:58:05] i: 46
+[2020/04/29 23:58:05] i: 47
+[2020/04/29 23:58:05] i: 48
+[2020/04/29 23:58:05] i: 49
+[2020/04/29 23:58:05] [load] 50 iejimu/isejimu
+[2020/04/29 23:58:05] SPECIAL CARS [7 free]:
+[2020/04/29 23:58:05] thief_Spot[spotCars][7]: Sunrise [1] [1$]
+[2020/04/29 23:58:05] thief_Spot[spotCars][8]: Super GT [1] [1$]
+[2020/04/29 23:58:05] thief_Spot[spotCars][9]: Tahoma [1] [1$]
+[2020/04/29 23:58:05] [load] 0 ismestu daiktu.
+[2020/04/29 23:58:05] [load] 22 namu
+[2020/04/29 23:58:05] [load] 4 konspiraciniu namu
+[2020/04/29 23:58:05] [load] 24 verslu
+[2020/04/29 23:58:05] [load] 23 ranku frakcijai "LSPD"
+[2020/04/29 23:58:05] [load] 9 ranku frakcijai "San News"
+[2020/04/29 23:58:05] [load] 9 ranku frakcijai "LSMD & LSFD"
+[2020/04/29 23:58:05] [load] 13 ranku frakcijai "Government"
+Console input: password realstate
+[2020/04/29 23:58:54] Setting server password to: "realstate"
+[2020/04/29 23:59:10] [connection] 127.0.0.1:55917 requests connection cookie.
+[2020/04/29 23:59:11] [connection] incoming connection: 127.0.0.1:55917 id: 0
+[2020/04/29 23:59:12] [join] f0cus has joined the server (0:127.0.0.1)
+[2020/04/29 23:59:12] [debug] OnPlayerConnect(f0cus)
+[2020/04/29 23:59:12] ResetData(, 1, 1)
+[2020/04/29 23:59:12] f0cus sending HTTP_OnProxyCheck
+[2020/04/29 23:59:12] HTTP_OnProxyCheck: Status: 200, data: N
+[2020/04/29 23:59:12] [debug] Kicker(f0cus)
+[2020/04/29 23:59:12] [debug] OnPlayerDisconnect(f0cus,2,1)
+[2020/04/29 23:59:12] [part] f0cus has left the server (0:2)
+[2020/04/29 23:59:15] [debug] LoginHalt(f0cus)
+[2020/04/30 00:00:04] Hash 80720B8C
+[2020/04/30 00:00:04] SIMPLE CARS [0 free] :
+[2020/04/30 00:00:04] thief_Spot[spotCars][0]: Sadler [2] [0$]
+[2020/04/30 00:00:04] thief_Spot[spotCars][1]: Nebula [2] [0$]
+[2020/04/30 00:00:04] thief_Spot[spotCars][2]: Regina [1] [0$]
+[2020/04/30 00:00:04] thief_Spot[spotCars][3]: Stratum [1] [0$]
+[2020/04/30 00:00:04] thief_Spot[spotCars][4]: Sentinel [1] [0$]
+[2020/04/30 00:00:04] thief_Spot[spotCars][5]: Vincent [1] [0$]
+[2020/04/30 00:00:04] thief_Spot[spotCars][6]: Admiral [1] [0$]
+[2020/04/30 00:00:04] SPECIAL CARS [7 free]:
+[2020/04/30 00:00:04] thief_Spot[spotCars][7]: Tahoma [1] [1$]
+[2020/04/30 00:00:04] thief_Spot[spotCars][8]: Combine [1] [1$]
+[2020/04/30 00:00:04] thief_Spot[spotCars][9]: Moonbeam [1] [1$]
