@@ -30801,6 +30801,22 @@ stock sd_MySQL()
 	return 1;
 }
 
+hook OnMysqlEstablished()
+{
+	inline uniqueNumbersLeft()
+	{
+		new left;
+		cache_get_value_name_int(0, "UniqueNumbers", left);
+		if(left <= 100)
+		{
+			printf("Neuztenka unikaliu numeriu! %d left. Sukurkite nauju: unused_phone_numbers", left);
+			SendRconCommand("exit");
+		}
+	}
+	mysql_tquery_inline(chandler, "SELECT COUNT(*) AS UniqueNumbers FROM `unused_phone_numbers`", using inline uniqueNumbersLeft, "");
+	return 1;
+}
+
 stock sd_Prepare()
 {
 	//Iter_Add(Vehicle, 0);

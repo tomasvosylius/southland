@@ -11,6 +11,7 @@
 #define INVENTORY_AMOUNT_GREATER 		4
 #define INVENTORY_AMOUNT_LESS 			5
 
+
 stock IsPlayerInventorySlotClear(playerid, slotid)
 {
 	if(InventoryInfo[playerid][slotid][invId] <= 0 && InventoryInfo[playerid][slotid][invAmount] <= 0) return true;
