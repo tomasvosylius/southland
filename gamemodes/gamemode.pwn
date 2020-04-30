@@ -39864,11 +39864,12 @@ alias:screen("options","textdraws");
 CMD:screen(playerid, params[])
 {
 	new string[256];
-	format(string, sizeof string, "{BABABA}Pasirinkimas\t{BABABA}Dabartinë reikðmë\nSpidometras\t%s\n{FFFFFF}Kalëjimo laikas\t%s\n{FFFFFF}Racijos informacija\t%s\n{FFFFFF}Patarimai\t%s",
+	format(string, sizeof string, "{BABABA}Pasirinkimas\t{BABABA}Dabartinë reikðmë\nSpidometras\t%s\n{FFFFFF}Kalëjimo laikas\t%s\n{FFFFFF}Racijos informacija\t%s",
 		!TextdrawDisabled_Speedo{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
 		!TextdrawDisabled_JailTimer{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
-		!TextdrawDisabled_InfoBar{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
-		!TextdrawDisabled_Tips{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
+		!TextdrawDisabled_InfoBar{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
+	
+	// \n{FFFFFF}Patarimai\t%s	!TextdrawDisabled_Tips{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
 	ShowPlayerDialog(playerid, DIALOG_PLAYER_OPTIONS, DIALOG_STYLE_TABLIST_HEADERS, "Textdraw valdymas", string, "Keisti", "Atðaukti");
 	return 1;
 }
