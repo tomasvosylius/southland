@@ -34700,6 +34700,36 @@ CMD:setgroup(playerid, params[])
 	return 1;
 }
 
+flags:unsetgroupsoff(CMD_TYPE_ADMIN);
+CMD:unsetgroupsoff(playerid, params[])
+{
+	new name[24];
+	if(sscanf(params,"s[24]",name)) return SendUsage(playerid, "/unsetgroupsoff [þaidëjas]");
+
+	new string[256];
+	mysql_format(chandler, string, sizeof string, "SELECT UserId FROM `players_data` WHERE Name = '%e'", name);
+	
+	inline findPlayerByName()
+	{
+		if(cache_num_rows())
+		{
+			new userid;
+			cache_get_value_name_int(0, "UserId", userid);
+			
+			SendFormat(playerid, 0x7be677ff, "Vartotojui %s paðalintos visos grupës.", GetUserNameById(userid));
+
+			mysql_format(chandler, string, sizeof string, "\
+				UPDATE `users_data` SET Group1='0',Group2='0',Group3='0' WHERE id = '%d'", userid);
+			mysql_fquery(chandler, string, "UserRemovedFromGroups");
+		}
+		else SendError(playerid, "Tokio veikëjo nëra.");
+	}
+	mysql_tquery_inline(chandler, string, using inline findPlayerByName, "");
+	return 1;
+}
+thread(UserRemovedFromGroups);
+
+
 flags:unsetgroup(CMD_TYPE_ADMIN);
 CMD:unsetgroup(playerid, params[])
 {
