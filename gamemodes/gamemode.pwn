@@ -155,7 +155,7 @@ native gpci(playerid, serial[], len);
 #endif
 #define INVALID_3DTEXT_ID Text3D:0xFFFF
 
-#if SERVER_DEBUG_LEVEL >= 3
+#if SERVER_DEBUG_LEVEL >= 5
 	new STREAMER_TAG_OBJECT __furnitureObjects[1000];
 #endif
 
@@ -4201,6 +4201,7 @@ ptask PT_VehicleSpeedo[200](playerid)
 
 	if((Recalculate_Mileage[playerid] += 1) >= 5)
 	{
+		Recalculate_Mileage[playerid] = 0;
 		/**
 		 * Praejo pilna viena sekunde
 		 */
@@ -26212,16 +26213,17 @@ stock HidePlayerTip(playerid)
 
 stock ShowPlayerTip(playerid, seconds, text[], bool:forceshow = false)
 {
+	#pragma unused text
 	if(PlayerInfo[playerid][pConnection] != CONNECTION_STATE_LOGGED) return 1;
 	if(TextdrawDisabled_Tips{playerid} && !forceshow) return 1;
 	if(PlayerTip[playerid] == 0)
 	{
-		TextDrawShowForPlayer(playerid, TipBox_Base);
-		TextDrawShowForPlayer(playerid, TipBox_NameBase);
-		TextDrawShowForPlayer(playerid, TipBox_Name);
-		PlayerTextDrawShow(playerid, TipBox_Info[playerid]);
-		PlayerTextDrawSetString(playerid, TipBox_Info[playerid], text);
-		TextDrawShowForPlayer(playerid, TipBox_LowText);
+		// TextDrawShowForPlayer(playerid, TipBox_Base);
+		// TextDrawShowForPlayer(playerid, TipBox_NameBase);
+		// TextDrawShowForPlayer(playerid, TipBox_Name);
+		// PlayerTextDrawShow(playerid, TipBox_Info[playerid]);
+		// PlayerTextDrawSetString(playerid, TipBox_Info[playerid], text);
+		// TextDrawShowForPlayer(playerid, TipBox_LowText);
 		PlayerTip[playerid] = seconds;
 	}
 	return 1;
@@ -39864,11 +39866,12 @@ alias:screen("options","textdraws");
 CMD:screen(playerid, params[])
 {
 	new string[256];
-	format(string, sizeof string, "{BABABA}Pasirinkimas\t{BABABA}Dabartinë reikðmë\nSpidometras\t%s\n{FFFFFF}Kalëjimo laikas\t%s\n{FFFFFF}Racijos informacija\t%s\n{FFFFFF}Patarimai\t%s",
+	format(string, sizeof string, "{BABABA}Pasirinkimas\t{BABABA}Dabartinë reikðmë\nSpidometras\t%s\n{FFFFFF}Kalëjimo laikas\t%s\n{FFFFFF}Racijos informacija\t%s",
 		!TextdrawDisabled_Speedo{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
 		!TextdrawDisabled_JailTimer{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
-		!TextdrawDisabled_InfoBar{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
-		!TextdrawDisabled_Tips{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
+		!TextdrawDisabled_InfoBar{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
+	
+	// \n{FFFFFF}Patarimai\t%s	!TextdrawDisabled_Tips{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
 	ShowPlayerDialog(playerid, DIALOG_PLAYER_OPTIONS, DIALOG_STYLE_TABLIST_HEADERS, "Textdraw valdymas", string, "Keisti", "Atðaukti");
 	return 1;
 }
