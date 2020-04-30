@@ -352,10 +352,11 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define PAYPHONE_DEFAULT_NUMBER 		100500
 #define PHONE_DEFAULT_NUMBER 			110000
 // verslai
-#define MAX_BUSINESS_FOR_PLAYER 			2
-#define MAX_BUSINESS_FOR_PLAYER_BRONZE 		4	
-#define MAX_BUSINESS_FOR_PLAYER_SILVER 		6	
-#define MAX_BUSINESS_FOR_PLAYER_GOLD 		12	
+#define DEFAULT_BUSINESS_PICKUP			1239	
+#define MAX_BUSINESS_FOR_PLAYER 		2
+#define MAX_BUSINESS_FOR_PLAYER_BRONZE 	4	
+#define MAX_BUSINESS_FOR_PLAYER_SILVER 	6	
+#define MAX_BUSINESS_FOR_PLAYER_GOLD 	12	
 // Masinos
 #define DEFAULT_LOCK_NEEDED_TO_FIND 	3 // kelinto alarm lygio masinai reik kad eitu v find
 #define MAX_SPAWNED_CARS 				3
@@ -16506,7 +16507,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						FAC_OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
 						FixBusinessLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 						sd_DestroyDynamicPickup(BusinessInfo[tmpSelected[playerid]][bPickup]);
-						BusinessInfo[tmpSelected[playerid]][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, tmpSelected[playerid], BusinessInfo[tmpSelected[playerid]][bOwner] > 0 ? (19523) : (19524), 1, BusinessInfo[tmpSelected[playerid]][bEnterX], BusinessInfo[tmpSelected[playerid]][bEnterY], BusinessInfo[tmpSelected[playerid]][bEnterZ], BusinessInfo[tmpSelected[playerid]][bOutVW], BusinessInfo[tmpSelected[playerid]][bExterior]);
+						BusinessInfo[tmpSelected[playerid]][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, tmpSelected[playerid], DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[tmpSelected[playerid]][bEnterX], BusinessInfo[tmpSelected[playerid]][bEnterY], BusinessInfo[tmpSelected[playerid]][bEnterZ], BusinessInfo[tmpSelected[playerid]][bOutVW], BusinessInfo[tmpSelected[playerid]][bExterior]);
 					}
 					else
 					{
@@ -16523,7 +16524,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							FAC_OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
 							FixBusinessLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 							sd_DestroyDynamicPickup(BusinessInfo[tmpSelected[playerid]][bPickup]);
-							BusinessInfo[tmpSelected[playerid]][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, tmpSelected[playerid], BusinessInfo[tmpSelected[playerid]][bOwner] > 0 ? (19523) : (19524), 1, BusinessInfo[tmpSelected[playerid]][bEnterX], BusinessInfo[tmpSelected[playerid]][bEnterY], BusinessInfo[tmpSelected[playerid]][bEnterZ], BusinessInfo[tmpSelected[playerid]][bOutVW], BusinessInfo[tmpSelected[playerid]][bExterior]);
+							BusinessInfo[tmpSelected[playerid]][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, tmpSelected[playerid], DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[tmpSelected[playerid]][bEnterX], BusinessInfo[tmpSelected[playerid]][bEnterY], BusinessInfo[tmpSelected[playerid]][bEnterZ], BusinessInfo[tmpSelected[playerid]][bOutVW], BusinessInfo[tmpSelected[playerid]][bExterior]);
 							log_set_values("'%d','%e','(AM) Pakeite verslo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], strval(inputtext));
 						}
 						else
@@ -16550,7 +16551,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						FAC_OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
 						FixBusinessLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 						sd_DestroyDynamicPickup(BusinessInfo[tmpSelected[playerid]][bPickup]);
-						BusinessInfo[tmpSelected[playerid]][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, tmpSelected[playerid], BusinessInfo[tmpSelected[playerid]][bOwner] > 0 ? (19523) : (19524), 1, BusinessInfo[tmpSelected[playerid]][bEnterX], BusinessInfo[tmpSelected[playerid]][bEnterY], BusinessInfo[tmpSelected[playerid]][bEnterZ], BusinessInfo[tmpSelected[playerid]][bOutVW], BusinessInfo[tmpSelected[playerid]][bExterior]);
+						BusinessInfo[tmpSelected[playerid]][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, tmpSelected[playerid], DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[tmpSelected[playerid]][bEnterX], BusinessInfo[tmpSelected[playerid]][bEnterY], BusinessInfo[tmpSelected[playerid]][bEnterZ], BusinessInfo[tmpSelected[playerid]][bOutVW], BusinessInfo[tmpSelected[playerid]][bExterior]);
 						log_set_values("'%d','%e','(AM) Pakeite verslo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], id);
 					}
 					else
@@ -16677,7 +16678,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET EnterX = '%f', EnterY = '%f', EnterZ = '%f', OutVW = '%d', Exterior = '%d' WHERE id = '%d'", x, y, z, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), BusinessInfo[selected][bId]);
 							mysql_fquery(chandler, string, "BusinessUpdated");
 							sd_DestroyDynamicPickup(BusinessInfo[selected][bPickup]);
-							BusinessInfo[selected][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, selected, BusinessInfo[selected][bOwner] > 0 ? (19523) : (19524), 1, BusinessInfo[selected][bEnterX], BusinessInfo[selected][bEnterY], BusinessInfo[selected][bEnterZ], BusinessInfo[selected][bOutVW], BusinessInfo[selected][bExterior]);
+							BusinessInfo[selected][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, selected, DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[selected][bEnterX], BusinessInfo[selected][bEnterY], BusinessInfo[selected][bEnterZ], BusinessInfo[selected][bOutVW], BusinessInfo[selected][bExterior]);
 							FixBusinessLabels(selected, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 							log_init(true);
 							log_set_table("logs_admins");
@@ -17021,7 +17022,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							Iter_Add(Business, businessid);
 							FixBusinessLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 							MsgSuccess(playerid, "VERSLAI", "Sëkmingai sukûrëte verslà, kurio ID: %d", BusinessInfo[businessid][bId]);
-							BusinessInfo[businessid][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, businessid, 19524, 1, x, y, z, BusinessInfo[businessid][bOutVW], BusinessInfo[businessid][bExterior]);
+							BusinessInfo[businessid][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, businessid, DEFAULT_BUSINESS_PICKUP, 1, x, y, z, BusinessInfo[businessid][bOutVW], BusinessInfo[businessid][bExterior]);
 							log_init(true);
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
@@ -28131,7 +28132,7 @@ public BusinessLoad()
 		cache_get_value_name(i, "Name", BusinessInfo[i][bName], 24);
 		cache_get_value_name(i, "Slogan", BusinessInfo[i][bSlogan], 128);
 
-		BusinessInfo[i][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, i, BusinessInfo[i][bOwner] > 0 ? (19523) : (19524), 1, BusinessInfo[i][bEnterX], BusinessInfo[i][bEnterY], BusinessInfo[i][bEnterZ], BusinessInfo[i][bOutVW], BusinessInfo[i][bExterior]);
+		BusinessInfo[i][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, i, DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[i][bEnterX], BusinessInfo[i][bEnterY], BusinessInfo[i][bEnterZ], BusinessInfo[i][bOutVW], BusinessInfo[i][bExterior]);
 		FixBusinessLabels(i, enabled_labels);
 		Iter_Add(Business, i);
 		LoadBusinessInventory(i);
@@ -28196,8 +28197,8 @@ stock FixBusinessLabels(i, enabled_labels)
 		else if(BusinessInfo[i][bSale] > 0) format(string, sizeof string, "{FFFFFF}Verslas parduodamas!\nKaina: $%d (/buybusiness){DADADA}\n\n", BusinessInfo[i][bSale]);
 		else format(string, sizeof string, "");
 		if(BusinessInfo[i][bOwner] > 0 && BusinessInfo[i][bSale] <= 0) format(pay, sizeof pay, "Áëjimo kaina: $%d\n", BusinessInfo[i][bEnterPrice]);
-		format(string, sizeof string, "%s%.76s\nVerslo numeris: %d\n%sRaðykite /enter", string, BusinessInfo[i][bName], BusinessInfo[i][bId], pay);
-		BusinessInfo[i][bLabel] = CreateDynamic3DTextLabel(string, 0xDADADAFF, BusinessInfo[i][bEnterX], BusinessInfo[i][bEnterY], BusinessInfo[i][bEnterZ], 4.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, BusinessInfo[i][bOutVW], BusinessInfo[i][bExterior]);
+		format(string, sizeof string, "%s%.76s\nID: %d\n%sRaðykite /enter", string, BusinessInfo[i][bName], BusinessInfo[i][bId], pay);
+		BusinessInfo[i][bLabel] = CreateDynamic3DTextLabel(string, 0xDADADAFF, BusinessInfo[i][bEnterX], BusinessInfo[i][bEnterY], BusinessInfo[i][bEnterZ] + 0.15, 3.75, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, BusinessInfo[i][bOutVW], BusinessInfo[i][bExterior]);
 	}
 	return 1;
 }
@@ -40778,7 +40779,7 @@ CMD:buybusiness(playerid, params[])
 		SaveBusinessIntEx(businessid, "Owner", PlayerInfo[playerid][pId]);
 		FixBusinessLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 		sd_DestroyDynamicPickup(BusinessInfo[businessid][bPickup]);
-		BusinessInfo[businessid][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, businessid, BusinessInfo[businessid][bOwner] > 0 ? (19523) : (19524), 1, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ], BusinessInfo[businessid][bOutVW], BusinessInfo[businessid][bExterior]);
+		BusinessInfo[businessid][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, businessid, DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ], BusinessInfo[businessid][bOutVW], BusinessInfo[businessid][bExterior]);
 	}
 	else SendWarning(playerid, "Ásitikinkite, kad esate lauke prie verslo.");
 	return 1;
