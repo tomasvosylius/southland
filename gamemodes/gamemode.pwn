@@ -106,6 +106,7 @@ stock FAC_ResetVariables(playerid)
 #include <YSI\y_va>
 #include <YSI\y_hooks>
 #include <YSI\y_inline>
+#include <YSI\y_timers>
 //#include <YSI\y_dialog>
 #include <easyDialog>
 #include <a_mysql>
@@ -1076,92 +1077,6 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX 		FAC
 #define DEFAULT_JOB_VEHICLE_NUMBER_PREFIX			JOB
 #define DEFAULT_WEAPON_UNIQUE_ID_PREFIX 			5SA00
-// ==============================================================================
-// Macro funkcijos
-#define SendACMessage(%0,%1,%2); 			foreach(new __internalPlayerid : Player){\
-												if(ChatsOff[__internalPlayerid][ACChat]==0 ||%1==true){\
-													SendFormat(__internalPlayerid,%0,%2);\
-												}\
-											}
-#define SendAdminMessage(%0,%1,%2);			foreach(new __internalPlayerid : Player){\
-												if((ChatsOff[__internalPlayerid][AdminChat]==0||%1==true) && IsPlayerInAnyAdminGroup(__internalPlayerid)>0) {\
-													SendFormat(__internalPlayerid,%0,%2); \
-												}\
-											}
-#define SendFactionMessage(%3,%0,%1,%2);	foreach(new __internalPlayerid : Player) {\
-												if((ChatsOff[__internalPlayerid][FactionChat]==0||%1==true) && PlayerInfo[__internalPlayerid][pFaction]==%3){\
-													SendChatMessage(__internalPlayerid,%0,%2); \
-												}\
-											}
-#define SendFactionTypeMessage(%3,%0,%1,%2); 	foreach(new __internalPlayerid : Player) {\
-													if(ChatsOff[__internalPlayerid][FactionChat]==0||%1==true){\
-														new __f = GetFactionArrayIndexById(PlayerInfo[__internalPlayerid][pFaction]);\
-														if(__f!=-1&&FactionInfo[__f][fType]==%3) {\
-															SendFormat(__internalPlayerid,%0,%2);\
-														}\
-													}\
-												}		
-#define SendToBroadcasters(%0,%1);			foreach(new __internalPlayerid : Player) {\
-												if(player_Broadcast[__internalPlayerid]) {\
-													SendFormat(__internalPlayerid,%0,%1);\
-												}\
-											}					
-#define SendBroadcast(%0,%1); 				foreach(new __internalPlayerid : Player) {\
-												if(!ChatsOff[__internalPlayerid][BroadcastChat]) {\
-													SendChatMessage(__internalPlayerid,%0,%1);\
-												}\
-											}
-
-#define reset(%0,%1,%2) 				new _rV_%0[%2];\
-										%1 = _rV_%0
-#define KickEx(%0)						SetTimerEx("Kicker", 100, false, "d", %0)
-/** Server vars **/
-#define SetGVarFloatEx(%0,%1,%2)		SetGVarFloat(%0,%1,%2) , SaveServerFloatEx(%0,%1)
-#define SetGVarIntEx(%0,%1,%2)			SetGVarInt(%0,%1,%2) , SaveServerIntEx(%0,%1)
-/** Chat **/
-#define SendFormat						va_SendClientMessage
-#define SendFormatToAll					va_SendClientMessageToAll
-#define SendUsage(%0,%1)				SendFormat(%0,0xBABABAFF,"Naudojimas: {E4E4E4}"%1)
-#define SendWarning(%0,%1) 				MsgWarning(%0,"Perspëjimas", %1)
-#define SendError(%0,%1)				MsgError(%0,"Klaida",%1)
-#define SendCommands(%0,%1)				SendFormat(%0,0xBABABAFF,"Komandos: {E4E4E4}"%1)
-#define MsgDefault(%0,%1,%2)			SendFormat(%0,0x2A8AD8FF,%1": {66A8DF}"%2)
-#define MsgSuccess(%0,%1,%2)			SendFormat(%0,0xA3D252FF,%1": {BFDF88}"%2)
-#define MsgWarning(%0,%1,%2)			SendFormat(%0,0xD7864BFF,%1": {E5A170}"%2)
-#define MsgError(%0,%1,%2)				SendFormat(%0,0xD94848FF,%1": {E86F6F}"%2)
-#define MsgInfo(%0,%1,%2)				SendFormat(%0,0xE4E4E4FF,%1": {DDDDDD}"%2)
-#define MsgImportant(%0,%1,%2)			SendFormat(%0,0xB0CF4CFF,%1": {C5DE74}"%2)
-/** Others **/
-#define TOS(%0,%1,%2) 					(%0 ? (%1) : (%2))
-#define ClearChat(%0,%1)				for(new c=0;c<%1;c++) SendClientMessage(%0,-1,"")
-#define mysql_fquery(%0,%1,%2)			mysql_tquery(%0,%1,"sdev__"%2)
-#define thread(%0) 						forward sdev__%0(); \
-										public sdev__%0() return 1
-#define forwarded%0\10;%1 				forward %0; \
-										public %0
-#define LogPlayerId(%0)	PlayerInfo[%0][pId]
-#define LogPlayerName(%0) PlayerInfo[%0][pName]
-#define IsValueInBetween(%0,%1,%2) 		(%0 <= %1 <= %2)
-#define SortEnumArray(%0,%1,%2,%3,%4,%5,%6); for(new i = %1; i < %2; i++) { if(%0[i]%3 == %4) { for(new x = i+1; x < %2; x++) { if(%0[x]%3 != %4) { new __reset[%5]; %0[i] = %0[x]; %0[x] = __reset; if(%6) { %0[x]%3 = %4; } break; } } } }
-
-#define GetSortedAsForeach(%0,%1,%2,%3);	new index,e_index;\
-										 	foreach(new loopindex : %0) { if(%3) { if(index == %1) { %2 = loopindex; break; } else { index++; } e_index++; } }
-										 	//foreach(new loopindex : %0) { if(index == %1 && %3) { %2 = loopindex; break; } else if(%3) { index++; } }
-
-#define ShowESCTextdraw(%0,%1)			tmpESC[%0] = %1, TextDrawShowForPlayer(%0,TD_ESC)
-#define HideESCTextdraw(%0)	 			tmpESC[%0] = ESC_TYPE_NONE , TextDrawShowForPlayer(%0,TD_ESC)
-#define GetESCType(%0) 					tmpESC[%0]
-
-#define PRESSED(%0) (((newkeys & (%0)) == (%0)) && ((oldkeys & (%0)) != (%0)))
-#define HOLDING(%0) ((newkeys & (%0)) == (%0))
-#define RELEASED(%0) (((newkeys & (%0)) != (%0)) && ((oldkeys & (%0)) == (%0)))
-#define IsVehicleInRangeOfPoint(%0,%1,%2,%3,%4) ((%1 >= GetVehicleDistanceFromPoint(%0,%2,%3,%4) ? true : false))
-#define Probability(%0) (100 - %0 <= random(100) <= 99 ? 1 : 0) // by Johurt
-#define GetPlayerIpEx(%0) PlayerInfo[%0][pIp]
-#define tobool(%0) !!%0
-#define EMPTY_STATEMENT truebool
-#define FALSE falsebool
-#define TRUE truebool
 
 // Forwards
 // ==============================================================================
@@ -1980,7 +1895,6 @@ new
 	bool:FurnitureMultiSelectionEnabled[MAX_PLAYERS char],
 	bool:ShowingInfoBar[MAX_PLAYERS char],
 	bool:ShowingJailTimer[MAX_PLAYERS char],
-	bool:ShowingSpeedo[MAX_PLAYERS char],
 	bool:ShowingJobGUI[MAX_PLAYERS char],
 	bool:TextdrawDisabled_JailTimer[MAX_PLAYERS char],
 	bool:TextdrawDisabled_Speedo[MAX_PLAYERS char],
@@ -4122,6 +4036,8 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 /** Player modules */
 #include "modules\player/proxy.pwn"
 #include "modules\player/ipspam.pwn"
+#include "modules\player\ui/speedo.pwn"
+#include "modules\player\ui/leftbox.pwn"
 
 main()
 {
@@ -4259,6 +4175,83 @@ public OnGameModeInit()
 	return 1;
 }
 
+static Recalculate_Mileage[MAX_PLAYERS] = {0,...};
+ptask PT_VehicleSpeedo[200](playerid)
+{
+	// spidometras ir masinos
+
+	new vehicleid,
+		Float:consumption, Float:currentX, Float:currentY, Float:distance,
+		string[26];
+
+	if((vehicleid = OldVehicle[playerid]) != GetPlayerVehicleID(playerid) || GetPlayerVehicleSeat(playerid) != 0)
+	{
+		(Recalculate_Mileage[playerid] > 0) && (Recalculate_Mileage[playerid] = 0);
+		return;
+	}
+	if(!VehicleHaveEngine(VehicleInfo[vehicleid][vModel]) || !VehicleInfo[vehicleid][vEngined])
+	{
+		// Transportas neturi variklio
+		return;
+	}	
+	
+	// Sedi masinoje.
+	new speed = GetVehicleSpeed(vehicleid);
+
+	GetVehiclePos(vehicleid, currentX, currentY, distance);
+
+	if((Recalculate_Mileage[playerid] += 1) >= 5)
+	{
+		/**
+		 * Praejo pilna viena sekunde
+		 */
+		if(Checkpoint[playerid] == CHECKPOINT_TYPE_DMV && tmpEditing_Component_DMV[playerid] > 0)
+		{
+			if(speed > 75)
+			{
+				PlayerExtra[playerid][peDMVSpeed]++;
+			}
+		}
+
+		if((distance = GetDistanceBetweenPoints3D(
+							VehicleInfo[vehicleid][vLastMileageX],
+							VehicleInfo[vehicleid][vLastMileageY],
+							0.0, 
+							currentX,
+							currentY,
+							0.0)) > 0.2)
+		{
+			/**
+			 * Skaiciuojame masinos rida, jei praejo 1 sekunde ir nuvaziavo kazkiek.
+			 */
+			VehicleInfo[vehicleid][vKM] += distance/500.0;
+			VehicleInfo[vehicleid][vLastMileageX] = currentX,
+			VehicleInfo[vehicleid][vLastMileageY] = currentY;
+			consumption = VehicleFuelUsageList[VehicleInfo[vehicleid][vModel]-400] * 3;
+			if(VehicleInfo[vehicleid][vFuel] > 0.0)
+			{
+				if(VehicleInfo[vehicleid][vFuel] < consumption) VehicleInfo[vehicleid][vFuel] = 0;
+				else VehicleInfo[vehicleid][vFuel] -= consumption;
+			}
+			if(VehicleInfo[vehicleid][vFuel] <= 0.0)
+			{
+				ChangeVehicleEngineStatus(playerid, vehicleid);
+			}
+		}
+		
+		format(string, sizeof string, "RIDA: %0.1fKM", VehicleInfo[vehicleid][vKM]);
+		Speedo_Update(playerid, .km_string = string);
+
+		if(VehicleInfo[vehicleid][vFuel] >= 0.0)
+		{
+			format(string, sizeof string, "DEGALAI: %s", ConvertFuelToString(VehicleInfo[vehicleid][vFuel], VehicleFuelCapacityList[VehicleInfo[vehicleid][vModel]-400]));
+		}
+		Speedo_Update(playerid, .fuel_level = string);
+	}
+
+	format(string, sizeof string, "GREITIS: %dKM/H", speed);
+	Speedo_Update(playerid, .speed_string = string);
+}
 
 
 thread(JailReset);
@@ -4615,57 +4608,6 @@ public SecondTimer()
 			if(playerjobtime == 0)
 			{
 				OnPlayerJobTimeExpired(playerid, PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction], PlayerInfo[playerid][pJobCurrentType]);
-			}
-		}
-		// spidometras ir masinos
-		new vehicleid,
-			Float:consumption;
-		if((vehicleid = OldVehicle[playerid]) == GetPlayerVehicleID(playerid) && GetPlayerVehicleSeat(playerid) == 0)
-		{
-			if(!VehicleHaveEngine(VehicleInfo[vehicleid][vModel]) || !VehicleInfo[vehicleid][vEngined]) { continue; }
-			else
-			{
-				new Float:currentX,
-					Float:currentY,
-					Float:distance,
-					string[26],
-					speed = GetVehicleSpeed(vehicleid);
-				GetVehiclePos(vehicleid, currentX, currentY, distance);
-				if((distance = GetDistanceBetweenPoints3D(VehicleInfo[vehicleid][vLastMileageX], VehicleInfo[vehicleid][vLastMileageY], 0.0, currentX, currentY, 0.0)) > 0.2)
-				{
-					VehicleInfo[vehicleid][vKM] += distance/500.0;
-					VehicleInfo[vehicleid][vLastMileageX] = currentX,
-					VehicleInfo[vehicleid][vLastMileageY] = currentY;
-					consumption = VehicleFuelUsageList[VehicleInfo[vehicleid][vModel]-400] * 3;
-					if(VehicleInfo[vehicleid][vFuel] > 0.0)
-					{
-						if(VehicleInfo[vehicleid][vFuel] < consumption) VehicleInfo[vehicleid][vFuel] = 0;
-						else VehicleInfo[vehicleid][vFuel] -= consumption;
-					}
-					if(VehicleInfo[vehicleid][vFuel] <= 0.0)
-					{
-						ChangeVehicleEngineStatus(playerid, vehicleid);
-					}
-				}
-				if(!TextdrawDisabled_Speedo{playerid})
-				{
-					format(string, sizeof string, "RIDA: %0.1fKM", VehicleInfo[vehicleid][vKM]);
-					Speedo_Update(playerid, .km_string = string);
-					format(string, sizeof string, "GREITIS: %dKM/H", speed);
-					Speedo_Update(playerid, .speed_string = string);
-					if(VehicleInfo[vehicleid][vFuel] >= 0.0)
-					{
-						format(string, sizeof string, "~n~DEGALAI: %s", ConvertFuelToString(VehicleInfo[vehicleid][vFuel], VehicleFuelCapacityList[VehicleInfo[vehicleid][vModel]-400]));
-					}
-					Speedo_Update(playerid, .fuel_level = string);
-				}
-				if(Checkpoint[playerid] == CHECKPOINT_TYPE_DMV && tmpEditing_Component_DMV[playerid] > 0)
-				{
-					if(speed > 75)
-					{
-						PlayerExtra[playerid][peDMVSpeed]++;
-					}
-				}
 			}
 		}
 		// padarom, kad jei prie bankomato, rasytu naudokite /atm
@@ -5812,13 +5754,11 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 		if(VehicleHaveEngine(VehicleInfo[vehicleid][vModel]))
 		{
-			if(!TextdrawDisabled_Speedo{playerid})
-			{
-				new string[26];
-				format(string, sizeof string, "RIDA: %0.1fKM", VehicleInfo[vehicleid][vKM]);
-				Speedo_Update(playerid, .km_string = string, .fuel_level = "~n~DEGALAI:", .vehicle_model = GetVehicleModel(vehicleid), .vehicle_color1 = VehicleInfo[vehicleid][vColor1], .vehicle_color2 = VehicleInfo[vehicleid][vColor2]);
-				Speedo_Show(playerid);
-			}
+			new string[26];
+			format(string, sizeof string, "RIDA: %0.1fKM", VehicleInfo[vehicleid][vKM]);
+			Speedo_Update(playerid, .km_string = string, .fuel_level = "DEGALAI:");
+			Speedo_Show(playerid);
+
 			if(VehicleInfo[vehicleid][vJob] == JOB_FARMER && PlayerInfo[playerid][pJob] == JOB_FARMER && PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_TAKE_COMBAIN)
 			{
 				PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_COLLECT_COMBAIN;
@@ -8117,7 +8057,6 @@ public OnPlayerConnect(playerid)
 		PhoneTD_Create_Player(playerid);
 		JobGuiTD_Create_Player(playerid);
 		InfoBar_Create_Player(playerid);
-		Speedo_Create_Player(playerid);
 		DeathScreen_Create_Player(playerid);
 		MDC_CreatePlayerTextdraws(playerid);
 		PayPhoneTD_Create_Player(playerid);
@@ -20049,7 +19988,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 0:
 					{
 						TextdrawDisabled_Speedo{playerid} = !TextdrawDisabled_Speedo{playerid};
-						if(TextdrawDisabled_Speedo{playerid} && ShowingSpeedo{playerid}) Speedo_Hide(playerid);
+						if(TextdrawDisabled_Speedo{playerid}) Speedo_Hide(playerid);
 						SaveAccountOption(playerid, "TextdrawDisabled_Speedo", TextdrawDisabled_Speedo{playerid});
 					}
 					case 1:
@@ -23978,6 +23917,7 @@ stock ApplyAnimation_Loop(playerid, animlib[], animname[], Float:speed, bool:loo
 {
 	ApplyAnimation(playerid, animlib, animname, speed, loop, lockx, locky, freeze, time, forcesync);
 	UsingLoopAnim{playerid} = true;
+	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim", .time = 3);
 	return 1;
 }
 
@@ -23985,6 +23925,7 @@ stock ApplyAnimation_Single(playerid, animlib[], animname[], Float:speed, bool:l
 {
 	ApplyAnimation(playerid, animlib, animname, speed, loop, lockx, locky, freeze, time, forcesync);
 	UsingSingleAnim{playerid} = true;
+	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim", .time = 3);
 	return 1;
 }
 
@@ -23992,6 +23933,7 @@ stock ApplyAnimation_Back(playerid, animlib[], animname[], Float:speed, bool:loo
 {
 	ApplyAnimation(playerid, animlib, animname, speed, loop, lockx, locky, freeze, time, forcesync);
 	UsingBackAnim[playerid] = back;
+	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim", .time = 3);
 	return 1;
 }
 
@@ -24881,10 +24823,7 @@ stock PhoneTD_Show(playerid, menu = 0, bool:forceesc = true)
 			SelectTextDraw(playerid, 0xBBBBBBFF);
 		}
 	}
-	if(ShowingSpeedo{playerid} == true)
-	{
-		Speedo_Hide(playerid, false);
-	}
+	Speedo_Hide(playerid, .destroy = false);
 	tmpPhone_InventoryPage[playerid] = menu;
 	if(forceesc) ShowESCTextdraw(playerid, ESC_TYPE_PHONE);
 	return 1;
@@ -24966,41 +24905,8 @@ stock PhoneTD_Hide(playerid, menu = 0)
 			TextDrawHideForPlayer(playerid, Phone_SpeakerTog);
 			PlayerTextDrawHide(playerid, Phone_CallStatus[playerid]);
 			tmpPhone_InventoryPage[playerid] = 0;
-			if(ShowingSpeedo{playerid} == true)
-			{
-				ShowingSpeedo{playerid} = false;
 
-
-
-
-
-
-				/*
-				* TODO : padaryti kad kai pasiemi daikta is inv, Selectina automatiskai 1 zemiau. tmpend
-				*
-				*
-				*
-				*
-				*
-				*
-				*
-				*
-				*
-				*
-				*
-				*
-				*
-				*
-				*/
-
-
-
-
-
-
-
-				Speedo_Show(playerid); // funkcijos viduj tikrina ar showingspeedo = false.
-			}
+			Speedo_Show(playerid);
 			CancelSelectTextDraw(playerid);
 		}
 	}
@@ -26860,9 +26766,14 @@ stock divmod( const number, const divider, &div, &mod )
 stock ConvertFuelToString(Float:fuellevel, Float:fuelcapacity)
 {
 	new fuel = floatround(((fuellevel*10) / fuelcapacity), floatround_round),
-		string[14];
-	if(fuel <= 0.0) string = " ";
+		string[16];
+	if(fuel <= 0) string = " ";
 	else for(new i = 0; i < fuel; i++) strcat(string, "I");
+
+	if(fuel <= 3) strins(string, "~r~~h~", 0);
+	else if(fuel <= 6) strins(string, "~y~", 0);
+	else strins(string, "~g~~h~", 0);
+
 	return string;
 }
 
@@ -26896,16 +26807,7 @@ stock SetVehicleSpeed(vehicleid, mph)
 	return 0;
 }
 
-stock Speedo_Update(playerid, speed_string[] = "", km_string[] = "", fuel_level[] = "", vehicle_model = 0, vehicle_color1 = -1, vehicle_color2 = -1)
-{
-	if(vehicle_color1 != -1 && vehicle_color2 != -1) PlayerTextDrawSetPreviewVehCol(playerid, Speedo_Model[playerid], vehicle_color1, vehicle_color2);
-	if(strlen(speed_string) >= 1) PlayerTextDrawSetString(playerid, Speedo_Speed[playerid], speed_string);
-	if(vehicle_model != 0) PlayerTextDrawSetPreviewModel(playerid, Speedo_Model[playerid], vehicle_model);
-	if(strlen(fuel_level) >= 1) PlayerTextDrawSetString(playerid, Speedo_FuelLevel[playerid], fuel_level);
-	if(strlen(km_string) >= 1) PlayerTextDrawSetString(playerid, Speedo_KM[playerid], km_string);
-	if(!ShowingSpeedo{playerid}) Speedo_Show(playerid);
-	return 1;
-}
+
 
 stock PayDay(playerid)
 {
@@ -27911,7 +27813,7 @@ stock EngineTurning(playerid)
 			}
 			else
 			{
-				new turn_time = 1000 +
+				new turn_time = 1200 +
 								floatround((VehicleInfo[vehicleid][vBatteryStatus] > 90.0 ? 0.0 : (100-VehicleInfo[vehicleid][vBatteryStatus])*28)) +
 								floatround((VehicleInfo[vehicleid][vEngineStatus] > 50.0 ? 0.0 : (100-VehicleInfo[vehicleid][vEngineStatus])*20));
 				if(StartLoadBar(playerid, LOAD_BAR_ENGINE, turn_time))
@@ -27932,9 +27834,9 @@ stock ChangeVehicleEngineStatus(playerid, vehicleid)
 	if(VehicleInfo[vehicleid][vEngined] == 0)
 	{
 		GameTextForPlayer(playerid, "Variklis ~r~uzgesintas", 3000, 5);
-		if(VehicleHaveEngine(VehicleInfo[vehicleid][vModel]) && !TextdrawDisabled_Speedo{playerid})
+		if(VehicleHaveEngine(VehicleInfo[vehicleid][vModel]))
 		{
-			Speedo_Update(playerid, .fuel_level = "~n~DEGALAI:", .vehicle_model = GetVehicleModel(OldVehicle[playerid]), .vehicle_color1 = VehicleInfo[OldVehicle[playerid]][vColor1], .vehicle_color2 = VehicleInfo[OldVehicle[playerid]][vColor2]);
+			Speedo_Update(playerid, .fuel_level = "DEGALAI:");
 		}
 	}
 	else
@@ -27962,7 +27864,7 @@ stock StartLoadBar(playerid, type, time)
 	PlayerTextDrawShow(playerid, LoadBar_LoadFull[playerid]);
 	PlayerTextDrawShow(playerid, LoadBar_Loaded[playerid]);
 	PlayerTextDrawShow(playerid, LoadBar_Text[playerid]);
-	return LoadBarInfo[playerid][barTimer] = SetTimerEx("UpdateLoadBar", time/100, true, "d", playerid);
+	return LoadBarInfo[playerid][barTimer] = SetTimerEx("UpdateLoadBar", time/50, true, "d", playerid);
 }
 
 forward UpdateSpamBar(playerid, type);
@@ -27988,9 +27890,9 @@ public UpdateSpamBar(playerid, type)
 forward UpdateLoadBar(playerid);
 public UpdateLoadBar(playerid)
 {
-	LoadBarInfo[playerid][barValue]++;
+	LoadBarInfo[playerid][barValue] += 2;
 	PlayerTextDrawHide(playerid, LoadBar_Loaded[playerid]);
-	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], LoadBarInfo[playerid][barValue]*2.65, 7.500000);
+	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], LoadBarInfo[playerid][barValue]*2.65, 3.0);
 	PlayerTextDrawShow(playerid, LoadBar_Loaded[playerid]);
 	if(LoadBarInfo[playerid][barValue] >= 100)
 	{
@@ -30824,7 +30726,6 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 	GetESCType(playerid) = ESC_TYPE_NONE;
 
 
-	ShowingSpeedo{playerid} = 
 	ShowingInfoBar{playerid} =
 	ShowingJailTimer{playerid} =
 	ShowingJobGUI{playerid} = false;
@@ -30844,7 +30745,6 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 
 	ShowingInfoBar{playerid} = 
 	ShowingJailTimer{playerid} = 
-	ShowingSpeedo{playerid} = 
 	ShowingJobGUI{playerid} = false;
 
 	TextdrawDisabled_JailTimer{playerid} =
@@ -32062,26 +31962,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
 				SpamBarTD_Hide(playerid);
 			}
-		}
-		if(UsingSingleAnim{playerid} == true)
-		{
-			ClearAnimations(playerid);
-			UsingSingleAnim{playerid} = false;
-		}
-		else if(UsingLoopAnim{playerid} == true)
-		{
-			StopLoopAnim(playerid);
-		}
-		else if(UsingBackAnim[playerid] != 0)
-		{
-			switch(UsingBackAnim[playerid])
-			{
-				case 1:
-				{
-					ApplyAnimation(playerid,"PED","seat_up",3.0,0,0,0,0,0);
-				}
-			}
-			UsingBackAnim[playerid] = 0;
 		}
 	}
 	return 1;
@@ -33549,6 +33429,31 @@ CMD:saveaccount(playerid, params[])
 {
 	SaveAccount(playerid, true);
 	MsgSuccess(playerid, "Þaidëjas", "Duomenys iðsaugoti.");
+	return 1;
+}
+alias:stopanim("sa");
+CMD:stopanim(playerid, params[])
+{
+	if(UsingSingleAnim{playerid} == true)
+	{
+		ClearAnimations(playerid);
+		UsingSingleAnim{playerid} = false;
+	}
+	else if(UsingLoopAnim{playerid} == true)
+	{
+		StopLoopAnim(playerid);
+	}
+	else if(UsingBackAnim[playerid] != 0)
+	{
+		switch(UsingBackAnim[playerid])
+		{
+			case 1:
+			{
+				ApplyAnimation(playerid,"PED","seat_up",3.0,0,0,0,0,0);
+			}
+		}
+		UsingBackAnim[playerid] = 0;
+	}
 	return 1;
 }
 CMD:stop(playerid, params[])
@@ -41814,7 +41719,10 @@ CMD:phone(playerid, params[])
 	if(IsItemInPlayerInventory(playerid, ITEM_PHONE))
 	{
 		if(GetESCType(playerid) != ESC_TYPE_NONE && GetESCType(playerid) != ESC_TYPE_PHONE) return SendWarning(playerid, "Praðome uþdaryti kitus langus (%d)", GetESCType(playerid));
-		if(tmpPhone_InventoryPage[playerid] == PHONE_PAGE_CALLING || tmpPhone_InventoryPage[playerid] == PHONE_PAGE_CALL) SelectTextDraw(playerid, 0x7E8A95FF);
+		if(tmpPhone_InventoryPage[playerid] == PHONE_PAGE_CALLING || tmpPhone_InventoryPage[playerid] == PHONE_PAGE_CALL)
+		{
+			SelectTextDraw(playerid, 0x7E8A95FF);
+		}
 		else PhoneTD_Show(playerid, PHONE_PAGE_MAIN);
 	}
 	else SendError(playerid, "Neturite mob. telefono.");

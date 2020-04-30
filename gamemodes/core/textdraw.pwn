@@ -41,8 +41,6 @@ new Text:vShop_Base,
 	Text:vShop_PrevBase,
 	Text:vShop_Prev;
 
-new Text:Speedo_Base;
-
 new Text:JailTimeTD_Bg,
 	Text:JailTimeTD_Timer;
 
@@ -259,10 +257,6 @@ new PlayerText:LoadBar_Base[MAX_PLAYERS],
 	PlayerText:LoadBar_Loaded[MAX_PLAYERS],
 	PlayerText:LoadBar_Text[MAX_PLAYERS];
 
-new PlayerText:Speedo_Model[MAX_PLAYERS],
-	PlayerText:Speedo_Speed[MAX_PLAYERS],
-	PlayerText:Speedo_FuelLevel[MAX_PLAYERS],
-	PlayerText:Speedo_KM[MAX_PLAYERS];
 
 new PlayerText:JobGuiTD_TopText[MAX_PLAYERS],
 	PlayerText:JobGuiTD_BotText[MAX_PLAYERS];
@@ -303,7 +297,6 @@ stock CreateGlobalTextdraws()
 	BorderHUD_Create_Global();
 	PhoneTD_Create_Global();
 	DMV_Create_Global();
-	Speedo_Create_Global();
 	VLTextdraw_Create_Global();
 	VShop_Create_Global();
 	FurnitureTd_Create_Global();
@@ -1373,81 +1366,13 @@ stock TipBox_Create_Player(playerid)
 	return 1;
 }
 
-stock Speedo_Create_Global()
-{
-	Speedo_Base = TextDrawCreate(484.667114, 373.039855, "box");
-	TextDrawLetterSize(Speedo_Base, 0.000000, 4.323807);
-	TextDrawTextSize(Speedo_Base, 606.000000, 0.000000);
-	TextDrawAlignment(Speedo_Base, 1);
-	TextDrawColor(Speedo_Base, -1);
-	TextDrawUseBox(Speedo_Base, 1);
-	TextDrawBoxColor(Speedo_Base, 93);
-	TextDrawSetShadow(Speedo_Base, 0);
-	TextDrawSetOutline(Speedo_Base, 0);
-	TextDrawBackgroundColor(Speedo_Base, 132);
-	TextDrawFont(Speedo_Base, 1);
-	TextDrawSetProportional(Speedo_Base, 1);
-	TextDrawSetShadow(Speedo_Base, 0);	
-	return 1;
-}
 
-stock Speedo_Create_Player(playerid)
-{
-	Speedo_Model[playerid] = CreatePlayerTextDraw(playerid, 476.809448, 356.386627, "");
-	PlayerTextDrawLetterSize(playerid, Speedo_Model[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, Speedo_Model[playerid], 58.000000, 67.000000);
-	PlayerTextDrawAlignment(playerid, Speedo_Model[playerid], 1);
-	PlayerTextDrawColor(playerid, Speedo_Model[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, Speedo_Model[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, Speedo_Model[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, Speedo_Model[playerid], 0);
-	PlayerTextDrawFont(playerid, Speedo_Model[playerid], 5);
-	PlayerTextDrawSetProportional(playerid, Speedo_Model[playerid], 0);
-	PlayerTextDrawSetShadow(playerid, Speedo_Model[playerid], 0);
-	PlayerTextDrawSetPreviewModel(playerid, Speedo_Model[playerid], 565);
-	PlayerTextDrawSetPreviewRot(playerid, Speedo_Model[playerid], -15.000000, 0.000000, 30.000000, 1.000000);
-	PlayerTextDrawSetPreviewVehCol(playerid, Speedo_Model[playerid], 1, 1);
-
-	Speedo_Speed[playerid] = CreatePlayerTextDraw(playerid, 535.333374, 379.439941, "GREITIS:_120KM/H");
-	PlayerTextDrawLetterSize(playerid, Speedo_Speed[playerid], 0.193523, 0.887466);
-	PlayerTextDrawAlignment(playerid, Speedo_Speed[playerid], 1);
-	PlayerTextDrawColor(playerid, Speedo_Speed[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, Speedo_Speed[playerid], 1);
-	PlayerTextDrawSetOutline(playerid, Speedo_Speed[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, Speedo_Speed[playerid], 255);
-	PlayerTextDrawFont(playerid, Speedo_Speed[playerid], 1);
-	PlayerTextDrawSetProportional(playerid, Speedo_Speed[playerid], 1);
-	PlayerTextDrawSetShadow(playerid, Speedo_Speed[playerid], 1);
-
-	Speedo_FuelLevel[playerid] = CreatePlayerTextDraw(playerid, 535.333374, 379.439941, "~n~DEGALAI:_120L");
-	PlayerTextDrawLetterSize(playerid, Speedo_FuelLevel[playerid], 0.193523, 0.887466);
-	PlayerTextDrawAlignment(playerid, Speedo_FuelLevel[playerid], 1);
-	PlayerTextDrawColor(playerid, Speedo_FuelLevel[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, Speedo_FuelLevel[playerid], 1);
-	PlayerTextDrawSetOutline(playerid, Speedo_FuelLevel[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, Speedo_FuelLevel[playerid], 255);
-	PlayerTextDrawFont(playerid, Speedo_FuelLevel[playerid], 1);
-	PlayerTextDrawSetProportional(playerid, Speedo_FuelLevel[playerid], 1);
-	PlayerTextDrawSetShadow(playerid, Speedo_FuelLevel[playerid], 1);
-
-	Speedo_KM[playerid] = CreatePlayerTextDraw(playerid, 535.333312, 395.226593, "RIDA:_0.0KM");
-	PlayerTextDrawLetterSize(playerid, Speedo_KM[playerid], 0.193523, 0.887466);
-	PlayerTextDrawAlignment(playerid, Speedo_KM[playerid], 1);
-	PlayerTextDrawColor(playerid, Speedo_KM[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, Speedo_KM[playerid], 1);
-	PlayerTextDrawSetOutline(playerid, Speedo_KM[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, Speedo_KM[playerid], 255);
-	PlayerTextDrawFont(playerid, Speedo_KM[playerid], 1);
-	PlayerTextDrawSetProportional(playerid, Speedo_KM[playerid], 1);
-	PlayerTextDrawSetShadow(playerid, Speedo_KM[playerid], 1);
-	return 1;
-}
 
 stock LoadBar_Create_Player(playerid)
 {
 	LoadBar_Base[playerid] = CreatePlayerTextDraw(playerid, 189.952392, 377.293304, "LD_SPAC:white");
 	PlayerTextDrawLetterSize(playerid, LoadBar_Base[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_Base[playerid], 268.000000, 11.000000);
+	PlayerTextDrawTextSize(playerid, LoadBar_Base[playerid], 268.000000, 6.000000);
 	PlayerTextDrawAlignment(playerid, LoadBar_Base[playerid], 1);
 	PlayerTextDrawColor(playerid, LoadBar_Base[playerid], 168430335);
 	PlayerTextDrawSetShadow(playerid, LoadBar_Base[playerid], 0);
@@ -1459,9 +1384,9 @@ stock LoadBar_Create_Player(playerid)
 
 	LoadBar_LoadFull[playerid] = CreatePlayerTextDraw(playerid, 191.476211, 378.999969, "LD_SPAC:white");
 	PlayerTextDrawLetterSize(playerid, LoadBar_LoadFull[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_LoadFull[playerid], 265.000000, 7.500000);
+	PlayerTextDrawTextSize(playerid, LoadBar_LoadFull[playerid], 265.000000, 3.0);
 	PlayerTextDrawAlignment(playerid, LoadBar_LoadFull[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_LoadFull[playerid], 524966399);
+	PlayerTextDrawColor(playerid, LoadBar_LoadFull[playerid], 0x8E721Cff);
 	PlayerTextDrawSetShadow(playerid, LoadBar_LoadFull[playerid], 0);
 	PlayerTextDrawSetOutline(playerid, LoadBar_LoadFull[playerid], 0);
 	PlayerTextDrawBackgroundColor(playerid, LoadBar_LoadFull[playerid], 255);
@@ -1471,9 +1396,9 @@ stock LoadBar_Create_Player(playerid)
 
 	LoadBar_Loaded[playerid] = CreatePlayerTextDraw(playerid, 191.476211, 378.999969, "LD_SPAC:white");
 	PlayerTextDrawLetterSize(playerid, LoadBar_Loaded[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], 97.000000, 7.500000);
+	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], 97.000000, 3.0);
 	PlayerTextDrawAlignment(playerid, LoadBar_Loaded[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_Loaded[playerid], -1614872577);
+	PlayerTextDrawColor(playerid, LoadBar_Loaded[playerid], 0xEEBC26ff);
 	PlayerTextDrawSetShadow(playerid, LoadBar_Loaded[playerid], 0);
 	PlayerTextDrawSetOutline(playerid, LoadBar_Loaded[playerid], 0);
 	PlayerTextDrawBackgroundColor(playerid, LoadBar_Loaded[playerid], 255);
@@ -3663,30 +3588,6 @@ stock JobGUI_Hide(playerid)
 	return 1;
 }
 
-stock Speedo_Show(playerid)
-{
-	if(!ShowingSpeedo{playerid})
-	{
-		TextDrawShowForPlayer(playerid, Speedo_Base);
-		PlayerTextDrawShow(playerid, Speedo_Model[playerid]);
-		PlayerTextDrawShow(playerid, Speedo_Speed[playerid]);
-		PlayerTextDrawShow(playerid, Speedo_KM[playerid]);
-		PlayerTextDrawShow(playerid, Speedo_FuelLevel[playerid]);
-		ShowingSpeedo{playerid} = true;
-	}
-	return 1;
-}
-
-stock Speedo_Hide(playerid, bool:setvariable = true)
-{
-	TextDrawHideForPlayer(playerid, Speedo_Base);
-	PlayerTextDrawHide(playerid, Speedo_Model[playerid]);
-	PlayerTextDrawHide(playerid, Speedo_Speed[playerid]);
-	PlayerTextDrawHide(playerid, Speedo_KM[playerid]);
-	PlayerTextDrawHide(playerid, Speedo_FuelLevel[playerid]);
-	if(setvariable) ShowingSpeedo{playerid} = false;
-	return 1;
-}
 
 stock BorderHUD_Show(playerid)
 {
