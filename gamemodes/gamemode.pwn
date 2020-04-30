@@ -263,6 +263,12 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define MAX_GFURNITURE_BRONZE 			100
 #define MAX_GFURNITURE_SILVER 			200
 #define MAX_GFURNITURE_GOLD 			300
+// Donators, remejai
+#define MAX_AFK_TIME_NO_DONATOR			10
+#define MAX_AFK_TIME_SILVER_USER		15	
+#define MAX_AFK_TIME_GOLD_USER			20
+#define TIME_TO_RESET_DONATOR 			2592000 // 30days
+
 // Inventorius
 #define MAX_INVENTORY_SLOTS 				15
 #define MAX_HOUSE_INVENTORY_SLOTS 			15
@@ -291,7 +297,6 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define WARNS_TO_BAN 					3
 #define TIP_EVERY_MINUTE				2 // kas kiek minuciu tip rodomas visiems random
 #define TIME_TO_DELETE_DROPS			18000 // 5val.  	60sec= 1mmin // kas kiek UNIX sec issitrins visi objektai
-#define TIME_TO_RESET_DONATOR 			2592000 // 30days
 #define MINUTES_TO_PAYDAY 				15 // kiek minuciu reik prazaist, kad gautum payday
 #define ADMIN_PERMISSIONS_PER_PAGE		18 // kiek permisionu per page rodyt ( << >> )
 #define MAX_FURNITURE_PER_PAGE 			180
@@ -1110,20 +1115,23 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define reset(%0,%1,%2) 				new _rV_%0[%2];\
 										%1 = _rV_%0
 #define KickEx(%0)						SetTimerEx("Kicker", 100, false, "d", %0)
+/** Server vars **/
+#define SetGVarFloatEx(%0,%1,%2)		SetGVarFloat(%0,%1,%2) , SaveServerFloatEx(%0,%1)
+#define SetGVarIntEx(%0,%1,%2)			SetGVarInt(%0,%1,%2) , SaveServerIntEx(%0,%1)
+/** Chat **/
 #define SendFormat						va_SendClientMessage
 #define SendFormatToAll					va_SendClientMessageToAll
 #define SendUsage(%0,%1)				SendFormat(%0,0xBABABAFF,"Naudojimas: {E4E4E4}"%1)
-#define SendWarning(%0,%1) 				MsgWarning(%0,"PERSPËJIMAS", %1)
-#define SendError(%0,%1)				MsgError(%0,"KLAIDA",%1)
+#define SendWarning(%0,%1) 				MsgWarning(%0,"Perspëjimas", %1)
+#define SendError(%0,%1)				MsgError(%0,"Klaida",%1)
 #define SendCommands(%0,%1)				SendFormat(%0,0xBABABAFF,"Komandos: {E4E4E4}"%1)
-#define SetGVarFloatEx(%0,%1,%2)		SetGVarFloat(%0,%1,%2) , SaveServerFloatEx(%0,%1)
-#define SetGVarIntEx(%0,%1,%2)			SetGVarInt(%0,%1,%2) , SaveServerIntEx(%0,%1)
-#define MsgDefault(%0,%1,%2)			SendFormat(%0,0x2A8AD8FF,"["%1"] {66A8DF}"%2)
-#define MsgSuccess(%0,%1,%2)			SendFormat(%0,0x8BCF16FF,"["%1"] {9ED83A}"%2)
-#define MsgWarning(%0,%1,%2)			SendFormat(%0,0xE46911FF,"["%1"] {E5823B}"%2)
-#define MsgError(%0,%1,%2)				SendFormat(%0,0xDC1515FF,"["%1"] {E23D3D}"%2)
-#define MsgInfo(%0,%1,%2)				SendFormat(%0,0xE4E4E4FF,"["%1"] {DDDDDD}"%2)
-#define MsgImportant(%0,%1,%2)			SendFormat(%0,0xAAD715FF,"["%1"] {C0E055}"%2)
+#define MsgDefault(%0,%1,%2)			SendFormat(%0,0x2A8AD8FF,%1": {66A8DF}"%2)
+#define MsgSuccess(%0,%1,%2)			SendFormat(%0,0x8BCF16FF,%1": {9ED83A}"%2)
+#define MsgWarning(%0,%1,%2)			SendFormat(%0,0xD7864BFF,%1": {E5A170}"%2)
+#define MsgError(%0,%1,%2)				SendFormat(%0,0xD94848FF,%1": {E86F6F}"%2)
+#define MsgInfo(%0,%1,%2)				SendFormat(%0,0xE4E4E4FF,%1": {DDDDDD}"%2)
+#define MsgImportant(%0,%1,%2)			SendFormat(%0,0xB0CF4CFF,%1": {C5DE74}"%2)
+/** Others **/
 #define TOS(%0,%1,%2) 					(%0 ? (%1) : (%2))
 #define ClearChat(%0,%1)				for(new c=0;c<%1;c++) SendClientMessage(%0,-1,"")
 #define mysql_fquery(%0,%1,%2)			mysql_tquery(%0,%1,"sdev__"%2)
@@ -4073,34 +4081,35 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core\map\willowfield_garage.pwn"
 #include "core\map\idlewood_basket.pwn"
 
-#include "core\map\empty_houses.pwn"
-#include "core\map\misc.pwn"
+// #include "core\map\empty_houses.pwn"
+// #include "core\map\misc.pwn"
 #include "core\map\china.pwn"
 #include "core\map\prison.pwn"
 #include "core\map\government.pwn"
-#include "core\map\ls_bus_station.pwn"
-#include "core\map\corona_small.pwn"
-#include "core\map\corona_big.pwn"
-#include "core\map\ls_dump.pwn"
-#include "core\map\taxi.pwn"
-#include "core\map\park.pwn"
-#include "core\map\mall.pwn"
 #include "core\map\mechanics.pwn"
-#include "core\map\ls_logistics.pwn"
-#include "core\map\lspd.pwn"
-#include "core\map\downtown_parking.pwn"
-#include "core\map\mall_parking.pwn"
 #include "core\map\train_ganton.pwn"
 #include "core\map\train_jefferson.pwn"
-#include "core\map\interiors.pwn"
-#include "core\map\laundry.pwn"
-#include "core\map\prieplauka.pwn"
-#include "core\map\bank.pwn"
-#include "core\map\grove.pwn"
-#include "core\map\dmv_change.pwn"
-#include "core\map\hospital.pwn"
-#include "core\map\deja_vu.pwn"
-#include "core\map\idlewood_park.pwn"
+// #include "core\map\ganghood_details.pwn"
+// #include "core\map\taxi.pwn"
+// #include "core\map\ls_bus_station.pwn"
+// #include "core\map\corona_small.pwn"
+// #include "core\map\corona_big.pwn"
+// #include "core\map\ls_dump.pwn"
+// #include "core\map\park.pwn"
+// #include "core\map\mall.pwn"
+// #include "core\map\ls_logistics.pwn"
+// #include "core\map\lspd.pwn"
+// #include "core\map\downtown_parking.pwn"
+// #include "core\map\mall_parking.pwn"
+// #include "core\map\interiors.pwn"
+// #include "core\map\laundry.pwn"
+// #include "core\map\prieplauka.pwn"
+// #include "core\map\bank.pwn"
+// #include "core\map\grove.pwn"
+// #include "core\map\dmv_change.pwn"
+// #include "core\map\hospital.pwn"
+// #include "core\map\deja_vu.pwn"
+// #include "core\map\idlewood_park.pwn"
 
 #include "modules\server/graffiti.pwn"
 #include "modules\server/thief.pwn"
@@ -26537,6 +26546,17 @@ stock ShowVehicleList(playerid, ...)
 	SelectTextDraw(playerid, 0xDBDBDBFF);
 }
 
+stock IsAdminGroupExisting(sqlid)
+{
+	foreach(new groupid : Group)
+	{
+		if(GroupsInfo[groupid][groupId] == sqlid)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
 stock GetGroupName(sqlid, bool:bysql = true)
 {
@@ -33520,6 +33540,7 @@ CMD:pickupdrugs(playerid, params[])
 CMD:saveaccount(playerid, params[])
 {
 	SaveAccount(playerid, true);
+	MsgSuccess(playerid, "Þaidëjas", "Duomenys iðsaugoti.");
 	return 1;
 }
 CMD:stop(playerid, params[])
@@ -34028,7 +34049,6 @@ stock Admin_NewChars_ShowMain(playerid)
 	Dialog_Show(playerid, DialogAdminNewCharsMain, DIALOG_STYLE_LIST, "Nepatvirtinti veikëjai", dialog_GetBody(), "Tæsti", "Atðaukti");
 	return 1;
 }
-
 Dialog:DialogAdminNewCharsMain(playerid, response, listitem, inputtext[])
 {
 	if(response)
@@ -34043,10 +34063,18 @@ Dialog:DialogAdminNewCharsMain(playerid, response, listitem, inputtext[])
 
 stock Admin_NewChars_ShowList(playerid)
 {
-	mysql_tquery(chandler, "SELECT players_new.id pid,players_new.Date,players_new.Name pname,players_new.Reviewed,users_data.Name uname,users_data.id uid FROM players_new INNER JOIN users_data ON users_data.id = players_new.UserId AND players_new.Status = '0' ORDER BY players_new.Date DESC", "AdminNewCharsLoad", "d", playerid);
+	mysql_tquery(chandler, "\
+		SELECT players_new.id pid,players_new.Date,players_new.Name pname,players_new.Reviewed,users_data.Name uname,users_data.id uid \
+		FROM players_new INNER JOIN users_data \
+		ON users_data.id = players_new.UserId AND players_new.Status = '0' \
+		ORDER BY players_new.Date DESC", "AdminNewCharsLoad", "d", playerid);
 	return 1;
 }
 
+/*
+	================================================================================================
+	Uzkrauname visa lista.
+*/
 forward AdminNewCharsLoad(playerid);
 public AdminNewCharsLoad(playerid)
 {
@@ -34075,12 +34103,11 @@ public AdminNewCharsLoad(playerid)
 			format(string, sizeof string, "%s%d. %s [%d]\t%s [%d]\t%s\n", string, i + 1, pname, pid, uname, uid, aname);
 		}
 	}
-	else format(string, sizeof string, "Nepatvirtintø veikëjø nëra");
+	else format(string, sizeof string, "Nepatvirtintø veikëjø nëra\nNëra");
 
 	Dialog_Show(playerid, DialogAdminNewCharsList, DIALOG_STYLE_TABLIST_HEADERS, "Nepatvirtinti veikëjai", string, "Tæsti", "Atðaukti");
 	return 1;
 }
-
 Dialog:DialogAdminNewCharsList(playerid, response, listitem, inputtext[])
 {
 	if(response)
@@ -34091,17 +34118,21 @@ Dialog:DialogAdminNewCharsList(playerid, response, listitem, inputtext[])
 	return 1;
 }
 
+/*
+	================================================================================================
+	Pasirinkto veikejo informacija uzkrauname:
+*/
 stock Admin_NewChars_ShowDetails(playerid, listitem)
 {
 	new 
 		string[1024];
 
-	mysql_format(chandler, string, 126, "SELECT id,Answer1,Answer2,Answer3,Name,Date,UserId FROM `players_new` WHERE Status = '0' ORDER BY Date DESC LIMIT 1 OFFSET %d", listitem);
+	mysql_format(chandler, string, 256, "\
+		SELECT id,Answer1,Answer2,Answer3,Name,Date,UserId FROM `players_new` \
+		WHERE Status = '0' ORDER BY Date DESC LIMIT 1 OFFSET %d", listitem);
 	mysql_tquery(chandler, string, "ShowNewChars", "d", playerid);
 	return 1;
 }
-thread(NewCharUpdate);
-
 forward ShowNewChars(playerid);
 public ShowNewChars(playerid)
 {
@@ -34123,12 +34154,16 @@ public ShowNewChars(playerid)
 		mysql_fquery(chandler, string, "NewCharUpdate");
 
 		format(string, sizeof string, "Veikëjo vardas: %s\nData: %s\nVartotojas: %s\n\n1. %s\n%s\n\n2. %s\n%s\n\n3. %s\n%s", 
-			name, date, GetUserNameById(player_NewCharUserId[playerid]), NewCharQuestions[0][ncq_Lt], Dialog_PrepareAnswer(answer1), NewCharQuestions[1][ncq_Lt], Dialog_PrepareAnswer(answer2), NewCharQuestions[2][ncq_Lt], Dialog_PrepareAnswer(answer3));
+			name, date, GetUserNameById(player_NewCharUserId[playerid]),
+			NewCharQuestions[0][ncq_Lt], Dialog_PrepareAnswer(answer1),
+			NewCharQuestions[1][ncq_Lt], Dialog_PrepareAnswer(answer2), 
+			NewCharQuestions[2][ncq_Lt], Dialog_PrepareAnswer(answer3));
 
 		Dialog_Show(playerid, DialogAdminNewCharDetail, DIALOG_STYLE_MSGBOX, "Naujo veikëjo patvirtinimas", string, "Priimti", "Atmesti");
 	}
 	else Admin_NewChars_ShowMain(playerid);
 }
+thread(NewCharUpdate);
 
 Dialog:DialogAdminNewCharDetail(playerid, response, listitem, inputtext[])
 {
@@ -34224,8 +34259,6 @@ hook OnCharAccepted(charid, charuserid, adminid)
 			break;
 		}
 	}
-	/*mysql_format(chandler, string, sizeof string, "UPDATE `players_new` SET Status = '%d' WHERE id = '%d'", (playerid == INVALID_PLAYER_ID ? 1 : 3), charid);
-	mysql_fquery(chandler, string, "NewCharUpdate");*/
 
 	mysql_format(chandler, string, sizeof string, "UPDATE `players_new` SET Status = '%d', AdminId = '%d' WHERE id = '%d'", (playerid == INVALID_PLAYER_ID ? 1 : 3), PlayerInfo[adminid][pUserId], charid);
 	mysql_tquery(chandler, string, "CharAcceptUpdate", "dd", charid, playerid);
@@ -34886,6 +34919,7 @@ CMD:setgroup(playerid, params[])
 	new groupsql, receiverid;
 	if(sscanf(params,"ud",receiverid,groupsql)) return SendUsage(playerid, "/setgroup [þaidëjas] [grupës MySQL ID (/groupslist)]");
 	if(IsPlayerNPC(receiverid)) return InfoBox(playerid, IB_WRONG_PLAYER);
+	if(!IsAdminGroupExisting(groupsql)) return SendError(playerid, "Tokios grupës(%d) nëra. Patikrinkite /groupslist", groupsql);
 	if(IsPlayerInAdminGroup(receiverid, groupsql)) return SendWarning(playerid, "Þaidëjas jau yra ðioje grupëje.");
 	for(new i = 0; i < MAX_PLAYER_GROUPS; i++)
 	{
@@ -38677,38 +38711,37 @@ CMD:inventory(playerid, params[])
 CMD:invweapon(playerid, params[])
 {
 	new weaponid = GetPlayerWeapon(playerid);
-	if(IsPlayerInAnyVehicle(playerid)) return SendWarning(playerid, "Negalite padëti ginklo tr. priemonëje.");
-	if(weaponid != 0)
+	// if(IsPlayerInAnyVehicle(playerid)) return SendWarning(playerid, "Negalite padëti ginklo tr. priemonëje.");
+	if(weaponid == 0) return SendError(playerid, "Neturite ginklo rankose.");
+
+	sd_CheckWeaponCheat(playerid, weaponid, false);
+	new wepslot = sd_GetWeaponSlot(weaponid);
+	if(sd_GetWeaponType(playerid, weaponid) == WEAPON_GIVE_TYPE_NO_INVENTORY)
 	{
-		sd_CheckWeaponCheat(playerid, weaponid, false);
-		new wepslot = sd_GetWeaponSlot(weaponid);
-		if(sd_GetWeaponType(playerid, weaponid) == WEAPON_GIVE_TYPE_NO_INVENTORY)
+		SendWarning(playerid, "Ðio ginklo pasidëti á inventoriø negalima.");
+		return 1;
+	}
+	if(sd_CheckIfSlotUsed(playerid, wepslot))
+	{
+		new slot = GetPlayerFreeInventorySlot(playerid);
+		if(slot != -1)
 		{
-			SendWarning(playerid, "Ðio ginklo pasidëti á inventoriø negalima.");
-			return 1;
+			new unused, ammo;
+			sd_GetPlayerWeaponData(playerid, wepslot, unused, ammo);
+			GivePlayerInventoryItem(playerid, weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid), .slotid = slot);
+
+			log_init(true);
+			log_set_table("logs_inventory");
+			log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
+			log_set_values("'%d','%e','-1','Padejo ginkla i inventoriu','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid));
+			log_push();
+
+			sd_ClearWeaponSlot(playerid, wepslot);
+			SendFormat(playerid, 0xBABABAFF, "Ginklas padëtas á inventoriø.");
 		}
-		if(sd_CheckIfSlotUsed(playerid, wepslot))
+		else
 		{
-			new slot = GetPlayerFreeInventorySlot(playerid);
-			if(slot != -1)
-			{
-				new unused, ammo;
-				sd_GetPlayerWeaponData(playerid, wepslot, unused, ammo);
-				GivePlayerInventoryItem(playerid, weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid), .slotid = slot);
-
-				log_init(true);
-				log_set_table("logs_inventory");
-				log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
-				log_set_values("'%d','%e','-1','Padejo ginkla i inventoriu','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid));
-				log_push();
-
-				sd_ClearWeaponSlot(playerid, wepslot);
-				SendFormat(playerid, 0xBABABAFF, "Ginklas padëtas á inventoriø.");
-			}
-			else
-			{
-				SendWarning(playerid, "Nëra vietos inventoriuje.");
-			}
+			SendWarning(playerid, "Nëra vietos inventoriuje.");
 		}
 	}
 	return 1;

@@ -166,19 +166,19 @@ stock sd_CheckAfk( playerid )
 
 	if(_playerX[playerid] == _newX && _playerY[playerid] == _newY && (_playerZ[playerid] == _newZ || ((_newZ - 2.0 <= _playerZ[playerid] <= _newZ + 2.0) && IsPlayerInWater(playerid))))
 	{
-	    if(PlayerExtra[playerid][peAFKTime] > 13)
+	    if(PlayerExtra[playerid][peAFKTime] > MAX_AFK_TIME_NO_DONATOR)
 	    {
     		if(!HaveAdminPermission(playerid, "IgnoreAFKKicker") && PlayerInfo[playerid][pIsApproved])
 			{
-				if(PlayerInfo[playerid][pDonator] <= 1 && PlayerExtra[playerid][peAFKTime] > 13)
+				if(PlayerInfo[playerid][pDonator] <= 1 && PlayerExtra[playerid][peAFKTime] > MAX_AFK_TIME_NO_DONATOR)
 				{
     				return KickPlayer(playerid, "Sistema", "AFK");
     			}
-    			else if(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && PlayerExtra[playerid][peAFKTime] > 180)
+    			else if(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && PlayerExtra[playerid][peAFKTime] > MAX_AFK_TIME_SILVER_USER)
 				{
     				return KickPlayer(playerid, "Sistema", "AFK");
     			}
-    			else if(PlayerInfo[playerid][pDonator] >= DONATOR_GOLD && PlayerExtra[playerid][peAFKTime] > 720)
+    			else if(PlayerInfo[playerid][pDonator] >= DONATOR_GOLD && PlayerExtra[playerid][peAFKTime] > MAX_AFK_TIME_GOLD_USER)
 				{
     				return KickPlayer(playerid, "Sistema", "AFK");
     			}
