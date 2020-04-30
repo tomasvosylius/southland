@@ -4041,7 +4041,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 main()
 {
 	print(" ===================================================");
-	print("|     Modifikacija programavo: Tomas Vosylius      |");
+	print("|     Modifikacijà programavo: Tomas Vosylius      |");
 	print("|  	  Skirta "#PROJECT_NAME"."#PROJECT_DOMAIN" projektui 		   |");
 	print(" ===================================================");
 	amx_wastetimer();
@@ -27832,7 +27832,7 @@ stock ChangeVehicleEngineStatus(playerid, vehicleid)
 	VehicleInfo[vehicleid][vEngined] = !VehicleInfo[vehicleid][vEngined];
 	if(VehicleInfo[vehicleid][vEngined] == 0)
 	{
-		GameTextForPlayer(playerid, "Variklis ~r~uzgesintas", 3000, 5);
+		UI_LeftBox_Show(playerid, "Variklis ~r~uzgesintas", .time = 3);
 		if(VehicleHaveEngine(VehicleInfo[vehicleid][vModel]))
 		{
 			Speedo_Update(playerid, .fuel_level = "DEGALAI:");
@@ -27840,7 +27840,7 @@ stock ChangeVehicleEngineStatus(playerid, vehicleid)
 	}
 	else
 	{
-		GameTextForPlayer(playerid, "Variklis ~g~uzvestas", 3000, 5);
+		UI_LeftBox_Show(playerid, "Variklis ~g~uzvestas", .time = 3);
 	}
 	new engine, lights, alarm, doors, bonnet, boot, objective;
 	GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
@@ -33433,6 +33433,8 @@ CMD:saveaccount(playerid, params[])
 alias:stopanim("sa");
 CMD:stopanim(playerid, params[])
 {
+	new specialAction = GetPlayerSpecialAction(playerid);
+
 	if(UsingSingleAnim{playerid} == true)
 	{
 		ClearAnimations(playerid);
@@ -33452,6 +33454,16 @@ CMD:stopanim(playerid, params[])
 			}
 		}
 		UsingBackAnim[playerid] = 0;
+	}
+
+	// Atiduodam cigarete/buteli atgal
+	switch(specialAction)
+	{
+		case 	SPECIAL_ACTION_USECELLPHONE, SPECIAL_ACTION_SMOKE_CIGGY, SPECIAL_ACTION_DRINK_BEER,\
+				SPECIAL_ACTION_DRINK_SPRUNK, SPECIAL_ACTION_DRINK_WINE:
+		{
+			SetPlayerSpecialAction(playerid, specialAction);
+		}
 	}
 	return 1;
 }
