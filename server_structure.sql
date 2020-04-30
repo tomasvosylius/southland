@@ -2633,7 +2633,7 @@ CREATE TABLE IF NOT EXISTS `server_whitelist` (
 --
 
 CREATE TABLE IF NOT EXISTS `users_data` (
-`id` int(10) unsigned NOT NULL,
+  `id` int(10) unsigned NOT NULL,
   `Name` varchar(21) NOT NULL,
   `Password` varchar(130) NOT NULL,
   `Salt` varchar(30) NOT NULL,
@@ -2645,6 +2645,25 @@ CREATE TABLE IF NOT EXISTS `users_data` (
   `NumberChanges` int(11) NOT NULL,
   `PlateChanges` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE IF NOT EXISTS `unused_phone_numbers` (
+  `Number` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+DELIMITER //
+CREATE PROCEDURE create_random_numbers()
+BEGIN
+    DECLARE i int DEFAULT 1;
+    WHILE i <= 1000000 DO
+        INSERT INTO `unused_phone_numbers` (`Number`) VALUES (CONVERT(LPAD(FLOOR(RAND() * 999999.99), 6, '1'), UNSIGNED INTEGER));
+        SET i = i + 1;
+    END WHILE;
+END//
+DELIMITER ;
+CALL create_random_numbers()
 
 -- --------------------------------------------------------
 

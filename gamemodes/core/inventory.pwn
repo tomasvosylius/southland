@@ -190,7 +190,8 @@ stock GivePlayerInventoryItem(playerid, itemid, amount, extraid = 0, slotid = -1
 		InventoryInfo[playerid][slotid][invExtraId] = extraid;
 		if(itemid == ITEM_PHONE)
 		{
-			PlayerInfo[playerid][pPhoneNumber] = (PHONE_DEFAULT_NUMBER + PlayerInfo[playerid][pId]) + (1503);
+			GenerateRandomPhoneNumber(PlayerInfo[playerid][pPhoneNumber], playerid);
+			// PlayerInfo[playerid][pPhoneNumber] = (PHONE_DEFAULT_NUMBER + PlayerInfo[playerid][pId]) + (1503);
 		}
 		return true;
 	}
@@ -623,3 +624,29 @@ stock GetItemExtraInformation(itemid)
 	}
 	return extra;
 }
+
+stock GenerateRandomPhoneNumber(&variable, playerid = INVALID_PLAYER_ID)
+{
+	inline selectRandomNumber()
+	{
+		if(cache_num_rows())
+		{
+			new number,
+				string[86];
+			cache_get_value_name_int(0, "Number", number);
+
+			mysql_format(chandler, string, sizeof string, "DELETE FROM `unused_phone_numbers` WHERE Number = '%d'", number);
+			mysql_fquery(chandler, string, "NumberGotUsed");
+
+			variable = number;
+
+			printf("Selected random number: %d for %s", variable, GetPlayerNameEx(playerid));
+		}
+		return 1;
+	}
+	mysql_tquery_inline(chandler, "\
+		SELECT Number FROM `unused_phone_numbers` ORDER BY RAND() LIMIT 1", using inline selectRandomNumber, "");
+	return 1;
+}
+
+thread(NumberGotUsed);

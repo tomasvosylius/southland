@@ -8852,7 +8852,7 @@ hook OnPlayerSubmitNewChar(playerid)
 	return 1;
 }
 
-stock CheckNumberUsage(number)
+stock IsPhoneNumberExisting(number)
 {
 	new	Cache:cur = cache_save(),
 		Cache:result,
@@ -9103,7 +9103,7 @@ Dialog:D_DonatorNumberInput(playerid, response, listitem, inputtext[])
 			number,
 			online;
 		if(sscanf(inputtext,"d",number) || !(200000 <= number <= 300000)) return SendWarning(playerid, "Numeris turi bûti tarp 200000 ir 300000.") , DonatorMenu_ShowNumberInput(playerid);
-		if(CheckNumberUsage(number)) return SendWarning(playerid, "Ðis numeris jau yra naudojamas.") , DonatorMenu_ShowNumberInput(playerid);
+		if(IsPhoneNumberExisting(number)) return SendWarning(playerid, "Ðis numeris jau yra naudojamas.") , DonatorMenu_ShowNumberInput(playerid);
 
 		if((online = FindPlayerBySql(charid)) != INVALID_PLAYER_ID)
 		{
