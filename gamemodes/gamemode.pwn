@@ -38577,25 +38577,7 @@ CMD:leavefaction(playerid, params[])
 			PlayerInfo[playerid][pFactionPermissions][i] = 0;
 		}
 		
-		new
-			data[13][3];
-		ac__PlayerIgnoreWeaponAC[playerid] = 2;
-		for(new i = 0; i < 13; i++)
-		{
-			if(ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NORMAL)
-			{
-				sd_GetPlayerWeaponData(playerid, i, data[i][0], data[i][1]);
-				data[i][2] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
-			}
-		}
-		sd_ResetPlayerWeapons(playerid);
-		for(new i = 0; i < 13; i++)
-		{
-			if(data[i][0] > 0 && data[i][1] > 0)
-			{	
-				sd_GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][2]);
-			}
-		}
+		ClearServerSidedWeapons(playerid);
 
   		new channel = PlayerInfo[playerid][pRadioChannel];
   		if((900 <= channel < 950) || (950 <= channel < 1000) || (1000 <= channel < 1050)) PlayerInfo[playerid][pRadioChannel] = 0;
@@ -38612,6 +38594,30 @@ CMD:leavefaction(playerid, params[])
 	}
 	return 1;
 }
+
+stock ClearServerSidedWeapons(playerid)
+{
+	new
+		data[13][3];
+	ac__PlayerIgnoreWeaponAC[playerid] = 2;
+	for(new i = 0; i < 13; i++)
+	{
+		if(ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NORMAL)
+		{
+			sd_GetPlayerWeaponData(playerid, i, data[i][0], data[i][1]);
+			data[i][2] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
+		}
+	}
+	sd_ResetPlayerWeapons(playerid);
+	for(new i = 0; i < 13; i++)
+	{
+		if(data[i][0] > 0 && data[i][1] > 0)
+		{	
+			sd_GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][2]);
+		}
+	}
+}
+
 alias:takejob("isidarbinti");
 CMD:takejob(playerid, params[])
 {
@@ -40309,25 +40315,7 @@ CMD:duty(playerid, params[])
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
 				if(job == JOB_MECHANIC)
 				{
-					new
-						wep_data[13][3];
-					ac__PlayerIgnoreWeaponAC[playerid] = 2;
-					for(new i = 0; i < 13; i++)
-					{
-						if(ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NORMAL)
-						{
-							sd_GetPlayerWeaponData(playerid, i, wep_data[i][0], wep_data[i][1]);
-							wep_data[i][2] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
-						}
-					}
-					sd_ResetPlayerWeapons(playerid);
-					for(new i = 0; i < 13; i++)
-					{
-						if(wep_data[i][0] > 0 && wep_data[i][1] > 0)
-						{	
-							sd_GivePlayerWeapon(playerid, wep_data[i][0], wep_data[i][1], WEAPON_GIVE_TYPE_NORMAL, wep_data[i][2]);
-						}
-					}
+					ClearServerSidedWeapons(playerid);
 					SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 				}
 				RemovePlayerAttachedObject(playerid, 9);
@@ -40376,25 +40364,7 @@ CMD:duty(playerid, params[])
 					{
 						default:
 						{
-							new
-								data[13][3];
-							ac__PlayerIgnoreWeaponAC[playerid] = 2;
-							for(new i = 0; i < 13; i++)
-							{
-								if(ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NORMAL)
-								{
-									sd_GetPlayerWeaponData(playerid, i, data[i][0], data[i][1]);
-									data[i][2] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
-								}
-							}
-							sd_ResetPlayerWeapons(playerid);
-							for(new i = 0; i < 13; i++)
-							{
-								if(data[i][0] > 0 && data[i][1] > 0)
-								{	
-									sd_GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][2]);
-								}
-							}
+							ClearServerSidedWeapons(playerid);
 						}
 					}
 				}
