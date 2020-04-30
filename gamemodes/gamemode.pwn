@@ -34143,6 +34143,7 @@ CMD:jetpack(playerid, params[])
 }
 
 flags:aduty(CMD_TYPE_ADMIN);
+alias:aduty("aod");
 CMD:aduty(playerid, params[])
 {
 	PlayerInfo[playerid][pAdminDuty] = !PlayerInfo[playerid][pAdminDuty];
@@ -34168,7 +34169,7 @@ CMD:aduty(playerid, params[])
 		SendFormatToAll(color, "%s %s[%d] pradëjo darbà.", GetGroupName(PlayerGroups[playerid][0]), GetPlayerNameEx(playerid), playerid);
 
 		SetPlayerColor(playerid, color);
-		if(isadmin) PlayerExtra[playerid][peDutyLabel] = CreateDynamic3DTextLabel("Budintis administratorius\n/report /ask", color, 0.0, 0.0, 0.50, 4.0, playerid, INVALID_VEHICLE_ID, 1);
+		if(isadmin) PlayerExtra[playerid][peDutyLabel] = CreateDynamic3DTextLabel("Admin On Duty", color, 0.0, 0.0, 0.50, 4.0, playerid, INVALID_VEHICLE_ID, 1);
 		//else PlayerExtra[playerid][peDutyLabel] = CreateDynamic3DTextLabel("Budintis pagalbininkas\n/report /ask", color, 0.0, 0.0, 0.50, 4.0, playerid, INVALID_VEHICLE_ID, 1);
 	}
 	else
