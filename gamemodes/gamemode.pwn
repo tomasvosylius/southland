@@ -31039,7 +31039,7 @@ stock sd_MySQL()
 		return 0;
 	}
 	call OnMysqlEstablished();
-	mysql_log(ERROR | WARNING);
+	mysql_log(ERROR);
 	return 1;
 }
 
