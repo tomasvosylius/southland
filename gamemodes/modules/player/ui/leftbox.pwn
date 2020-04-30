@@ -17,7 +17,7 @@ stock UI_LeftBox_Show(playerid, string[], time = 3)
     }
     else
     {
-        TD_LeftBox[playerid] = CreatePlayerTextDraw(playerid, 17.000000, 152.000000, "Sustabdyti animacija gali parases ~r~/stopanim"); // 
+        TD_LeftBox[playerid] = CreatePlayerTextDraw(playerid, 17.000000, 152.000000, string); // 
         PlayerTextDrawLetterSize(playerid, TD_LeftBox[playerid], 0.356249, 1.693331);
         PlayerTextDrawTextSize(playerid, TD_LeftBox[playerid], 149.000000, 0.000000);
         PlayerTextDrawAlignment(playerid, TD_LeftBox[playerid], 1);
