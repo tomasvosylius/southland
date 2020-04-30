@@ -1004,6 +1004,7 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define CLOTHES_CATEGORY_WATCHES 		0
 #define CLOTHES_CATEGORY_ACCESSORIES 	1
 #define CLOTHES_CATEGORY_HATS 			2
+#define CLOTHES_CATEGORY_OTHER			3
 
 #define LOAD_BAR_ENGINE 				1
 
@@ -3844,9 +3845,10 @@ new FurnitureList[][E_FURNITURE_LIST_DATA] = {
 
 
 new ClothesListNames[][37] = {
-	/* CLOTHES_CATEGORY_WATCHES */ {"Laikrodþiai"},
-	/* CLOTHES_CATEGORY_ACCESORIES */ {"Aksesuarai, akiniai"},
-	/* CLOTHES_CATEGORY_HATS */ {"Kepurës, ðalmai, skrybelës, skarelës"}
+	/* CLOTHES_CATEGORY_WATCHES */ 		{"Laikrodþiai"},
+	/* CLOTHES_CATEGORY_ACCESORIES */ 	{"Aksesuarai, akiniai"},
+	/* CLOTHES_CATEGORY_HATS */ 		{"Kepurës, ðalmai, skrybelës, skarelës"},
+	/* CLOTHES_CATEGORY_OTHER */		{"Kita"}
 };
 
 new ClothesList[][E_CLOTHES_LIST_DATA] = {
@@ -3950,7 +3952,21 @@ new ClothesList[][E_CLOTHES_LIST_DATA] = {
 	{CLOTHES_CATEGORY_HATS, "Vilkiko vairuotojo kepure", 18961, 79},
 	{CLOTHES_CATEGORY_HATS, "Picerijos berniuko kepure", 19558, 79},
 	{CLOTHES_CATEGORY_HATS, "Salmas geltonas", 19160, 25},
-	{CLOTHES_CATEGORY_HATS, "Salmas pilkas", 19093, 25}
+	{CLOTHES_CATEGORY_HATS, "Salmas pilkas", 19093, 25},
+	{CLOTHES_CATEGORY_OTHER, "Paper bag", 2663, 10},
+	{CLOTHES_CATEGORY_OTHER, "Paper cup", 2647, 10},
+	{CLOTHES_CATEGORY_OTHER, "Kebabas", 2769, 10},
+	{CLOTHES_CATEGORY_OTHER, "Kava", 19835, 10},
+	{CLOTHES_CATEGORY_OTHER, "Alus1", 1486, 10},
+	{CLOTHES_CATEGORY_OTHER, "Alus2", 1543, 10},
+	{CLOTHES_CATEGORY_OTHER, "Bokalas", 1666, 10},
+	{CLOTHES_CATEGORY_OTHER, "Cocktail taure", 19819, 10},
+	{CLOTHES_CATEGORY_OTHER, "Litras viskio", 19820, 20},
+	{CLOTHES_CATEGORY_OTHER, "Plaktukas", 18635, 10},
+	{CLOTHES_CATEGORY_OTHER, "Lauþtuvas", 18634, 10},
+	{CLOTHES_CATEGORY_OTHER, "Keptuvë", 19584, 10},
+	{CLOTHES_CATEGORY_OTHER, "Wrench", 19627, 10},
+	{CLOTHES_CATEGORY_OTHER, "Skateboardas", 19878, 100}
 };
 
 enum E_NEW_CHAR_QUESTIONS
@@ -4315,10 +4331,17 @@ public SecondTimer()
 		new Float:health;
 		DrugTextdrawShowed = false;
 		GetPlayerHealth(playerid, health);
-		if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK && !IsPlayerInAnyAdminGroup(playerid))
+		if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK)
 		{
-			BanPlayer(playerid, "Sistema", "JetPack");
-			continue;
+			if(!IsPlayerInAnyAdminGroup(playerid))
+			{
+				BanPlayer(playerid, "Sistema", "JetPack");
+				continue;
+			}
+			else if(!PlayerInfo[playerid][pAdminDuty])
+			{
+				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+			}
 		}
 		for(new i = 0; i < MAX_DRUG_TYPES; i++)
 		{
