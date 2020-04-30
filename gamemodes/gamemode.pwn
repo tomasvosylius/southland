@@ -4178,7 +4178,7 @@ public OnGameModeInit()
 
 	// ==============================================================================
 	CreateGlobalTextdraws();
-	BlockGarages(.text = "DRAUDZIAMA");
+	BlockGarages(.text = "X");
 
 	// Timers
 	// ==============================================================================
@@ -4198,7 +4198,9 @@ ptask PT_VehicleSpeedo[200](playerid)
 		Float:consumption, Float:currentX, Float:currentY, Float:distance,
 		string[26];
 
-	if((vehicleid = OldVehicle[playerid]) != GetPlayerVehicleID(playerid) || GetPlayerVehicleSeat(playerid) != 0)
+	if(	!IsPlayerInAnyVehicle(playerid) || 
+		(vehicleid = OldVehicle[playerid]) != GetPlayerVehicleID(playerid) || 
+		GetPlayerVehicleSeat(playerid) != 0)
 	{
 		(Recalculate_Mileage[playerid] > 0) && (Recalculate_Mileage[playerid] = 0);
 		return;
@@ -4259,7 +4261,8 @@ ptask PT_VehicleSpeedo[200](playerid)
 
 		if(VehicleInfo[vehicleid][vFuel] >= 0.0)
 		{
-			format(string, sizeof string, "DEGALAI: %s", ConvertFuelToString(VehicleInfo[vehicleid][vFuel], VehicleFuelCapacityList[VehicleInfo[vehicleid][vModel]-400]));
+			format(string, sizeof string, "DEGALAI: %s", 
+				ConvertFuelToString(VehicleInfo[vehicleid][vFuel], VehicleFuelCapacityList[VehicleInfo[vehicleid][vModel]-400]));
 		}
 		Speedo_Update(playerid, .fuel_level = string);
 	}

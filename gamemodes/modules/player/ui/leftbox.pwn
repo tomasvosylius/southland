@@ -2,12 +2,12 @@
 
 static 
     Timer:player_Timer[MAX_PLAYERS],
-    bool:player_UI_Showed[MAX_PLAYERS],
+    bool:player_UI_Created[MAX_PLAYERS],
     PlayerText:TD_LeftBox[MAX_PLAYERS];
 
 stock UI_LeftBox_Show(playerid, string[], time = 3)
 {
-    if(player_UI_Showed[playerid])
+    if(player_UI_Created[playerid])
     {
         if(player_Timer[playerid] != Timer:NONE)
         {
@@ -27,24 +27,24 @@ stock UI_LeftBox_Show(playerid, string[], time = 3)
         PlayerTextDrawSetShadow(playerid, TD_LeftBox[playerid], 0);
         PlayerTextDrawBackgroundColor(playerid, TD_LeftBox[playerid], 255);
         PlayerTextDrawFont(playerid, TD_LeftBox[playerid], 1);
-        PlayerTextDrawSetProportional(playerid, TD_LeftBox[playerid], 1);
-        PlayerTextDrawShow(playerid, TD_LeftBox[playerid]);
+        PlayerTextDrawSetProportional(playerid, TD_LeftBox[playerid], 1);    
     }
+    PlayerTextDrawShow(playerid, TD_LeftBox[playerid]);
 
-    player_UI_Showed[playerid] = true;
+    player_UI_Created[playerid] = true;
     player_Timer[playerid] = defer PT_HideLeftHud[time * 1000](playerid);
 }
 
 timer PT_HideLeftHud[3000](playerid)
 {
-    PlayerTextDrawDestroy(playerid, TD_LeftBox[playerid]);
-    player_UI_Showed[playerid] = false;
+    (player_UI_Created[playerid]) && PlayerTextDrawDestroy(playerid, TD_LeftBox[playerid]);
+    player_UI_Created[playerid] = false;
     return 1;
 }
 
 hook OnPlayerConnect(playerid)
 {
-    player_UI_Showed[playerid] = false;
+    player_UI_Created[playerid] = false;
     player_Timer[playerid] = Timer:NONE;
     return 1;
 }

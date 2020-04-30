@@ -13,18 +13,9 @@ stock Speedo_Update(playerid, speed_string[] = "", km_string[] = "", fuel_level[
     if(TextdrawDisabled_Speedo{playerid}) return 0; // Zaidejas yra pasirinkes nematyti spidometro.
 
 	(!player_UI_Showed[playerid]) && Speedo_Show(playerid);
-	if(strlen(speed_string) >= 1)
-    {
-        PlayerTextDrawSetString(playerid, TD_Speedo[playerid][idx_Speedo_Speed], speed_string);
-    }
-	if(strlen(fuel_level) >= 1)
-    {
-        PlayerTextDrawSetString(playerid, TD_Speedo[playerid][idx_Speedo_Fuel], fuel_level);
-    }
-	if(strlen(km_string) >= 1)
-    {
-        PlayerTextDrawSetString(playerid, TD_Speedo[playerid][idx_Speedo_Mileage], km_string);
-    }
+	(strlen(speed_string) >= 1) && PlayerTextDrawSetString(playerid, TD_Speedo[playerid][idx_Speedo_Speed], speed_string);
+    (strlen(fuel_level) >= 1)   && PlayerTextDrawSetString(playerid, TD_Speedo[playerid][idx_Speedo_Fuel], fuel_level);
+	(strlen(km_string) >= 1)    && PlayerTextDrawSetString(playerid, TD_Speedo[playerid][idx_Speedo_Mileage], km_string);
 	return 1;
 }
 
