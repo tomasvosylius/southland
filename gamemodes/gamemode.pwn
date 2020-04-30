@@ -8882,7 +8882,7 @@ hook OnPlayerSubmitNewChar(playerid)
 		mysql_format(chandler, string, sizeof string, "%sVALUES ('%e','%d','%d','%e','%d','%d','%e','%e','%e','%e')", string, player_CharName[playerid], PlayerInfo[playerid][pUserId], player_CharSkin[playerid], OriginsList[player_CharOrigin[playerid] - 1],  player_CharGender[playerid], player_CharDate[playerid], player_CharAnswers[playerid][0], player_CharAnswers[playerid][1], player_CharAnswers[playerid][2], gpci_string);
 		mysql_tquery(chandler, string, "InsertNewChar", "d", playerid);
 
-		printf("InsertNewChar: %s", string);
+		// printf("InsertNewChar: %s", string);
 	}
 	return 1;
 }
