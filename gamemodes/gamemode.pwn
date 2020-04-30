@@ -9927,8 +9927,7 @@ stock User_Register_Show(playerid)
 		Prisijungus galësite kurti atskirus veikëjus ir juos valdyti!\n");
 
 	strcat(string, "\n\n\
-		{d78484}Slaptaþodis turi bûti nuo 6 iki 30 simboliø.\n\
-		Slaptaþodyje privalo bûti didþiosios ir maþosios raidës bei skaièius/simbolis.");
+		{d78484}Slaptaþodis turi bûti nuo 6 iki 30 simboliø.");
 
 	Dialog_Show(playerid, DialogRegisterPassword, DIALOG_STYLE_PASSWORD, "Registracija", string, "Registruotis", "Iðeiti");
 	return 1;
@@ -10023,17 +10022,16 @@ stock CheckRoleplayName(name[])
 stock CheckPasswordComplexity(password[], size = sizeof password)
 {
 	new 
-		bool:_char, bool:_l, bool:_u;
+		bool:_l, bool:_u;
 	if(size <= -1) size = strlen(password);
 	if(strlen(password) < 6 || strlen(password) > 30) return false;
 	for(new i = 0; i < size; i++)
 	{
-		if(_char && _l && _u) return true;
-		if(!_char) if(!('a' <= password[i] <= 'z') && !('A' <= password[i] <= 'Z')) _char = true;
+		if(_l && _u) return true;
 		if(!_l) if(('a' <= password[i] <= 'z')) _l = true;
 		if(!_u) if(('A' <= password[i] <= 'Z')) _u = true;
 	}
-	if(_char && _l && _u) return true;
+	if(_l && _u) return true;
 	return false; 
 }
 
