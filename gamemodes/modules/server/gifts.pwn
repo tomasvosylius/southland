@@ -117,7 +117,7 @@ CMD:opengift(playerid, params[])
 					PlayerInfo[playerid][pHaveCars]++;
 				}
 			}
-			strcat(string, "\n{d86a27}Ðiltø ir graþiø ðvenèiø linki Southland.lt komanda!");
+			strcat(string, "\n{d86a27}Ðiltø ir graþiø ðvenèiø linki southland.lt komanda!");
 
 			Dialog_Show(playerid, DialogGiftOpen, DIALOG_STYLE_MSGBOX, "Dovana", string, "Gerai", "");
 

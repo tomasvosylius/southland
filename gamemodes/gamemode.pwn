@@ -1070,7 +1070,7 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 
 // ==============================================================================
 // Projekto pavadinimas ir pns
-#define PROJECT_NAME								"Southland"
+#define PROJECT_NAME								"southland"
 #define PROJECT_DOMAIN								"lt"
 #define DEFAULT_IBAN_PREFIX 						SA
 #define DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX 		FAC
