@@ -1126,7 +1126,7 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define SendError(%0,%1)				MsgError(%0,"Klaida",%1)
 #define SendCommands(%0,%1)				SendFormat(%0,0xBABABAFF,"Komandos: {E4E4E4}"%1)
 #define MsgDefault(%0,%1,%2)			SendFormat(%0,0x2A8AD8FF,%1": {66A8DF}"%2)
-#define MsgSuccess(%0,%1,%2)			SendFormat(%0,0x8BCF16FF,%1": {9ED83A}"%2)
+#define MsgSuccess(%0,%1,%2)			SendFormat(%0,0xA3D252FF,%1": {BFDF88}"%2)
 #define MsgWarning(%0,%1,%2)			SendFormat(%0,0xD7864BFF,%1": {E5A170}"%2)
 #define MsgError(%0,%1,%2)				SendFormat(%0,0xD94848FF,%1": {E86F6F}"%2)
 #define MsgInfo(%0,%1,%2)				SendFormat(%0,0xE4E4E4FF,%1": {DDDDDD}"%2)
@@ -28174,18 +28174,28 @@ stock GetUserNameById(sqlid)
 	cache_set_active(memory);
 	return name;
 }
-stock GetNameBySql(sqlid)
+stock GetNewCharNameBySql(sqlid) {
+	new name[MAX_PLAYER_NAME+1];
+	format(name, MAX_PLAYER_NAME+1, GetStringBySqlId(sqlid, "Name", "players_new"));
+	return name;
+}
+stock GetNameBySql(sqlid) {
+	new name[MAX_PLAYER_NAME+1];
+	format(name, MAX_PLAYER_NAME+1, GetStringBySqlId(sqlid, "Name", "players_data"));
+	return name;
+}
+stock GetStringBySqlId(sqlid, row[], table[])
 {
 	new string[64],
-		name[24],
+		return_str[56],
 		Cache:memory = cache_save();
-	mysql_format(chandler, string, sizeof string, "SELECT Name FROM `players_data` WHERE id = '%d'", sqlid);
+	mysql_format(chandler, string, sizeof string, "SELECT `%e` FROM `%e` WHERE id = '%d'", row, table, sqlid);
 	new Cache:result = mysql_query(chandler, string, true);
-	if(cache_num_rows()) cache_get_value_name(0, "Name", name, 23);
-	else format(name, sizeof name, "None");
+	if(cache_num_rows()) cache_get_value_name(0, row, return_str, 23);
+	else format(return_str, sizeof return_str, "None");
 	cache_delete(result);
 	cache_set_active(memory);
-	return name;
+	return return_str;
 }
 
 stock FindPlayerBySql(sqlid)
@@ -34261,7 +34271,8 @@ hook OnCharAccepted(charid, charuserid, adminid)
 	mysql_format(chandler, string, sizeof string, "UPDATE `players_new` SET Status = '%d', AdminId = '%d' WHERE id = '%d'", (playerid == INVALID_PLAYER_ID ? 1 : 3), PlayerInfo[adminid][pUserId], charid);
 	mysql_tquery(chandler, string, "CharAcceptUpdate", "dd", charid, playerid);
 
-	format(string, sizeof string, "[AdmCmd] Administratorius %s priëmë veikëjà %s (vartotojas: %s)", GetPlayerNameEx(adminid), GetNameBySql(charid), GetUserNameById(charuserid));
+
+	format(string, sizeof string, "[AdmCmd] Administratorius %s priëmë veikëjà %s (vartotojas: %s)", GetPlayerNameEx(adminid), GetNewCharNameBySql(charid), GetUserNameById(charuserid));
 	SendAdminMessage(0xFF6347AA, false, string);
 	return 1;
 }
@@ -34301,7 +34312,7 @@ public CharAcceptMoveSelect(charid, playerid)
 
 		mysql_format(chandler, string, sizeof string, "INSERT INTO `players_data` (`Name`,`BirthDate`,`Skin`,`Gender`,`Origin`,`Money`,`LastVersion_Server`,`UserId`,`X`,`Y`,`Z`,`gpci`) VALUES ('%e','%d','%d','%d','%e','%d','"#CODE_VERSION_P"','%d','%f','%f','%f','%e')", name, year, skinid, gender, origin, GetGVarInt("StartMoney"), userid, GetGVarFloat("SpawnX"), GetGVarFloat("SpawnY"), GetGVarFloat("SpawnZ"), gpci_string);
 		mysql_tquery(chandler, string, "CharAcceptMoveInsert", "dd", charid, playerid);
-		printf(string);
+		// printf(string);
 	}
 }
 
