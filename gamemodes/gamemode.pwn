@@ -26216,12 +26216,12 @@ stock ShowPlayerTip(playerid, seconds, text[], bool:forceshow = false)
 	if(TextdrawDisabled_Tips{playerid} && !forceshow) return 1;
 	if(PlayerTip[playerid] == 0)
 	{
-		TextDrawShowForPlayer(playerid, TipBox_Base);
-		TextDrawShowForPlayer(playerid, TipBox_NameBase);
-		TextDrawShowForPlayer(playerid, TipBox_Name);
-		PlayerTextDrawShow(playerid, TipBox_Info[playerid]);
-		PlayerTextDrawSetString(playerid, TipBox_Info[playerid], text);
-		TextDrawShowForPlayer(playerid, TipBox_LowText);
+		// TextDrawShowForPlayer(playerid, TipBox_Base);
+		// TextDrawShowForPlayer(playerid, TipBox_NameBase);
+		// TextDrawShowForPlayer(playerid, TipBox_Name);
+		// PlayerTextDrawShow(playerid, TipBox_Info[playerid]);
+		// PlayerTextDrawSetString(playerid, TipBox_Info[playerid], text);
+		// TextDrawShowForPlayer(playerid, TipBox_LowText);
 		PlayerTip[playerid] = seconds;
 	}
 	return 1;
