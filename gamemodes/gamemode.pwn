@@ -7430,7 +7430,6 @@ public OnPlayerSpawn(playerid)
 		call OnPlayerSpawnFirstTime(playerid);
 		PlayerInfo[playerid][pAfterLogin] = 0;
 
-
 		if(PlayerInfo[playerid][pIsApproved])
 		{
 			PreparePlayerLoginNotes(playerid);
@@ -7451,8 +7450,7 @@ public OnPlayerSpawn(playerid)
 			#endif
 		}
 
-		TogglePlayerControllable(playerid, 0);
-		SetTimerEx("SetSkinSpawn", 2000, false, "dd", playerid, 1);
+		SetSkinSpawn(playerid, true);
 
 		SetPlayerColor(playerid, 0x99999911);
 
@@ -7493,16 +7491,15 @@ public OnPlayerSpawn(playerid)
 			DestroyDynamic3DTextLabel(PlayerExtra[playerid][peDeathLabel]);
 		}
 		PlayerExtra[playerid][peDeathLabel] = INVALID_3DTEXT_ID;
-		SetTimerEx("SetSkinSpawn", 2000, false, "dd", playerid, 0);
+		SetSkinSpawn(playerid, false);
 	}
 	return 1;
 }
 
-forward SetSkinSpawn(playerid, unfreeze);
-public SetSkinSpawn(playerid, unfreeze)
+stock SetSkinSpawn(playerid, bool:unfreeze)
 {
 	SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
-	if(unfreeze >= 1) TogglePlayerControllable(playerid, 1);
+	unfreeze && TogglePlayerControllable(playerid, 1);
 	return 1;
 }
 
@@ -34705,6 +34702,12 @@ CMD:unsetgroupsoff(playerid, params[])
 {
 	new name[24];
 	if(sscanf(params,"s[24]",name)) return SendUsage(playerid, "/unsetgroupsoff [þaidëjas]");
+
+	if((J@ = FindPlayerByName(name)) != INVALID_PLAYER_ID)
+	{
+		SendWarning(playerid, "Þaidëjas %s prisijungæs. Naudok /unsetgroup", GetPlayerNameEx(J@));
+		return 1;
+	}
 
 	new string[256];
 	mysql_format(chandler, string, sizeof string, "SELECT UserId FROM `players_data` WHERE Name = '%e'", name);
