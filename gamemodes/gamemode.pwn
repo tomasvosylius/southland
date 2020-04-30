@@ -24895,7 +24895,7 @@ stock PhoneTD_Hide(playerid, menu = 0)
 			PlayerTextDrawHide(playerid, Phone_CallStatus[playerid]);
 			tmpPhone_InventoryPage[playerid] = 0;
 
-			Speedo_Show(playerid);
+			(GetPlayerVehicleSeat(playerid) == 0) && Speedo_Show(playerid);
 			CancelSelectTextDraw(playerid);
 		}
 	}
