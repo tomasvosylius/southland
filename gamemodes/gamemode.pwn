@@ -143,7 +143,7 @@ native gpci(playerid, serial[], len);
 // ==============================================================================
 // Serveris
 #pragma tabsize 0
-#define CODE_VERSION 		1.1.47
+#define CODE_VERSION 		1.2.0
 #define CODE_VERSION_P 		1147
 #define SERVER_DEBUG_LEVEL 	3 		// [0:nieko] [1:errorai, gm klaidos] [2:visi callbackai] [3:funkcijos]
 //#define BETA_TEST_MODE 	// galima /reportbug naudot
