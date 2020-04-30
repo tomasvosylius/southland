@@ -2053,9 +2053,6 @@ CREATE TABLE IF NOT EXISTS `players_data` (
   `JailTime` int(11) NOT NULL,
   `SpawnType` tinyint(4) NOT NULL,
   `SpawnId` mediumint(9) NOT NULL,
-  `Group1` mediumint(9) NOT NULL,
-  `Group2` mediumint(9) NOT NULL,
-  `Group3` mediumint(9) NOT NULL,
   `PayDayTime` smallint(6) NOT NULL,
   `Savings` int(11) NOT NULL,
   `Bank` int(11) NOT NULL,
@@ -2083,9 +2080,7 @@ CREATE TABLE IF NOT EXISTS `players_data` (
   `FishedLimit` int(11) NOT NULL,
   `gpci` varchar(41) NOT NULL,
   `TaxiLic` int(11) NOT NULL,
-  `Donator` int(11) NOT NULL,
   `PayDayCollected` int(11) NOT NULL,
-  `DonatorTime` int(11) NOT NULL,
   `StolenCars` int(11) NOT NULL,
   `GraffitiAllowed` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -2633,7 +2628,7 @@ CREATE TABLE IF NOT EXISTS `server_whitelist` (
 --
 
 CREATE TABLE IF NOT EXISTS `users_data` (
-`id` int(10) unsigned NOT NULL,
+  `id` int(10) unsigned NOT NULL,
   `Name` varchar(21) NOT NULL,
   `Password` varchar(130) NOT NULL,
   `Salt` varchar(30) NOT NULL,
@@ -2643,7 +2638,10 @@ CREATE TABLE IF NOT EXISTS `users_data` (
   `DonatorTime` int(11) NOT NULL,
   `NameChanges` int(11) NOT NULL,
   `NumberChanges` int(11) NOT NULL,
-  `PlateChanges` int(11) NOT NULL
+  `PlateChanges` int(11) NOT NULL,
+  `Group1` mediumint(9) NOT NULL,
+  `Group2` mediumint(9) NOT NULL,
+  `Group3` mediumint(9) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
