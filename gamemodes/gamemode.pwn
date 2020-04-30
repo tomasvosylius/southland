@@ -3986,6 +3986,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 //#include "core\map\newbie.pwn"
 //#include "core\map\alhambra_replacement.pwn"
 //#include "core\map\central_hotel.pwn"
+// #include "core\map\empty_houses.pwn"
 
 #include "core\map\school.pwn"
 #include "core\map\squatters.pwn"
@@ -3994,9 +3995,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core\map\docks.pwn"
 #include "core\map\willowfield_garage.pwn"
 #include "core\map\idlewood_basket.pwn"
-
-// #include "core\map\empty_houses.pwn"
-// #include "core\map\misc.pwn"
+#include "core\map\misc.pwn"
 #include "core\map\china.pwn"
 #include "core\map\prison.pwn"
 #include "core\map\government.pwn"
