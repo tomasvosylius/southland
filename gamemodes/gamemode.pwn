@@ -1039,24 +1039,24 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #if defined USING_VIRTUAL_PRIVATE_SERVER
 	#if defined VPS_TEST
 		//#define DELETE_AFTER_INIT
-		#define MYSQL_HOSTNAME "localhost"
-		#define MYSQL_USERNAME "server_test"
-		#define MYSQL_PASSWORD "YhFknSUyvsL7VxWL"
-		#define MYSQL_DATABASE "test_server"
+		// #define MYSQL_HOSTNAME "localhost"
+		// #define MYSQL_USERNAME "server_test"
+		// #define MYSQL_PASSWORD "OKWAoZS8cftiw4d1"
+		// #define MYSQL_DATABASE "test_server"
 
-		#define MYSQL_LOG_HOSTNAME "localhost"
-		#define MYSQL_LOG_USERNAME "server_test"
-		#define MYSQL_LOG_PASSWORD "YhFknSUyvsL7VxWL"
-		#define MYSQL_LOG_DATABASE "test_logs"
+		// #define MYSQL_LOG_HOSTNAME "localhost"
+		// #define MYSQL_LOG_USERNAME "server_test"
+		// #define MYSQL_LOG_PASSWORD "OKWAoZS8cftiw4d1"
+		// #define MYSQL_LOG_DATABASE "test_logs"
 	#else 
 		#define MYSQL_HOSTNAME "localhost"
 		#define MYSQL_USERNAME "server_user"
-		#define MYSQL_PASSWORD "75C20m3fsIWpWFz6"
+		#define MYSQL_PASSWORD "OKWAoZS8cftiw4d1"
 		#define MYSQL_DATABASE "rp_server"
 
 		#define MYSQL_LOG_HOSTNAME "localhost"
 		#define MYSQL_LOG_USERNAME "server_user"
-		#define MYSQL_LOG_PASSWORD "75C20m3fsIWpWFz6"
+		#define MYSQL_LOG_PASSWORD "OKWAoZS8cftiw4d1"
 		#define MYSQL_LOG_DATABASE "rp_logs"
 	#endif
 #else
@@ -8852,7 +8852,7 @@ hook OnPlayerSubmitNewChar(playerid)
 	return 1;
 }
 
-stock CheckNumberUsage(number)
+stock IsPhoneNumberExisting(number)
 {
 	new	Cache:cur = cache_save(),
 		Cache:result,
@@ -9103,7 +9103,7 @@ Dialog:D_DonatorNumberInput(playerid, response, listitem, inputtext[])
 			number,
 			online;
 		if(sscanf(inputtext,"d",number) || !(200000 <= number <= 300000)) return SendWarning(playerid, "Numeris turi bûti tarp 200000 ir 300000.") , DonatorMenu_ShowNumberInput(playerid);
-		if(CheckNumberUsage(number)) return SendWarning(playerid, "Ðis numeris jau yra naudojamas.") , DonatorMenu_ShowNumberInput(playerid);
+		if(IsPhoneNumberExisting(number)) return SendWarning(playerid, "Ðis numeris jau yra naudojamas.") , DonatorMenu_ShowNumberInput(playerid);
 
 		if((online = FindPlayerBySql(charid)) != INVALID_PLAYER_ID)
 		{
@@ -30801,6 +30801,25 @@ stock sd_MySQL()
 	return 1;
 }
 
+hook OnMysqlEstablished()
+{
+	mysql_tquery(chandler, "SELECT COUNT(*) AS UniqueNumbers FROM `unused_phone_numbers`", "GetUniqueNumbersLeft", "");
+	return 1;
+}
+
+forward GetUniqueNumbersLeft();
+public GetUniqueNumbersLeft()
+{
+	new left;
+	cache_get_value_name_int(0, "UniqueNumbers", left);
+	if(left <= 100)
+	{
+		printf("Neuztenka unikaliu numeriu! %d left. Sukurkite nauju: unused_phone_numbers", left);
+		SendRconCommand("exit");
+	}
+	printf("%d laisvu telefono numeriu", left);
+}
+
 stock sd_Prepare()
 {
 	//Iter_Add(Vehicle, 0);
@@ -38561,25 +38580,7 @@ CMD:leavefaction(playerid, params[])
 			PlayerInfo[playerid][pFactionPermissions][i] = 0;
 		}
 		
-		new
-			data[13][3];
-		ac__PlayerIgnoreWeaponAC[playerid] = 2;
-		for(new i = 0; i < 13; i++)
-		{
-			if(ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NORMAL)
-			{
-				sd_GetPlayerWeaponData(playerid, i, data[i][0], data[i][1]);
-				data[i][2] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
-			}
-		}
-		sd_ResetPlayerWeapons(playerid);
-		for(new i = 0; i < 13; i++)
-		{
-			if(data[i][0] > 0 && data[i][1] > 0)
-			{	
-				sd_GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][2]);
-			}
-		}
+		ClearServerSidedWeapons(playerid);
 
   		new channel = PlayerInfo[playerid][pRadioChannel];
   		if((900 <= channel < 950) || (950 <= channel < 1000) || (1000 <= channel < 1050)) PlayerInfo[playerid][pRadioChannel] = 0;
@@ -38596,6 +38597,30 @@ CMD:leavefaction(playerid, params[])
 	}
 	return 1;
 }
+
+stock ClearServerSidedWeapons(playerid)
+{
+	new
+		data[13][3];
+	ac__PlayerIgnoreWeaponAC[playerid] = 2;
+	for(new i = 0; i < 13; i++)
+	{
+		if(ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NORMAL)
+		{
+			sd_GetPlayerWeaponData(playerid, i, data[i][0], data[i][1]);
+			data[i][2] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
+		}
+	}
+	sd_ResetPlayerWeapons(playerid);
+	for(new i = 0; i < 13; i++)
+	{
+		if(data[i][0] > 0 && data[i][1] > 0)
+		{	
+			sd_GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][2]);
+		}
+	}
+}
+
 alias:takejob("isidarbinti");
 CMD:takejob(playerid, params[])
 {
@@ -40293,25 +40318,7 @@ CMD:duty(playerid, params[])
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
 				if(job == JOB_MECHANIC)
 				{
-					new
-						wep_data[13][3];
-					ac__PlayerIgnoreWeaponAC[playerid] = 2;
-					for(new i = 0; i < 13; i++)
-					{
-						if(ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NORMAL)
-						{
-							sd_GetPlayerWeaponData(playerid, i, wep_data[i][0], wep_data[i][1]);
-							wep_data[i][2] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
-						}
-					}
-					sd_ResetPlayerWeapons(playerid);
-					for(new i = 0; i < 13; i++)
-					{
-						if(wep_data[i][0] > 0 && wep_data[i][1] > 0)
-						{	
-							sd_GivePlayerWeapon(playerid, wep_data[i][0], wep_data[i][1], WEAPON_GIVE_TYPE_NORMAL, wep_data[i][2]);
-						}
-					}
+					ClearServerSidedWeapons(playerid);
 					SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 				}
 				RemovePlayerAttachedObject(playerid, 9);
@@ -40360,25 +40367,7 @@ CMD:duty(playerid, params[])
 					{
 						default:
 						{
-							new
-								data[13][3];
-							ac__PlayerIgnoreWeaponAC[playerid] = 2;
-							for(new i = 0; i < 13; i++)
-							{
-								if(ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NORMAL)
-								{
-									sd_GetPlayerWeaponData(playerid, i, data[i][0], data[i][1]);
-									data[i][2] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
-								}
-							}
-							sd_ResetPlayerWeapons(playerid);
-							for(new i = 0; i < 13; i++)
-							{
-								if(data[i][0] > 0 && data[i][1] > 0)
-								{	
-									sd_GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][2]);
-								}
-							}
+							ClearServerSidedWeapons(playerid);
 						}
 					}
 				}
