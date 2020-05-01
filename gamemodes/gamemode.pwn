@@ -1039,24 +1039,24 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #if defined USING_VIRTUAL_PRIVATE_SERVER
 	#if defined VPS_TEST
 		//#define DELETE_AFTER_INIT
-		#define MYSQL_HOSTNAME "localhost"
-		#define MYSQL_USERNAME "server_test"
-		#define MYSQL_PASSWORD "YhFknSUyvsL7VxWL"
-		#define MYSQL_DATABASE "test_server"
+		// #define MYSQL_HOSTNAME "localhost"
+		// #define MYSQL_USERNAME "server_test"
+		// #define MYSQL_PASSWORD "OKWAoZS8cftiw4d1"
+		// #define MYSQL_DATABASE "test_server"
 
-		#define MYSQL_LOG_HOSTNAME "localhost"
-		#define MYSQL_LOG_USERNAME "server_test"
-		#define MYSQL_LOG_PASSWORD "YhFknSUyvsL7VxWL"
-		#define MYSQL_LOG_DATABASE "test_logs"
+		// #define MYSQL_LOG_HOSTNAME "localhost"
+		// #define MYSQL_LOG_USERNAME "server_test"
+		// #define MYSQL_LOG_PASSWORD "OKWAoZS8cftiw4d1"
+		// #define MYSQL_LOG_DATABASE "test_logs"
 	#else 
 		#define MYSQL_HOSTNAME "localhost"
 		#define MYSQL_USERNAME "server_user"
-		#define MYSQL_PASSWORD "75C20m3fsIWpWFz6"
+		#define MYSQL_PASSWORD "OKWAoZS8cftiw4d1"
 		#define MYSQL_DATABASE "rp_server"
 
 		#define MYSQL_LOG_HOSTNAME "localhost"
 		#define MYSQL_LOG_USERNAME "server_user"
-		#define MYSQL_LOG_PASSWORD "75C20m3fsIWpWFz6"
+		#define MYSQL_LOG_PASSWORD "OKWAoZS8cftiw4d1"
 		#define MYSQL_LOG_DATABASE "rp_logs"
 	#endif
 #else
