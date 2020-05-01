@@ -1033,7 +1033,7 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-#define USING_VIRTUAL_PRIVATE_SERVER
+// #define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -1289,7 +1289,8 @@ enum E_PLAYER_DATA
 	pAttachObject,
 	pHaveCars,
 	pTaxiLicense,
-	pIp[MAX_PLAYER_IP+1]
+	pIp[MAX_PLAYER_IP+1],
+	pDiscordVerified
 };
 new PlayerInfo[MAX_PLAYERS][E_PLAYER_DATA];
 
@@ -4010,6 +4011,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core\map\willowfield_garage.pwn"
 #include "core\map\idlewood_basket.pwn"
 #include "core\map\misc.pwn"
+#include "core\map\corona247.pwn"
 #include "core\map\china.pwn"
 #include "core\map\prison.pwn"
 #include "core\map\government.pwn"
@@ -8104,7 +8106,7 @@ forward LoginHalt(playerid);
 public LoginHalt(playerid)
 {
 	#if SERVER_DEBUG_LEVEL >= 3
-		printf("[debug] LoginHalt(%s)", GetPlayerNameEx(playerid));
+		printf("[debug] LoginHalt(%s, %s)", GetPlayerNameEx(playerid), GetPlayerIpEx(playerid));
 	#endif
 
 	new country[56];
@@ -8185,7 +8187,7 @@ public CheckUserName(playerid)
 		else
 		{
 			cache_get_value_name(0, "Salt", PlayerInfo[playerid][pSalt], 30);
-			User_Login_Show(playerid);
+			Login_ShowPassword(playerid);
 		}
 	}
 	else
@@ -8201,14 +8203,7 @@ public CheckUserName(playerid)
 
 hook OnPlayerRegister(playerid)
 {
-	dialog_SetHeader("");
-	dialog_SetBody("{ffffff}Sëkmingai uþsiregistravote á southland.lt!\nDabar bûsite perkeltas á veikëjo kûrimà.");
-	Dialog_Show(playerid, DialogRegisterInfo, DIALOG_STYLE_MSGBOX, "Registracija", dialog_GetBody(), "Gerai", "");
-	return 1;
-}
-Dialog:DialogRegisterInfo(playerid, response, listitem, inputtext[])
-{
-	CharCreateTD_Show(playerid);
+	Register_ShowDiscordInput(playerid);
 	return 1;
 }
 
@@ -8456,7 +8451,7 @@ stock User_SaveCharCountTotal(playerid)
 	}
 	cache_delete(result);
 	cache_set_active(cur);
-	return player_DataChars[playerid] + player_NewChars[playerid];
+	return (player_DataChars[playerid] + player_NewChars[playerid]);
 }
 
 stock User_GetNewCharacterStatus(playerid)
@@ -8511,11 +8506,74 @@ stock User_GetNewCharacterReason(playerid)
 	return string;
 }
 
+stock Register_ShowDiscordInput(playerid)
+{
+	dialog_SetHeader("{f1f1f1}Norëdami þaisti ðiame serveryje, turite sujungti savo vartotojà su Discord.");
+	dialog_SetBody("{f1f1f1}1. Prisijunkite prie mûsø Discord serverio: {FAD831}invite.gg/southland");
+	dialog_SetBody("{f1f1f1}2. Ásitikinkite, jog esate patvirtines Discord vartotojo tel. numerá.");
+	dialog_SetBody("{f1f1f1}3. Discord kanale paraðykite {FAD831}!verify %s", GetPlayerNameEx(playerid));
+	dialog_SkipLine();
+	dialog_SetBody("{f1f1f1}4. Áveskite {FA9231}gautà kodà:");
+	Dialog_Show(playerid, InputDiscordCode, DIALOG_STYLE_INPUT, "Discord kodas", dialog_GetBody(), "Patvirtinti", "Iðeiti");
+	return 1;
+}
+
+Dialog:InputDiscordCode(playerid, response, listitem, inputtext[])
+{
+	if(response)
+	{
+		if(!strlen(inputtext)) return Register_ShowDiscordInput(playerid);
+
+		new string[126];
+		inline checkCode()
+		{
+			if(cache_num_rows())
+			{
+				MsgSuccess(playerid, "Serveris", "Sëkmingai patvirtinote vartotojà! Gero þaidimo.");
+				PlayerInfo[playerid][pDiscordVerified] = 2;
+				mysql_format(chandler, string, sizeof string, "\
+					UPDATE `users_data` SET `DiscordVerified`='2' WHERE id = '%d'", PlayerInfo[playerid][pUserId]);
+				mysql_tquery(chandler, string, "OnDiscordVerified", "d", playerid);
+			}
+			else 
+			{
+				SendError(playerid, "Patvirtinimo kodas neteisingas!");
+				Register_ShowDiscordInput(playerid);
+			}
+		}
+		mysql_format(chandler, string, sizeof string, "\
+			SELECT NULL FROM `users_data` WHERE id = '%d' AND DiscordCode='%e' AND DiscordVerified!='2'",
+			PlayerInfo[playerid][pUserId], inputtext);
+		mysql_tquery_inline(chandler, string, using inline checkCode, "");
+	}
+	else Kick(playerid);
+	return 1;
+}
+forward OnDiscordVerified(playerid);
+public OnDiscordVerified(playerid)
+{
+	dialog_SetHeader("");
+	dialog_SetBody("{ffffff}Sëkmingai patvirtinote vartotojà!\nDabar bûsite perkeltas á veikëjo kûrimà.");
+	Dialog_Show(playerid, DialogRegisterInfo, DIALOG_STYLE_MSGBOX, "Registracija", dialog_GetBody(), "Gerai", "");
+	return 1;
+}
+Dialog:DialogRegisterInfo(playerid, response, listitem, inputtext[])
+{
+	CharCreateTD_Show(playerid);
+	return 1;
+}
 
 hook OnPlayerLogIn(playerid)
 {
 	new 
 		string[126];
+
+	if(PlayerInfo[playerid][pDiscordVerified] <= 1)
+	{
+		Register_ShowDiscordInput(playerid);
+		return 1;
+	}
+
 	if(User_SaveCharCountTotal(playerid) > 0)
 	{
 		CheckDonations(playerid); // patikrins ar nieko nenusipirko neseniai
@@ -9773,7 +9831,7 @@ public LoginAnswerCheck(playerid)
 	return 1;
 }
 
-stock User_Login_Show(playerid)
+stock Login_ShowPassword(playerid)
 {
 	new 
 		string[512];
@@ -9794,7 +9852,8 @@ Dialog:DialogUserLogin(playerid, response, listitem, inputtext[])
 
 		format(string, 60, "%s%s", dialog_Input(), PlayerInfo[playerid][pSalt]);
 		WP_Hash(salted, sizeof salted, string);
-		mysql_format(chandler, string, sizeof string, "SELECT RegisterIp FROM `users_data` WHERE id = '%d' AND Password = '%e'", PlayerInfo[playerid][pUserId], salted);
+		mysql_format(chandler, string, sizeof string, "\
+			SELECT RegisterIp,DiscordCode,DiscordVerified FROM `users_data` WHERE id = '%d' AND Password = '%e'", PlayerInfo[playerid][pUserId], salted);
 		mysql_tquery(chandler, string, "CheckRegisterIp", "d", playerid);
 	}
 	else
@@ -9812,6 +9871,8 @@ public CheckRegisterIp(playerid)
 		new 
 			RegisterIp[19];
 		cache_get_value_name(0, "RegisterIp", RegisterIp);
+		cache_get_value_name_int(0, "DiscordVerified", PlayerInfo[playerid][pDiscordVerified]);
+
 		if(!isequal(RegisterIp, GetPlayerIpEx(playerid)))
 		{
 			// IP su registracijos nesutampa, reikia apsaugos klausima rodyt
@@ -9827,13 +9888,13 @@ public CheckRegisterIp(playerid)
 	{
 		PlayerInfo[playerid][pWrongPassword] ++ ;
 		if(PlayerInfo[playerid][pWrongPassword] >= 3) return Kick(playerid);
-		else User_Login_Show(playerid);
+		else Login_ShowPassword(playerid);
 	}
 	return 1;
 }
 
 
-stock User_Register_SecurityAnswer(playerid)
+stock Register_SecurityAnswer(playerid)
 {
 	new 
 		string[512];
@@ -9849,24 +9910,18 @@ Dialog:DialogRegisterAnswer(playerid, response, listitem, inputtext[])
 {
 	if(response)
 	{
-		if(!strlen(dialog_Input())) User_Register_SecurityAnswer(playerid);
+		if(!strlen(dialog_Input()))
+		{
+			return Register_SecurityAnswer(playerid);
+		}
 		User_AddToDb(playerid, .i_password = PlayerInfo[playerid][pPassword], .i_salt = PlayerInfo[playerid][pSalt], .i_question = tmpArray[playerid], .i_answer = dialog_Input());
-		dialog_SetHeader("Kas yra roleplay?");
-		dialog_SetBody("Roleplay - realybës atkartojimas þaidime. Þaidþiant roleplay tipo serveryje jûsø tikslas yra savo veiksmus iðreikðti kuo realistiðkiau.");
-		Dialog_Show(playerid, DialogAboutRoleplay, DIALOG_STYLE_MSGBOX, "Kas yra roleplay", dialog_GetBody(), "Gerai", "");
 	}
-	else User_Register_SecurityAnswer(playerid);
-	return 1;
-}
-
-Dialog:DialogAboutRoleplay(playerid, response, listitem, inputtext[])
-{
-	CharCreateTD_Show(playerid);
+	else Register_SecurityAnswer(playerid);
 	return 1;
 }
 
 
-stock User_Register_SecurityQuestion(playerid)
+stock Register_SecurityQuestion(playerid)
 {
 	new 
 		string[512];
@@ -9881,9 +9936,9 @@ Dialog:DialogRegisterQuestion(playerid, response, listitem, inputtext[])
 {
 	if(response)
 	{
-		if(!strlen(dialog_Input())) User_Register_SecurityQuestion(playerid);
+		if(!strlen(dialog_Input())) Register_SecurityQuestion(playerid);
 		format(tmpArray[playerid], 128, dialog_Input());
-		User_Register_SecurityAnswer(playerid);
+		Register_SecurityAnswer(playerid);
 	}
 	else User_Register_Show(playerid);
 	return 1;
@@ -9915,7 +9970,7 @@ Dialog:DialogRegisterPassword(playerid, response, listitem, inputtext[])
 		GenerateSalt(PlayerInfo[playerid][pSalt], GetPlayerIpEx(playerid), 30);
 		format(PlayerInfo[playerid][pPassword], 130, dialog_Input());
 
-		User_Register_SecurityQuestion(playerid);
+		Register_SecurityQuestion(playerid);
 	}
 	else Kick(playerid);
 	return 1;
@@ -9931,7 +9986,7 @@ stock User_AddToDb(playerid, i_password[], i_salt[], i_question[], i_answer[])
 	format(string, sizeof string, "%s%s", i_password, i_salt);
 	WP_Hash(hashed, 130, string);
 
-	mysql_format(chandler, string, sizeof string, "INSERT INTO `users_data` (`Name`,`Password`,`Salt`,`RegisterIp`) VALUES ('%e','%e','%e','%e')", GetPlayerNameEx(playerid), hashed, i_salt, GetPlayerIpEx(playerid));
+	mysql_format(chandler, string, sizeof string, "INSERT INTO `users_data` (`Name`,`Password`,`Salt`,`RegisterIp`,`DiscordVerified`) VALUES ('%e','%e','%e','%e','0')", GetPlayerNameEx(playerid), hashed, i_salt, GetPlayerIpEx(playerid));
 	mysql_tquery(chandler, string, "AddUserToDb", "d", playerid);
 
 	mysql_format(chandler, string, sizeof string, "INSERT INTO `users_safe_questions` (`UserId`,`Question`,`Answer`) VALUES ('%d','%e','%e')", PlayerInfo[playerid][pUserId], i_question, MD5_Hash(i_answer));
@@ -9944,7 +9999,7 @@ public AddUserToDb(playerid)
 {
 	PlayerInfo[playerid][pUserId] = cache_insert_id();
 
-	SendFormat(playerid, 0xa8cf52ff, "Sëkmingai uþregistravote vartotojà %s! Susikurkite savo pirmàjá veikëjà.", GetPlayerNameEx(playerid));
+	SendFormat(playerid, 0xa8cf52ff, "Sëkmingai uþregistravote vartotojà %s! Prieð pradedant þaist patvirtinkite savo vartotojà Discord pagalba.", GetPlayerNameEx(playerid));
 	call OnPlayerRegister(playerid);
 	return 1;
 }
@@ -28247,7 +28302,7 @@ stock FixBusinessLabels(i, enabled_labels)
 		else format(string, sizeof string, "");
 		if(BusinessInfo[i][bOwner] > 0 && BusinessInfo[i][bSale] <= 0) format(pay, sizeof pay, "Áëjimo kaina: $%d\n", BusinessInfo[i][bEnterPrice]);
 		format(string, sizeof string, "%s%.76s\nID: %d\n%sRaðykite /enter", string, BusinessInfo[i][bName], BusinessInfo[i][bId], pay);
-		BusinessInfo[i][bLabel] = CreateDynamic3DTextLabel(string, 0xDADADAFF, BusinessInfo[i][bEnterX], BusinessInfo[i][bEnterY], BusinessInfo[i][bEnterZ] + 0.15, 3.75, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, BusinessInfo[i][bOutVW], BusinessInfo[i][bExterior]);
+		BusinessInfo[i][bLabel] = CreateDynamic3DTextLabel(string, 0xDADADAFF, BusinessInfo[i][bEnterX], BusinessInfo[i][bEnterY], BusinessInfo[i][bEnterZ] + 0.15, 2.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, BusinessInfo[i][bOutVW], BusinessInfo[i][bExterior]);
 	}
 	return 1;
 }

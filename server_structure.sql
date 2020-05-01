@@ -2622,6 +2622,13 @@ CREATE TABLE IF NOT EXISTS `server_whitelist` (
   `Date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+CREATE TABLE `ip_blacklist` (
+  `IP` varchar(32) COLLATE cp1257_lithuanian_ci NOT NULL,
+  `Reason` varchar(56) COLLATE cp1257_lithuanian_ci DEFAULT NULL,
+  `Date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=cp1257 COLLATE=cp1257_lithuanian_ci;
+
 -- --------------------------------------------------------
 
 --
