@@ -222,7 +222,7 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define MAX_BUSINESS_WARES 				20
 #define MAX_PARKINGS 					100
 #define MAX_ROADBLOCKS	 				100
-#define MAX_ENTERS_EXITS				50
+#define MAX_ENTERS_EXITS				300
 #define MAX_AVAILABLE_WARES 			25
 #define MAX_JOBS						10
 #define MAX_MAP_ICONS					100
