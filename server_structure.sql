@@ -130,6 +130,7 @@ CREATE TABLE IF NOT EXISTS `business_furniture` (
   `Added` int(11) NOT NULL,
   `Category` varchar(86) COLLATE utf8_lithuanian_ci NOT NULL,
   `Price` int(11) NOT NULL,
+  `Type` tinyint(1) NOT NULL,
   `Date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Texture0` smallint(6) NOT NULL,
   `Texture1` smallint(6) NOT NULL,
@@ -197,7 +198,7 @@ CREATE TABLE IF NOT EXISTS `business_orders_fuel` (
 --
 
 CREATE TABLE IF NOT EXISTS `business_wares` (
-`id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `BusinessId` int(11) NOT NULL,
   `Packed` varchar(356) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -334,6 +335,7 @@ CREATE TABLE IF NOT EXISTS `dealers_houses_data` (
   `ExitX` float NOT NULL,
   `ExitY` float NOT NULL,
   `ExitZ` int(11) NOT NULL,
+  `Price` int(11) NOT NULL,
   `OutVW` int(11) NOT NULL,
   `Exterior` int(11) NOT NULL,
   `VW` int(11) NOT NULL,

@@ -30803,18 +30803,21 @@ stock sd_MySQL()
 
 hook OnMysqlEstablished()
 {
-	inline uniqueNumbersLeft()
-	{
-		new left;
-		cache_get_value_name_int(0, "UniqueNumbers", left);
-		if(left <= 100)
-		{
-			printf("Neuztenka unikaliu numeriu! %d left. Sukurkite nauju: unused_phone_numbers", left);
-			SendRconCommand("exit");
-		}
-	}
-	mysql_tquery_inline(chandler, "SELECT COUNT(*) AS UniqueNumbers FROM `unused_phone_numbers`", using inline uniqueNumbersLeft, "");
+	mysql_tquery(chandler, "SELECT COUNT(*) AS UniqueNumbers FROM `unused_phone_numbers`", "GetUniqueNumbersLeft", "");
 	return 1;
+}
+
+forward GetUniqueNumbersLeft();
+public GetUniqueNumbersLeft()
+{
+	new left;
+	cache_get_value_name_int(0, "UniqueNumbers", left);
+	if(left <= 100)
+	{
+		printf("Neuztenka unikaliu numeriu! %d left. Sukurkite nauju: unused_phone_numbers", left);
+		SendRconCommand("exit");
+	}
+	printf("%d laisvu telefono numeriu", left);
 }
 
 stock sd_Prepare()
