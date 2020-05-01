@@ -7430,7 +7430,6 @@ public OnPlayerSpawn(playerid)
 		call OnPlayerSpawnFirstTime(playerid);
 		PlayerInfo[playerid][pAfterLogin] = 0;
 
-
 		if(PlayerInfo[playerid][pIsApproved])
 		{
 			PreparePlayerLoginNotes(playerid);
@@ -7451,8 +7450,7 @@ public OnPlayerSpawn(playerid)
 			#endif
 		}
 
-		TogglePlayerControllable(playerid, 0);
-		SetTimerEx("SetSkinSpawn", 2000, false, "dd", playerid, 1);
+		SetSkinSpawn(playerid, true);
 
 		SetPlayerColor(playerid, 0x99999911);
 
@@ -7493,16 +7491,15 @@ public OnPlayerSpawn(playerid)
 			DestroyDynamic3DTextLabel(PlayerExtra[playerid][peDeathLabel]);
 		}
 		PlayerExtra[playerid][peDeathLabel] = INVALID_3DTEXT_ID;
-		SetTimerEx("SetSkinSpawn", 2000, false, "dd", playerid, 0);
+		SetSkinSpawn(playerid, false);
 	}
 	return 1;
 }
 
-forward SetSkinSpawn(playerid, unfreeze);
-public SetSkinSpawn(playerid, unfreeze)
+stock SetSkinSpawn(playerid, bool:unfreeze)
 {
 	SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
-	if(unfreeze >= 1) TogglePlayerControllable(playerid, 1);
+	unfreeze && TogglePlayerControllable(playerid, 1);
 	return 1;
 }
 
@@ -8139,7 +8136,10 @@ public LoginHalt(playerid)
 	 * Tikrinam ar isvis yra toks useris
 	 */
 	new string[156];
-	mysql_format(chandler, string, sizeof string, "SELECT id,Salt,NameChanges,NumberChanges,PlateChanges,Donator,DonatorTime FROM `users_data` WHERE Name = '%e'", GetPlayerNameEx(playerid));
+	mysql_format(chandler, string, sizeof string, "\
+		SELECT id,Salt,NameChanges,NumberChanges,PlateChanges,Donator,DonatorTime,\
+		Group1,Group2,Group3 \
+		FROM `users_data` WHERE Name = '%e'", GetPlayerNameEx(playerid));
 	mysql_tquery(chandler, string, "CheckUserName", "d", playerid);
 	return 1;
 }
@@ -8154,6 +8154,15 @@ public CheckUserName(playerid)
 		cache_get_value_name_int(0, "NumberChanges", PlayerInfo[playerid][pNumberChanges]);
 		cache_get_value_name_int(0, "PlateChanges", PlayerInfo[playerid][pPlateChanges]);
 		cache_get_value_name_int(0, "DonatorTime", PlayerInfo[playerid][pDonatorTime]);
+
+		new fetch_string[12];
+		for(new i = 0; i < MAX_PLAYER_GROUPS; i++)
+		{
+			format(fetch_string, 12, "Group%d", i+1);
+			cache_get_value_name_int(0, fetch_string, PlayerGroups[playerid][i]);
+		}
+		SortArray(PlayerGroups[playerid], 0, MAX_PLAYER_GROUPS);
+
 		if(PlayerInfo[playerid][pDonatorTime] + TIME_TO_RESET_DONATOR < gettime())
 		{
 			PlayerInfo[playerid][pDonator] = 0;
@@ -19188,9 +19197,23 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 								log_set_values("'%d','%e','(AM) Istryne grupe','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GroupsInfo[groupid][groupId], GroupsInfo[groupid][groupName]);
 								log_push();
-								mysql_format(chandler, string, sizeof string, "DELETE FROM `groups_data` WHERE id = '%d'; DELETE FROM `groups_permissions` WHERE GroupId = '%d'; DELETE FROM `groups_commands` WHERE GroupId = '%d';", GroupsInfo[groupid][groupId], GroupsInfo[groupid][groupId], GroupsInfo[groupid][groupId]);
-								mysql_format(chandler, string, sizeof string, "%sUPDATE `players_data` SET Group1 = '0' WHERE Group1 = '%d'; UPDATE `players_data` SET Group2 = '0' WHERE Group2 = '%d'; UPDATE `players_data` SET Group3 = '0' WHERE Group3 = '%d'", string, GroupsInfo[groupid][groupId], GroupsInfo[groupid][groupId], GroupsInfo[groupid][groupId]);
+
+								new groupSql = GroupsInfo[groupid][groupId];
+
+								
+								mysql_format(chandler, string, sizeof string, "DELETE FROM `groups_data` WHERE id = '%d'", groupSql);
 								mysql_fquery(chandler, string, "GroupDeleted");
+								mysql_format(chandler, string, sizeof string, "DELETE FROM `groups_permissions` WHERE GroupId = '%d'", groupSql);
+								mysql_fquery(chandler, string, "GroupDeleted");
+								mysql_format(chandler, string, sizeof string, "DELETE FROM `groups_commands` WHERE GroupId = '%d'", groupSql);
+								mysql_fquery(chandler, string, "GroupDeleted");
+								mysql_format(chandler, string, sizeof string, "UPDATE `users_data` SET Group1 = '0' WHERE Group1 = '%d'", groupSql);
+								mysql_fquery(chandler, string, "GroupDeleted");
+								mysql_format(chandler, string, sizeof string, "UPDATE `users_data` SET Group2 = '0' WHERE Group2 = '%d'", groupSql);
+								mysql_fquery(chandler, string, "GroupDeleted");
+								mysql_format(chandler, string, sizeof string, "UPDATE `users_data` SET Group3 = '0' WHERE Group3 = '%d'", groupSql);
+								mysql_fquery(chandler, string, "GroupDeleted");
+
 								MsgSuccess(playerid, "GRUPËS", "Grupë sëkmingai iðtrinta.");
 								reset(Group, GroupsInfo[groupid], E_GROUP_DATA);
 								Iter_Remove(Group, groupid);
@@ -29549,7 +29572,7 @@ stock SaveAccount(playerid, bool:save_inventory = false, bool:save_groups = true
 		SaveUserIntEx(userid, "DonatorTime", PlayerInfo[playerid][pDonatorTime]);
 	}
 
-	save_groups && SaveGroups(playerid);
+	save_groups && SaveUserGroups(playerid);
 	save_inventory && SaveInventory(playerid);
 	save_clothes && SaveClothes(playerid);
 	save_drug_stats && SaveDrugStats(playerid);
@@ -29568,18 +29591,18 @@ stock SaveDrugStats(playerid, drug_type = -1)
 	return 1;
 }
 
-stock SaveGroups(playerid)
+stock SaveUserGroups(playerid)
 {
 	new line[24],
 		string[186];
-	mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET ");
+	mysql_format(chandler, string, sizeof string, "UPDATE `users_data` SET ");
 	for(new i = 0; i < MAX_PLAYER_GROUPS; i++)
 	{
 		format(line, sizeof line, "Group%d = '%d'", i+1, PlayerGroups[playerid][i]);
 		if(i != MAX_PLAYER_GROUPS-1) strcat(line, ", ");
 		strcat(string, line);
 	}
-	mysql_format(chandler, string, sizeof string, "%s WHERE id = '%d'", string, PlayerInfo[playerid][pId]);
+	mysql_format(chandler, string, sizeof string, "%s WHERE id = '%d'", string, PlayerInfo[playerid][pUserId]);
 	mysql_fquery(chandler, string, "AccountGroupsSave");
 	return 1;
 }
@@ -29713,13 +29736,7 @@ public AccountLoad(playerid)
 
 		cache_get_value_name(0, "ForumName", PlayerInfo[playerid][pForumName], 24);
 		SetPlayerScore(playerid, PlayerInfo[playerid][pLevel]);
-		new fetch_string[12];
-		for(new i = 0; i < MAX_PLAYER_GROUPS; i++)
-		{
-			format(fetch_string, 12, "Group%d", i+1);
-			cache_get_value_name_int(0, fetch_string, PlayerGroups[playerid][i]);
-		}
-		SortArray(PlayerGroups[playerid], 0, MAX_PLAYER_GROUPS);
+
 		if(PlayerInfo[playerid][pFaction] != 0 && GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]) == -1)
 		{
 			SendFormat(playerid, 0xFFA03FFF, "JÛSØ FRAKCIJA, KURIAI PRIKLAUSËTE BUVO IÐTRINTA ARBA KITAIP PAKEISTA.");
@@ -34686,17 +34703,54 @@ CMD:setgroup(playerid, params[])
 		if(PlayerGroups[receiverid][i] == 0)
 		{
 			// free
-			SendFormat(playerid, 0x7BE677FF, "Pridëjote þaidëjà %s á grupæ %s.", GetPlayerNameEx(receiverid), GetGroupName(groupsql));
-			SendFormat(receiverid, 0x7BE677FF, "%s pridëjo Jus á grupæ %s.", GetPlayerNameEx(playerid), GetGroupName(groupsql));
+			SendFormat(playerid, 0x7BE677FF, "Pridëjote þaidëjà %s á grupæ %s. Visi jo veikëjai turës ðià grupæ.", GetPlayerNameEx(receiverid), GetGroupName(groupsql));
+			SendFormat(receiverid, 0x7BE677FF, "%s pridëjo Jus á grupæ %s. Visi jûsø veikëjai turës ðià grupæ.", GetPlayerNameEx(playerid), GetGroupName(groupsql));
+			
 			PlayerGroups[receiverid][i] = groupsql;
 			SortArray(PlayerGroups[receiverid], 0, MAX_PLAYER_GROUPS);
-			SaveGroups(receiverid);
+			SaveUserGroups(receiverid);
 			return 1;
 		}
 	}
 	SendWarning(playerid, "Þaidëjas jau yra "#MAX_PLAYER_GROUPS" grupëse.");
 	return 1;
 }
+
+flags:unsetgroupsoff(CMD_TYPE_ADMIN);
+CMD:unsetgroupsoff(playerid, params[])
+{
+	new name[24];
+	if(sscanf(params,"s[24]",name)) return SendUsage(playerid, "/unsetgroupsoff [þaidëjas]");
+
+	if((J@ = FindPlayerByName(name)) != INVALID_PLAYER_ID)
+	{
+		SendWarning(playerid, "Þaidëjas %s prisijungæs. Naudok /unsetgroup", GetPlayerNameEx(J@));
+		return 1;
+	}
+
+	new string[256];
+	mysql_format(chandler, string, sizeof string, "SELECT UserId FROM `players_data` WHERE Name = '%e'", name);
+	
+	inline findPlayerByName()
+	{
+		if(cache_num_rows())
+		{
+			new userid;
+			cache_get_value_name_int(0, "UserId", userid);
+			
+			SendFormat(playerid, 0x7be677ff, "Vartotojui %s paðalintos visos grupës.", GetUserNameById(userid));
+
+			mysql_format(chandler, string, sizeof string, "\
+				UPDATE `users_data` SET Group1='0',Group2='0',Group3='0' WHERE id = '%d'", userid);
+			mysql_fquery(chandler, string, "UserRemovedFromGroups");
+		}
+		else SendError(playerid, "Tokio veikëjo nëra.");
+	}
+	mysql_tquery_inline(chandler, string, using inline findPlayerByName, "");
+	return 1;
+}
+thread(UserRemovedFromGroups);
+
 
 flags:unsetgroup(CMD_TYPE_ADMIN);
 CMD:unsetgroup(playerid, params[])
@@ -34713,7 +34767,7 @@ CMD:unsetgroup(playerid, params[])
 			SendFormat(receiverid, 0x7BE677FF, "%s paðalino Jus ið grupës %s.", GetPlayerNameEx(playerid), GetGroupName(groupsql));
 			PlayerGroups[receiverid][i] = 0;
 			SortArray(PlayerGroups[receiverid], 0, MAX_PLAYER_GROUPS);
-			SaveGroups(receiverid);
+			SaveUserGroups(receiverid);
 
 			found = true;
 		}
