@@ -1033,7 +1033,7 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-// #define USING_VIRTUAL_PRIVATE_SERVER
+#define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -1052,12 +1052,12 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 		#define MYSQL_HOSTNAME "localhost"
 		#define MYSQL_USERNAME "server_user"
 		#define MYSQL_PASSWORD "OKWAoZS8cftiw4d1"
-		#define MYSQL_DATABASE "rp_server"
+		#define MYSQL_DATABASE "southland"
 
 		#define MYSQL_LOG_HOSTNAME "localhost"
 		#define MYSQL_LOG_USERNAME "server_user"
 		#define MYSQL_LOG_PASSWORD "OKWAoZS8cftiw4d1"
-		#define MYSQL_LOG_DATABASE "rp_logs"
+		#define MYSQL_LOG_DATABASE "southland_logs"
 	#endif
 #else
 	#define MYSQL_HOSTNAME "localhost"

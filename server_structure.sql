@@ -2667,7 +2667,7 @@ BEGIN
     END WHILE;
 END//
 DELIMITER ;
-CALL create_random_numbers()
+-- CALL create_random_numbers()
 
 -- --------------------------------------------------------
 
