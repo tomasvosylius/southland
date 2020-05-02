@@ -1735,7 +1735,7 @@ stock sd_DestroyVehicle(vehicleid)
 	if(IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel])) DestroyDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]);
 	for(new i = 0; i < 4; i++)
 	{
-		if(IsValidDynamicObject(VehicleInfo[vehicleid][vObjects][i])) DestroyDynamicObject(VehicleInfo[vehicleid][vObjects][i], "vehicle", "destroy");
+		if(IsValidDynamicObject(VehicleInfo[vehicleid][vObjects][i])) DestroyDynamicObject(VehicleInfo[vehicleid][vObjects][i]);//, "vehicle", "destroy");
 	}
 	
 	VehicleInfo[vehicleid] = __reset_VehicleInfo;

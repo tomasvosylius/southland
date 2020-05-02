@@ -113,4 +113,6 @@
 #define NONE 								-1
 #define Probability(%0) 					(100 - %0 <= random(100) <= 99 ? 1 : 0) // by Johurt
 
+#define GetDynamicObjectModel(%0) 			Streamer_GetIntData(STREAMER_TYPE_OBJECT,%0,E_STREAMER_MODEL_ID)
+
 #define IsVehicleInRangeOfPoint(%0,%1,%2,%3,%4) ((%1 >= GetVehicleDistanceFromPoint(%0,%2,%3,%4) ? true : false))

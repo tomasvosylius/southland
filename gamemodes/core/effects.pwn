@@ -53,7 +53,7 @@ stock CreateItem(Float:x, Float:y, Float:z, objectid, &object_return, playerid =
 			}
 		}
 
-		object_return = CreateDynamicObject(objectid, x, y, z+0.01, finalrx, finalry, finalrz, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), -1, 30.0, 30.0, .called = "drops", .extra = "create");
+		object_return = CreateDynamicObject(objectid, x, y, z+0.01, finalrx, finalry, finalrz, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), -1, 30.0, 30.0);//, .called = "drops", .extra = "create");
 		if(playerid != INVALID_PLAYER_ID) Streamer_Update(playerid);
 		return 1;
 	}
@@ -89,7 +89,7 @@ stock CreateRoadblock(playerid, type)
 			GetPlayerPos(playerid, x, y, z);
 			GetPlayerFacingAngle(playerid, a);
 			GetXYJudgedByAngle(1.5, x, y, a, x, y);
-			Roadblocks[free] = CreateDynamicObject(objectid, x, y, z, 0.0, 0.0, a, .called = "effects", .extra = "roadblock");
+			Roadblocks[free] = CreateDynamicObject(objectid, x, y, z, 0.0, 0.0, a);//, .called = "effects", .extra = "roadblock");
 			switch(objectid)
 			{
 				case 2599:
@@ -125,7 +125,7 @@ stock DestroyRoadblock(playerid)
 		GetDynamicObjectPos(Roadblocks[rb], rb_x, rb_y, rb_z);
 		if(IsPlayerInRangeOfPoint(playerid, 5.0, rb_x, rb_y, rb_z))
 		{
-			if(IsValidDynamicObject(Roadblocks[rb])) DestroyDynamicObject(Roadblocks[rb], "effects", "roadblock");
+			if(IsValidDynamicObject(Roadblocks[rb])) DestroyDynamicObject(Roadblocks[rb]);//, "effects", "roadblock");
 			Roadblocks[rb] = INVALID_OBJECT_ID;
 			Iter_Remove(Roadblock, rb);
 			return true;

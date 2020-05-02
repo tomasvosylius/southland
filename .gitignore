@@ -3,3 +3,4 @@ server_log.txt
 logs/errors.log
 logs/warnings.log
 logs/*
+scriptfiles/*.db
