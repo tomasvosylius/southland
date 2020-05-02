@@ -174,9 +174,9 @@
  
 #if !defined AC_DONT_USE_YSI
 	#tryinclude <YSI_Coding\y_hooks>
+	#define _INC_y_hooks
 #else 
 	#if defined _INC_y_hooks
-		#define y_hooks_WAS_DEFINED
 		#undef _INC_y_hooks
 	#endif
 #endif
@@ -202,8 +202,8 @@
 // Nustatymai
 #define AC_WEAPONS_TIME 					500 	
 #define AC_MONEY_TIME 						450 	
-#define AC_AIRBREAK_TIME 					800 
-#define AC_HEALTH_TIME 						1000
+#define AC_AIRBREAK_TIME 					400 
+#define AC_HEALTH_TIME 						800
 #define AC_SPEED_TIME 						250
 #define AC_TELEPORTER_TIME					350
 #define AC_MISC_TIME 						1500
@@ -233,7 +233,7 @@ Enables/disables
 	#define AC_ENABLE_INV 						true
 #endif
 #if !defined AC_ENABLE_JETPACK
-	#define AC_ENABLE_JETPACK 					true
+	#define AC_ENABLE_JETPACK 					false
 #endif
 #if !defined AC_ENABLE_DIALOGS
 	#define AC_ENABLE_DIALOGS 					false
@@ -295,13 +295,13 @@ Settings
 	#define AC_WEAPONS_SKIP_MULTIPLE_BANS 		true
 #endif
 #if !defined AC_AIRBREAK_MAX_WARNINGS
-	#define AC_AIRBREAK_MAX_WARNINGS 			3
+	#define AC_AIRBREAK_MAX_WARNINGS 			2
 #endif
 #if !defined AC_FAKE_KILL_MAX_WARNINGS
-	#define AC_FAKE_KILL_MAX_WARNINGS 			3
+	#define AC_FAKE_KILL_MAX_WARNINGS 			2
 #endif
 #if !defined AC_INV_MAX_WARNINGS
-	#define AC_INV_MAX_WARNINGS 				6
+	#define AC_INV_MAX_WARNINGS 				4
 #endif
 #if !defined AC_HIGH_PING_MARK
 	#define AC_HIGH_PING_MARK					300				
@@ -1193,15 +1193,15 @@ public t_ac__Health()
 #endif
 {
 	ac__LastAFKTick[playerid] = GetTickCount();
-	#if !defined _INC_y_hooks
-		#if defined FAC_OnPlayerCommandText
-			return FAC_OnPlayerCommandText(playerid, cmdtext);
-		#else 
-			return 1;
-		#endif
-	#else 
-		return 1;
-	#endif
+	// #if !defined _INC_y_hooks
+	// 	#if defined FAC_OnPlayerCommandText
+	// 		return FAC_OnPlayerCommandText(playerid, cmdtext);
+	// 	#else 
+	// 		return 1;
+	// 	#endif
+	// #else 
+	// 	return 1;
+	// #endif
 }
 
 #if defined _INC_y_hooks
@@ -2381,18 +2381,17 @@ public t_ac__AirBreak()
 				!_FAC_IsPlayerLeavingCar(playerid))
 		{
 			vehicleid = GetPlayerVehicleID(playerid);
+			distance = GetPlayerDistanceFromPoint(playerid, ac__AirBreak[playerid][e_ac_AirBrkX], ac__AirBreak[playerid][e_ac_AirBrkY], ac__AirBreak[playerid][e_ac_AirBrkZ]);
 			switch((playerstate = GetPlayerState(playerid)))
 			{
 				case PLAYER_STATE_ONFOOT:
 				{
-					distance = GetPlayerDistanceFromPoint(playerid, ac__AirBreak[playerid][e_ac_AirBrkX], ac__AirBreak[playerid][e_ac_AirBrkY], ac__AirBreak[playerid][e_ac_AirBrkZ]);
 					GetPlayerPos(playerid, x, y, z);
 					if((floatabs(ac__AirBreak[playerid][e_ac_AirBrkZ] - z) < 15.0 && floatabs(distance) >= 20.0) && 
 						(floatabs(ac__AirBreak[playerid][e_ac_AirBrkX] - x) >= 20.0 || floatabs(ac__AirBreak[playerid][e_ac_AirBrkY] - y) >= 20.0)) FAC_Airbreak(playerid);
 				}
 				case PLAYER_STATE_DRIVER:
 				{
-					distance = GetVehicleDistanceFromPoint(vehicleid, ac__AirBreak[playerid][e_ac_AirBrkX], ac__AirBreak[playerid][e_ac_AirBrkY], ac__AirBreak[playerid][e_ac_AirBrkZ]);
 					GetVehiclePos(vehicleid, x, y, z);
 					if((!FAC_IsVehicleMoving(vehicleid) && floatabs(distance) >= 20.0) &&
 						(floatabs(ac__AirBreak[playerid][e_ac_AirBrkX] - x) >= 20.0 || floatabs(ac__AirBreak[playerid][e_ac_AirBrkY] - y) >= 20.0)) FAC_Airbreak(playerid);
@@ -2421,9 +2420,12 @@ public t_ac__AirBreak()
 
 stock FAC_Airbreak(playerid)
 {
+	SendFormat(playerid, -1, "Airbrk");
+
 	new 
 		now = gettime();
-	if((ac__AirBreak[playerid][e_ac_AirBrkDetected]++) >= AC_AIRBREAK_MAX_WARNINGS && (now - ac__AirBreak[playerid][e_ac_AirBrkLast]) < 30)
+	if(	(ac__AirBreak[playerid][e_ac_AirBrkDetected]++) >= AC_AIRBREAK_MAX_WARNINGS && 
+		(now - ac__AirBreak[playerid][e_ac_AirBrkLast]) < 10)
 	{
 		_FAC_CheatDetected(playerid, CHEAT_AIRBRK);
 		ac__AirBreak[playerid][e_ac_AirBrkIgnore] = now + 3;
@@ -2570,7 +2572,7 @@ stock FAC_GetTickDiff(newtick, oldtick)
 	#endif
 	
 
-	#if defined _ALS_OnPlayerPickUpDynamicPicku
+	#if defined _ALS_OnPlayerPickUpDynamicPickup
 		#undef OnPlayerPickUpDynamicPickup
 	#else
 		#define _ALS_OnPlayerPickUpDynamicPickup
@@ -2953,12 +2955,6 @@ stock FAC_GetTickDiff(newtick, oldtick)
 #undef AC_REVISION
 #undef AC_SHAKE
 #undef AC_FULL_VERSION
-
-#if defined y_hooks_WAS_DEFINED 
-	#if !defined _INC_y_hooks
-		#define _INC_y_hooks
-	#endif
-#endif
 
 #pragma unused 	BustAim_g_WeaponRange, FAC_aimInt_DCTTL, FAC_aimInt_GXYIFOP, FAC_aimInt_IsCameraAimingAt,\
 				_FAC_IsPlayerStatePlaying, _FAC_IsPlayerStateVehicle, ac__Aim_LastWeapon

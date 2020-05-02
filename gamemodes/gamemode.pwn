@@ -911,8 +911,9 @@ native gpci(playerid, serial[], len);
 #include "libraries/samp.pwn"
 #include "libraries/macros.pwn"
 #include "libraries/als.pwn"
-#include "libraries/dialog.pwn"
 #include "libraries/anticheat.pwn"
+// #include "libraries/airbreak.pwn"
+#include "libraries/dialog.pwn"
 
 // ==============================================================================
 // Projekto pavadinimas ir pns
@@ -2172,6 +2173,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 //#include "core\map\central_hotel.pwn"
 // #include "core\map\empty_houses.pwn"
 
+#include "core\map\interiors.pwn"
 #include "core\map\school.pwn"
 #include "core\map\squatters.pwn"
 #include "core\map\china_town.pwn"
@@ -2188,19 +2190,18 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core\map\mechanics.pwn"
 #include "core\map\train_ganton.pwn"
 #include "core\map\train_jefferson.pwn"
+#include "core\map\ls_bus_station.pwn"
+#include "core\map\ls_dump.pwn"
+#include "core\map\ls_logistics.pwn"
 // #include "core\map\ganghood_details.pwn"
 // #include "core\map\taxi.pwn"
-// #include "core\map\ls_bus_station.pwn"
 // #include "core\map\corona_small.pwn"
 // #include "core\map\corona_big.pwn"
-// #include "core\map\ls_dump.pwn"
 // #include "core\map\park.pwn"
 // #include "core\map\mall.pwn"
-// #include "core\map\ls_logistics.pwn"
 // #include "core\map\lspd.pwn"
 // #include "core\map\downtown_parking.pwn"
 // #include "core\map\mall_parking.pwn"
-// #include "core\map\interiors.pwn"
 // #include "core\map\laundry.pwn"
 // #include "core\map\prieplauka.pwn"
 // #include "core\map\bank.pwn"
@@ -2225,6 +2226,11 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player/cheats.pwn"
 #include "modules\player\ui/speedo.pwn"
 #include "modules\player\ui/leftbox.pwn"
+
+// stock FAC_GetWeaponSlot(playerid) return 1;
+// stock RemovePlayerWeaponInSlot(playerid, slot) return 1;
+// stock PlayerHasWeaponInSlot(playerid, slot) return false;
+// stock GetVehicleColor(playerid, &color1,&color2) color1=color2=random(100);
 
 main()
 {
@@ -2915,7 +2921,7 @@ public MinuteTimer()
 {
 	new unix = gettime();
 	// gilzez
-	new delete = -1;
+	/*new delete = -1;
 	foreach(new shell : Shell)
 	{
 		if(delete != -1 && delete != shell)
@@ -2930,7 +2936,7 @@ public MinuteTimer()
 			Shells[shell][shellLabel] = INVALID_3DTEXT_ID;
 			Shells[shell][shellObject] = INVALID_OBJECT_ID;
 		}
-	}
+	}*/
 	// patarimai
 	static timefortip;
 	if(timefortip < TIP_EVERY_MINUTE)
@@ -6178,6 +6184,8 @@ public OnPlayerCommandReceived(playerid, cmd[], params[], flags)
 
 public OnPlayerCommandPerformed(playerid, cmd[], params[], result, flags)
 {
+	printf("OnPlayerCommandPerformed(%s, %s, %s, %d, %d)", playerid, cmd, params, result, flags);
+
 	PlayerExtra[playerid][peAFKTime] = 0;
 	if(result == -1) { return SendError(playerid, "Tokios komandos nëra. Naudokite /help arba /ask"); }
 	else
@@ -16068,8 +16076,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if(response)
 			{
-				new olddata[E_VEHICLE_DATA],
-					model,
+				new model,
 					oldvehicleid = tmpIter[playerid],
 					vehicleid = INVALID_VEHICLE_ID;
 				if(sscanf(inputtext,"d",model) || model < 400 || model > 612) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 2, "");
@@ -16082,10 +16089,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				GetVehicleColor(oldvehicleid, col1, col2);
 
 
-				olddata = VehicleInfo[oldvehicleid];
-				vehicleid = CreateVehicle(model, x, y, z, a, col1, col2, olddata[vRespawnTime], olddata[vAddSiren]);
+				vehicleid = CreateVehicle(model, x, y, z, a, col1, col2, VehicleInfo[oldvehicleid][vRespawnTime], VehicleInfo[oldvehicleid][vAddSiren]);
 
-				VehicleInfo[vehicleid] = olddata;
+				VehicleInfo[vehicleid] = VehicleInfo[oldvehicleid];
 				SaveServerVehicleIntEx(vehicleid, "Model", model);
 
 				DestroyVehicle(oldvehicleid);
@@ -16168,9 +16174,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				MsgSuccess(playerid, "TRANSPORTAS", "Tr. priemonë priskirta frakcijai, kurios MySQL numeris: %d.", factionid);
 				new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
 				for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
-				//PutFactionWeaponsInVehicle(vehicleid);
+				
 				SetVehicleToRespawn(vehicleid);
 				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
+
 				log_init(true);
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
@@ -16346,7 +16353,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							{
 								tmpIter[playerid] = vehicleid;
 								new Float:x, Float:y, Float:z, Float:a, model,
-									olddata[E_VEHICLE_DATA],
 									newvehicleid,
 									col1, col2;
 
@@ -16360,9 +16366,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								SaveServerVehicleFloatEx(vehicleid, "Z", z);
 								SaveServerVehicleFloatEx(vehicleid, "A", a);
 								
-								olddata = VehicleInfo[vehicleid];
-								newvehicleid = CreateVehicle(model, x, y, z, a, col1, col2, olddata[vRespawnTime], olddata[vAddSiren]);
-								VehicleInfo[newvehicleid] = olddata;
+								newvehicleid = CreateVehicle(model, x, y, z, a, col1, col2, VehicleInfo[vehicleid][vRespawnTime], VehicleInfo[vehicleid][vAddSiren]);
+								VehicleInfo[newvehicleid] = VehicleInfo[vehicleid];
 
 								DestroyVehicle(vehicleid);
 								MsgSuccess(playerid, "TRANSPORTAS", "Vieta sëkmingai iðsaugota.");
@@ -32396,18 +32401,6 @@ public OnDialogPerformed(playerid, dialog[], response, success)
 	return 1;
 }
 
-/*
-CMD:createattach(playerid, params[])
-{
-	new Float:x, Float:y, Float:z,
-		Float:rx, Float:ry, Float:rz;
-	sscanf(params,"ffffff", x, y, z, rx, ry, rz);
-	static objtempdel;
-	DestroyObject(objtempdel);
-	objtempdel = CreateObject(19078, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); // 18693
-	return AttachObjectToPlayer(objtempdel, playerid, x, y, z, rx, ry, rz);
-}*/
-
 CMD:ahelp(playerid, params[]) return pc_cmd_help(playerid, "admin");
 
 flags:jetpack(CMD_TYPE_ADMIN);
@@ -33672,13 +33665,15 @@ stock KickPlayer(playerid, adminname[], reason[])
 	ClearChat(playerid, 10);
 	SendACMessage(0xFF6347AA, false, "[AdmCmd] %s iðmetë þaidëjà %s ið serverio.", adminname, GetPlayerNameEx(playerid));
 	SendACMessage(0xFF6347AA, false, "Prieþastis: %s", reason);
-	log_init(true);
-	new string[126];
+
+	new string[56];
 	format(string, sizeof string, "Ismestas nuo %s", adminname);
+	log_init(true);
 	log_set_table("logs_players");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%e','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string, reason);
 	log_push();
+
 	KickEx(playerid);
 	return 1;
 }
