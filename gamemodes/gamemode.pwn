@@ -2489,7 +2489,7 @@ stock IsModelShitty(model)
 stock GetMaxShittyCarSpeed(model)
 {
 	#pragma unused model
-	return 120;
+	return 100;
 }
 
 
@@ -25998,6 +25998,7 @@ stock StartLoadBar(playerid, type, time)
 	LoadBarInfo[playerid][barValue] = 0;
 	PlayerTextDrawShow(playerid, LoadBar_Base[playerid]);
 	PlayerTextDrawShow(playerid, LoadBar_LoadFull[playerid]);
+	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], 0.0, 3.0);
 	PlayerTextDrawShow(playerid, LoadBar_Loaded[playerid]);
 	PlayerTextDrawShow(playerid, LoadBar_Text[playerid]);
 	return LoadBarInfo[playerid][barTimer] = SetTimerEx("UpdateLoadBar", time/10, true, "d", playerid);

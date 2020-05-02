@@ -209,6 +209,9 @@
 #define AC_MISC_TIME 						1500
 #define AC_AFK_MAX_TIME						1600 // Po kiek laiko zaidejas fiksuojamas AFK							
 
+#define FAC_INVALID_OBJECT_ID				65535
+#define FAC_INVALID_VEHICLE_ID				65535
+
 /*
 ***************************
 Enables/disables
@@ -739,7 +742,7 @@ stock FAC_Reset(playerid)
 
 	ac__CurrentVehicle[playerid] = 
 	ac__LastVehicle[playerid] = 
-	ac__EnteringVehicle[playerid] = INVALID_VEHICLE_ID;
+	ac__EnteringVehicle[playerid] = FAC_INVALID_VEHICLE_ID;
 
 	ac__PlayerHealth[playerid] = 100.0;
 	ac__IgnoreAfkHealth[playerid] = 999.0;
@@ -902,8 +905,8 @@ static _FAC_IsPlayerLeavingCar(playerid)
 }
 static _FAC_IsPlayerSurfing(playerid)
 {
-	return (GetPlayerSurfingObjectID(playerid) != INVALID_OBJECT_ID ||
-			GetPlayerSurfingVehicleID(playerid) != INVALID_VEHICLE_ID);
+	return (GetPlayerSurfingObjectID(playerid) != FAC_INVALID_OBJECT_ID ||
+			GetPlayerSurfingVehicleID(playerid) != FAC_INVALID_VEHICLE_ID);
 }
 
 static _FAC_IsPlayerStatePlaying(playerid)
@@ -1234,7 +1237,7 @@ public t_ac__Health()
 		#endif
 		#if AC_ENABLE_WARP_INTO_CAR
 			if(	ac__LastVehicle[playerid] != current_vehicle && 
-				ac__LastVehicle[playerid] != INVALID_VEHICLE_ID)
+				ac__LastVehicle[playerid] != FAC_INVALID_VEHICLE_ID)
 			{
 				// Warp into car is kitos transporto priemones.
 				_FAC_CheatDetected(playerid, CHEAT_WARP_TO_CAR, current_vehicle);
@@ -1666,7 +1669,7 @@ public t_ac__Health()
 		}
 		else if(oldstate == PLAYER_STATE_DRIVER &&
 				FAC_GetTickDiff(tick, ac__LastDriveState[playerid]) <= 20 &&
-				ac__LastVehicle[playerid] != INVALID_VEHICLE_ID)
+				ac__LastVehicle[playerid] != FAC_INVALID_VEHICLE_ID)
 		{
 			/** Keicia savo state per greitai 
 				Sugebejo islipt is masinos per 200ms
@@ -1682,13 +1685,13 @@ public t_ac__Health()
 			printf("%s ?==? warp (cur:%d,enter:%d,last:%d)", GetPlayerNameEx(playerid), current_vehicle, ac__EnteringVehicle[playerid], ac__LastVehicle[playerid]);
 			if(	(
 					/** Nelipa i jokia masina, arba ne i sita. */
-					ac__EnteringVehicle[playerid] == INVALID_VEHICLE_ID || 	
+					ac__EnteringVehicle[playerid] == FAC_INVALID_VEHICLE_ID || 	
 					ac__EnteringVehicle[playerid] != current_vehicle
 				)
 				|| 
 				(	
 					/** Is kitos masinos paspaude HOME mygtuka. */
-					ac__LastVehicle[playerid] != INVALID_VEHICLE_ID &&
+					ac__LastVehicle[playerid] != FAC_INVALID_VEHICLE_ID &&
 					ac__EnteringVehicle[playerid] != current_vehicle &&
 					ac__LastVehicle[playerid] != current_vehicle
 				)
@@ -1696,14 +1699,14 @@ public t_ac__Health()
 			{
 				_FAC_CheatDetected(playerid, CHEAT_WARP_TO_CAR, current_vehicle);
 			}
-			ac__EnteringVehicle[playerid] 	= INVALID_VEHICLE_ID;
+			ac__EnteringVehicle[playerid] 	= FAC_INVALID_VEHICLE_ID;
 			ac__LastVehicle[playerid] 		= current_vehicle;
 		}
 	#endif
 
-	if(newstate != PLAYER_STATE_DRIVER && newstate != PLAYER_STATE_PASSENGER && ac__LastVehicle[playerid] != INVALID_VEHICLE_ID)
+	if(newstate != PLAYER_STATE_DRIVER && newstate != PLAYER_STATE_PASSENGER && ac__LastVehicle[playerid] != FAC_INVALID_VEHICLE_ID)
 	{
-		ac__LastVehicle[playerid] = INVALID_VEHICLE_ID;
+		ac__LastVehicle[playerid] = FAC_INVALID_VEHICLE_ID;
 	}
 
 	#if !defined _INC_y_hooks
@@ -1977,7 +1980,7 @@ stock FAC_CreateVehicle(vehicletype, Float:x, Float:y, Float:z, Float:rotation, 
     if(color2 == -1) color2 = l_randomColorsList[random(sizeof l_randomColorsList)];
 
 	new vehicleid = CreateVehicle(vehicletype, x, y, z, rotation, color1, color2, respawn_delay, addsiren);
-	if(vehicleid != INVALID_VEHICLE_ID)
+	if(vehicleid != FAC_INVALID_VEHICLE_ID)
 	{
 		ac__VehicleHealth[vehicleid] = 1000.0000000000000000000000000;
 		vehicle_Colors[vehicleid][0] = color1;
@@ -2036,7 +2039,7 @@ stock FAC_SetVehicleHealth(vehicleid, Float:health)
 
 stock FAC_CancelVehicleEnter(playerid)
 {
-	ac__EnteringVehicle[playerid] = INVALID_VEHICLE_ID;
+	ac__EnteringVehicle[playerid] = FAC_INVALID_VEHICLE_ID;
 	return CancelVehicleEnter(playerid);
 }
 
@@ -2046,7 +2049,7 @@ stock FAC_RemovePlayerFromVehicle(playerid)
 	defer PT_CheckIfStillInCar[2000](playerid, vehicleid);
 
 	ac__LastVehicle[playerid] = 
-	ac__EnteringVehicle[playerid] = INVALID_VEHICLE_ID;
+	ac__EnteringVehicle[playerid] = FAC_INVALID_VEHICLE_ID;
 	return RemovePlayerFromVehicle(playerid);
 }
 
@@ -2338,7 +2341,7 @@ stock FAC_SetPlayerInterior(playerid, interiorid)
 stock FAC_SetPlayerPos(playerid, Float:x, Float:y, Float:z)
 {
 	ac__AirBreak[playerid][e_ac_AirBrkIgnore] = gettime() + 3;
-	ac__EnteringVehicle[playerid] = INVALID_VEHICLE_ID;
+	ac__EnteringVehicle[playerid] = FAC_INVALID_VEHICLE_ID;
 	return SetPlayerPos(playerid, x, y, z);
 }
 
