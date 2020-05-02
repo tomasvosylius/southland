@@ -1622,7 +1622,7 @@ public t_ac__Health()
 	#endif
 	#if !defined _INC_y_hooks
 		#if defined FAC_OnPlayerKeyStateChange
-			return FAC_OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
+			return FAC_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
 		#else 
 			return 1;
 		#endif
@@ -2569,7 +2569,8 @@ stock FAC_GetTickDiff(newtick, oldtick)
 		forward FAC_OnDialogResponse(playerid, dialogid, response, listitem, inputtext[]);
 	#endif
 	
-	#if defined _ALS_OnPlayerPickUpDynamicPickup
+
+	#if defined _ALS_OnPlayerPickUpDynamicPicku
 		#undef OnPlayerPickUpDynamicPickup
 	#else
 		#define _ALS_OnPlayerPickUpDynamicPickup
