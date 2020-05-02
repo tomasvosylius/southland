@@ -1,3 +1,75 @@
+/*
+Legal:
+	Version: MPL 1.1
+	
+	The contents of this file are subject to the Mozilla Public License Version 
+	1.1 the "License"; you may not use this file except in compliance with 
+	the License. You may obtain a copy of the License at 
+	http://www.mozilla.org/MPL/
+	
+	Software distributed under the License is distributed on an "AS IS" basis,
+	WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+	for the specific language governing rights and limitations under the
+	License.
+	
+	The Original Code is the YSI framework.
+	
+	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
+	Portions created by the Initial Developer are Copyright C 2011
+	the Initial Developer. All Rights Reserved.
+
+Contributors:
+	Y_Less
+	koolk
+	JoeBullet/Google63
+	g_aSlice/Slice
+	Misiur
+	samphunter
+	tianmeta
+	maddinat0r
+	spacemud
+	Crayder
+	Dayvison
+	Ahmad45123
+	Zeex
+	irinel1996
+	Yiin-
+	Chaprnks
+	Konstantinos
+	Masterchen09
+	Southclaws
+	PatchwerkQWER
+	m0k1
+	paulommu
+	udan111
+
+Thanks:
+	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
+	ZeeX - Very productive conversations.
+	koolk - IsPlayerinAreaEx code.
+	TheAlpha - Danish translation.
+	breadfish - German translation.
+	Fireburn - Dutch translation.
+	yom - French translation.
+	50p - Polish translation.
+	Zamaroht - Spanish translation.
+	Los - Portuguese translation.
+	Dracoblue, sintax, mabako, Xtreme, other coders - Producing other modes for
+		me to strive to better.
+	Pixels^ - Running XScripters where the idea was born.
+	Matite - Pestering me to release it and using it.
+
+Very special thanks to:
+	Thiadmer - PAWN, whose limits continue to amaze me!
+	Kye/Kalcor - SA:MP.
+	SA:MP Team past, present and future - SA:MP.
+
+Optional plugins:
+	Gamer_Z - GPS.
+	Incognito - Streamer.
+	Me - sscanf2, fixes2, Whirlpool.
+*/
+
 
 #define CB_GET(%0)  new _cb[E_CALLBACK_DATA]; Callback_Get(cb, _cb, (%0))
 #define CB_CALL(%0) Callback_Call(_cb,%0)
@@ -34,7 +106,7 @@ stock MapIdx(callback:cb, const arr[], dest[], al = sizeof (arr), dl = sizeof (d
 	}
 	return CB_REL();
 }
-#define MapIdx({%0}%1)%8; LAMBDA_ii<IdxMap>{%0}(%1)%8;
+#define MapIdx({%0}%1)%8; LAMBDA_ii<MapIdx>{%0}(%1)%8;
 
 stock MapIdx_(callback:cb, const arr[], len = sizeof (arr))
 {
@@ -45,7 +117,7 @@ stock MapIdx_(callback:cb, const arr[], len = sizeof (arr))
 	}
 	return CB_REL();
 }
-#define MapIdx_({%0}%1)%8; LAMBDA_ii<IdxMap_>{%0}(%1)%8;
+#define MapIdx_({%0}%1)%8; LAMBDA_ii<MapIdx_>{%0}(%1)%8;
 
 stock ZipWith(callback:cb, const l[], const r[], dest[], ls = sizeof (l), rs = sizeof (r), ds = sizeof (dest))
 {
@@ -100,7 +172,7 @@ stock ZipWithIdx(callback:cb, const l[], const r[], dest[], ls = sizeof (l), rs 
 	}
 	return CB_REL();
 }
-#define ZipWithIdx({%0}%1)%8; LAMBDA_ii<ZipWith>{%0}(%1)%8;
+#define ZipWithIdx({%0}%1)%8; LAMBDA_iii<ZipWithIdx>{%0}(%1)%8;
 
 stock ZipWithIdx_(callback:cb, const l[], const r[], ls = sizeof (l), rs = sizeof (r))
 {
@@ -111,7 +183,7 @@ stock ZipWithIdx_(callback:cb, const l[], const r[], ls = sizeof (l), rs = sizeo
 	}
 	return CB_REL();
 }
-#define ZipWithIdx_({%0}%1)%8; LAMBDA_ii<ZipWith_>{%0}(%1)%8;
+#define ZipWithIdx_({%0}%1)%8; LAMBDA_iii<ZipWithIdx_>{%0}(%1)%8;
 
 stock ZipWith3Idx(callback:cb, const l[], const m[], const r[], dest[], ls = sizeof (l), ms = sizeof (m), rs = sizeof (r), ds = sizeof (dest))
 {
@@ -122,7 +194,7 @@ stock ZipWith3Idx(callback:cb, const l[], const m[], const r[], dest[], ls = siz
 	}
 	return CB_REL();
 }
-#define ZipWith3Idx({%0}%1)%8; LAMBDA_iii<ZipWith3>{%0}(%1)%8;
+#define ZipWith3Idx({%0}%1)%8; LAMBDA_iiii<ZipWith3Idx>{%0}(%1)%8;
 
 stock ZipWith3Idx_(callback:cb, const l[], const m[], const r[], ls = sizeof (l), ms = sizeof (m), rs = sizeof (r))
 {
@@ -133,7 +205,7 @@ stock ZipWith3Idx_(callback:cb, const l[], const m[], const r[], ls = sizeof (l)
 	}
 	return CB_REL();
 }
-#define ZipWith3Idx_({%0}%1)%8; LAMBDA_iii<ZipWith3_>{%0}(%1)%8;
+#define ZipWith3Idx_({%0}%1)%8; LAMBDA_iiii<ZipWith3Idx_>{%0}(%1)%8;
 
 stock FoldLIdx(callback:cb, n, const arr[], len = sizeof (arr))
 {
@@ -148,7 +220,7 @@ stock FoldLIdx(callback:cb, n, const arr[], len = sizeof (arr))
 		CB_REL(),
 		cur;
 }
-#define FoldLIdx({%0}%1)%8; LAMBDA_ii<FoldL>{%0}(%1)%8;
+#define FoldLIdx({%0}%1)%8; LAMBDA_iii<FoldLIdx>{%0}(%1)%8;
 
 stock ScanLIdx(callback:cb, n, const arr[], dest[], al = sizeof (arr), dl = sizeof (dest))
 {
@@ -168,7 +240,7 @@ stock ScanLIdx(callback:cb, n, const arr[], dest[], al = sizeof (arr), dl = size
 		CB_REL(),
 		1;
 }
-#define ScanLIdx({%0}%1)%8; LAMBDA_ii<ScanL>{%0}(%1)%8;
+#define ScanLIdx({%0}%1)%8; LAMBDA_iii<ScanLIdx>{%0}(%1)%8;
 
 stock FoldRIdx(callback:cb, const arr[], n, len = sizeof (arr))
 {
@@ -177,13 +249,13 @@ stock FoldRIdx(callback:cb, const arr[], n, len = sizeof (arr))
 		cur = n;
 	while (len--)
 	{
-		cur = CB_CALL(i, arr[len], cur);
+		cur = CB_CALL(len, arr[len], cur);
 	}
 	return
 		CB_REL(),
 		cur;
 }
-#define FoldRIdx({%0}%1)%8; LAMBDA_ii<FoldR>{%0}(%1)%8;
+#define FoldRIdx({%0}%1)%8; LAMBDA_iii<FoldRIdx>{%0}(%1)%8;
 
 stock ScanRIdx(callback:cb, n, const arr[], dest[], al = sizeof (arr), dl = sizeof (dest))
 {
@@ -195,13 +267,13 @@ stock ScanRIdx(callback:cb, n, const arr[], dest[], al = sizeof (arr), dl = size
 	dest[len] = cur;
 	while (len--)
 	{
-		dest[len] = cur = CB_CALL(i, arr[len], cur);
+		dest[len] = cur = CB_CALL(len, arr[len], cur);
 	}
 	return
 		CB_REL(),
 		1;
 }
-#define ScanRIdx({%0}%1)%8; LAMBDA_ii<ScanR>{%0}(%1)%8;
+#define ScanRIdx({%0}%1)%8; LAMBDA_iii<ScanRIdx>{%0}(%1)%8;
 
 stock FoldL1Idx(callback:cb, const arr[], len = sizeof (arr))
 {
@@ -217,7 +289,7 @@ stock FoldL1Idx(callback:cb, const arr[], len = sizeof (arr))
 		CB_REL(),
 		cur;
 }
-#define FoldL1Idx({%0}%1)%8; LAMBDA_ii<FoldL1>{%0}(%1)%8;
+#define FoldL1Idx({%0}%1)%8; LAMBDA_iii<FoldL1Idx>{%0}(%1)%8;
 
 stock FoldR1Idx(callback:cb, const arr[], len = sizeof (arr))
 {
@@ -227,13 +299,13 @@ stock FoldR1Idx(callback:cb, const arr[], len = sizeof (arr))
 		cur = arr[--len];
 	while (len--)
 	{
-		cur = CB_CALL(i, arr[len], cur);
+		cur = CB_CALL(len, arr[len], cur);
 	}
 	return
 		CB_REL(),
 		cur;
 }
-#define FoldR1Idx({%0}%1)%8; LAMBDA_ii<FoldR1>{%0}(%1)%8;
+#define FoldR1Idx({%0}%1)%8; LAMBDA_iii<FoldR1Idx>{%0}(%1)%8;
 
 stock FoldL(callback:cb, n, const arr[], len = sizeof (arr))
 {
@@ -390,7 +462,7 @@ stock bool:AllIdx(callback:cb, const arr[], len = sizeof (arr))
 		CB_REL(),
 		true;
 }
-#define AllIdx({%0}%1)%8; LAMBDA_i<All>{%0}(%1)%8;
+#define AllIdx({%0}%1)%8; LAMBDA_ii<AllIdx>{%0}(%1)%8;
 
 stock bool:AnyIdx(callback:cb, const arr[], len = sizeof (arr))
 {
@@ -403,7 +475,7 @@ stock bool:AnyIdx(callback:cb, const arr[], len = sizeof (arr))
 		CB_REL(),
 		false;
 }
-#define AnyIdx({%0}%1)%8; LAMBDA_i<Any>{%0}(%1)%8;
+#define AnyIdx({%0}%1)%8; LAMBDA_ii<AnyIdx>{%0}(%1)%8;
 
 stock Reverse(const arr[], len = sizeof (arr))
 {

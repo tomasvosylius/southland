@@ -15,7 +15,6 @@
 // Includinam funkciju failus
 #pragma warning disable 239, 217, 214
 
-
 #include <a_samp>
 #if defined MAX_PLAYERS
 	#undef MAX_PLAYERS
@@ -62,7 +61,6 @@ native WP_Hash(buffer[], len, const str[]);
 native gpci(playerid, serial[], len);
 // ==============================================================================
 // Serveris
-#pragma tabsize 0
 #define CODE_VERSION 		1.2.1
 #define CODE_VERSION_P 		1147
 #define SERVER_DEBUG_LEVEL 	3 		// [0:nieko] [1:errorai, gm klaidos] [2:visi callbackai] [3:funkcijos]
@@ -104,7 +102,7 @@ native gpci(playerid, serial[], len);
 #define MAX_DRUGS_PER_ORDER 			100 // strpack things
 #define MAX_RANDOM_SPAWNS 				5
 #define MAX_PLAYER_GROUPS				3
-#define MAX_GROUPS 						8
+#define MAX_ADMIN_GROUPS 						8
 #define MAX_HOUSE_EXTRA_ENTERS			2
 #define MAX_BUSINESS_EXTRA_ENTERS		2
 #define MAX_TEXTURE_SLOTS				6
@@ -1236,7 +1234,7 @@ enum E_GROUP_DATA
 	groupId,
 	groupName[30]
 };
-new GroupsInfo[MAX_GROUPS][E_GROUP_DATA];
+new GroupsInfo[MAX_ADMIN_GROUPS][E_GROUP_DATA];
 new PlayerGroups[MAX_PLAYERS][MAX_PLAYER_GROUPS];
 
 enum E_FACTION_DATA
@@ -1713,7 +1711,7 @@ new Iterator:House<MAX_HOUSES>,
 	Iterator:Garage<MAX_GARAGES>,
 	Iterator:PayPhone<MAX_PAYPHONES>,
 	Iterator:Parking<MAX_PARKINGS>,
-	Iterator:Group<MAX_GROUPS>,
+	Iterator:AdminGroup<MAX_ADMIN_GROUPS>,
 	Iterator:DealerHouse<MAX_DEALER_HOUSES>,
 	Iterator:Shell<MAX_SHELLS>,
 	Iterator:Roadblock<MAX_ROADBLOCKS>,
@@ -5104,10 +5102,10 @@ public GroupsLoad()
 	new rows = cache_num_rows();
 	for(new i = 0; i < rows; i++)
 	{
-		if(i >= MAX_GROUPS-1) { break; }
+		if(i >= MAX_ADMIN_GROUPS-1) { break; }
 		cache_get_value_name_int(i, "id", GroupsInfo[i][groupId]);
 		cache_get_value_name(i, "Name", GroupsInfo[i][groupName], 30);
-		Iter_Add(Group, i);
+		Iter_Add(AdminGroup, i);
 	}
 	printf("[load] %d grupiu", rows);
 	return 1;
@@ -19133,8 +19131,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								mysql_fquery(chandler, string, "GroupDeleted");
 
 								MsgSuccess(playerid, "GRUPËS", "Grupë sëkmingai iðtrinta.");
-								reset(Group, GroupsInfo[groupid], E_GROUP_DATA);
-								Iter_Remove(Group, groupid);
+								reset(AdminGroup, GroupsInfo[groupid], E_GROUP_DATA);
+								Iter_Remove(AdminGroup, groupid);
 							}
 							cache_delete(result);
 						}
@@ -19150,7 +19148,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				tmpSelected[playerid] = listitem;
 				new groupid; // itter
-				GetSortedAsForeach(Group, listitem, groupid, EMPTY_STATEMENT);
+				GetSortedAsForeach(AdminGroup, listitem, groupid, EMPTY_STATEMENT);
 				tmpIter[playerid] = groupid;
 				tmpTexture_MarkStart_CP[playerid] =
 				tmpPage_Object[playerid] = 0;
@@ -19168,10 +19166,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				mysql_format(chandler, string, sizeof string, "INSERT INTO `groups_data` (`Name`,`Super`,`Added`) VALUES ('%e','0','%d')", name, PlayerInfo[playerid][pId]);
 				new Cache:result = mysql_query(chandler, string, true);
 				cache_set_active(result);
-				new itter = Iter_Free(Group);
+				new itter = Iter_Free(AdminGroup);
 				GroupsInfo[itter][groupId] = cache_insert_id();
 				format(GroupsInfo[itter][groupName], 30, name);
-				Iter_Add(Group, itter);
+				Iter_Add(AdminGroup, itter);
 				cache_delete(result);
 				mysql_tquery(chandler, "SELECT `Permission` FROM `groups_permissions_list` WHERE DefaultValue > '0'", "NewGroupPermissionListLoad", "d", playerid);
 				MsgSuccess(playerid, "GRUPËS", "Grupë sëkmingai sukurta.");
@@ -19198,7 +19196,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							new line[56],
 								i,
 								string[512] = "{BABABA}Nr.\t{BABABA}Pavadinimas\n";
-							foreach(new groupid : Group)
+							foreach(new groupid : AdminGroup)
 							{
 								i++;
 								format(line, sizeof line, "%d.\t%s (MySQL ID: %d)\n", i, GetGroupName(groupid, false), GroupsInfo[groupid][groupId]);
@@ -26386,7 +26384,7 @@ stock ShowVehicleList(playerid, ...)
 
 stock IsAdminGroupExisting(sqlid)
 {
-	foreach(new groupid : Group)
+	foreach(new groupid : AdminGroup)
 	{
 		if(GroupsInfo[groupid][groupId] == sqlid)
 		{
@@ -26406,7 +26404,7 @@ stock GetGroupName(sqlid, bool:bysql = true)
 	}
 	else
 	{
-		foreach(new groupid : Group)
+		foreach(new groupid : AdminGroup)
 		{
 			if(GroupsInfo[groupid][groupId] == sqlid)
 			{
@@ -34274,7 +34272,7 @@ CMD:groupslist(playerid, params[])
 {
 	new real_itter = 1;
 	SendFormat(playerid, 0xFFBD40FF, "_______________ Serverio grupës _______________");
-	foreach(new groupid : Group)
+	foreach(new groupid : AdminGroup)
 	{
 		if(GroupsInfo[groupid][groupId] > 0)
 		{
