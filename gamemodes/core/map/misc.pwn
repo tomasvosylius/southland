@@ -12,7 +12,7 @@ hook OnPlayerConnect(playerid)
 
 	// turbo gang hood detailings
 	RemoveBuildingForPlayer(playerid, 620, 2116.9297, -1916.0781, 10.8047, 16.0);
-	RemoveBuildingForPlayer(playerid, 5633, 2089.3594, -1643.9297, 18.2188, 0.25);
+	// RemoveBuildingForPlayer(playerid, 5633, 2089.3594, -1643.9297, 18.2188, 0.25);
 	RemoveBuildingForPlayer(playerid, 1412, 1917.3203, -1797.4219, 13.8125, 0.25);
 	RemoveBuildingForPlayer(playerid, 1412, 1912.0547, -1797.4219, 13.8125, 0.25);
 	RemoveBuildingForPlayer(playerid, 1412, 1906.7734, -1797.4219, 13.8125, 0.25);
