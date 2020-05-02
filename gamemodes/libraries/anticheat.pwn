@@ -768,7 +768,7 @@ stock FAC_Reset(playerid)
 		Streamer_GetFloatData(STREAMER_TYPE_PICKUP, pickupid, E_STREAMER_Y, __pick_y);
 		Streamer_GetFloatData(STREAMER_TYPE_PICKUP, pickupid, E_STREAMER_Z, __pick_z);	
 		
-		if(!IsPlayerInRangeOfPoint(playerid, 1.75, __pick_x, __pick_y, __pick_z))
+		if(!IsPlayerInRangeOfPoint(playerid, 3.0, __pick_x, __pick_y, __pick_z))
 		{
 			_FAC_CheatDetected(playerid, CHEAT_PICKUP_TP, pickupid);
 			#if defined _INC_y_hooks
