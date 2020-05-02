@@ -428,10 +428,6 @@ stock sd_GivePlayerMoney(playerid, amount)
 	PlayerInfo[playerid][pMoney] += amount;
 	return GivePlayerMoney(playerid, amount);
 }
-stock sd_GetPlayerMoney(playerid) 
-{
-	return PlayerInfo[playerid][pMoney];
-}
 
 stock sd_CheckAfk( playerid )
 {

@@ -97,7 +97,7 @@ Dialog:ConfirmPayNSpray(playerid, response, listitem, inputtext[])
 					}
 					else
 					{
-						if(sd_GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
+						if(GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
 						GivePlayerMoney(playerid, -price);
 					}
 
@@ -127,7 +127,7 @@ public T_PayNSpray(playerid, vehicleid, point, timeleft)
 		{
 			if(timeleft <= 0)
 			{
-				sd_RepairVehicle(vehicleid);
+				RepairVehicle(vehicleid);
 				SendFormat(playerid, 0x91e23bFF, "Sëkmingai sutvarkëte savo transporto priemonæ!");
 				StopFixAction(playerid);
 			}

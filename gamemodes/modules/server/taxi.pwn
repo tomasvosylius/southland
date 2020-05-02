@@ -498,7 +498,7 @@ CMD:taxiprice(playerid, params[])
 CMD:taxilicense(playerid, params[])
 {
 	if(PlayerInfo[playerid][pTaxiLic] >= 1) return SendError(playerid, "Licencijà jau turite.");
-	else if(sd_GetPlayerMoney(playerid) < DEFAULT_TAXI_LICENCE_PRICE) return SendError(playerid, "Taksi licencija kainuoja $"#DEFAULT_TAXI_LICENCE_PRICE"");
+	else if(GetPlayerMoney(playerid) < DEFAULT_TAXI_LICENCE_PRICE) return SendError(playerid, "Taksi licencija kainuoja $"#DEFAULT_TAXI_LICENCE_PRICE"");
 
 	PlayerInfo[playerid][pTaxiLic] = 1;
 	SaveAccountIntEx(playerid, "TaxiLic", 1);

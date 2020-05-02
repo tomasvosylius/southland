@@ -236,7 +236,7 @@ Enables/disables
 	#define AC_ENABLE_JETPACK 					true
 #endif
 #if !defined AC_ENABLE_DIALOGS
-	#define AC_ENABLE_DIALOGS 					true
+	#define AC_ENABLE_DIALOGS 					false
 #endif
 #if !defined AC_ENABLE_FLOOD
 	#define AC_ENABLE_FLOOD 					true
@@ -260,7 +260,7 @@ Enables/disables
 	#define AC_ENABLE_TROLLBOSS 				true 
 #endif
 #if !defined AC_ENABLE_ANTIMOD	
-	#define AC_ENABLE_ANTIMOD					false
+	#define AC_ENABLE_ANTIMOD					true
 #endif
 #if !defined AC_ENABLE_PARACHUTE_DAMAGE
 	#define AC_ENABLE_PARACHUTE_DAMAGE			true
@@ -278,7 +278,7 @@ Enables/disables
 	#define AC_ENABLE_PICKUP_TELEPORT			true
 #endif 
 #if !defined AC_ENABLE_TELEPORTER
-	#define AC_ENABLE_TELEPORTER				true
+	#define AC_ENABLE_TELEPORTER				false
 #endif 
 #if !defined AC_ENABLE_VW_INT
 	#define AC_ENABLE_VW_INT					true
@@ -307,7 +307,7 @@ Settings
 	#define AC_HIGH_PING_MARK					300				
 #endif
 #if !defined AC_IGNORE_PAYNSPRAY_VEHICLE_HP
-	#define AC_IGNORE_PAYNSPRAY_VEHICLE_HP	true
+	#define AC_IGNORE_PAYNSPRAY_VEHICLE_HP		false
 #endif
 /* Aim */
 #if !defined AC_AIM_MAX_PACKET_LOSS
@@ -825,10 +825,10 @@ stock FAC_ShowPlayerDialog(playerid, dialogid, style, caption[], info[], button1
 forward t_ac__Teleporter();
 public t_ac__Teleporter()
 {
-	new now = gettime();
 
 	#if AC_ENABLE_TELEPORTER
-		new Float:dist = 0.0;
+		new now = gettime(),
+			Float:dist = 0.0;
 		AC_playerloop(playerid)
 		{
 			if(	now > ac__AirBreak[playerid][e_ac_AirBrkIgnore] &&
@@ -2189,6 +2189,17 @@ stock RemovePlayerWeapon(playerid, weapon)
 	return false;
 }
 
+stock PlayerHasWeaponInSlot(playerid, slot)
+{
+	new data[2];
+	GetPlayerWeaponData(playerid, slot, data[0], data[1]);
+	if(data[0] != 0 && data[1] > 0)
+	{
+		return data[0];
+	}
+	return 0;
+}
+
 stock RemovePlayerWeaponInSlot(playerid, remove)
 {
 	new 	
@@ -2205,7 +2216,7 @@ stock RemovePlayerWeaponInSlot(playerid, remove)
 	return 1;
 }
 
-static stock FAC_GetWeaponSlot(weaponid)
+stock FAC_GetWeaponSlot(weaponid)
 {
 	switch(weaponid) 
     { 
@@ -2947,3 +2958,6 @@ stock FAC_GetTickDiff(newtick, oldtick)
 		#define _INC_y_hooks
 	#endif
 #endif
+
+#pragma unused 	BustAim_g_WeaponRange, FAC_aimInt_DCTTL, FAC_aimInt_GXYIFOP, FAC_aimInt_IsCameraAimingAt,\
+				_FAC_IsPlayerStatePlaying, _FAC_IsPlayerStateVehicle, ac__Aim_LastWeapon

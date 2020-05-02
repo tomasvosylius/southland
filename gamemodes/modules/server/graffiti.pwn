@@ -107,14 +107,14 @@ CMD:givegraffiti(playerid, params[])
 CMD:graffiti(playerid, params[])
 {
 	new 
-		slot = sd_GetWeaponSlot(WEAPON_SPRAYCAN),
+		slot = FAC_GetWeaponSlot(WEAPON_SPRAYCAN),
 		weaponid,
 		ammo;
 
 	if(PlayerInfo[playerid][pGraffitiAllowed] <= 0) return SendWarning(playerid, "Neturite /graffiti leidimo. Já gauti galite ið administratoriaus.");
 	if(player_Started[playerid] || IsValidDynamicObject(player_GraffitiObject[playerid])) return SendWarning(playerid, "Jûs jau esate pradëjæs graffiti.");
 
-	sd_GetPlayerWeaponData(playerid, slot, weaponid, ammo);
+	GetPlayerWeaponData(playerid, slot, weaponid, ammo);
 	if(weaponid != WEAPON_SPRAYCAN || GetPlayerWeapon(playerid) != WEAPON_SPRAYCAN) return SendWarning(playerid, "Rankose turite turëti Spray Can.");
 
 	Dialog_Show(playerid, DialogInputGraffiti, DIALOG_STYLE_INPUT, "Graffiti", "{ffffff}Áveskite tekstà, kurá norite iðpaiðyti\n\nGalimos spalvos:\n{FF8B00}[•] {ffffff}(o) - oranþinë\n{5B3F01}[•] {ffffff}(br) - ruda\n{0000FF}[•] {ffffff}(bl) - mëlyna\n{000000}[•] {ffffff}(b) - juoda\n{008000}[•] {ffffff}(g) - þalia\n{FFFFFF}[•] {ffffff}(w) - balta\n{FFFF00}[•] {ffffff}(y) - geltona\n{FF0000}[•] {ffffff}(r) - raudona\n{800000}[•] {ffffff}(mr) - tamsiai raudona\n\n(n) - nauja eilute", "Pradëti", "Atðaukti");
