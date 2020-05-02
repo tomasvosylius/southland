@@ -28,7 +28,6 @@ native IsValidVehicle(vehicleid);
 //#include <audio>
 #include <FileManager>
 #include <crashdetect>
-#define FOREACH_NO_VEHICLES
 #include <YSI\y_iterate>
 #include <YSI\y_va>
 #include <YSI\y_hooks>
@@ -941,6 +940,7 @@ native gpci(playerid, serial[], len);
 #include "libraries/macros.pwn"
 #include "libraries/als.pwn"
 #include "libraries/dialog.pwn"
+#include "libraries/anticheat.pwn"
 
 // ==============================================================================
 // Projekto pavadinimas ir pns
@@ -1703,7 +1703,6 @@ new Iterator:House<MAX_HOUSES>,
 	Iterator:HFurniture<MAX_HOUSE_FURNITURES>,
 	Iterator:BFurniture<MAX_BUSINESS_FURNITURES>,
 	Iterator:GFurniture<MAX_GARAGE_FURNITURES>,
-	Iterator:Vehicle<MAX_VEHICLES>,
 	Iterator:Salon<MAX_SALONS>,
 	Iterator:SellVehicle<MAX_SALON_MODELS>,
 	Iterator:DroppedItem<MAX_DROPPED_ITEMS>,
@@ -3857,7 +3856,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core/weapons.pwn"
 #include "core/logs.pwn"
 #include "core/airbreak.pwn"
-#include "core/anticheat.pwn"
 #include "core/textdraw.pwn"
 #include "core/vehicle.pwn"
 #include "core/player.pwn"
@@ -4689,7 +4687,7 @@ public MinuteTimer()
 
 		if(IsValidVehicle(RentedVeh[playerid]) && RentedBy[RentedVeh[playerid]] == playerid)
 		{
-			sd_GivePlayerMoney(playerid, -25);
+			GivePlayerMoney(playerid, -25);
 			if(sd_GetPlayerMoney(playerid) < 25)
 			{
 				Rent_Cancel(playerid);
@@ -4722,7 +4720,7 @@ public MinuteTimer()
 		if(PhoneInfo[playerid][phoneCallOwner] > 0 && PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
 		{
 			// nuimam jam saibu
-			sd_GivePlayerMoney(playerid, -1);
+			GivePlayerMoney(playerid, -1);
 			if(sd_GetPlayerMoney(playerid) <= 0)
 			{
 				PlayerPhoneHangup(playerid);
@@ -5445,7 +5443,7 @@ public OnVehicleDeath(vehicleid, killerid)
 			if(IsPlayerConnected(by))
 			{
 				SendFormat(by, 0x80DFABFF, "Jûsø nuomos tr. priemonë buvo susprogdinta. Gavote $500 baudà.");
-				sd_GivePlayerMoney(by, -500);
+				GivePlayerMoney(by, -500);
 				Rent_Cancel(by);
 			}
 		}
@@ -6138,7 +6136,7 @@ public OnPlayerEnterCheckpoint(playerid)
 								SendFormat(playerid, 0x8BD5FFFF, "Sveikiname sëkmingai iðlaikius {48AFEB}pilotavimo{8BD5FF} egzaminà.");
 							}
 						}
-						sd_GivePlayerMoney(playerid, -DEFAULT_DMV_PRICE);
+						GivePlayerMoney(playerid, -DEFAULT_DMV_PRICE);
 						tmpEditing_Component_DMV[playerid] = 0;
 						DisablePlayerCheckpointEx(playerid);
 					}
@@ -6306,7 +6304,7 @@ public OnPlayerEnterCheckpoint(playerid)
 				ResetPlayerJobTask(playerid);
 				PlayerExtra[playerid][peJobDutyCooldown] = 0;
 				MsgSuccess(playerid, "UÞSAKYMAS", "Sëkmingai pristatëte kroviná. Gavote $%d", money);
-				sd_GivePlayerMoney(playerid, money);
+				GivePlayerMoney(playerid, money);
 			}
 			else
 			{
@@ -6373,7 +6371,7 @@ public OnPlayerEnterCheckpoint(playerid)
 					price = CargoList[cargo][cargoPrice]/4;
 				}
 			}
-			sd_GivePlayerMoney(playerid, -price);
+			GivePlayerMoney(playerid, -price);
 			MsgSuccess(playerid, "UÞSAKYMAS", "Sëkmingai pakrovëte kroviná. Sumokëjote $%d", price);
 			PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_UNLOAD_CARGO;
 			PlayerInfo[playerid][pJobVehicle] = vehicleid;
@@ -6632,7 +6630,7 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if(PlayerInfo[playerid][pJobActionIndex] == 0)
 			{
-				sd_GivePlayerMoney(playerid, -tmpDubStart_Price[playerid]);
+				GivePlayerMoney(playerid, -tmpDubStart_Price[playerid]);
 			}
 			PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_PUT_WHEELS_VEHICLE;
 			PlayerInfo[playerid][pJobActionTime] = 30;
@@ -7356,7 +7354,7 @@ public OnPlayerSpawn(playerid)
 			money = sd_GetPlayerMoney(playerid)/100*percents;
 			SendFormat(playerid, 0xF27C45FF, "Pametëte %dproc. ($%d) turëtø grynøjø pinigø.", percents, money);
 		}
-		sd_GivePlayerMoney(playerid, -150 - money);
+		GivePlayerMoney(playerid, -150 - money);
 		SetCameraBehindPlayer(playerid);
 		PlayerInfo[playerid][pCurrentStatus] = 0;
 		for(new td = 0; td < 4; td++) TextDrawHideForPlayer(playerid, DrugEffect[td]);
@@ -10303,7 +10301,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					new vehicleid = tmpIter[playerid];
 					new money = floatround(VehicleInfo[vehicleid][vPrice]/2.5);
-					if(money > 0) sd_GivePlayerMoney(playerid, money);
+					if(money > 0) GivePlayerMoney(playerid, money);
 					new string[356];
 					mysql_format(chandler, string, sizeof string, "DELETE FROM `vehicles_data` WHERE id = '%d'; DELETE IGNORE FROM `vehicles_inventory` WHERE VehicleId = '%d'; DELETE IGNORE FROM `vehicles_dubkeys` WHERE VehicleId = '%d'", VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vId]);
 					mysql_fquery(chandler, string, "VehicleDeletedEx");
@@ -10577,7 +10575,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				factionid;
 			if(response)
 			{
-				sd_GivePlayerMoney(playerid, -amount);
+				GivePlayerMoney(playerid, -amount);
 			}
 			else
 			{
@@ -10605,7 +10603,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if(response)
 			{
-				sd_GivePlayerMoney(playerid, -PlayerExtra[playerid][peFilling]);
+				GivePlayerMoney(playerid, -PlayerExtra[playerid][peFilling]);
 			}
 			else
 			{
@@ -10630,7 +10628,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				sd_GivePlayerWeapon(playerid, weaponid, AvailableWeaponsShop[listitem][1], WEAPON_GIVE_TYPE_NORMAL, -1); // nauja ID duodam
 				SendFormat(playerid, 0xD0ED88FF, "Nusipirkote ginklà {C8F25E}%s{D0ED88}", GetInventoryItemName(weaponid));
 				BusinessInfo[businessid][bBudget] += AvailableWeaponsShop[listitem][2];
-				sd_GivePlayerMoney(playerid, -AvailableWeaponsShop[listitem][2]);
+				GivePlayerMoney(playerid, -AvailableWeaponsShop[listitem][2]);
 				log_init(true);
 				log_set_table("logs_business");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`,`ExtraId`,`ExtraString`");
@@ -10651,7 +10649,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(sd_GetPlayerMoney(playerid) < ClothesList[selected][clothesListPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, ClothesList[selected][clothesListPrice]);
 					ClothesInventory[playerid][slot] = ClothesList[selected][clothesListModel];
 					BusinessInfo[businessid][bBudget] += ClothesList[selected][clothesListPrice];
-					sd_GivePlayerMoney(playerid, -ClothesList[selected][clothesListPrice]);
+					GivePlayerMoney(playerid, -ClothesList[selected][clothesListPrice]);
 					MsgSuccess(playerid, "DRABUÞIAI", "Daiktas sëkmingai nupirktas");
 					log_init(true);
 					log_set_table("logs_clothes");
@@ -10694,7 +10692,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								}
 								GivePlayerInventoryItem(playerid, bw_id, amount, 0, slot);
 								SendFormat(playerid, 0xD0ED88FF, "> Nusipirkote daiktà {C8F25E}%s{D0ED88}", GetInventoryItemName(bw_id));
-								sd_GivePlayerMoney(playerid, -BusinessWares[businessid][i][bWarePrice]);
+								GivePlayerMoney(playerid, -BusinessWares[businessid][i][bWarePrice]);
 								BusinessInfo[businessid][bBudget] += BusinessWares[businessid][i][bWarePrice];
 								rp_me(playerid, _, "padeda daiktus ant prekystalio.");
 								return 1;
@@ -10871,7 +10869,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// clothes
 						if(HouseInfo[tmpIter[playerid]][hUpdateClothes] > 0) return MsgError(playerid, "NAMAS", "Ðá atnaujinimà jau esate ásirengæ."), pc_cmd_hmenu(playerid, "");
 						if(sd_GetPlayerMoney(playerid) < HOUSE_UPDATE_CLOTHES_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HOUSE_UPDATE_CLOTHES_PRICE), pc_cmd_hmenu(playerid, "");
-						sd_GivePlayerMoney(playerid, -HOUSE_UPDATE_CLOTHES_PRICE);
+						GivePlayerMoney(playerid, -HOUSE_UPDATE_CLOTHES_PRICE);
 						HouseInfo[tmpIter[playerid]][hUpdateClothes] = 1;
 						SaveHouseIntEx(tmpIter[playerid], "UpdateClothes", 1);
 						MsgSuccess(playerid, "NAMAS", "Sëkmingai árengëte atnaujinimà.");
@@ -10887,7 +10885,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// seifas
 						if(HouseInfo[tmpIter[playerid]][hUpdateSafe] > 0) return MsgError(playerid, "NAMAS", "Ðá atnaujinimà jau esate ásirengæ."), pc_cmd_hmenu(playerid, "");
 						if(sd_GetPlayerMoney(playerid) < HOUSE_UPDATE_SAFE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HOUSE_UPDATE_SAFE_PRICE), pc_cmd_hmenu(playerid, "");
-						sd_GivePlayerMoney(playerid, -HOUSE_UPDATE_SAFE_PRICE);
+						GivePlayerMoney(playerid, -HOUSE_UPDATE_SAFE_PRICE);
 						HouseInfo[tmpIter[playerid]][hUpdateSafe] = 1;
 						SaveHouseIntEx(tmpIter[playerid], "UpdateSafe", 1);
 						MsgSuccess(playerid, "NAMAS", "Sëkmingai árengëte atnaujinimà.");
@@ -10903,7 +10901,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// eat
 						if(HouseInfo[tmpIter[playerid]][hUpdateEat] > 0) return MsgError(playerid, "NAMAS", "Ðá atnaujinimà jau esate ásirengæ."), pc_cmd_hmenu(playerid, "");
 						if(sd_GetPlayerMoney(playerid) < HOUSE_UPDATE_EAT_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HOUSE_UPDATE_EAT_PRICE), pc_cmd_hmenu(playerid, "");
-						sd_GivePlayerMoney(playerid, -HOUSE_UPDATE_EAT_PRICE);
+						GivePlayerMoney(playerid, -HOUSE_UPDATE_EAT_PRICE);
 						HouseInfo[tmpIter[playerid]][hUpdateEat] = 1;
 						SaveHouseIntEx(tmpIter[playerid], "UpdateEat", 1);
 						MsgSuccess(playerid, "NAMAS", "Sëkmingai árengëte atnaujinimà.");
@@ -10952,7 +10950,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(sscanf(inputtext,"d",amount) || amount < 0) return OnDialogResponse(playerid, DIALOG_HM_SAFE_MAIN, 1, 1, "");
 				if(amount > HouseInfo[tmpIter[playerid]][hSafe]) return SendError(playerid, "Tiek pinigø banko seife nëra."), OnDialogResponse(playerid, DIALOG_HM_SAFE_MAIN, 1, 1, "");
 				HouseInfo[tmpIter[playerid]][hSafe] -= amount;
-				sd_GivePlayerMoney(playerid, amount);
+				GivePlayerMoney(playerid, amount);
 				pc_cmd_hmenu(playerid, "");
 				MsgSuccess(playerid, "NAMAS", "Paëmëte $%d ið seifo.", amount);
 				SaveHouseIntEx(tmpIter[playerid], "Safe", HouseInfo[tmpIter[playerid]][hSafe]);
@@ -10971,7 +10969,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new amount;
 				if(sscanf(inputtext,"d",amount) || amount < 0) return OnDialogResponse(playerid, DIALOG_HM_SAFE_MAIN, 1, 2, "");
 				if(amount > sd_GetPlayerMoney(playerid)) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount), OnDialogResponse(playerid, DIALOG_HM_SAFE_MAIN, 1, 2, "");
-				sd_GivePlayerMoney(playerid, -amount);
+				GivePlayerMoney(playerid, -amount);
 				HouseInfo[tmpIter[playerid]][hSafe] += amount;
 				pc_cmd_hmenu(playerid, "");
 				MsgSuccess(playerid, "NAMAS", "Padëjote $%d á seifà.", amount);
@@ -11470,7 +11468,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SendWarning(playerid, "Biudþete tiek pinigø nëra.");
 					return pc_cmd_bmenu(playerid, "");
 				}
-				sd_GivePlayerMoney(playerid, amount);
+				GivePlayerMoney(playerid, amount);
 				BusinessInfo[businessid][bBudget] -= amount;
 				SaveBusinessIntEx(businessid, "Budget", BusinessInfo[businessid][bBudget]);
 				SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
@@ -11496,7 +11494,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
 					return pc_cmd_bmenu(playerid, "");
 				}
-				sd_GivePlayerMoney(playerid, -amount);
+				GivePlayerMoney(playerid, -amount);
 				BusinessInfo[businessid][bBudget] += amount;
 				SaveBusinessIntEx(businessid, "Budget", BusinessInfo[businessid][bBudget]);
 				SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
@@ -12051,7 +12049,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(0 < amount <= sd_GetPlayerMoney(playerid))
 				{
 					PlayerInfo[playerid][pBank] += amount;
-					sd_GivePlayerMoney(playerid, -amount);
+					GivePlayerMoney(playerid, -amount);
 					MsgSuccess(playerid, "BANKAS", "Padëjote $%d á sàskaità.", amount);
 					new string[126];
 					mysql_format(chandler, string, sizeof string, "INSERT INTO `players_bank_history` (`PlayerId`,`String`,`Amount`) VALUES ('%d','pinigø padëjimas banke','%d')", PlayerInfo[playerid][pId], amount);
@@ -12074,7 +12072,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(0 < amount <= PlayerInfo[playerid][pBank])
 				{
 					PlayerInfo[playerid][pBank] -= amount;
-					sd_GivePlayerMoney(playerid, amount);
+					GivePlayerMoney(playerid, amount);
 					MsgSuccess(playerid, "BANKAS", "Nusiëmëte $%d ið sàskaitos.", amount);
 					new string[126];
 					mysql_format(chandler, string, sizeof string, "INSERT INTO `players_bank_history` (`PlayerId`,`String`,`Amount`) VALUES ('%d','pinigø nuëmimas banke','%d')", PlayerInfo[playerid][pId], amount);
@@ -12142,7 +12140,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								MsgSuccess(playerid, "BANKAS", "Ásigijote banko kortelæ. Jûsø sàskaitos numeris: "#DEFAULT_IBAN_PREFIX"%d", GetPlayerIBAN(PlayerInfo[playerid][pId]));
 								PlayerInfo[playerid][pBankCard] = 1;
 								SaveAccountIntEx(playerid, "BankCard", 1);
-								sd_GivePlayerMoney(playerid, -DEFAULT_BANK_CARD_PRICE);
+								GivePlayerMoney(playerid, -DEFAULT_BANK_CARD_PRICE);
 								ShowPlayerBank(playerid);
 							}
 						}
@@ -12317,7 +12315,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(0 < amount <= sd_GetPlayerMoney(playerid))
 				{
 					PlayerInfo[playerid][pBank] += amount;
-					sd_GivePlayerMoney(playerid, -amount);
+					GivePlayerMoney(playerid, -amount);
 					MsgSuccess(playerid, "BANKOMATAS", "Padëjote $%d á sàskaità.", amount);
 					log_init(true);
 					log_set_table("logs_money");
@@ -12338,7 +12336,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(0 < amount <= PlayerInfo[playerid][pBank])
 				{
 					PlayerInfo[playerid][pBank] -= amount;
-					sd_GivePlayerMoney(playerid, amount);
+					GivePlayerMoney(playerid, amount);
 					MsgSuccess(playerid, "BANKOMATAS", "Nusiëmëte $%d ið sàskaitos.", amount);
 					log_init(true);
 					log_set_table("logs_money");
@@ -13442,7 +13440,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					else
 					{
 						BuyVehicle(playerid, model, GetModelName(model), price, random(56), random(56), 0, -1, 0, 1, DEFAULT_ANY_SALON_X, DEFAULT_ANY_SALON_Y, DEFAULT_ANY_SALON_Z, DEFAULT_ANY_SALON_A);
-						sd_GivePlayerMoney(playerid, -price);
+						GivePlayerMoney(playerid, -price);
 					}
 				}
 				if(cache_is_valid(result)) cache_delete(result);
@@ -13732,7 +13730,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							if(final_weapon_list[0] <= 0) return SendWarning(playerid, "Nepasirinkote ginklø.");
 							SendFormat(playerid, 0xBABABAFF, "Jûsø uþsakymas kainavo $%d, atðaukus uþsakymà pinigø neatgausite.", final_price);
-							sd_GivePlayerMoney(playerid, -final_price);
+							GivePlayerMoney(playerid, -final_price);
 							format(string, 2, "");
 							for(new i = 0; i < MAX_WEAPONS_PER_ORDER; i++)
 							{
@@ -13786,7 +13784,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							if(!anyweapons) return SendWarning(playerid, "Nepasirinkote ginklø.");
 							SendFormat(playerid, 0xBABABAFF, "Jûsø uþsakymas kainavo $%d, atðaukus uþsakymà pinigø neatgausite.", total_price);
-							sd_GivePlayerMoney(playerid, -total_price);
+							GivePlayerMoney(playerid, -total_price);
 
 							format(string, 2, "");
 							for(new i = 0; i < MAX_WEAPONS_PER_ORDER; i++)
@@ -13869,7 +13867,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							if(!anydrugs) return SendWarning(playerid, "Nepasirinkote narkotikø.");
 							SendFormat(playerid, 0xBABABAFF, "Jûsø uþsakymas kainavo $%d, atðaukus uþsakymà pinigø neatgausite.", total_price);
-							sd_GivePlayerMoney(playerid, -total_price);
+							GivePlayerMoney(playerid, -total_price);
 							format(string, 2, "");
 							for(new i = 0; i < MAX_DRUGS_PER_ORDER; i++)
 							{
@@ -13997,7 +13995,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							string[126];
 						mysql_format(chandler, string, sizeof string, "UPDATE `dealers_houses_data` SET Owner = '0' WHERE id = '%d'", DealerHouseInfo[selected][dealerHouseId]);
 						mysql_fquery(chandler, string, "DealerSaved");
-						sd_GivePlayerMoney(playerid, DealerHouseInfo[selected][dealerHousePrice]/2);
+						GivePlayerMoney(playerid, DealerHouseInfo[selected][dealerHousePrice]/2);
 						SendFormat(playerid, 0x79DF75FF, "Sëkmingai pardavëte namà.");
 						log_init(true);
 						log_set_table("logs_dealer_houses");
@@ -20797,7 +20795,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(sscanf(inputtext,"d",amount)) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "");
 				if(sd_GetPlayerMoney(playerid) < amount || amount < 0) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "") , InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
 				FactionInfo[factionid][fBudget] += amount;
-				sd_GivePlayerMoney(playerid, -amount);
+				GivePlayerMoney(playerid, -amount);
 				MsgSuccess(playerid, "FRAKCIJA", "Padëjote $%d á frakcijos biudþetà.", amount);
 				OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "");
 				SaveFactionIntEx(factionid, "Budget", FactionInfo[factionid][fBudget]);
@@ -20817,7 +20815,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(sscanf(inputtext,"d",amount)) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 2, "");
 				if(FactionInfo[factionid][fBudget] < amount || amount < 0) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 2, "") , InfoBox(playerid, "NEPAKANKAMAI", "PINIGU BIUDZETE");
 				FactionInfo[factionid][fBudget] -= amount;
-				sd_GivePlayerMoney(playerid, amount);
+				GivePlayerMoney(playerid, amount);
 				MsgSuccess(playerid, "FRAKCIJA", "Paëmete $%d ið frakcijos biudþeto.", amount);
 				OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 2, "");
 				SaveFactionIntEx(factionid, "Budget", FactionInfo[factionid][fBudget]);
@@ -20851,7 +20849,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new Float:x, Float:y, Float:z;
 				GetPosFrontVehicle(PlayerInfo[playerid][pJobVehicle], x, y, z, 1.5);
 				SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_REPAINT_VEHICLE, x, y, z, 2.3);
-				sd_GivePlayerMoney(playerid, -DEFAULT_REPAINT_PRICE);
+				GivePlayerMoney(playerid, -DEFAULT_REPAINT_PRICE);
 				PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_REPAINT_VEHICLE;
 				PlayerInfo[playerid][pJobActionTime] = 60;
 				PlayerInfo[playerid][pJobActionIndex] = 0;
@@ -21455,7 +21453,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						else
 						{
 							//BuyFurniture(playerid, tmpType_Salon[playerid], ownerid, FurnitureList[tmpSelected[playerid]][furnitureListPrice], FurnitureList[tmpSelected[playerid]][furnitureListModel], FurnitureList[tmpSelected[playerid]][furnitureListName], FurnitureListNames[FurnitureList[tmpSelected[playerid]][furnitureListCategory]], PlayerInfo[playerid][pPosX]+2.0, PlayerInfo[playerid][pPosY]+2.0, PlayerInfo[playerid][pPosZ]+1.0, 0.0, 0.0, 0.0);
-							sd_GivePlayerMoney(playerid, -price);
+							GivePlayerMoney(playerid, -price);
 							BuyFurniture(playerid, tmpType_Salon[playerid], owner, price, model, name, "Duplikuoti", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
 						}
 					}
@@ -21471,7 +21469,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							case 1:
 							{
 								price = hFurnitureInfo[tmpSelected[playerid]][hfPrice]/2;
-								sd_GivePlayerMoney(playerid, price);
+								GivePlayerMoney(playerid, price);
 								format(name, sizeof name, hFurnitureInfo[tmpSelected[playerid]][hfName]);
 								Iter_Remove(HFurniture, tmpSelected[playerid]);
 								mysql_format(chandler, string, sizeof string, "DELETE FROM `houses_furniture` WHERE id = '%d'", hFurnitureInfo[tmpSelected[playerid]][hfId]);
@@ -21484,7 +21482,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							{
 								price = bFurnitureInfo[tmpSelected[playerid]][bfPrice]/2;
 								new businessid = FindBusinessBySql(bFurnitureInfo[tmpSelected[playerid]][bfOwner]);
-								sd_GivePlayerMoney(playerid, price);
+								GivePlayerMoney(playerid, price);
 								format(name, sizeof name, bFurnitureInfo[tmpSelected[playerid]][bfName]);
 								Iter_Remove(BFurniture, tmpSelected[playerid]);
 								mysql_format(chandler, string, sizeof string, "DELETE FROM `business_furniture` WHERE id = '%d'", bFurnitureInfo[tmpSelected[playerid]][bfId]);
@@ -21496,7 +21494,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							case 3:
 							{
 								price = gFurnitureInfo[tmpSelected[playerid]][gfPrice]/2;
-								sd_GivePlayerMoney(playerid, price);
+								GivePlayerMoney(playerid, price);
 								format(name, sizeof name, gFurnitureInfo[tmpSelected[playerid]][gfName]);
 								Iter_Remove(GFurniture, tmpSelected[playerid]);
 								mysql_format(chandler, string, sizeof string, "DELETE FROM `garages_furniture` WHERE id = '%d'", gFurnitureInfo[tmpSelected[playerid]][gfId]);
@@ -24132,7 +24130,7 @@ stock PlayerPhoneSMS(playerid, receiver_number, text[])
 			mysql_format(chandler, string, sizeof string, "INSERT INTO `san_news_sms` (`PlayerNumber`,`Text`) VALUES ('%d','%e')", PlayerInfo[playerid][pPhoneNumber], text);
 			mysql_tquery(chandler, string, "SanNewsSMSAdd");
 
-			sd_GivePlayerMoney(playerid, -5);
+			GivePlayerMoney(playerid, -5);
 
 			new factionid = GetFactionArrayIndexByType(FACTION_TYPE_SAN_NEWS);
 			if(factionid != -1)
@@ -24162,7 +24160,7 @@ stock PlayerPhoneSMS(playerid, receiver_number, text[])
 			mysql_format(chandler, string, sizeof string, "INSERT INTO `players_sms` (`SenderNumber`,`ReceiverNumber`,`Text`,`Notification`) VALUES ('%d','%d','%e','%d')", sender_number, receiver_number, text, PhoneInfo[receiver][phoneDisabled] > 0 ? (1) : (0));
 			mysql_fquery(chandler, string, "SMSAdded");
 
-			sd_GivePlayerMoney(playerid, -1);
+			GivePlayerMoney(playerid, -1);
 		}
 	}
 	else
@@ -29663,7 +29661,7 @@ public AccountLoad(playerid)
 		}
 		new tmpint;
 		cache_get_value_name_int(0, "Money", tmpint);
-		sd_GivePlayerMoney(playerid, tmpint);
+		GivePlayerMoney(playerid, tmpint);
 		cache_get_value_name_int(0, "Skin", PlayerInfo[playerid][pSkin]);
 		//if(!(0 <= PlayerInfo[playerid][pSkin] <= 311)) PlayerInfo[playerid][pSkin] = 1;
 		cache_get_value_name_int(0, "Interior", PlayerInfo[playerid][pInterior]);
@@ -30756,7 +30754,6 @@ public GetUniqueNumbersLeft()
 
 stock sd_Prepare()
 {
-	//Iter_Add(Vehicle, 0);
 	DisableInteriorEnterExits();
 	EnableStuntBonusForAll(0);
 	ShowPlayerMarkers(0);
@@ -31596,11 +31593,11 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				{
 					new engine, lights, alarm, doors, bonnet, boot, objective;
 					GetVehicleParamsEx(jobvehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
-					sd_RepairVehicle(jobvehicleid);
+					RepairVehicle(jobvehicleid);
 					SetVehicleParamsEx(jobvehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
 					SendFormat(playerid, 0x9BC154FF, "Sëkmingai sutvarkëte tr. priemonæ.");
 					ResetPlayerJobTask(playerid, true);
-					sd_GivePlayerMoney(playerid, -DEFAULT_REPAIR_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_REPAIR_PRICE);
 					rp_me(playerid, _, "sutaiso transporto priemonæ.");
 				}
 				else
@@ -31670,7 +31667,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				SendFormat(playerid, 0x9BC154FF, "Sëkmingai sutvarkëte tr. priemonës variklá.");
 				ResetPlayerJobTask(playerid, true);
 
-				sd_GivePlayerMoney(playerid, -floatround((100-VehicleInfo[jobvehicleid][vEngineStatus]))*MECHANICS_REPAIR_ENGINE_PRICE);
+				GivePlayerMoney(playerid, -floatround((100-VehicleInfo[jobvehicleid][vEngineStatus]))*MECHANICS_REPAIR_ENGINE_PRICE);
 				rp_me(playerid, _, "pabaigia taisyti transporto priemonës variklá.");
 
 				VehicleInfo[jobvehicleid][vEngineStatus] = 100.0;
@@ -31697,7 +31694,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 				SendFormat(playerid, 0x9BC154FF, "Sëkmingai sutvarkëte tr. priemonës akumuliatoriø.");
 				ResetPlayerJobTask(playerid, true);
-				sd_GivePlayerMoney(playerid, -floatround((100-VehicleInfo[jobvehicleid][vEngineStatus]))*MECHANICS_REPAIR_BATTERY_PRICE);
+				GivePlayerMoney(playerid, -floatround((100-VehicleInfo[jobvehicleid][vEngineStatus]))*MECHANICS_REPAIR_BATTERY_PRICE);
 				rp_me(playerid, _, "pabaigia taisyti transporto priemonës akumuliatoriø.");
 
 				VehicleInfo[jobvehicleid][vBatteryStatus] = 100.0;
@@ -31725,7 +31722,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				SendFormat(playerid, 0x9BC154FF, "Sëkmingai pakeitëte tr. priemonës variklá.");
 				ResetPlayerJobTask(playerid, true);
 
-				sd_GivePlayerMoney(playerid, -MECHANICS_CHANGE_ENGINE_PRICE);
+				GivePlayerMoney(playerid, -MECHANICS_CHANGE_ENGINE_PRICE);
 				rp_me(playerid, _, "pabaigia keisti transporto priemonës variklá.");
 
 				VehicleInfo[jobvehicleid][vEngineStatus] = 100.0;
@@ -31752,7 +31749,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 				SendFormat(playerid, 0x9BC154FF, "Sëkmingai pakeitëte tr. priemonës akumuliatoriø.");
 				ResetPlayerJobTask(playerid, true);
-				sd_GivePlayerMoney(playerid, -MECHANICS_CHANGE_BATTERY_PRICE);
+				GivePlayerMoney(playerid, -MECHANICS_CHANGE_BATTERY_PRICE);
 				rp_me(playerid, _, "pabaigia keisti transporto priemonës akumuliatoriø.");
 
 				VehicleInfo[jobvehicleid][vBatteryStatus] = 100.0;
@@ -32263,7 +32260,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 					case 3: ownerid = GarageInfo[tmpIter[playerid]][gId];
 				}
 				BuyFurniture(playerid, tmpType_Salon[playerid], ownerid, FurnitureList[tmpSelected[playerid]][furnitureListPrice], FurnitureList[tmpSelected[playerid]][furnitureListModel], FurnitureList[tmpSelected[playerid]][furnitureListName], FurnitureListNames[FurnitureList[tmpSelected[playerid]][furnitureListCategory]], PlayerInfo[playerid][pPosX]+2.0, PlayerInfo[playerid][pPosY]+2.0, PlayerInfo[playerid][pPosZ]+1.0, 0.0, 0.0, 0.0);
-				sd_GivePlayerMoney(playerid, -FurnitureList[tmpSelected[playerid]][furnitureListPrice]);
+				GivePlayerMoney(playerid, -FurnitureList[tmpSelected[playerid]][furnitureListPrice]);
 			}
 			return 1;
 		}
@@ -32572,7 +32569,7 @@ public OnPlayerClickPTextDraw(playerid, PlayerText:playertextid)
 			new model = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehicleModel];
 			if(PlayerInfo[playerid][pHaveCars] >= MAX_OWNED_VEHICLES) return SendWarning(playerid, "Jau turite "#MAX_OWNED_VEHICLES" tr. priemoniø.");
 			BuyVehicle(playerid, model, GetModelName(model), price, VehicleShopColors[random(sizeof VehicleShopColors)], VehicleShopColors[random(sizeof VehicleShopColors)], 0, tmpType_Salon[playerid], donator_requirement);
-			sd_GivePlayerMoney(playerid, -price);
+			GivePlayerMoney(playerid, -price);
 		}
 		return 1;
 	}
@@ -33194,6 +33191,18 @@ public php_kick(string[])
 
 COMMANDS
 */
+
+CMD:charity(playerid, params[])
+{
+	new amount;
+	if(sscanf(params,"d",amount) || amount < 0) return SendUsage(playerid, "/charity [kiekis]");
+	if(sd_GetPlayerMoney(playerid) < amount) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
+
+	GivePlayerMoney(playerid, -amount);
+	SendFormat(playerid, 0xb0df67ff, "Paaukojote $%d", amount);
+	return 1;
+}
+
 
 CMD:vradio(playerid, params[])
 {
@@ -34417,7 +34426,7 @@ public OnDonationLoad(playerid, userid)
 				}
 				else
 				{
-					sd_GivePlayerMoney(playerid, 50000);
+					GivePlayerMoney(playerid, 50000);
 					format(service, sizeof service, "50'000$");
 				}
 			}
@@ -34429,7 +34438,7 @@ public OnDonationLoad(playerid, userid)
 				}
 				else
 				{
-					sd_GivePlayerMoney(playerid, 100000);
+					GivePlayerMoney(playerid, 100000);
 					format(service, sizeof service, "100'000$");
 				}
 			}
@@ -34441,7 +34450,7 @@ public OnDonationLoad(playerid, userid)
 				}
 				else
 				{
-					sd_GivePlayerMoney(playerid, 200000);
+					GivePlayerMoney(playerid, 200000);
 					format(service, sizeof service, "200'000$");
 				}
 			}
@@ -34453,7 +34462,7 @@ public OnDonationLoad(playerid, userid)
 				}
 				else
 				{
-					sd_GivePlayerMoney(playerid, 500000);
+					GivePlayerMoney(playerid, 500000);
 					format(service, sizeof service, "500'000$");
 				}
 			}
@@ -35091,7 +35100,7 @@ CMD:givemoney(playerid, params[])
 	new receiverid, amount;
 	if(sscanf(params, "ud", receiverid, amount)) return SendUsage(playerid, "/givemoney [þaidëjas] [kiekis]");
 	if(!CheckPlayerid(receiverid)) return InfoBox(playerid, IB_WRONG_PLAYER);
-	sd_GivePlayerMoney(receiverid, amount);
+	GivePlayerMoney(receiverid, amount);
 	new string[256];
 	format(string, sizeof string, "[AdmCmd] Administratorius %s davë pinigø þaidëjui %s (%d)", GetPlayerNameEx(playerid), GetPlayerNameEx(receiverid), amount);
 	SendAdminMessage(0xFF6347AA, false, string);
@@ -35847,7 +35856,7 @@ CMD:aheal(playerid, params[])
 	new vehicle;
 	if((vehicle = GetPlayerVehicleID(receiverid)) != INVALID_VEHICLE_ID)
 	{
-		sd_RepairVehicle(vehicle);
+		RepairVehicle(vehicle);
 		sd_SetVehicleHealth(vehicle, 1000.0);
 	}
 	log_init(true);
@@ -36587,7 +36596,7 @@ CMD:payticket(playerid, params[])
 		if(VehicleInfo[vehicleid][vTicket] > 0)
 		{
 			if(sd_GetPlayerMoney(playerid) < VehicleInfo[vehicleid][vTicket]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, VehicleInfo[vehicleid][vTicket]);
-			sd_GivePlayerMoney(playerid, -VehicleInfo[vehicleid][vTicket]);
+			GivePlayerMoney(playerid, -VehicleInfo[vehicleid][vTicket]);
 			MsgSuccess(playerid, "BAUDA", "Sëkmingai susimokëjote uþ baudà.");
 			foreach(new factionid : Faction)
 			{
@@ -37392,7 +37401,7 @@ CMD:arrest(playerid, params[])
 	if(!CheckPlayerid(receiverid) || receiverid == playerid) return InfoBox(playerid, IB_WRONG_PLAYER);
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 5.0)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
 	if(!IsPlayerInRangeOfPoint(playerid, 25.0, GetGVarFloat("ArrestX", SERVER_VARS_ID), GetGVarFloat("ArrestY", SERVER_VARS_ID), GetGVarFloat("ArrestZ", SERVER_VARS_ID))) return SendWarning(playerid, "Nesate kalëjime.");
-	sd_GivePlayerMoney(receiverid, -price);
+	GivePlayerMoney(receiverid, -price);
 	JailPlayer(receiverid, GetPlayerNameEx(playerid, true, true), "", time, .type = 1);
 	SendFormatToAll(0x6BBFFFFF, "Policininkas %s uþdarë %s á areðtinæ %d minutëm.", GetPlayerNameEx(playerid, true, true), GetPlayerNameEx(receiverid, true, true), time);
 	SendFormat(receiverid, 0x6BBFFFFF, "Jûs buvote pasodintas á kalëjimà. Laikas: %dmin, bauda: $%d", time, price);
@@ -37425,7 +37434,7 @@ CMD:prison(playerid, params[])
 	if(!CheckPlayerid(receiverid) || receiverid == playerid) return InfoBox(playerid, IB_WRONG_PLAYER);
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 5.0)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
 	if(!IsPlayerInRangeOfPoint(playerid, 25.0, GetGVarFloat("JailX", SERVER_VARS_ID), GetGVarFloat("JailY", SERVER_VARS_ID), GetGVarFloat("JailZ", SERVER_VARS_ID))) return SendWarning(playerid, "Nesate kalëjime.");
-	sd_GivePlayerMoney(receiverid, -price);
+	GivePlayerMoney(receiverid, -price);
 	JailPlayer(receiverid, GetPlayerNameEx(playerid, true, true), "", time, .type = 2);
 	SendFormatToAll(0x6BBFFFFF, "Policininkas %s pasodino %s á kalëjimà %d minutëm.", GetPlayerNameEx(playerid, true, true), GetPlayerNameEx(receiverid, true, true), time);
 	SendFormat(receiverid, 0x6BBFFFFF, "Jûs buvote pasodintas á kalëjimà. Laikas: %dmin, bauda: $%d", time, price);
@@ -37900,7 +37909,7 @@ CMD:sellfishes(playerid, params[])
 		new 
 			money = randomEx(2,4) * PlayerInfo[playerid][pFishes];
 
-		sd_GivePlayerMoney(playerid, money);
+		GivePlayerMoney(playerid, money);
 		PlayerInfo[playerid][pFishedLimit] += money;
 		PlayerInfo[playerid][pFishes] = 0;
 
@@ -38806,8 +38815,8 @@ CMD:pay(playerid, params[])
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 5.0) || IsPlayerSpectatedBy(playerid, receiverid)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
 	if(PlayerInfo[playerid][pHoursPlayed] < 2 || PlayerInfo[receiverid][pHoursPlayed] < 2) return SendWarning(playerid, "Jûs arba þaidëjas nesate praþaidæs 2.");
 	if(sd_GetPlayerMoney(playerid) < amount) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
-	sd_GivePlayerMoney(receiverid, amount);
-	sd_GivePlayerMoney(playerid, -amount);
+	GivePlayerMoney(receiverid, amount);
+	GivePlayerMoney(playerid, -amount);
 	SendFormat(playerid, 0x1EC600FF, "Padavëte %s $%d", GetPlayerNameEx(receiverid, true), amount);
 	SendFormat(receiverid, 0x1EC600FF, "Gavote $%d ið %s", amount, GetPlayerNameEx(playerid, true));
 	SaveAccountIntEx(receiverid, "Money", sd_GetPlayerMoney(receiverid));
@@ -39367,7 +39376,7 @@ CMD:enter(playerid, params[])
 				}		
 				if(BusinessInfo[businessid][bEnterPrice] > 0 && PlayerNoEnterPriceBusiness[playerid][businessid] <= 0)
 				{
-					sd_GivePlayerMoney(playerid, -BusinessInfo[businessid][bEnterPrice]);
+					GivePlayerMoney(playerid, -BusinessInfo[businessid][bEnterPrice]);
 					BusinessInfo[businessid][bBudget] += BusinessInfo[businessid][bEnterPrice];
 					PlayerNoEnterPriceBusiness[playerid][businessid] = 10;
 					SendFormat(playerid, 0xFFD688FF, "Sumokëjote áëjimo mokestá $%d. 10 minuèiø á verslà galësite áeiti nemokamai.", BusinessInfo[businessid][bEnterPrice]);
@@ -40553,7 +40562,7 @@ CMD:buydealerhouse(playerid, params[])
 					mysql_format(chandler, string, sizeof string, "UPDATE `dealers_houses_data` SET Owner = '%d' WHERE id = '%d'", PlayerInfo[playerid][pId], DealerHouseInfo[houseid][dealerHouseId]);
 					mysql_fquery(chandler, string, "DealerHouseSaved");
 					DealerHouseInfo[houseid][dealerHouseOwner] = PlayerInfo[playerid][pId];
-					sd_GivePlayerMoney(playerid, -DealerHouseInfo[houseid][dealerHousePrice]);
+					GivePlayerMoney(playerid, -DealerHouseInfo[houseid][dealerHousePrice]);
 					MsgSuccess(playerid, "KONSPIRACINIAI NAMAI", "Sëkmingai nusipirkote konspiraciná namà uþ $%d", DealerHouseInfo[houseid][dealerHousePrice]);
 					log_init(true);
 					log_set_table("logs_dealer_houses");
@@ -40663,7 +40672,7 @@ CMD:buyhouse(playerid, params[])
 		if(HouseInfo[houseid][hOwner] > 0 && HouseInfo[houseid][hSale] > 0)
 		{
 			if(sd_GetPlayerMoney(playerid) < HouseInfo[houseid][hSale]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HouseInfo[houseid][hSale]);
-			sd_GivePlayerMoney(playerid, -HouseInfo[houseid][hSale]);
+			GivePlayerMoney(playerid, -HouseInfo[houseid][hSale]);
 			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
 			// pardavineja savininkas
 			new oldowner = INVALID_PLAYER_ID;
@@ -40671,7 +40680,7 @@ CMD:buyhouse(playerid, params[])
 			{
 				SendFormat(oldowner, 0xFFCD6EFF, "------------------------------------------------------------------------");
 				SendFormat(oldowner, 0xFFCD6EFF, "%s nupirko Jûsø namà uþ $%d", GetPlayerNameEx(playerid, .roleplay = true, .ignoremask = true), HouseInfo[houseid][hSale]);
-				sd_GivePlayerMoney(oldowner, HouseInfo[houseid][hSale]);
+				GivePlayerMoney(oldowner, HouseInfo[houseid][hSale]);
 				SaveAccountIntEx(oldowner, "Money", sd_GetPlayerMoney(oldowner));
 			}
 			else
@@ -40690,7 +40699,7 @@ CMD:buyhouse(playerid, params[])
 		else if(HouseInfo[houseid][hOwner] <= 0)
 		{
 			if(sd_GetPlayerMoney(playerid) < HouseInfo[houseid][hPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HouseInfo[houseid][hPrice]);
-			sd_GivePlayerMoney(playerid, -HouseInfo[houseid][hPrice]);
+			GivePlayerMoney(playerid, -HouseInfo[houseid][hPrice]);
 			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
 			MsgSuccess(playerid, "NAMAS", "Sëkmingai nusipirkote namà uþ $%d", HouseInfo[houseid][hPrice]);
 			log_set_table("logs_houses");
@@ -40731,7 +40740,7 @@ CMD:buybusiness(playerid, params[])
 		if(BusinessInfo[businessid][bOwner] > 0 && BusinessInfo[businessid][bSale] > 0)
 		{
 			if(sd_GetPlayerMoney(playerid) < BusinessInfo[businessid][bSale]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, BusinessInfo[businessid][bSale]);
-			sd_GivePlayerMoney(playerid, -BusinessInfo[businessid][bSale]);
+			GivePlayerMoney(playerid, -BusinessInfo[businessid][bSale]);
 			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
 			// pardavineja senas savininkas
 			new oldowner = INVALID_PLAYER_ID;
@@ -40739,7 +40748,7 @@ CMD:buybusiness(playerid, params[])
 			{
 				SendFormat(oldowner, 0xFFCD6EFF, "------------------------------------------------------------------------");
 				SendFormat(oldowner, 0xFFCD6EFF, "%s nupirko Jûsø verslà \"%s\" uþ $%d", GetPlayerNameEx(playerid, .roleplay = true, .ignoremask = true), BusinessInfo[businessid][bName], BusinessInfo[businessid][bSale]);
-				sd_GivePlayerMoney(oldowner, BusinessInfo[businessid][bSale]);
+				GivePlayerMoney(oldowner, BusinessInfo[businessid][bSale]);
 				SaveAccountIntEx(oldowner, "Money", sd_GetPlayerMoney(oldowner));
 			}
 			else
@@ -40758,7 +40767,7 @@ CMD:buybusiness(playerid, params[])
 		else if(BusinessInfo[businessid][bOwner] <= 0)
 		{
 			if(sd_GetPlayerMoney(playerid) < BusinessInfo[businessid][bPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, BusinessInfo[businessid][bPrice]);
-			sd_GivePlayerMoney(playerid, -BusinessInfo[businessid][bPrice]);
+			GivePlayerMoney(playerid, -BusinessInfo[businessid][bPrice]);
 			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
 			MsgSuccess(playerid, "VERSLAS", "Sëkmingai nusipirkote verslà uþ $%d", BusinessInfo[businessid][bPrice]);
 			log_set_table("logs_business");
@@ -40789,7 +40798,7 @@ CMD:buygarage(playerid, params[])
 		if(GarageInfo[garageid][gOwner] > 0 && GarageInfo[garageid][gSale] > 0)
 		{
 			if(sd_GetPlayerMoney(playerid) < GarageInfo[garageid][gSale]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, GarageInfo[garageid][gSale]);
-			sd_GivePlayerMoney(playerid, -GarageInfo[garageid][gSale]);
+			GivePlayerMoney(playerid, -GarageInfo[garageid][gSale]);
 			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
 			// pardavineja senas savininkas
 			new oldowner = INVALID_PLAYER_ID;
@@ -40797,7 +40806,7 @@ CMD:buygarage(playerid, params[])
 			{
 				SendFormat(oldowner, 0xFFCD6EFF, "------------------------------------------------------------------------");
 				SendFormat(oldowner, 0xFFCD6EFF, "%s nupirko Jûsø garaþà uþ $%d", GetPlayerNameEx(playerid, .roleplay = true, .ignoremask = true), GarageInfo[garageid][gSale]);
-				sd_GivePlayerMoney(oldowner, GarageInfo[garageid][gSale]);
+				GivePlayerMoney(oldowner, GarageInfo[garageid][gSale]);
 				SaveAccountIntEx(oldowner, "Money", sd_GetPlayerMoney(oldowner));
 			}
 			else
@@ -40815,7 +40824,7 @@ CMD:buygarage(playerid, params[])
 		else if(GarageInfo[garageid][gOwner] <= 0)
 		{
 			if(sd_GetPlayerMoney(playerid) < GarageInfo[garageid][gPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, GarageInfo[garageid][gPrice]);
-			sd_GivePlayerMoney(playerid, -GarageInfo[garageid][gPrice]);
+			GivePlayerMoney(playerid, -GarageInfo[garageid][gPrice]);
 			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
 			MsgSuccess(playerid, "GARAÞAS", "Sëkmingai nusipirkote garaþà uþ $%d", GarageInfo[garageid][gPrice]);
 			log_set_table("logs_garages");
@@ -40886,7 +40895,7 @@ CMD:buyfood(playerid, params[])
 					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_STEAK_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_STEAK_PRICE);
 					add = 45.0;
 					strcat(foodname, "kepsná");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_STEAK_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_STEAK_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_STEAK_PRICE;
 				}
 				case 2:
@@ -40894,7 +40903,7 @@ CMD:buyfood(playerid, params[])
 					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_SNACK_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_SNACK_PRICE);
 					add = 15.0;
 					strcat(foodname, "uþkandëlæ");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_SNACK_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_SNACK_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_SNACK_PRICE;
 				}
 				case 3:
@@ -40902,7 +40911,7 @@ CMD:buyfood(playerid, params[])
 					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_SANDWICH_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_SANDWICH_PRICE);
 					add = 15.0;
 					strcat(foodname, "sumuðtiná");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_SANDWICH_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_SANDWICH_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_SANDWICH_PRICE;
 				}
 				case 4:
@@ -40910,7 +40919,7 @@ CMD:buyfood(playerid, params[])
 					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_PIZZA_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_PIZZA_PRICE);
 					add = 25.0;
 					strcat(foodname, "picà");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_PIZZA_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_PIZZA_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_PIZZA_PRICE;
 				}
 				case 5:
@@ -40918,7 +40927,7 @@ CMD:buyfood(playerid, params[])
 					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_PANCAKES_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_PANCAKES_PRICE);
 					add = 20.0;
 					strcat(foodname, "blynø");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_PANCAKES_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_PANCAKES_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_PANCAKES_PRICE;
 				}
 				case 6:
@@ -40926,7 +40935,7 @@ CMD:buyfood(playerid, params[])
 					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_BEER_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_BEER_PRICE);
 					add = 0.01;
 					strcat(foodname, "alaus");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_BEER_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_BEER_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_BEER_PRICE;
 					SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_BEER);
 				}
@@ -40935,7 +40944,7 @@ CMD:buyfood(playerid, params[])
 					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_JUICE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_JUICE_PRICE);
 					add = 2.0;
 					strcat(foodname, "sulèiø");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_JUICE_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_JUICE_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_JUICE_PRICE;
 					SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_SPRUNK);
 				}
@@ -40944,7 +40953,7 @@ CMD:buyfood(playerid, params[])
 					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_WINE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_WINE_PRICE);
 					add = 0.5;
 					strcat(foodname, "vyno");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_WINE_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_WINE_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_WINE_PRICE;
 					SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_WINE);
 				}
@@ -41034,7 +41043,7 @@ CMD:ad(playerid, params[])
 		{
 			FactionInfo[factionid][fBudget] += DEFAULT_AD_PRICE;
 		}
-		sd_GivePlayerMoney(playerid, -DEFAULT_AD_PRICE);
+		GivePlayerMoney(playerid, -DEFAULT_AD_PRICE);
 	}
 	else SendWarning(playerid, "Nesate /ad vietoje.");
 	return 1;
@@ -41062,7 +41071,7 @@ CMD:cad(playerid, params[])
 			{
 				FactionInfo[factionid][fBudget] += DEFAULT_AD_PRICE*2;
 			}
-			sd_GivePlayerMoney(playerid, -DEFAULT_AD_PRICE*2);
+			GivePlayerMoney(playerid, -DEFAULT_AD_PRICE*2);
 		}
 		else return InfoBox(playerid, IB_NO_BUSINESS_KEYS);
 	}
@@ -41219,7 +41228,7 @@ stock PayForFuel(playerid, businessid)
 	if(PlayerInfo[playerid][pBankCard] <= 0)
 	{
 		SendFormat(playerid, 0xBABABAFF, "Kadangi banko kortelës neturite, apmokate grynais.");
-		sd_GivePlayerMoney(playerid, -PlayerExtra[playerid][peFilling]);
+		GivePlayerMoney(playerid, -PlayerExtra[playerid][peFilling]);
 		PlayerExtra[playerid][peFilling] =
 		PlayerExtra[playerid][peFillingAt] = 0;
 	}
@@ -41390,8 +41399,8 @@ CMD:v(playerid, params[])
 					if(!IsPlayerInRangeOfVehicle(playerid, 5.0, Offer[playerid][2])) return InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
 					if(sd_GetPlayerMoney(playerid) < Offer[playerid][3]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, Offer[playerid][3]);
 					new string[126];
-					sd_GivePlayerMoney(owner, Offer[playerid][3]);
-					sd_GivePlayerMoney(playerid, -Offer[playerid][3]);
+					GivePlayerMoney(owner, Offer[playerid][3]);
+					GivePlayerMoney(playerid, -Offer[playerid][3]);
 					mysql_format(chandler, string, sizeof string, "UPDATE `vehicles_data` SET Owner = '%d' WHERE id = '%d'", PlayerInfo[playerid][pId], VehicleInfo[Offer[playerid][2]][vId]);
 					mysql_fquery(chandler, string, "VehicleSavedEx");
 					VehicleInfo[Offer[playerid][2]][vOwner] = PlayerInfo[playerid][pId];
@@ -41496,7 +41505,7 @@ CMD:v(playerid, params[])
 		log_set_values("'%d','%e','%d','%e','Priregistravo tr. priemone','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]), VEHICLE_REGISTER_PRICE, VehicleInfo[vehicleid][vNumbers]);
 		log_push();
 		SendFormat(playerid, 0xBABABAFF, "Tr. priemonë sëkmingai priregistruota, numeriai atsiras ið naujo priparkavus.");
-		sd_GivePlayerMoney(playerid, -VEHICLE_REGISTER_PRICE);
+		GivePlayerMoney(playerid, -VEHICLE_REGISTER_PRICE);
 		return 1;
 	}
 	else if(strfind(input, "buylock", true) == 0) // /v buylock
@@ -41538,7 +41547,7 @@ CMD:v(playerid, params[])
 			
 			if(sd_GetPlayerMoney(playerid) < money) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, money);
 			VehicleInfo[vehicleid][vLock] = level;
-			sd_GivePlayerMoney(playerid, -money);
+			GivePlayerMoney(playerid, -money);
 			SaveVehicleIntEx(vehicleid, "Lock", level);
 			SendFormat(playerid, 0xBABABAFF, "Sëkmingai ádiegëte {1162E5}%d{BABABA} lygio uþrakto sistemà.", level);
 			log_init(true);
@@ -41600,7 +41609,7 @@ CMD:v(playerid, params[])
 				VehicleInfo[vehicleid][vInsurance]++;
 				SendFormat(playerid, 0xD9D9D9FF, "Tr. priemonës draudimas pratæstas. Jis kainavo {5FCE48}$%d", price);
 				SaveVehicleIntEx(vehicleid, "Insurance", VehicleInfo[vehicleid][vInsurance]);
-				sd_GivePlayerMoney(playerid, -price);
+				GivePlayerMoney(playerid, -price);
 				log_init(true);
 				log_set_table("logs_vehicles");
 				log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Amount`,`ExtraId`");
@@ -41652,7 +41661,7 @@ CMD:v(playerid, params[])
 			SaveVehicleFloatEx(vehicleid, "Z", z);
 			SaveVehicleFloatEx(vehicleid, "A", a);
 
-			sd_GivePlayerMoney(playerid, -VEHICLE_BUY_PARK_PRICE);
+			GivePlayerMoney(playerid, -VEHICLE_BUY_PARK_PRICE);
 			SendFormat(playerid, 0xD9D9D9FF, "Tr. priemonës parkavimo vieta nupirkta.");
 
 			format(string, sizeof string, "%0.1f, %0.1f, %0.1f, %0.1f", x, y, z, a);

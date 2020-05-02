@@ -367,8 +367,8 @@ hook OnPlayerStateChange(playerid, newstate, oldstate)
 			{
 				new fee = floatround((VehicleInfo[vehicleid][vKM] - vehicle_Taxi_KM[vehicleid]) * vehicle_Taxi_Price[vehicleid]);
 				SendFormat(playerid, 0xbababaff, "Sumokëjote $%d uþ kelionæ.", fee);
-				sd_GivePlayerMoney(playerid, -fee);
-				sd_GivePlayerMoney(GetVehicleDriverID(vehicleid), fee);
+				GivePlayerMoney(playerid, -fee);
+				GivePlayerMoney(GetVehicleDriverID(vehicleid), fee);
 
 				PlayerTextDrawHide(playerid, TaxometerTD[playerid]);
 
@@ -502,7 +502,7 @@ CMD:taxilicense(playerid, params[])
 
 	PlayerInfo[playerid][pTaxiLic] = 1;
 	SaveAccountIntEx(playerid, "TaxiLic", 1);
-	sd_GivePlayerMoney(playerid, -DEFAULT_TAXI_LICENCE_PRICE);
+	GivePlayerMoney(playerid, -DEFAULT_TAXI_LICENCE_PRICE);
 
 	MsgSuccess(playerid, "TAXI", "Nusipirkote taksi licencijà.");
 	return 1;

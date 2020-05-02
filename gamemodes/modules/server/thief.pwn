@@ -259,7 +259,7 @@ CMD:sellcar(playerid, params[])
 							SendFormat(playerid, 0xc25c43ff, "[SMS]: Ðitos labai reikëjo, sumoku papildomai.", money);
 							money = floatround(money * 1.15);
 						}
-						sd_GivePlayerMoney(playerid, money);
+						GivePlayerMoney(playerid, money);
 
 						Destroy_Stolen_Vehicle(vehicleid);
 						thief_Spot[spotCarsNeed][car] -- ;

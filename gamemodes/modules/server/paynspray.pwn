@@ -98,7 +98,7 @@ Dialog:ConfirmPayNSpray(playerid, response, listitem, inputtext[])
 					else
 					{
 						if(sd_GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
-						sd_GivePlayerMoney(playerid, -price);
+						GivePlayerMoney(playerid, -price);
 					}
 
 					SetTimerEx("T_PayNSpray", 1000, false, "dddd", playerid, vehicleid, point, 15);
