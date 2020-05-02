@@ -23,6 +23,8 @@
 #endif
 #define ASM_INC
 
+#include <core>
+
 #include "amx_base"
 #include "amx_header"
 #include "amx_memory"
@@ -30,11 +32,17 @@
 #include "dynamic_call"
 #include "opcode"
 
+#if !defined ASM_MAX_LABELS
+	#define ASM_MAX_LABELS (8)
+#endif
+
 enum AsmError {
 	ASM_ERROR_NONE,
 	ASM_ERROR_OPCODE,
 	ASM_ERROR_OPERAND,
 	ASM_ERROR_SPACE,
+	ASM_ERROR_LABEL_OVERFLOW,
+	ASM_ERROR_LABEL_DUPLICATE,
 };
 
 enum AsmContext {
@@ -43,6 +51,23 @@ enum AsmContext {
 	AsmContext_buffer_offset,
 	AsmContext_error,
 	AsmContext_error_handler,  // ErrorHandler(ctx[AsmContext])
+	AsmContext_label_names[ASM_MAX_LABELS],
+	// All labels in PAWN should be 4-byte-aligned (1 cell in 32-bit).  This
+	// means the bottom two bits are always `0b00`.  We re-use this data to
+	// store two bits of information - is this label resolved (i.e. do we know
+	// the true address yet), and is this use of the label relative or absolute?
+	// 
+	// If the label is NOT resolved, the current value is the start pointer of a
+	// linked list of jump-ahead uses of the label (relative to DAT), i.e. jumps
+	// waiting to know the label's address when it is eventually defined.  If
+	// the label IS resolved, it is just the absolute address of the label
+	// (relative to COD) so that any new uses can be resolved instantly.  The
+	// lowest bit determines which.
+	// 
+	// If a jump to an unknown label is emitted, the value is the next item in
+	// the linked list (potentially NULL), and the bottom bit is instead used to
+	// determine which jump type this is - relative (1) or absolute (0).
+	AsmContext_labels[ASM_MAX_LABELS],
 };
 
 stock const ASM_ARGUMENTS_OFFSET    =  0x0C;
@@ -85,6 +110,113 @@ static stock AsmError:AsmEmitCell(ctx[AsmContext], value) {
 	return ASM_ERROR_NONE;
 }
 
+// Label functions:
+
+#define AsmIsLabelResolved(%2,%0)    (%2[AsmContext_labels][(%0)] & 1)
+#define AsmIsJumpRelative(%0)        ((%0) & 1)
+#define AsmSetJumpRelative(%2,%0,%1) (%2[AsmContext_labels][(%0)] & (%1))
+#define AsmGetLabel(%2,%0)           (%2[AsmContext_labels][(%0)] & ~1)
+#define AsmSetLabel(%2,%0,%1)        (%2[AsmContext_labels][(%0)] = (%1) | 1)
+
+static stock AsmHashLabel(const label[]) {
+	// Return the Bernstein hash of this label.  This is NOT a cryptographically
+	// secure hash, but is sufficient for our uses.
+	new hash = -1;
+	new i = -1;
+	new ch;
+	while ((ch = label[++i])) {
+		hash = hash * 33 + ch;
+	}
+	return hash;
+}
+
+static stock AsmFindLabelIndex(const ctx[AsmContext], hash) {
+	for (new i = 0; i != ASM_MAX_LABELS; ++i) {
+		if (ctx[AsmContext_label_names][i] == hash) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+stock AsmError:AsmEmitLabelStringize(ctx[AsmContext], const label[]) {
+	// Everything works on the hashes - it saves storing the strings.
+	new hash = AsmHashLabel(label);
+	// See if this label already exists.
+	new idx = AsmFindLabelIndex(ctx, hash);
+	// Get the true address.  Use an offset of -8 because
+	// `AsmGetJumpAddressFromOffset` assumes the jump is from the start of the
+	// next instruction (8 bytes later), while we want it from right here, so
+	// shift back accordingly.
+	new datAddr = ctx[AsmContext_buffer] + ctx[AsmContext_buffer_offset];
+	new codAddr = AsmGetJumpAddressFromOffset(ctx, -8);
+	if (idx == -1) {
+		// Doesn't exist.  Get a free slot.
+		idx = AsmFindLabelIndex(ctx, 0);
+		if (idx == -1) {
+			return AsmRaiseError(ctx, ASM_ERROR_LABEL_OVERFLOW);
+		}
+		ctx[AsmContext_label_names][idx] = hash;
+	}
+	if (AsmIsLabelResolved(ctx, idx)) {
+		// Check that no other labels have the same name.
+		return AsmRaiseError(ctx, ASM_ERROR_LABEL_DUPLICATE);
+	} else {
+		// Loop over all the pending items in the linked list.
+		new cur = AsmGetLabel(ctx, idx);
+		while (cur) {
+			new next = ReadAmxMemory(cur);
+			if (AsmIsJumpRelative(next)) {
+				WriteAmxMemory(cur, datAddr - cur - 4);
+			} else {
+				WriteAmxMemory(cur, codAddr);
+			}
+			cur = next & ~1;
+		}
+	}
+	// Store the label's absolute address, along with a flag to mark that it is
+	// resolved.
+	AsmSetLabel(ctx, idx, codAddr);
+	return ASM_ERROR_NONE;
+}
+
+stock AsmError:AsmEmitJumpStringize(ctx[AsmContext], const label[], bool:relative) {
+	new hash = AsmHashLabel(label);
+	new idx = AsmFindLabelIndex(ctx, hash);
+	new datAddr = ctx[AsmContext_buffer] + ctx[AsmContext_buffer_offset];
+	new AsmError:error = ASM_ERROR_NONE;
+	if (idx == -1) {
+		// Doesn't exist.  Get a free slot.
+		idx = AsmFindLabelIndex(ctx, 0);
+		if (idx == -1) {
+			return AsmRaiseError(ctx, ASM_ERROR_LABEL_OVERFLOW);
+		}
+		ctx[AsmContext_label_names][idx] = hash;
+	}
+	if (AsmIsLabelResolved(ctx, idx)) {
+		// The label was in the past, jump to that.
+		new cur = AsmGetLabel(ctx, idx);
+		if (relative) {
+			error = AsmEmitCell(ctx, cur - datAddr - 4);
+		} else {
+			error = AsmEmitCell(ctx, cur);
+		}
+	} else {
+		// The label is not yet known, store this use in the list.
+		new cur = AsmGetLabel(ctx, idx);
+		if (relative) {
+			error = AsmEmitCell(ctx, cur | 1);
+		} else {
+			error = AsmEmitCell(ctx, cur);
+		}
+		if (error == ASM_ERROR_NONE) {
+			// Store to the list only if the output was successful.
+			ctx[AsmContext_labels][idx] = datAddr;
+		}
+	}
+	return error;
+}
+
 // Core functions:
 
 stock AsmError:AsmEmitOpcode(ctx[AsmContext], Opcode:opcode) {
@@ -122,7 +254,7 @@ stock AsmError:AsmEmitInstruction(ctx[AsmContext], Opcode:opcode, ...) {
 	return ASM_ERROR_NONE;
 }
 
-stock AsmGetJumpAddressFromOffset(ctx[AsmContext], offset) {
+stock AsmGetJumpAddressFromOffset(const ctx[AsmContext], offset) {
 	new amxhdr[AMX_HDR];
 	GetAmxHeader(amxhdr);
 
@@ -137,11 +269,28 @@ stock AsmError:AsmEmitJumpInstruction(ctx[AsmContext], Opcode:opcode, offset) {
 	return AsmEmitInstruction(ctx, opcode, AsmGetJumpAddressFromOffset(ctx, offset));
 }
 
+stock AsmError:AsmEmitJumpLabelInstruction(ctx[AsmContext], Opcode:opcode, const label[], bool:relative = false) {
+	// if there's an error while writing then backtracking is useful
+	gPreviousWriteOffset = ctx[AsmContext_buffer_offset];
+
+	new AsmError:error = ASM_ERROR_NONE;
+
+	error = AsmEmitOpcode(ctx, opcode);
+	if (error != ASM_ERROR_NONE) {
+		return error;
+	}
+	return AsmEmitJumpStringize(ctx, label, relative);
+}
+
 stock AsmError:AsmInitPtr(ctx[AsmContext], buffer, size) {
 	ctx[AsmContext_buffer] = buffer;
 	ctx[AsmContext_buffer_size] = size;
 	ctx[AsmContext_buffer_offset] = 0;
 	ctx[AsmContext_error_handler] = 0;
+	for (new i = 0; i != ASM_MAX_LABELS; ++i) {
+		ctx[AsmContext_label_names][i] = 0;
+		ctx[AsmContext_labels][i] = 0;
+	}
 	return ASM_ERROR_NONE;
 }
 
@@ -149,7 +298,7 @@ stock AsmGetPreviousWriteOffset() {
 	return gPreviousWriteOffset;
 }
 
-stock AsmGetBufferSize(ctx[AsmContext]) {
+stock AsmGetBufferSize(const ctx[AsmContext]) {
 	return ctx[AsmContext_buffer_size] - ctx[AsmContext_buffer_offset];
 }
 
@@ -167,7 +316,7 @@ stock AsmGetCodeSize(const ctx[AsmContext]) {
 	return ctx[AsmContext_buffer_offset];
 }
 
-stock AsmError:AsmGetError(ctx[AsmContext]) {
+stock AsmError:AsmGetError(const ctx[AsmContext]) {
 	return AsmError:ctx[AsmContext_error];
 }
 
@@ -188,9 +337,26 @@ stock AsmError:AsmSetErrorHandler(ctx[AsmContext], error_handler) {
 	return ASM_ERROR_NONE;
 }
 
-stock AsmError:AsmSetErrorHandlerName(ctx[AsmContext], error_handler[]) {
+stock AsmError:AsmSetErrorHandlerName(ctx[AsmContext], const error_handler[]) {
 	ctx[AsmContext_error_handler] = GetPublicAddressFromName(error_handler);
 	return ASM_ERROR_NONE;
+}
+
+stock AsmEmitPadding(ctx[AsmContext], Opcode:op = OP_NOP) {
+	// Must not have parameters, to make the padding valid.
+	if (!IsOpcodeValid(op) || GetOpcodeInstructionParameters(op)) {
+		op = OP_NOP;
+	}
+	// Resolve it for speed.
+	op = RelocateOpcode(op);
+	new
+		cur = ctx[AsmContext_buffer] + ctx[AsmContext_buffer_offset],
+		end = ctx[AsmContext_buffer] + ctx[AsmContext_buffer_size];
+	while (cur < end) {
+		WriteAmxMemory(cur, _:op);
+		cur += 4;
+	}
+	ctx[AsmContext_buffer_offset] = ctx[AsmContext_buffer_size];
 }
 
 // Low level functions:
@@ -224,7 +390,7 @@ stock AsmError:AsmEmitAnd(ctx[AsmContext]) {
 }
 
 stock AsmError:AsmEmitBounds(ctx[AsmContext], bound) {
-	return AsmEmitInstruction(ctx, OP_BOUDNS, bound);
+	return AsmEmitInstruction(ctx, OP_BOUNDS, bound);
 }
 
 stock AsmError:AsmEmitBreak(ctx[AsmContext]) {
@@ -239,6 +405,10 @@ stock AsmError:AsmEmitCallAbs(ctx[AsmContext], address) {
 	new hdr[AMX_HDR];
 	GetAmxHeader(hdr);
 	return AsmEmitInstruction(ctx, OP_CALL, address + GetAmxBaseAddress() + hdr[AMX_HDR_COD]);
+}
+
+stock AsmError:AsmEmitCallLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_CALL, label);
 }
 
 stock AsmError:AsmEmitCmps(ctx[AsmContext], nbytes) {
@@ -402,11 +572,11 @@ stock AsmError:AsmEmitJsgeqRel(ctx[AsmContext], offset) {
 }
 
 stock AsmError:AsmEmitJsgrtr(ctx[AsmContext], address) {
-	return AsmEmitInstruction(ctx, OP_JSTRTR, address);
+	return AsmEmitInstruction(ctx, OP_JSGRTR, address);
 }
 
 stock AsmError:AsmEmitJsgrtrRel(ctx[AsmContext], offset) {
-	return AsmEmitJumpInstruction(ctx, OP_JSTRTR, offset);
+	return AsmEmitJumpInstruction(ctx, OP_JSGRTR, offset);
 }
 
 stock AsmError:AsmEmitJsleq(ctx[AsmContext], address) {
@@ -442,7 +612,63 @@ stock AsmError:AsmEmitJzerRel(ctx[AsmContext], offset) {
 }
 
 stock AsmError:AsmEmitJrel(ctx[AsmContext], offset) {
-	return AsmEmitInstruction(ctx, OP_JREL, offset);
+	return AsmEmitJumpInstruction(ctx, OP_JREL, offset);
+}
+
+stock AsmError:AsmEmitJeqLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JEQ, label);
+}
+
+stock AsmError:AsmEmitJgeqLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JGEQ, label);
+}
+
+stock AsmError:AsmEmitJgrtrLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JGRTR, label);
+}
+
+stock AsmError:AsmEmitJleqLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JLEQ, label);
+}
+
+stock AsmError:AsmEmitJlessLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JLESS, label);
+}
+
+stock AsmError:AsmEmitJneqLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JNEQ, label);
+}
+
+stock AsmError:AsmEmitJnzLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JNZ, label);
+}
+
+stock AsmError:AsmEmitJsgeqLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JSGEQ, label);
+}
+
+stock AsmError:AsmEmitJsgrtrLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JSGRTR, label);
+}
+
+stock AsmError:AsmEmitJsleqLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JSLEQ, label);
+}
+
+stock AsmError:AsmEmitJslessLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JSLESS, label);
+}
+
+stock AsmError:AsmEmitJumpLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JUMP, label);
+}
+
+stock AsmError:AsmEmitJzerLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JZER, label);
+}
+
+stock AsmError:AsmEmitJrelLabelStringize(ctx[AsmContext], const label[]) {
+	return AsmEmitJumpLabelInstruction(ctx, OP_JREL, label, true);
 }
 
 stock AsmError:AsmEmitLctrl(ctx[AsmContext], index) {
@@ -613,7 +839,7 @@ stock AsmError:AsmEmitShl(ctx[AsmContext]) {
 }
 
 stock AsmError:AsmEmitShlCAlt(ctx[AsmContext], shift) {
-	return AsmEmitInstruction(ctx, OP_SHL_C_PRI, shift);
+	return AsmEmitInstruction(ctx, OP_SHL_C_ALT, shift);
 }
 
 stock AsmError:AsmEmitShlCPri(ctx[AsmContext], shift) {
@@ -621,7 +847,7 @@ stock AsmError:AsmEmitShlCPri(ctx[AsmContext], shift) {
 }
 
 stock AsmError:AsmEmitShrCAlt(ctx[AsmContext], shift) {
-	return AsmEmitInstruction(ctx, OP_SHR_C_PRI, shift);
+	return AsmEmitInstruction(ctx, OP_SHR_C_ALT, shift);
 }
 
 stock AsmError:AsmEmitShrCPri(ctx[AsmContext], shift) {

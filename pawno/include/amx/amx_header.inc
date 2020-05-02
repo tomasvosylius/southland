@@ -23,11 +23,11 @@
 #endif
 #define AMX_HEADER_INC
 
-#include <a_samp>
+#tryinclude <console>
 
 #include "amx_memory"
 
-#define AMX_HDR_BYTES (60)
+#define AMX_HDR_BYTES (56)
 #define AMX_HDR_CELLS (AMX_HDR_BYTES / 4)
 
 #define AMX_TAG_MASK (0x80000000)
@@ -263,7 +263,7 @@ static stock NtCopy(src, dest[], size = sizeof(dest)) {
 	return i;
 }
 
-stock GetNumPublics(amxhdr[AMX_HDR]) {
+stock GetNumPublics(const amxhdr[AMX_HDR]) {
 	new num_publics = (amxhdr[AMX_HDR_NATIVES] - amxhdr[AMX_HDR_PUBLICS]) / amxhdr[AMX_HDR_DEFSIZE];
 	return num_publics;
 }
@@ -369,7 +369,7 @@ stock HookPublic(index, address) {
 	return old_address;
 }
 
-stock GetNumNatives(amxhdr[AMX_HDR]) {
+stock GetNumNatives(const amxhdr[AMX_HDR]) {
 	return (amxhdr[AMX_HDR_LIBRARIES] - amxhdr[AMX_HDR_NATIVES]) / amxhdr[AMX_HDR_DEFSIZE];
 }
 
@@ -469,7 +469,7 @@ stock HookNative(index, address) {
 	return old_address;
 }
 
-stock GetNumPubVars(amxhdr[AMX_HDR]) {
+stock GetNumPubVars(const amxhdr[AMX_HDR]) {
 	return (amxhdr[AMX_HDR_TAGS] - amxhdr[AMX_HDR_PUBVARS]) / amxhdr[AMX_HDR_DEFSIZE];
 }
 
@@ -493,26 +493,18 @@ stock GetPubVarIndexFromName(const name[]) {
 	InitStaticAmxHeader();
 
 	new num_pubvars = GetNumPubVars(gHdr);
+	new off = gHdr[AMX_HDR_PUBVARS] - gHdr[AMX_HDR_DAT];
 
-	// Binary search
-	new first = 0;
-	new last = num_pubvars - 1;
-	new mid;
-
-	while (first <= last) {
-		mid = (first + last) / 2;
-
-		new off = gHdr[AMX_HDR_PUBVARS] - gHdr[AMX_HDR_DAT] + mid * gHdr[AMX_HDR_DEFSIZE];
+	// Linear search
+	for (new i = 0; i < num_pubvars; i++) {
 		new nameofs = ReadAmxMemory(off + 4) - gHdr[AMX_HDR_DAT];
 
 		new diff = NtCompare(nameofs, name);
-		if (diff < 0) {
-			first = mid + 1;
-		} else if (diff > 0) {
-			last = mid - 1;
-		} else {
-			return mid;
+		if (diff == 0) {
+			return i;
 		}
+
+		off += gHdr[AMX_HDR_DEFSIZE];
 	}
 
 	return -1;
@@ -558,12 +550,8 @@ stock bool:GetPubVarNameFromAddress(address, name[], size = sizeof(name)) {
 	return GetPubVarNameFromIndex(GetPubVarIndexFromAddress(address), name, size);
 }
 
-static stock GetNumTagsInternal(amxhdr[AMX_HDR]) {
+stock GetNumTags(const amxhdr[AMX_HDR]) {
 	return (amxhdr[AMX_HDR_NAMETABLE] - amxhdr[AMX_HDR_TAGS]) / amxhdr[AMX_HDR_DEFSIZE];
-}
-
-stock GetNumTags(amxhdr[AMX_HDR]) {
-	return GetNumTagsInternal(amxhdr) + 1;
 }
 
 stock bool:GetTagInfo(index, info[AMX_FUNCSTUBNT]) {
@@ -574,7 +562,7 @@ stock bool:GetTagInfo(index, info[AMX_FUNCSTUBNT]) {
 	}
 	InitStaticAmxHeader();
 
-	new num_tags = GetNumTagsInternal(gHdr);
+	new num_tags = GetNumTags(gHdr);
 
 	if (index < 0 || index >= num_tags) {
 		return false;
@@ -588,31 +576,21 @@ stock bool:GetTagInfo(index, info[AMX_FUNCSTUBNT]) {
 }
 
 stock GetTagIndexFromName(const name[]) {
-	if (name[0] == '_' && name[1] == '\0')
-		return 0;
 	InitStaticAmxHeader();
 
-	new num_tags = GetNumTagsInternal(gHdr);
+	new num_tags = GetNumTags(gHdr);
+	new off = gHdr[AMX_HDR_TAGS] - gHdr[AMX_HDR_DAT];
 
-	// Binary search
-	new first = 0;
-	new last = num_tags - 1;
-	new mid;
-
-	while (first <= last) {
-		mid = (first + last) / 2;
-
-		new off = gHdr[AMX_HDR_TAGS] - gHdr[AMX_HDR_DAT] + mid * gHdr[AMX_HDR_DEFSIZE];
+	// Linear search
+	for (new i = 0; i < num_tags; i++) {
 		new nameofs = ReadAmxMemory(off + 4) - gHdr[AMX_HDR_DAT];
 
 		new diff = NtCompare(nameofs, name);
-		if (diff < 0) {
-			first = mid + 1;
-		} else if (diff > 0) {
-			last = mid - 1;
-		} else {
-			return mid;
+		if (diff == 0) {
+			return i;
 		}
+
+		off += gHdr[AMX_HDR_DEFSIZE];
 	}
 
 	return -1;
@@ -624,11 +602,11 @@ stock GetTagIndexFromID(id) {
 		return 0;
 	InitStaticAmxHeader();
 
-	new num_tags = GetNumTagsInternal(gHdr);
+	new num_tags = GetNumTags(gHdr);
 	new off = gHdr[AMX_HDR_TAGS] - gHdr[AMX_HDR_DAT];
 
 	// Linear search
-	for (new i = 0; i < num_tags; i++) {
+	for (new i = 0; i <= num_tags; i++) {
 		if (ReadAmxMemory(off) == id) {
 			return i;
 		}
@@ -677,6 +655,8 @@ stock bool:GetTagNameFromID(id, name[], size = sizeof(name)) {
 	return GetTagNameFromIndex(GetTagIndexFromID(id), name, size);
 }
 
+#define AMX_ASSEMBLY_NO_BUGGED_TAGS 2
+
 stock bool:IsTagIDStrong(tag) {
 	return !!(tag & AMX_TAG_STRONG);
 }
@@ -689,26 +669,26 @@ stock bool:IsTagIDEmpty(tag) {
 	return !(tag & ~AMX_TAG_MASK);
 }
 
-stock bool:IsTagNameStrong(tag[]) {
+stock bool:IsTagNameStrong(const tag[]) {
 	return ('A' <= tag[0] <= 'Z');
 }
 
-stock bool:IsTagNameWeak(tag[]) {
+stock bool:IsTagNameWeak(const tag[]) {
 	return !('A' <= tag[0] <= 'Z');
 }
 
-stock bool:IsTagNameEmpty(tag[]) {
+stock bool:IsTagNameEmpty(const tag[]) {
 	return (tag[0] == '_' && tag[1] == '\0');
 }
 
 stock bool:IsTagIndexStrong(tag) {
 	new info[AMX_FUNCSTUBNT];
-	return (GetTagInfo(index, info) && IsTagIDStrong(info[AMX_FUNCSTUBNT_ID]);
+	return (GetTagInfo(tag, info) && IsTagIDStrong(info[AMX_FUNCSTUBNT_ID]));
 }
 
 stock bool:IsTagIndexWeak(tag) {
 	new info[AMX_FUNCSTUBNT];
-	return (GetTagInfo(index, info) && IsTagIDWeak(info[AMX_FUNCSTUBNT_ID]);
+	return (GetTagInfo(tag, info) && IsTagIDWeak(info[AMX_FUNCSTUBNT_ID]));
 }
 
 stock bool:IsTagIndexEmpty(tag) {
