@@ -23,7 +23,10 @@
 #endif
 #define PROFILER_INC
 
-#include <a_samp>
+#include <file>
+#include <time>
+#include <string>
+#tryinclude <console>
 
 #include "amx_base"
 #include "amx_header"
@@ -40,10 +43,14 @@
 #endif
 
 enum ProfEntryCode {
-	pec_push_address[2],
-	pec_push_index[2],
-	pec_push_8[2],
-	pec_call_enter[2]
+	Opcode:pec_push_c0,
+	pec_push_address,
+	Opcode:pec_push_c1,
+	pec_push_index,
+	Opcode:pec_push_c2,
+	pec_push_8,
+	Opcode:pec_call,
+	pec_call_enter
 }
 
 static stock g_pecs[PROF_MAX_PUBLICS][ProfEntryCode];
@@ -77,7 +84,7 @@ static stock exit_public() {
 
 		if (index < g_num_publics) {
 			new i = g_call_depth;
-			new tick = GetTickCount();
+			new tick = tickcount();
 			new time = tick - g_call_stack[i][pci_start_time];
 			if (time < 0) {
 				// Work around negative intervals due to tick count overflow
@@ -114,7 +121,7 @@ static stock enter_public(index, address) {
 	if (g_call_depth < sizeof(g_call_stack)) {
 		new pci[ProfCallInfo];
 		pci[pci_index] = index;
-		pci[pci_start_time] = GetTickCount();
+		pci[pci_start_time] = tickcount();
 		g_call_stack[g_call_depth] = pci;
 	} else {
 		printf("profiler warning: PROF_MAX_CALL_STACK is set to %d but current level is %d", PROF_MAX_CALL_STACK, g_call_depth);
@@ -142,20 +149,20 @@ static stock new_pec(index, address, code_start) {
 	if (g_num_pecs < sizeof(g_pecs)) {
 		new pec[ProfEntryCode];
 
-		pec[pec_push_address][0] = RelocateOpcode(OP_PUSH_C);
-		pec[pec_push_address][1] = address;
+		pec[pec_push_c0] = RelocateOpcode(OP_PUSH_C);
+		pec[pec_push_address] = address;
 
-		pec[pec_push_index][0] = RelocateOpcode(OP_PUSH_C);
-		pec[pec_push_index][1] = index;
+		pec[pec_push_c1] = RelocateOpcode(OP_PUSH_C);
+		pec[pec_push_index] = index;
 
-		pec[pec_push_8][0] = RelocateOpcode(OP_PUSH_C);
-		pec[pec_push_8][1] = 8;
+		pec[pec_push_c2] = RelocateOpcode(OP_PUSH_C);
+		pec[pec_push_8] = 8;
 
 		new enter_proc;
 		#emit const.pri enter_public
 		#emit stor.s.pri enter_proc
-		pec[pec_call_enter][0] = RelocateOpcode(OP_CALL);
-		pec[pec_call_enter][1] = code_start + enter_proc;
+		pec[pec_call] = RelocateOpcode(OP_CALL);
+		pec[pec_call_enter] = code_start + enter_proc;
 
 		g_pecs[g_num_pecs] = pec;
 		return g_num_pecs++;
@@ -172,7 +179,7 @@ stock ProfilerInit() {
 	new defsize = hdr[AMX_HDR_DEFSIZE];
 	new num_publics = (hdr[AMX_HDR_NATIVES] - hdr[AMX_HDR_PUBLICS]) / defsize;
 
-	new amx_base = GetAmxBase();
+	new amx_base = GetAmxBaseAddress();
 
 	// Redirect all public calls to ProfileHook().
 	for (new i = 0, cur = publics; i < num_publics; cur += defsize, i++) {
@@ -219,16 +226,30 @@ stock bool:ProfilerWriteData(const filename[]) {
 	fwrite(file, "+----------------------------------+----------------+----------------+----------------+\n");
 
 	for (new i = 0; i < g_num_publics; i++) {
-		new name[32];
-		GetPublicNameByIndex(i, name);
-		format(buffer, sizeof(buffer), "| %32s |%15d |%15d |%15d |\n",
-			name,
-			g_publics[i][ppi_num_calls],
-			g_publics[i][ppi_total_time] - g_publics[i][ppi_child_time],
-			g_publics[i][ppi_total_time]
-		);
-		fwrite(file, buffer);
-		fwrite(file, "+----------------------------------+----------------+----------------+----------------+\n");
+			new name[32];
+			GetPublicNameFromIndex(i, name);
+		#if defined strformat
+			strformat(buffer, sizeof(buffer), false, "| %32s |%15d |%15d |%15d |\n",
+				name,
+				g_publics[i][ppi_num_calls],
+				g_publics[i][ppi_total_time] - g_publics[i][ppi_child_time],
+				g_publics[i][ppi_total_time]
+			);
+		#elseif defined format
+			format(buffer, sizeof(buffer), "| %32s |%15d |%15d |%15d |\n",
+				name,
+				g_publics[i][ppi_num_calls],
+				g_publics[i][ppi_total_time] - g_publics[i][ppi_child_time],
+				g_publics[i][ppi_total_time]
+			);
+		#else
+			// Generate proper compiler errors for the missing symbols - ONLY IF the function is
+			// actually used.
+			format(buffer, 0, "You need this function or strformat");
+			strformat(buffer, 0, false, "You need this function or format");
+		#endif
+			fwrite(file, buffer);
+			fwrite(file, "+----------------------------------+----------------+----------------+----------------+\n");
 	}
 
 	fclose(file);
