@@ -34,6 +34,7 @@ native IsValidVehicle(vehicleid);
 #include <YSI\y_hooks>
 #include <YSI\y_inline>
 #include <YSI\y_timers>
+#include <YSI\y_stringhash>
 //#include <YSI\y_dialog>
 #include <easyDialog>
 #include <a_mysql>
@@ -111,7 +112,6 @@ native gpci(playerid, serial[], len);
 #define MAX_PLAYER_IP 					21
 #define MAX_SHELLS 						5
 #define MAX_WATER_AREAS 				303
-#define MAX_SAVINGS 					2000000
 // namu baldai
 #define MAX_HFURNITURE 					150
 #define MAX_HFURNITURE_BRONZE 			250
@@ -147,6 +147,10 @@ native gpci(playerid, serial[], len);
 // Broadcast
 #define MAX_DISTANCE_BETWEEN_BROADCASTERS 	15.0
 // Nustatymai
+#define MIN_SAVINGS_MONEY_TO_PUT		50000
+#define MAX_SAVINGS_MONEY_TO_PUT		300000
+#define MAX_SAVINGS_COLLECTED			1000000
+
 #define ENABLE_BANK_CARD_CREATION		false
 #define SERVER_VARS_ID 					0 		// nekeisti
 #define GARAGE_VIRTUAL_WORLD 			10000
@@ -12094,7 +12098,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new amount;
 				if(sscanf(inputtext,"d",amount)) return 0, ShowPlayerBank(playerid);
-				if(1000 < amount <= 100000)
+				if(MIN_SAVINGS_MONEY_TO_PUT < amount <= MAX_SAVINGS_MONEY_TO_PUT)
 				{
 					if(amount > PlayerInfo[playerid][pBank])
 					{
@@ -12119,7 +12123,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				else
 				{
-					MsgWarning(playerid, "BANKAS", "Minimali suma 1000$, maksimali 100000$");
+					MsgWarning(playerid, "BANKAS", "Minimali suma "#MIN_SAVINGS_MONEY_TO_PUT"$, maksimali "#MAX_SAVINGS_MONEY_TO_PUT"$");
 				}
 			}
 			ShowPlayerBank(playerid);
@@ -23323,7 +23327,14 @@ stock ShowPlayerBank(playerid, bool:show_nr = false)
 	else
 	{
 		show_nr && SendFormat(playerid, 0xEEFFB2FF, "Jûsø sàskaitos numeris: {DCFF64}"#DEFAULT_IBAN_PREFIX"%d", GetPlayerIBAN(PlayerInfo[playerid][pId]));
-		format(string, sizeof string, "Sàskaitos likutis\t{%s}$%d\n{DCDCDC}  -  Áneðti\n{DCDCDC}  -  Paimti\n{FFFFFF}Indëlis\t{1BAA35}$%d\n{DCDCDC}  -  %s\n{FFFFFF}Sàskaitos iðklotinë\nVietiniai pervedimai", PlayerInfo[playerid][pBank] >= 0 ? ("1BAA35") : ("A82626"), PlayerInfo[playerid][pBank], PlayerInfo[playerid][pSavings], PlayerInfo[playerid][pSavings] > 0 ? ("Nutraukti") : ("Áneðti"));
+		format(string, sizeof string, "\
+			Sàskaitos likutis\t{%s}$%d\n\
+			{DCDCDC}  -  Áneðti\n\
+			{DCDCDC}  -  Paimti\n\
+			{FFFFFF}Indëlis\t{1BAA35}$%d\n\
+			{DCDCDC}  -  %s\n\
+			{FFFFFF}Sàskaitos iðklotinë\n\
+			Vietiniai pervedimai", PlayerInfo[playerid][pBank] >= 0 ? ("1BAA35") : ("A82626"), PlayerInfo[playerid][pBank], PlayerInfo[playerid][pSavings], PlayerInfo[playerid][pSavings] > 0 ? ("Nutraukti") : ("Áneðti"));
 	}
 	ShowPlayerDialog(playerid, DIALOG_BANK_MAIN, DIALOG_STYLE_TABLIST, "Bankas", string, "Tæsti", "Atðaukti");
 	return 1;
@@ -26856,19 +26867,21 @@ stock PayDay(playerid)
 	}
 	cache_delete(result);
 
+
+	// SAVINGS
+	// ================================================================
+	new savings = floatround(PlayerInfo[playerid][pSavings] * 0.0025);
+	PlayerInfo[playerid][pSavings] += savings;
+
 	/* Savings Ceiling: */
-	if(PlayerInfo[playerid][pSavings] >= MAX_SAVINGS)
+	if(PlayerInfo[playerid][pSavings] >= MAX_SAVINGS_COLLECTED)
 	{
 		new savingsTemp = PlayerInfo[playerid][pSavings];
 		PlayerInfo[playerid][pSavings] = 0;
 		PlayerInfo[playerid][pBank] += savingsTemp;
-		SendWarning(playerid, "Jûs pasiekëte palûkanø maksimumà. Palûkanos iðimtos automatiðkai.");
+		SendWarning(playerid, "Jûs pasiekëte palûkanø maksimumà "#MAX_SAVINGS_COLLECTED"$. Palûkanos iðimtos automatiðkai.");
 	}
 
-	// SAVINGS
-	// ================================================================
-	new savings = floatround(PlayerInfo[playerid][pSavings]/140);
-	PlayerInfo[playerid][pSavings] += savings;
 	// ================================================================
 	
 	SendFormat(playerid, 0x55E451ff, "———————————— MAZE BANK ————————————");
@@ -38445,7 +38458,13 @@ CMD:setspawn(playerid, params[])
 {
 	new type[24];
 	if(sscanf(params,"s[24]",type)) return SendUsage(playerid, "/setspawn [namas, verslas, frakcija, joks]");
-	if(!strcmp(type,"namas",true))
+	
+	if(!strcmp(type,"joks",true) || !strcmp(type,"none",true) || !strcmp(type,"default",true))
+	{
+		SaveAccountIntEx(playerid, "SpawnType", 0);
+		MsgSuccess(playerid, "SERVERIS", "Sëkmingai pakeitëte SPAWN vietà á paprastà.");
+	}
+	else if(!strcmp(type,"namas",true))
 	{
 		// namas
 		new houseid = INVALID_HOUSE_ID;
@@ -38491,11 +38510,6 @@ CMD:setspawn(playerid, params[])
 			SaveAccountIntEx(playerid, "SpawnType", 3);
 			MsgSuccess(playerid, "SERVERIS", "Sëkmingai pakeitëte SPAWN vietà á frakcijos.");
 		}
-	}
-	else if(!strcmp(type,"joks",true) || !strcmp(type,"none",true) || !strcmp(type,"default",true))
-	{
-		SaveAccountIntEx(playerid, "SpawnType", 0);
-		MsgSuccess(playerid, "SERVERIS", "Sëkmingai pakeitëte SPAWN vietà á paprastà.");
 	}
 	else pc_cmd_setspawn(playerid, "");
 	return 1;
