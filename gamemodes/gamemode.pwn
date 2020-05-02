@@ -912,7 +912,6 @@ native gpci(playerid, serial[], len);
 #include "libraries/macros.pwn"
 #include "libraries/als.pwn"
 #include "libraries/dialog.pwn"
-#define AC_DONT_USE_YSI
 #include "libraries/anticheat.pwn"
 
 // ==============================================================================
