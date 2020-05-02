@@ -24,29 +24,22 @@
 #define DISASM_INC
 
 #include <string>
+#include <file>
 
 #include "amx_base"
 #include "amx_header"
 #include "amx_memory"
 #include "opcode"
 
-#define DISASM_MAX_INSN_NAME 15
 #define DISASM_MAX_PUBLIC_NAME 32
 #define DISASM_MAX_NATIVE_NAME 100
-
-enum DisasmInsnInfo {
-	DisasmInsnInfo_name[DISASM_MAX_INSN_NAME],
-	DisasmInsnInfo_num_opers,
-	bool:DisasmInsnInfo_needs_reloc
-}
 
 enum DisasmContext {
 	DisasmContext_start_ip,
 	DisasmContext_end_ip,
 	DisasmContext_nip,
 	DisasmContext_cip,
-	Opcode:DisasmContext_opcode,
-	DisasmContext_insn[DisasmInsnInfo]
+	Opcode:DisasmContext_opcode
 }
 
 enum DisasmResult {
@@ -54,147 +47,6 @@ enum DisasmResult {
 	DISASM_NOP  = 1,
 	DISASM_OK   = 2
 }
-
-static stock const insn_table[][DisasmInsnInfo] = {
-	{ "none",        0, false },
-	{ "load.pri",    1, false },
-	{ "load.alt",    1, false },
-	{ "load.s.pri",  1, false },
-	{ "load.s.alt",  1, false },
-	{ "lref.pri",    1, false },
-	{ "lref.alt",    1, false },
-	{ "lref.s.pri",  1, false },
-	{ "lref.s.alt",  1, false },
-	{ "load.i",      0, false },
-	{ "lodb.i",      1, false },
-	{ "const.pri",   1, false },
-	{ "const.alt",   1, false },
-	{ "addr.pri",    1, false },
-	{ "addr.alt",    1, false },
-	{ "stor.pri",    1, false },
-	{ "stor.alt",    1, false },
-	{ "stor.s.pri",  1, false },
-	{ "stor.s.alt",  1, false },
-	{ "sref.pri",    1, false },
-	{ "sref.alt",    1, false },
-	{ "sref.s.pri",  1, false },
-	{ "sref.s.alt",  1, false },
-	{ "stor.i",      0, false },
-	{ "strb.i",      1, false },
-	{ "lidx",        0, false },
-	{ "lidx.b",      1, false },
-	{ "idxaddr",     0, false },
-	{ "idxaddr.b",   1, false },
-	{ "align.pri",   1, false },
-	{ "align.alt",   1, false },
-	{ "lctrl",       1, false },
-	{ "sctrl",       1, false },
-	{ "move.pri",    0, false },
-	{ "move.alt",    0, false },
-	{ "xchg",        0, false },
-	{ "push.pri",    0, false },
-	{ "push.alt",    0, false },
-	{ "push.r",      1, false },
-	{ "push.c",      1, false },
-	{ "push",        1, false },
-	{ "push.s",      1, false },
-	{ "pop.pri",     0, false },
-	{ "pop.alt",     0, false },
-	{ "stack",       1, false },
-	{ "heap",        1, false },
-	{ "proc",        0, false },
-	{ "ret",         0, false },
-	{ "retn",        0, false },
-	{ "call",        1, true  },
-	{ "call.pri",    0, false },
-	{ "jump",        1, true  },
-	{ "jrel",        1, false },
-	{ "jzer",        1, true  },
-	{ "jnz",         1, true  },
-	{ "jeq",         1, true  },
-	{ "jneq",        1, true  },
-	{ "jless",       1, true  },
-	{ "jleq",        1, true  },
-	{ "jgrtr",       1, true  },
-	{ "jgeq",        1, true  },
-	{ "jsless",      1, true  },
-	{ "jsleq",       1, true  },
-	{ "jsgrtr",      1, true  },
-	{ "jsgeq",       1, true  },
-	{ "shl",         0, false },
-	{ "shr",         0, false },
-	{ "sshr",        0, false },
-	{ "shl.c.pri",   1, false },
-	{ "shl.c.alt",   1, false },
-	{ "shr.c.pri",   1, false },
-	{ "shr.c.alt",   1, false },
-	{ "smul",        0, false },
-	{ "sdiv",        0, false },
-	{ "sdiv.alt",    0, false },
-	{ "umul",        0, false },
-	{ "udiv",        0, false },
-	{ "udiv.alt",    0, false },
-	{ "add",         0, false },
-	{ "sub",         0, false },
-	{ "sub.alt",     0, false },
-	{ "and",         0, false },
-	{ "or",          0, false },
-	{ "xort",        0, false },
-	{ "not",         0, false },
-	{ "neg",         0, false },
-	{ "invert",      0, false },
-	{ "add.c",       1, false },
-	{ "smul.c",      1, false },
-	{ "zero.pri",    0, false },
-	{ "zero.alt",    0, false },
-	{ "zero",        1, false },
-	{ "zero.s",      1, false },
-	{ "sign.pri",    0, false },
-	{ "sign.alt",    0, false },
-	{ "eq",          0, false },
-	{ "neq",         0, false },
-	{ "less",        0, false },
-	{ "leq",         0, false },
-	{ "grtr",        0, false },
-	{ "geq",         0, false },
-	{ "sless",       0, false },
-	{ "sleq",        0, false },
-	{ "sgrtr",       0, false },
-	{ "sgeq",        0, false },
-	{ "eq.c.pri",    1, false },
-	{ "eq.c.alt",    1, false },
-	{ "inc.pri",     0, false },
-	{ "inc.alt",     0, false },
-	{ "inc",         1, false },
-	{ "inc.s",       1, false },
-	{ "inc.i",       0, false },
-	{ "dec.pri",     0, false },
-	{ "dec.alt",     0, false },
-	{ "dec",         1, false },
-	{ "dec.s",       1, false },
-	{ "dec.i",       0, false },
-	{ "movs",        1, false },
-	{ "cmps",        1, false },
-	{ "fill",        1, false },
-	{ "halt",        1, false },
-	{ "bounds",      1, false },
-	{ "sysreq.pri",  1, false },
-	{ "sysreq.c",    1, false },
-	{ "file",       -1, false }, // obsolete
-	{ "line",       -1, false }, // obsolete
-	{ "symbol",     -1, false }, // obsolete
-	{ "srange",     -1, false }, // obsolete
-	{ "jump.pri",    0, false },
-	{ "switch",      1, true },
-	{ "casetbl",    -1, true },
-	{ "swap.pri",    0, false },
-	{ "swap.alt",    0, false },
-	{ "push.adr",    1, false },
-	{ "nop",         0, false },
-	{ "sysreq.d",    1, false },
-	{ "symtag",      1, false }, // obsolete
-	{ "break",       0, false }
-};
 
 static stock gCodBase;
 
@@ -240,7 +92,6 @@ stock bool:DisasmDecodeInsn(ctx[DisasmContext]) {
 
 	ctx[DisasmContext_cip] = ip;
 	ctx[DisasmContext_opcode] = opcode;
-	ctx[DisasmContext_insn] = insn_table[_:opcode];
 
 	ip += 4;
 
@@ -248,9 +99,8 @@ stock bool:DisasmDecodeInsn(ctx[DisasmContext]) {
 		new n = ReadAmxMemory(ip);
 		ip += 4;
 		ip += (2 * n + 1) * 4;
-		ctx[DisasmContext_insn][DisasmInsnInfo_num_opers] = n;
 	} else {
-		ip += 4 * insn_table[_:opcode][DisasmInsnInfo_num_opers];
+		ip += 4 * GetOpcodeInstructionParameters(opcode);
 	}
 
 	ctx[DisasmContext_nip] = ip;
@@ -283,40 +133,50 @@ stock Opcode:DisasmNextInsn(ctx[DisasmContext]) {
 	return OP_NONE;
 }
 
-stock Opcode:DisasmGetOpcode(ctx[DisasmContext]) {
+stock Opcode:DisasmGetOpcode(const ctx[DisasmContext]) {
 	return ctx[DisasmContext_opcode];
 }
 
-stock DisasmGetOperand(ctx[DisasmContext], index = 0) {
+stock DisasmGetOperand(const ctx[DisasmContext], index = 0) {
 	return ReadAmxMemory(ctx[DisasmContext_cip] + (index + 1) * 4);
 }
 
-stock DisasmGetNumOperands(ctx[DisasmContext]) {
-	return ctx[DisasmContext_insn][DisasmInsnInfo_num_opers];
+stock DisasmGetNumOperands(const ctx[DisasmContext]) {
+	new Opcode:opcode = ctx[DisasmContext_opcode];
+
+	if (opcode == OP_CASETBL) {
+		return ReadAmxMemory(ctx[DisasmContext_cip] + 4);
+	} else {
+		return GetOpcodeInstructionParameters(opcode);
+	}
 }
 
-stock bool:DisasmNeedReloc(ctx[DisasmContext]) {
-	return ctx[DisasmContext_insn][DisasmInsnInfo_needs_reloc];
+stock bool:DisasmNeedReloc(const ctx[DisasmContext]) {
+	return GetOpcodeInstructionRelocatable(ctx[DisasmContext_opcode]);
 }
 
-stock DisasmGetNextIp(ctx[DisasmContext]) {
+stock DisasmReloc(addr) {
+	return addr - gCodBase;
+}
+
+stock DisasmGetNextIp(const ctx[DisasmContext]) {
 	return ctx[DisasmContext_nip];
 }
 
-stock DisasmGetCurIp(ctx[DisasmContext]) {
+stock DisasmGetCurIp(const ctx[DisasmContext]) {
 	return ctx[DisasmContext_cip];
 }
 
-stock DisasmGetRemaining(ctx[DisasmContext]) {
+stock DisasmGetRemaining(const ctx[DisasmContext]) {
 	return ctx[DisasmContext_end_ip] - ctx[DisasmContext_nip];
 }
 
-stock DisasmGetInsnName(ctx[DisasmContext], name[], size = sizeof(name)) {
+stock DisasmGetInsnName(const ctx[DisasmContext], name[], size = sizeof(name)) {
 	name[0] = '\0';
-	strcat(name, ctx[DisasmContext_insn][DisasmInsnInfo_name], size);
+	strcat(name, GetOpcodeInstructionName(ctx[DisasmContext_opcode]), size);
 }
 
-stock DisasmGetOperandReloc(ctx[DisasmContext], index = 0) {
+stock DisasmGetOperandReloc(const ctx[DisasmContext], index = 0) {
 	new param = DisasmGetOperand(ctx, index);
 	// Needs special code for dealing with "CASETBL", which has multiple
 	// parameters - not all of them to be relocated.  If the opcode is NOT that,
@@ -344,7 +204,7 @@ stock DisasmGetOperandReloc(ctx[DisasmContext], index = 0) {
 	//   
 	// I think the conditional ends up nicer in this rare case.
 	if ((ctx[DisasmContext_opcode] == OP_CASETBL) ? (index & 1) : _:DisasmNeedReloc(ctx)) {
-		return param - gCodBase;
+		return DisasmReloc(param);
 	} else {
 		return param;
 	}
@@ -409,7 +269,7 @@ stock DisasmWriteCode(File:file) {
 			fwrite(file, "\n");
 		}
 
-		new insn_name[DISASM_MAX_INSN_NAME];
+		new insn_name[OPCODE_MAX_INSN_NAME];
 		DisasmGetInsnName(ctx, insn_name);
 		fwrite(file, ToHexStr(cip + dat - cod));
 		fwrite(file, " ");

@@ -1,17 +1,9 @@
-/**--------------------------------------------------------------------------**\
-					===============================
-					 y_va2 - Enhanced vararg code!
-					===============================
-Description:
-	This library provides a new macro - the triple underscore (___) which fully
-	passes all of a function's parameters on to another function.
-	
-	This is a replacement for all other solutions like y_va.
+/*
 Legal:
 	Version: MPL 1.1
 	
 	The contents of this file are subject to the Mozilla Public License Version 
-	1.1 (the "License"); you may not use this file except in compliance with 
+	1.1 the "License"; you may not use this file except in compliance with 
 	the License. You may obtain a copy of the License at 
 	http://www.mozilla.org/MPL/
 	
@@ -20,77 +12,63 @@ Legal:
 	for the specific language governing rights and limitations under the
 	License.
 	
-	The Original Code is the YSI vararg include.
+	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright (C) 2011
+	Portions created by the Initial Developer are Copyright C 2011
 	the Initial Developer. All Rights Reserved.
-	
-	Contributors:
-		ZeeX, koolk, JoeBullet/Google63, g_aSlice/Slice
-	
-	Thanks:
-		JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
-		ZeeX - Very productive conversations.
-		koolk - IsPlayerinAreaEx code.
-		TheAlpha - Danish translation.
-		breadfish - German translation.
-		Fireburn - Dutch translation.
-		yom - French translation.
-		50p - Polish translation.
-		Zamaroht - Spanish translation.
-		Dracoblue, sintax, mabako, Xtreme, other coders - Producing other modes
-			for me to strive to better.
-		Pixels^ - Running XScripters where the idea was born.
-		Matite - Pestering me to release it and using it.
-	
-	Very special thanks to:
-		Thiadmer - PAWN, whose limits continue to amaze me!
-		Kye/Kalcor - SA:MP.
-		SA:MP Team past, present and future - SA:MP.
-	
-Version:
-	2.0
-Changelog:
-	02/05/11:
-		First version.
-	01/06/17:
-		Second version.
-Functions:
-	Public:
-		-
-	Core:
-		-
-	Stock:
-		-
-	Static:
-		-
-	Inline:
-		-
-	API:
-		-
-Callbacks:
-	-
-Definitions:
-	-
-Enums:
-	-
-Macros:
-	___ - Passes all variable arguments to another function.
-Tags:
-	-
-Variables:
-	Global:
-		-
-	Static:
-		-
-Commands:
-	-
-Compile options:
-	-
-Operators:
-	-
-\**--------------------------------------------------------------------------**/
+
+Contributors:
+	Y_Less
+	koolk
+	JoeBullet/Google63
+	g_aSlice/Slice
+	Misiur
+	samphunter
+	tianmeta
+	maddinat0r
+	spacemud
+	Crayder
+	Dayvison
+	Ahmad45123
+	Zeex
+	irinel1996
+	Yiin-
+	Chaprnks
+	Konstantinos
+	Masterchen09
+	Southclaws
+	PatchwerkQWER
+	m0k1
+	paulommu
+	udan111
+
+Thanks:
+	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
+	ZeeX - Very productive conversations.
+	koolk - IsPlayerinAreaEx code.
+	TheAlpha - Danish translation.
+	breadfish - German translation.
+	Fireburn - Dutch translation.
+	yom - French translation.
+	50p - Polish translation.
+	Zamaroht - Spanish translation.
+	Los - Portuguese translation.
+	Dracoblue, sintax, mabako, Xtreme, other coders - Producing other modes for
+		me to strive to better.
+	Pixels^ - Running XScripters where the idea was born.
+	Matite - Pestering me to release it and using it.
+
+Very special thanks to:
+	Thiadmer - PAWN, whose limits continue to amaze me!
+	Kye/Kalcor - SA:MP.
+	SA:MP Team past, present and future - SA:MP.
+
+Optional plugins:
+	Gamer_Z - GPS.
+	Incognito - Streamer.
+	Me - sscanf2, fixes2, Whirlpool.
+*/
 
 #if !defined MAX_NESTED_PASSTHROUGHS
 	#define MAX_NESTED_PASSTHROUGHS (4) // Should be MORE than enough!
@@ -102,7 +80,8 @@ static stock
 	YSI_g_sStacks[MAX_NESTED_PASSTHROUGHS],
 	YSI_g_sContexts[MAX_NESTED_PASSTHROUGHS][AsmContext],
 	YSI_g_sMaxNesting = 0,
-	YSI_g_sPassthroughNestings = 0;
+	YSI_g_sPassthroughNestings = 0,
+	YSI_g_sInitialised = 0;
 
 #define CALL@YVA2_DoPush YVA2_DoPush(-1, -1, -1)
 static stock YVA2_DoPush(const skippedBytes, const pushedBytes, const pushRequirements)
@@ -161,6 +140,7 @@ static stock YVA2_DoPush(const skippedBytes, const pushedBytes, const pushRequir
 	#emit SCTRL        5 // Go back to the previous frame.
 	// The frame is now the same.
 	#emit POP.pri
+	#emit MOVE.alt
 	#emit STOR.pri     sReturnAddress
 	#emit POP.pri        // Don't care about this parameter count (don't save).
 	#emit POP.alt                        // skippedBytes
@@ -205,6 +185,7 @@ static stock YVA2_DoPush(const skippedBytes, const pushedBytes, const pushRequir
 	// Return from this function.  We are already in the parent frame and have
 	// no parameters on the stack, so function postamble is not required.
 	#emit LOAD.pri     sReturnAddress
+	#emit SCTRL        8
 	#emit SCTRL        6
 }
 
@@ -214,6 +195,7 @@ static stock YVA2_DoPush(const skippedBytes, const pushedBytes, const pushRequir
 // PARAMETER BYTE COUNT IN THE SCANNER!  ONLY DONE IT EVERY TIME SO FAR...
 stock YVA2_DummyPush(const skippedBytes = 0, const pushedBytes = 0, const pushRequirements = 4, const dummy0 = 0, const dummy1 = 0, const dummy2 = 0, const dummy3 = 0, const dummy4 = 0, const dummy5 = 0)
 {
+	P:3("YVA2_DummyPush start");
 	#pragma unused dummy0, dummy1, dummy2, dummy3, dummy4, dummy5
 	// This function serves four purposes:
 	//   
@@ -230,13 +212,52 @@ stock YVA2_DummyPush(const skippedBytes = 0, const pushedBytes = 0, const pushRe
 	//       we always have all the matcher functions - but if they are
 	//       including this library they probably want to use this library!
 	//   
-	if (FALSE)
+	if (YSI_g_sInitialised)
+	{
+		P:W("Bare `___` usage found - make sure it is a function parameter.");
+	}
+	else if (TRUE)
+	{
+		// Save the return address.
+		#emit LOAD.S.pri   4
+		#emit STOR.pri     YSI_g_sInitialised
+		// Run lazy initialisation.  This now means that the code is only
+		// scanned and set up when the first `___` is actually found.
+		YVA2_Initalise();
+		// Change the return to jump back to the start of this code.
+		#emit LOAD.pri     YSI_g_sInitialised
+		#emit STOR.S.pri   4
+	}
+	else
 	{
 		YVA2_DoPush(pushedBytes, skippedBytes, pushRequirements);
 	}
-	P:W("Bare `___` usage found - make sure it is a function parameter.");
 	return 0;
 }
+
+public OnScriptInit()
+{
+	// To ensure it is correctly initialised with the JIT as well, since we
+	// switched to lazy loading.  VERY few YSI features can be used in
+	// `OnCodeInit`, and if there are ever any issues relating to that, the
+	// correct response is "don't do that"!
+	if (!YSI_g_sInitialised)
+	{
+		YVA2_Initalise();
+		YSI_g_sInitialised = -1;
+	}
+	#if defined VA_OnScriptInit
+		return VA_OnScriptInit();
+	#else
+		return 1;
+	#endif
+}
+
+#undef OnScriptInit
+#define OnScriptInit VA_OnScriptInit
+#if defined VA_OnScriptInit
+	forward VA_OnScriptInit();
+#endif
 
 static stock YVA2_CodeGenPushSite(ctx[AsmContext], const pushedBytes, const skippedBytes/*, const depth*/, const offset)
 {
@@ -307,7 +328,7 @@ static stock YVA2_CodeGenPushVariable(ctx[AsmContext], stack)
 	@emit PUSH.S       stack
 }
 
-static stock YVA2_FoundCall(m[CodeScanner])
+static stock YVA2_FoundCall(const m[CodeScanner])
 {
 	if (YSI_g_sPassthroughNestings)
 	{
@@ -400,8 +421,10 @@ static stock YVA2_FoundCall(m[CodeScanner])
 	return -1;
 }
 
-static stock YVA2_FoundPush(m[CodeScanner])
+static stock YVA2_FoundPush(const m[CodeScanner])
 {
+	new
+		addr = CodeScanGetMatchAddress(m);
 	if (YSI_g_sPassthroughNestings >= MAX_NESTED_PASSTHROUGHS)
 	{
 		P:F("`___` nested too deeply - increase `MAX_NESTED_PASSTHROUGHS`.");
@@ -414,7 +437,7 @@ static stock YVA2_FoundPush(m[CodeScanner])
 	CodeScanGetMatchAsm(m, YSI_g_sContexts[YSI_g_sPassthroughNestings]),
 	YSI_g_sStacks[YSI_g_sPassthroughNestings] = CodeScanGetMatchStack(m),
 	// If the code is 96 bytes long, `ZERO_PRI` was used not a constant number.
-	YSI_g_sSkips[YSI_g_sPassthroughNestings] = (YSI_g_sLength[YSI_g_sPassthroughNestings] == 120) ? 0 : CodeScanGetMatchHole(m, 0);
+	YSI_g_sSkips[YSI_g_sPassthroughNestings] = (YSI_g_sLength[YSI_g_sPassthroughNestings] == 112) ? 0 : CodeScanGetMatchHole(m, 0);
 	if (!YSI_g_sPassthroughNestings)
 	{
 		// Check if this function is returning a string.  It has an extra hidden
@@ -435,6 +458,12 @@ static stock YVA2_FoundPush(m[CodeScanner])
 	}
 	++YSI_g_sPassthroughNestings;
 	P:3("YVA2_FoundPush: %d", CodeScanGetMatchStack(m));
+	P:5("YVA2_FoundPush: %d %d", addr, YSI_g_sInitialised);
+	if (addr < YSI_g_sInitialised < addr + 100)
+	{
+		P:5("YVA2_FoundPush: Found match");
+		YSI_g_sInitialised = addr;
+	}
 }
 
 // Add a scanner to find the `___` function call.
@@ -449,8 +478,9 @@ static stock YVA2_FoundPush(m[CodeScanner])
 // `Func1`'s `___` will be first in the code, but before finding the call to
 // `Func1` itself, we would see the inner `___` AND the inner function call.
 
-public OnScriptInit()
+static stock YVA2_Initalise()
 {
+	P:3("YVA2_Initalise start");
 	new
 		scanner[CodeScanner],
 		csmO0A[CodeScanMatcher],
@@ -476,10 +506,6 @@ public OnScriptInit()
 	*/
 	CodeScanMatcherInit(csmO0A, &YVA2_FoundPush);
 	CodeScanMatcherPattern(csmO0A,
-		OP(ZERO_PRI)                    // 12
-		OP(PUSH_PRI)                    // 16
-		OP(ZERO_PRI)                    // 20
-		OP(PUSH_PRI)                    // 24
 		OP(ZERO_PRI)                    // 4
 		OP(PUSH_PRI)                    // 8
 		OP(ZERO_PRI)                    // 12
@@ -488,26 +514,26 @@ public OnScriptInit()
 		OP(PUSH_PRI)                    // 24
 		OP(ZERO_PRI)                    // 28
 		OP(PUSH_PRI)                    // 32
-		OP(CONST_PRI,  4)               // 40
-		OP(PUSH_PRI)                    // 44
-		OP(ZERO_PRI)                    // 48
-		OP(PUSH_PRI)                    // 52
-		OP(ZERO_PRI)                    // 56
+		OP(ZERO_PRI)                    // 36
+		OP(PUSH_PRI)                    // 40
+		OP(ZERO_PRI)                    // 44
+		OP(PUSH_PRI)                    // 48
+		OP(CONST_PRI,  4)               // 56
 		OP(PUSH_PRI)                    // 60
-		OP(PUSH_C,     36)              // 68
-		OP(CALL,       &YVA2_DummyPush) // 76
-		OP(HEAP,       4)               // 84
-		OP(STOR_I)                      // 88
-		OP(MOVE_PRI)                    // 92
-		OP(PUSH_PRI)                    // 96
+		OP(ZERO_PRI)                    // 64
+		OP(PUSH_PRI)                    // 68
+		OP(ZERO_PRI)                    // 72
+		OP(PUSH_PRI)                    // 76
+		OP(PUSH_C,     36)              // 84
+		OP(CALL,       &YVA2_DummyPush) // 92
+		OP(HEAP,       4)               // 100
+		OP(STOR_I)                      // 104
+		OP(MOVE_PRI)                    // 108
+		OP(PUSH_PRI)                    // 112
 	);
 	CodeScanAddMatcher(scanner, csmO0A);
 	CodeScanMatcherInit(csmO0B, &YVA2_FoundPush);
 	CodeScanMatcherPattern(csmO0B,
-		OP(ZERO_PRI)                    // 12
-		OP(PUSH_PRI)                    // 16
-		OP(ZERO_PRI)                    // 20
-		OP(PUSH_PRI)                    // 24
 		OP(ZERO_PRI)                    // 4
 		OP(PUSH_PRI)                    // 8
 		OP(ZERO_PRI)                    // 12
@@ -516,18 +542,22 @@ public OnScriptInit()
 		OP(PUSH_PRI)                    // 24
 		OP(ZERO_PRI)                    // 28
 		OP(PUSH_PRI)                    // 32
-		OP(CONST_PRI,  4)               // 40
-		OP(PUSH_PRI)                    // 44
-		OP(ZERO_PRI)                    // 52
-		OP(PUSH_PRI)                    // 56
-		OP(CONST_PRI,  ???)             // 60
-		OP(PUSH_PRI)                    // 64
-		OP(PUSH_C,     36)              // 72
-		OP(CALL,       &YVA2_DummyPush) // 80
-		OP(HEAP,       4)               // 88
-		OP(STOR_I)                      // 92
-		OP(MOVE_PRI)                    // 96
-		OP(PUSH_PRI)                    // 100
+		OP(ZERO_PRI)                    // 36
+		OP(PUSH_PRI)                    // 40
+		OP(ZERO_PRI)                    // 44
+		OP(PUSH_PRI)                    // 48
+		OP(CONST_PRI,  4)               // 56
+		OP(PUSH_PRI)                    // 60
+		OP(ZERO_PRI)                    // 64
+		OP(PUSH_PRI)                    // 68
+		OP(CONST_PRI,  ???)             // 76
+		OP(PUSH_PRI)                    // 80
+		OP(PUSH_C,     36)              // 88
+		OP(CALL,       &YVA2_DummyPush) // 96
+		OP(HEAP,       4)               // 104
+		OP(STOR_I)                      // 108
+		OP(MOVE_PRI)                    // 112
+		OP(PUSH_PRI)                    // 116
 	);
 	CodeScanAddMatcher(scanner, csmO0B);
 	/*
@@ -543,20 +573,20 @@ public OnScriptInit()
 	*/
 	CodeScanMatcherInit(csmO1, &YVA2_FoundPush);
 	CodeScanMatcherPattern(csmO1,
-		OP(PUSH_C,     0)               // 16
-		OP(PUSH_C,     0)               // 24
 		OP(PUSH_C,     0)               // 8
 		OP(PUSH_C,     0)               // 16
 		OP(PUSH_C,     0)               // 24
 		OP(PUSH_C,     0)               // 32
-		OP(PUSH_C,     4)               // 40
+		OP(PUSH_C,     0)               // 40
 		OP(PUSH_C,     0)               // 48
-		OP(PUSH_C,     ???)             // 56
-		OP(PUSH_C,     36)              // 64
-		OP(CALL,       &YVA2_DummyPush) // 72
-		OP(HEAP,       4)               // 80
-		OP(STOR_I)                      // 84
-		OP(PUSH_ALT)                    // 88
+		OP(PUSH_C,     4)               // 56
+		OP(PUSH_C,     0)               // 64
+		OP(PUSH_C,     ???)             // 72
+		OP(PUSH_C,     36)              // 80
+		OP(CALL,       &YVA2_DummyPush) // 84
+		OP(HEAP,       4)               // 92
+		OP(STOR_I)                      // 96
+		OP(PUSH_ALT)                    // 100
 	);
 	CodeScanAddMatcher(scanner, csmO1);
 	// Match ANY function calls anywhere.  Will even match calls to `___`, but
@@ -589,22 +619,8 @@ public OnScriptInit()
 	// Replace calls with the correct parameter counts etc.
 	CodeScanRun(scanner);
 	//DisasmDump("yva2.asm");
-	#if defined _y_va_OnScriptInit
-		_y_va_OnScriptInit();
-	#endif
 	return 1;
 }
-
-#if defined _ALS_OnScriptInit
-	#undef OnScriptInit
-#else
-	#define _ALS_OnScriptInit
-#endif
-#define OnScriptInit _y_va_OnScriptInit
-
-#if defined _y_va_OnScriptInit
-	forward _y_va_OnScriptInit();
-#endif
 
 stock va_strlen(arg)
 {
