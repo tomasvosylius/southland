@@ -420,7 +420,7 @@ stock GetInventoryItemName(itemid, bool:lower_case = false)
 		default: name[0] = EOS;
 	}
 
-	(lower_case) && (name[0] = name[0] - 'A');
+	(lower_case) && (name[0] = tolower(name[0]));
 
 	return name;
 }

@@ -25517,32 +25517,32 @@ public OnPlayerPutInventoryItem(playerid, slotid, to_type, to_itter)
 		{
 			if(IsModelPedal(GetVehicleModel(to_itter))) return SendWarning(playerid, "Tr. priemonë bagaþinës neturi.");
 			result = GiveVehicleInventoryItem(to_itter, itemid, amount, extra, to_slot);
-			rp_me(playerid, _, "padeda daiktà á bagaþinæ, kuris atrodo kaip %s", GetInventoryItemName(itemid));
+			rp_me(playerid, _, "padeda daiktà á bagaþinæ, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
 			SaveVehicleInventory(to_itter);
 		}
 		case INVENTORY_TYPE_DEALER_HOUSE:
 		{
 			result = GiveDealerHouseInventoryItem(to_itter, itemid, amount, extra, to_slot);
-			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s", GetInventoryItemName(itemid));
+			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
 			SaveDealerHouseInventory(to_itter);
 		}
 		case INVENTORY_TYPE_HOUSE:
 		{
 			result = GiveHouseInventoryItem(to_itter, itemid, amount, extra, to_slot);
-			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s", GetInventoryItemName(itemid));
+			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
 			SaveHouseInventory(to_itter);
 		}
 		case INVENTORY_TYPE_BUSINESS:
 		{
 			result = GiveBusinessInventoryItem(to_itter, itemid, amount, extra, to_slot);
-			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s", GetInventoryItemName(itemid));	
+			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));	
 			SaveBusinessInventory(to_itter);
 		}
 	}
 	if(result)
 	{
 		ClearPlayerInventorySlot(playerid, slotid);
-		SendFormat(playerid, 0x77D55BFF, "> Sëkmingai padëjote daiktà %s (kiekis: %d)", GetInventoryItemName(itemid), amount);
+		SendFormat(playerid, 0x77D55BFF, "> Sëkmingai padëjote daiktà %s (kiekis: %d)", GetInventoryItemName(itemid, .lower_case = true), amount);
 	}
 	else
 	{
@@ -25568,7 +25568,7 @@ public OnPlayerDropInventoryItem(playerid, type, itter, slotid)
 
 			new 
 				itemid = InventoryInfo[playerid][slotid][invId];
-			rp_me(playerid, _, "iðmeta daiktà, atrodantá kaip %s.", GetInventoryItemName(itemid));
+			rp_me(playerid, _, "iðmeta daiktà, atrodantá kaip %s.", GetInventoryItemName(itemid, .lower_case = true));
 			
 			if(itemid == ITEM_RADIO)
 			{
@@ -25589,7 +25589,7 @@ public OnPlayerDropInventoryItem(playerid, type, itter, slotid)
 
 			new 
 				itemid = VehicleInventory[itter][slotid][invId];
-			rp_me(playerid, _, "iðmeta daiktà ið bagaþinës, atrodantá kaip %s.", GetInventoryItemName(itemid));
+			rp_me(playerid, _, "iðmeta daiktà ið bagaþinës, atrodantá kaip %s.", GetInventoryItemName(itemid, .lower_case = true));
 			if(itemid == ITEM_MASK)
 			{
 				if(IsValidDynamic3DTextLabel(PlayerExtra[playerid][peMaskLabel])) DestroyDynamic3DTextLabel(PlayerExtra[playerid][peMaskLabel]);
@@ -25672,7 +25672,7 @@ public OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot)
 			itemid = VehicleInventory[from_itter][from_slot][invId];
 			amount = VehicleInventory[from_itter][from_slot][invAmount];
 			extra = VehicleInventory[from_itter][from_slot][invExtraId];
-			rp_me(playerid, _, "paima daiktà ið bagaþinës, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
+			rp_me(playerid, _, "paima daiktà ið bagaþinës, kuris atrodo kaip %s.", GetInventoryItemName(itemid, .lower_case = true));
 			ClearVehicleInventorySlot(from_itter, from_slot);
 			SaveVehicleInventory(from_itter);
 		}
@@ -25681,7 +25681,7 @@ public OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot)
 			itemid = DealerHouseInventory[from_itter][from_slot][invId];
 			amount = DealerHouseInventory[from_itter][from_slot][invAmount];
 			extra = DealerHouseInventory[from_itter][from_slot][invExtraId];
-			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
+			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s.", GetInventoryItemName(itemid, .lower_case = true));
 			ClearDealerHouseInventorySlot(from_itter, from_slot);
 			SaveDealerHouseInventory(from_itter);
 		}
@@ -25690,7 +25690,7 @@ public OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot)
 			itemid = HouseInventory[from_itter][from_slot][invId];
 			amount = HouseInventory[from_itter][from_slot][invAmount];
 			extra = HouseInventory[from_itter][from_slot][invExtraId];
-			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
+			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s.", GetInventoryItemName(itemid, .lower_case = true));
 			ClearHouseInventorySlot(from_itter, from_slot);
 			SaveHouseInventory(from_itter);
 		}
@@ -25699,7 +25699,7 @@ public OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot)
 			itemid = BusinessInventory[from_itter][from_slot][invId];
 			amount = BusinessInventory[from_itter][from_slot][invAmount];
 			extra = BusinessInventory[from_itter][from_slot][invExtraId];
-			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));	
+			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s.", GetInventoryItemName(itemid, .lower_case = true));	
 			ClearBusinessInventorySlot(from_itter, from_slot);
 			SaveBusinessInventory(from_itter);
 		}
@@ -31613,7 +31613,7 @@ stock TakeDroppedItem(playerid)
 				GivePlayerInventoryItem(playerid, DroppedItems[itter][droppedItemId], DroppedItems[itter][droppedItemAmount], DroppedItems[itter][droppedItemExtraId], slotid);
 				if(IsValidDynamicObject(DroppedItems[itter][droppedItemObject])) DestroyDynamicObject(DroppedItems[itter][droppedItemObject], "drops", "take");
 				new string[126];
-				rp_me(playerid, _, "paima daiktà %s nuo þemës.", GetInventoryItemName(DroppedItems[itter][droppedItemId]));
+				rp_me(playerid, _, "paima daiktà nuo þemës, kuris atrodo kaip %s.", GetInventoryItemName(DroppedItems[itter][droppedItemId], .lower_case = true));
 				mysql_format(chandler, string, sizeof string, "UPDATE `drops_data` SET Valid = '0', PickedBy = '%d' WHERE id = '%d'", PlayerInfo[playerid][pId], DroppedItems[itter][droppedItemMysqlId]);
 				mysql_fquery(chandler, string, "DropDeletedAuto");
 				new clear[E_DROPPED_ITEMS_DATA];
