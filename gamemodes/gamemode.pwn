@@ -58,6 +58,12 @@ native IsValidVehicle(vehicleid);
 #include <requests>
 #include <garage_block>
 
+#define ZMSG_MAX_CHAT_LENGTH	96
+#define ZMSG_SEPARATORS_LIST	' '
+#define ZMSG_HYPHEN_END			""
+#define ZMSG_HYPHEN_START		""
+#include <zmessage>
+
 native WP_Hash(buffer[], len, const str[]);
 native gpci(playerid, serial[], len);
 // ==============================================================================
@@ -3887,6 +3893,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core\map\mechanics.pwn"
 #include "core\map\train_ganton.pwn"
 #include "core\map\train_jefferson.pwn"
+#include "core\map\pier.pwn"
 // #include "core\map\ganghood_details.pwn"
 // #include "core\map\taxi.pwn"
 // #include "core\map\ls_bus_station.pwn"
@@ -3901,7 +3908,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\mall_parking.pwn"
 // #include "core\map\interiors.pwn"
 // #include "core\map\laundry.pwn"
-// #include "core\map\prieplauka.pwn"
 // #include "core\map\bank.pwn"
 // #include "core\map\grove.pwn"
 // #include "core\map\dmv_change.pwn"
@@ -25628,10 +25634,17 @@ public OnPlayerGiveInventoryItem(playerid, slotid)
 		GivePlayerInventoryItem(receiverid, itemid, amount, extra, receiver_slot);
 		ClearPlayerInventorySlot(playerid, slotid);
 		
-		SendFormat(playerid, 0x77D55BFF, "> Perdavëte daiktà þaidëjui %s: %s(%s) kurio kiekis %d.", GetPlayerNameEx(receiverid, true), GetInventoryItemName(itemid), GetUniqueNumber(itemid, extra, INVALID_PLAYER_ID), amount);
-		SendFormat(receiverid, 0x77D55BFF, "> Gavote daiktà %s(%s) ið %s, kurio kiekis %d.", GetInventoryItemName(itemid), GetUniqueNumber(itemid, extra, INVALID_PLAYER_ID), GetPlayerNameEx(playerid, true), amount);
+		SendFormat(playerid, 0x77D55BFF, "> Perdavëte daiktà þaidëjui %s: %s, kiekis: %d.",
+			GetPlayerNameEx(receiverid, true),
+			GetInventoryItemName(itemid),
+			amount);
+
+		SendFormat(receiverid, 0x77D55BFF, "> Gavote daiktà %s ið %s, kurio kiekis: %d.",
+			GetInventoryItemName(itemid, .lower_case = true),
+			GetPlayerNameEx(playerid, true),
+			amount);
 		
-		rp_me(playerid, _, "perduoda daiktà %s, kuris atrodo kaip %s", GetPlayerNameEx(receiverid, true), GetInventoryItemName(itemid));
+		rp_me(playerid, _, "perduoda daiktà %s, kuris atrodo kaip %s", GetPlayerNameEx(receiverid, true), GetInventoryItemName(itemid, .lower_case = true));
 
 		log_init(true);
 		log_set_table("logs_inventory");
@@ -25659,7 +25672,7 @@ public OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot)
 			itemid = VehicleInventory[from_itter][from_slot][invId];
 			amount = VehicleInventory[from_itter][from_slot][invAmount];
 			extra = VehicleInventory[from_itter][from_slot][invExtraId];
-			rp_me(playerid, _, "paima daiktà ið bagaþinës, kuris atrodo kaip %s", GetInventoryItemName(itemid));
+			rp_me(playerid, _, "paima daiktà ið bagaþinës, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
 			ClearVehicleInventorySlot(from_itter, from_slot);
 			SaveVehicleInventory(from_itter);
 		}
@@ -25668,7 +25681,7 @@ public OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot)
 			itemid = DealerHouseInventory[from_itter][from_slot][invId];
 			amount = DealerHouseInventory[from_itter][from_slot][invAmount];
 			extra = DealerHouseInventory[from_itter][from_slot][invExtraId];
-			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s", GetInventoryItemName(itemid));
+			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
 			ClearDealerHouseInventorySlot(from_itter, from_slot);
 			SaveDealerHouseInventory(from_itter);
 		}
@@ -25677,7 +25690,7 @@ public OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot)
 			itemid = HouseInventory[from_itter][from_slot][invId];
 			amount = HouseInventory[from_itter][from_slot][invAmount];
 			extra = HouseInventory[from_itter][from_slot][invExtraId];
-			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s", GetInventoryItemName(itemid));
+			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
 			ClearHouseInventorySlot(from_itter, from_slot);
 			SaveHouseInventory(from_itter);
 		}
@@ -25686,12 +25699,12 @@ public OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot)
 			itemid = BusinessInventory[from_itter][from_slot][invId];
 			amount = BusinessInventory[from_itter][from_slot][invAmount];
 			extra = BusinessInventory[from_itter][from_slot][invExtraId];
-			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s", GetInventoryItemName(itemid));	
+			rp_me(playerid, _, "paima daiktà ið spintelës, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));	
 			ClearBusinessInventorySlot(from_itter, from_slot);
 			SaveBusinessInventory(from_itter);
 		}
 	}
-	SendFormat(playerid, 0x77D55BFF, "> Sëkmingai paëmete daiktà %s (kiekis: %d)", GetInventoryItemName(itemid), amount);
+	SendFormat(playerid, 0x77D55BFF, "> Sëkmingai paëmete daiktà %s (kiekis: %d)", GetInventoryItemName(itemid, .lower_case = true), amount);
 	GivePlayerInventoryItem(playerid, itemid, amount, extra, to_slot);
 	return 1;
 }
@@ -27096,10 +27109,7 @@ stock FreezePlayer(playerid, seconds)
 	return TogglePlayerControllable(playerid, 0);
 }
 
-
-
-
-stock SendChatMessage(playerid,color,text[],lenght_to_cut = 96)
+/*stock SendChatMessage(playerid,color,text[],lenght_to_cut = 96)
 {
     if(strlen(text) >= lenght_to_cut)
 	{
@@ -27131,7 +27141,7 @@ stock SendChatMessageToAll(color,text[],lenght_to_cut=96)
 		return 1;
 	}
     else return SendClientMessageToAll(color,text);
-}
+}*/
 
 stock ProxDetector(Float:radi, playerid, string[], color1, color2, color3, color4, color5)
 {
@@ -33769,7 +33779,6 @@ CMD:r(playerid, params[])
 	log_push();
 	format(string, sizeof string, "%s sako (á racijà): %s", GetPlayerNameEx(playerid, true, false), text);
 	ProxDetector(IsPlayerInAnyVehicle(playerid) ? 6.0 : 10.0, playerid, string, 0xE9E9E9FF, 0xDADADAFF, 0xC7C7C7FF, 0xABABABFF, 0x929292FF);
-	//OnPlayerText(playerid, text);
 	return 1;
 }
 
@@ -37928,7 +37937,11 @@ CMD:fishing(playerid, params[])
 {
 	if(!IsItemInPlayerInventory(playerid, ITEM_ROD) || !IsItemInPlayerInventory(playerid, ITEM_BAIT)) return SendWarning(playerid, "Neturite meðkerës arba masalo.");
 	new item_bait;
-	if(!IsPlayerInRangeOfPoint(playerid, 60.0, 2969.11, -1993.24, 4.71)) return SendWarning(playerid, "Nesate þvejybos vietoje.");
+	if(!IsPlayerInRangeOfPoint(playerid, 60.0, 2969.11, -1993.24, 4.71))
+	{
+		SetPlayerCheckpointEx(playerid, 0, 2900.65, -1934.49, 11.91, 2.3);
+		return SendWarning(playerid, "Nesate þvejybos vietoje. Þvejybos vieta buvo paþymëta þemëlapyje.");
+	}
 	if(PlayerInfo[playerid][pFishedLimit] >= 500)
 	{
 		SendWarning(playerid, "Jûs jau esate prigaudæs þuvø limità!");
@@ -37953,7 +37966,6 @@ CMD:fishing(playerid, params[])
 	}
 	else SendWarning(playerid, "Neturite masalo.");
 	return 1;
-	//2969.11, -1993.24, 4.71
 }
 forward FishingTimer(playerid);
 public FishingTimer(playerid)
@@ -37986,19 +37998,25 @@ public FishingTimer(playerid)
 	return 1;
 }
 
+#define MIN_MONEY_PER_FISH	7
+#define MAX_MONEY_PER_FISH	15
 
 CMD:sellfishes(playerid, params[])
 {
 	if(!IsPlayerInRangeOfPoint(playerid, 4.0, 2900.65, -1934.49, 11.91))
 	{
+		SendFormat(playerid, -1, "Þuvø pardavimo vieta paþymëta þemëlapyje.");
 		SetPlayerCheckpointEx(playerid, 0, 2900.65, -1934.49, 11.91, 2.3);
 	}
 	else
 	{
 		if(PlayerInfo[playerid][pFishes] <= 0) return SendWarning(playerid, "Neturite þuvø.");
 
-		new 
-			money = randomEx(2,4) * PlayerInfo[playerid][pFishes];
+		new money = 0;
+		for(new f = 0; f < PlayerInfo[playerid][pFishes]; f++)
+		{
+			money += randomEx(MIN_MONEY_PER_FISH, MAX_MONEY_PER_FISH);
+		}
 
 		sd_GivePlayerMoney(playerid, money);
 		PlayerInfo[playerid][pFishedLimit] += money;

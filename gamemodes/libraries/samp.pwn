@@ -1,4 +1,6 @@
 
+stock SendChatMessage(playerid, color, const text[]) return SendClientMessage(playerid, color, text);
+stock SendChatMessageToAll(color, const text[]) return SendClientMessageToAll(color, text);
 
 stock sd_DestroyDynamicObject(STREAMER_TAG_OBJECT objectid, called[] = "default", extra[] = "")
 {

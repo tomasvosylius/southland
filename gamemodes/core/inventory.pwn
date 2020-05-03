@@ -248,11 +248,11 @@ stock GetUniqueNumber(itemid, extraid, playerid)
 			else format(unique, sizeof unique, ""#DEFAULT_WEAPON_UNIQUE_ID_PREFIX"%d", extraid);
 		}
 		case ITEM_PHONE: if(playerid != INVALID_PLAYER_ID) format(unique, sizeof unique, "%d", PlayerInfo[playerid][pPhoneNumber]);
-		case ITEM_SHELLS: format(unique, sizeof unique, "Nezinomas");
+		case ITEM_SHELLS: format(unique, sizeof unique, "Neþinomas");
 		default:
 		{
 			if(extraid != 0) format(unique, sizeof unique, "%d", extraid);
-			else format(unique, sizeof unique, "Nera");
+			else format(unique, sizeof unique, "Nëra");
 		}
 	}
 
@@ -382,7 +382,7 @@ stock GetBusinessFreeInventorySlot(businessid)
 }
 
 
-stock GetInventoryItemName(itemid)
+stock GetInventoryItemName(itemid, bool:lower_case = false)
 {
 	new name[24];
 	switch(itemid)
@@ -419,6 +419,9 @@ stock GetInventoryItemName(itemid)
 		case ITEM_TOOLBOX: name = "Árankiø dëþutë";
 		default: name[0] = EOS;
 	}
+
+	(lower_case) && (name[0] = name[0] - 'A');
+
 	return name;
 }
 
