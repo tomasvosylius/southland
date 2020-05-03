@@ -60,8 +60,8 @@ native IsValidVehicle(vehicleid);
 
 #define ZMSG_MAX_CHAT_LENGTH	96
 #define ZMSG_SEPARATORS_LIST	' '
-#define ZMSG_HYPHEN_END			""
-#define ZMSG_HYPHEN_START		""
+#define ZMSG_HYPHEN_END			" ..."
+#define ZMSG_HYPHEN_START		"... "
 #include <zmessage>
 
 native WP_Hash(buffer[], len, const str[]);
@@ -26878,7 +26878,7 @@ stock PayDay(playerid)
 			if(multiply < 1.0) 		multiply = 1.0;
 			else if(multiply > 2.0) multiply = 2.0;
 
-			payday *= multiply;
+			payday = floatround(payday * multiply);
 		}
 	}
 
