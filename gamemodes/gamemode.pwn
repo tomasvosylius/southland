@@ -170,23 +170,13 @@ native gpci(playerid, serial[], len);
 #define MAX_BUSINESS_PER_PAGE 			100
 // ==============================================================================
 // Defaultai
-// kur spawninsim lektuva nelegaliems
-#define DEFAULT_ILLEGAL_VEHICLE_SPAWN_X 0.0
-#define DEFAULT_ILLEGAL_VEHICLE_SPAWN_Y	0.0
-#define DEFAULT_ILLEGAL_VEHICLE_SPAWN_Z	0.0
-// kur spawninsim autobusa legaliam
-#define DEFAULT_LEGAL_VEHICLE_SPAWN_X 	639.62
-#define DEFAULT_LEGAL_VEHICLE_SPAWN_Y	-412.20
-#define DEFAULT_LEGAL_VEHICLE_SPAWN_Z	16.37
-// kur aktorius nelegaliam spawninsis
-#define DEFAULT_ILLEGAL_PLAYER_SPAWN_X 	-135.90
-#define DEFAULT_ILLEGAL_PLAYER_SPAWN_Y	2.49
-#define DEFAULT_ILLEGAL_PLAYER_SPAWN_Z 	3.10
-// kur aktorius legaliam spawninsis
-#define DEFAULT_LEGAL_PLAYER_SPAWN_X 	633.6732
-#define DEFAULT_LEGAL_PLAYER_SPAWN_Y	-456.2115
-#define DEFAULT_LEGAL_PLAYER_SPAWN_Z 	16.3359
-#define DEFAULT_TRAILER_VW				1000
+
+// Spawn types
+#define SPAWN_TYPE_DEFAULT_ID_DEFAULT		0
+#define SPAWN_TYPE_DEFAULT_ID_JEFFERSON		1
+#define SPAWN_TYPE_DEFAULT_ID_EAST_LS		2
+#define SPAWN_TYPE_DEFAULT_ID_EAST_LS		3
+
 // kiti
 #define DEFAULT_BUSINESS_FUEL_ORDER		1.75 // kiek trukumas_litru*sita_reiksme kainuos uzsakymas
 #define DEFAULT_BUSINESS_FUEL_CAPACITY 	10000 // kiek litru telpa degalinej
@@ -7390,8 +7380,8 @@ stock SpawnPlayerEx(playerid, type = 0, bool:set = false)
 		jail_time = PlayerInfo[playerid][pJailTime],
 		status = PlayerInfo[playerid][pCurrentStatus],
 		Float:x, Float:y, Float:z,
-		spawn_type = PlayerInfo[playerid][pSpawnType],
-		spawn_id = PlayerInfo[playerid][pSpawnId];
+		spawn_type 	= PlayerInfo[playerid][pSpawnType],
+		spawn_id 	= PlayerInfo[playerid][pSpawnId];
 
 	if(PlayerInfo[playerid][pIsApproved])
 	{
@@ -38438,10 +38428,7 @@ CMD:invweapon(playerid, params[])
 
 stock IsPlayerSpectatedBy(who, adminid)
 {
-	foreach(new receiverid : Player)
-	{
-		if(SpectateOn[adminid] == who) return true;
-	}
+	if(SpectateOn[adminid] == who) return true;
 	return false;
 }
 
@@ -38451,16 +38438,39 @@ public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_
 	return 1;
 }
 
-
 CMD:setspawn(playerid, params[])
 {
 	new type[24];
-	if(sscanf(params,"s[24]",type)) return SendUsage(playerid, "/setspawn [namas, verslas, frakcija, joks]");
+	if(sscanf(params,"s[24]",type))
+	{
+		SendUsage(playerid, "/setspawn [pasirinkimas]");
+		MsgInfo(playerid, "Variantai", "[Default]  [Jefferson]  [East LS]  [West LS]  [Namas]  [Verslas]  [Frakcija]");
+		return 1;
+	}
 	
 	if(!strcmp(type,"joks",true) || !strcmp(type,"none",true) || !strcmp(type,"default",true))
 	{
 		SaveAccountIntEx(playerid, "SpawnType", 0);
-		MsgSuccess(playerid, "SERVERIS", "Sëkmingai pakeitëte SPAWN vietà á paprastà.");
+		SaveAccountIntEx(playerid, "SpawnId", SPAWN_TYPE_DEFAULT_ID_DEFAULT);
+		MsgSuccess(playerid, "SERVERIS", "Sëkmingai pakeitëte SPAWN vietà á paprastà (Pizza Stack).");
+	}
+	else if(strfind(type,"Jefferson") != -1)
+	{
+		SaveAccountIntEx(playerid, "SpawnType", 0);
+		SaveAccountIntEx(playerid, "SpawnId", SPAWN_TYPE_DEFAULT_ID_JEFFERSON);
+		MsgSuccess(playerid, "SERVERIS", "Sëkmingai pakeitëte SPAWN vietà á Jefferson.");
+	}
+	else if(strfind(type,"East") != -1)
+	{
+		SaveAccountIntEx(playerid, "SpawnType", 0);
+		SaveAccountIntEx(playerid, "SpawnId", SPAWN_TYPE_DEFAULT_ID_EAST_LS);
+		MsgSuccess(playerid, "SERVERIS", "Sëkmingai pakeitëte SPAWN vietà á East Los Santos.");
+	}
+	else if(strfind(type,"West") != -1)
+	{
+		SaveAccountIntEx(playerid, "SpawnType", 0);
+		SaveAccountIntEx(playerid, "SpawnId", SPAWN_TYPE_DEFAULT_ID_EAST_LS);
+		MsgSuccess(playerid, "SERVERIS", "Sëkmingai pakeitëte SPAWN vietà á West Los Santos.");
 	}
 	else if(!strcmp(type,"namas",true))
 	{
