@@ -2740,7 +2740,7 @@ stock SpamBarTD_Create_Global()
 	TextDrawLetterSize(SpamBarTD_Base, 0.000000, 0.000000);
 	TextDrawTextSize(SpamBarTD_Base, 303.000000, 18.000000);
 	TextDrawAlignment(SpamBarTD_Base, 1);
-	TextDrawColor(SpamBarTD_Base, 2621695);
+	TextDrawColor(SpamBarTD_Base, 0x151515ff);
 	TextDrawSetShadow(SpamBarTD_Base, 0);
 	TextDrawSetOutline(SpamBarTD_Base, 0);
 	TextDrawBackgroundColor(SpamBarTD_Base, 255);
@@ -2752,7 +2752,7 @@ stock SpamBarTD_Create_Global()
 	TextDrawLetterSize(SpamBarTD_LoadBase, 0.000000, 0.000000);
 	TextDrawTextSize(SpamBarTD_LoadBase, 300.000000, 14.000000);
 	TextDrawAlignment(SpamBarTD_LoadBase, 1);
-	TextDrawColor(SpamBarTD_LoadBase, 1347440895);
+	TextDrawColor(SpamBarTD_LoadBase, 0x7F7019ff);
 	TextDrawSetShadow(SpamBarTD_LoadBase, 0);
 	TextDrawSetOutline(SpamBarTD_LoadBase, 0);
 	TextDrawBackgroundColor(SpamBarTD_LoadBase, 255);
@@ -2768,7 +2768,7 @@ stock SpamBarTD_Create_Player(playerid)
 	PlayerTextDrawLetterSize(playerid, SpamBarTD_Load[playerid], 0.000000, 0.000000);
 	PlayerTextDrawTextSize(playerid, SpamBarTD_Load[playerid], 0.000000, 14.000000);
 	PlayerTextDrawAlignment(playerid, SpamBarTD_Load[playerid], 1);
-	PlayerTextDrawColor(playerid, SpamBarTD_Load[playerid], 1353527295);
+	PlayerTextDrawColor(playerid, SpamBarTD_Load[playerid], 0xE0C31Bff);
 	PlayerTextDrawSetShadow(playerid, SpamBarTD_Load[playerid], 0);
 	PlayerTextDrawSetOutline(playerid, SpamBarTD_Load[playerid], 0);
 	PlayerTextDrawBackgroundColor(playerid, SpamBarTD_Load[playerid], 255);

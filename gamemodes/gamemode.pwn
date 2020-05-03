@@ -172,10 +172,15 @@ native gpci(playerid, serial[], len);
 // Defaultai
 
 // Spawn types
+#define SPAWN_TYPE_DEFAULT 					0
+#define SPAWN_TYPE_HOUSE 					1
+#define SPAWN_TYPE_BUSINESS					2
+#define SPAWN_TYPE_FACTION 					3
+
 #define SPAWN_TYPE_DEFAULT_ID_DEFAULT		0
 #define SPAWN_TYPE_DEFAULT_ID_JEFFERSON		1
 #define SPAWN_TYPE_DEFAULT_ID_EAST_LS		2
-#define SPAWN_TYPE_DEFAULT_ID_EAST_LS		3
+#define SPAWN_TYPE_DEFAULT_ID_WEST_LS		3
 
 // kiti
 #define DEFAULT_BUSINESS_FUEL_ORDER		1.75 // kiek trukumas_litru*sita_reiksme kainuos uzsakymas
@@ -6508,7 +6513,7 @@ public OnPlayerEnterCheckpoint(playerid)
 			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 			ApplyAnimation(playerid,"CARRY","putdwn", 4.0, 0, 1, 0, 0, 0);
 			RemovePlayerAttachedObject(playerid, 9);
-			if(GetVehicleBonnet(jobvehicleid) != 1 && !IsModelBike(GetVehicleModel(jobvehicleid))) return SendWarning(playerid, "Atidarykite tr. priemonës kapotà.");
+			if(GetVehicleBonnet(jobvehicleid) != 1 && !IsModelBike(GetVehicleModel(jobvehicleid))) return SendWarning(playerid, "Atidarykite tr. priemonës kapotà (/bonnet).");
 			DisablePlayerCheckpointEx(playerid);
 			TogglePlayerControllable(playerid, 0);
 			SpamBarTD_Show(playerid);
@@ -7458,14 +7463,14 @@ stock SpawnPlayerEx(playerid, type = 0, bool:set = false)
 		{
 			switch(spawn_type)
 			{
-				case 0:
+				case SPAWN_TYPE_DEFAULT:
 				{
 					// default
 					SetSpawnInfo(playerid, playerid, skin, PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ], 0.0, 0, 0, 0, 0, 0, 0);
 					SetPlayerVirtualWorld(playerid, PlayerInfo[playerid][pVW]);
 					SetPlayerInterior(playerid, PlayerInfo[playerid][pInterior]);
 				}
-				case 1:
+				case SPAWN_TYPE_HOUSE:
 				{
 					// namas
 					new houseid = FindHouseBySql(spawn_id);
@@ -7482,7 +7487,7 @@ stock SpawnPlayerEx(playerid, type = 0, bool:set = false)
 						SetPlayerInterior(playerid, PlayerInfo[playerid][pInterior]);
 					}
 				}
-				case 2:
+				case SPAWN_TYPE_BUSINESS:
 				{
 					// verslas
 					new businessid = FindBusinessBySql(spawn_id);
@@ -7499,7 +7504,7 @@ stock SpawnPlayerEx(playerid, type = 0, bool:set = false)
 						SetPlayerInterior(playerid, PlayerInfo[playerid][pInterior]);
 					}
 				}
-				case 3:
+				case SPAWN_TYPE_FACTION:
 				{
 					// frakcija
 					new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
@@ -23757,18 +23762,116 @@ stock GetDealerDrugOrder(playerid)
 
 stock ShowPlayerStats(playerid, receiverid)
 {
-	new year, unused;
-	getdate(year, unused, unused);
-	unused = (PlayerInfo[playerid][pLevel] + 1)*4;
-	SendFormat(receiverid, 0x93DD5EFF, "|______________________ Veikëjo %s(%d) informacija ______________________|", GetPlayerNameEx(playerid), PlayerInfo[playerid][pId]);
-	SendFormat(receiverid, 0xFCFCFCFF, "Amþius: %d (%d), Tautybë: %s, Grynieji pinigai: $%d, Banke: $%d, Indëlis: $%d", year-PlayerInfo[playerid][pBirthDate], PlayerInfo[playerid][pBirthDate], PlayerInfo[playerid][pOrigin], sd_GetPlayerMoney(playerid), PlayerInfo[playerid][pBank], PlayerInfo[playerid][pSavings]);
-	SendFormat(receiverid, 0xFCFCFCFF, "Lygis: %d (%d/%d), Telefono numeris: %d, Remëjas: %dlvl (galioja: %s), Praþaista val: %dval", PlayerInfo[playerid][pLevel], PlayerInfo[playerid][pXP], unused, PlayerInfo[playerid][pPhoneNumber], PlayerInfo[playerid][pDonator], PlayerInfo[playerid][pDonator] > 0 ? (UnixDiffToDays(gettime(), PlayerInfo[playerid][pDonatorTime] + TIME_TO_RESET_DONATOR)) : ("-"), PlayerInfo[playerid][pHoursPlayed]);
- 	if(playerid == receiverid) SendFormat(receiverid, 0xFCFCFCFF, "Tiekëjas: %s, Grupës: [1. %s] [2. %s] [3. %s]", PlayerInfo[playerid][pDealer] == -1 ? ("joks") : (PlayerInfo[playerid][pDealer] == 0 ? ("guns") : (PlayerInfo[playerid][pDealer] == 1 ? ("drugs") : ("drugs&guns"))), GetGroupName(PlayerGroups[playerid][0]), GetGroupName(PlayerGroups[playerid][1]), GetGroupName(PlayerGroups[playerid][2]));
-	SendFormat(receiverid, 0xFCFCFCFF, "Frakcija: %s(%d), Rangas: %s (%d), Darbas: %s, SPAWN: %s", GetFactionName(PlayerInfo[playerid][pFaction]), PlayerInfo[playerid][pFaction], GetPlayerFactionRankName(playerid), PlayerInfo[playerid][pJobLevel], GetJobName(PlayerInfo[playerid][pJob]), PlayerInfo[playerid][pSpawnType] == 0 ? ("numatyta") : (PlayerInfo[playerid][pSpawnType] == 1 ? ("namas") : (PlayerInfo[playerid][pSpawnType] == 2 ? ("verslas") : ("frakcija"))));
-	SendFormat(receiverid, 0xFCFCFCFF, "Vartotojas: %s (%d), Int: %d, VW: %d", GetUserNameById(PlayerInfo[playerid][pUserId]), PlayerInfo[playerid][pUserId], GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
-	SendFormat(receiverid, 0xFCFCFCFF, "[Vardo keitimai: %d] [Tel nr. keitimai: %d] [Tr. priemoniø nr. keitimai: %d] [Graffiti leidimai: %d]", PlayerInfo[playerid][pNameChanges], PlayerInfo[playerid][pNumberChanges], PlayerInfo[playerid][pPlateChanges], PlayerInfo[playerid][pGraffitiAllowed]);
-	SendFormat(receiverid, 0x93DD5EFF, "|____________________________________________________________________|");
+	new year, xp_to_next_lvl;
+	getdate(year, xp_to_next_lvl, xp_to_next_lvl);
+	xp_to_next_lvl = (PlayerInfo[playerid][pLevel] + 1)*4;
+
+	SendFormat(receiverid, 0x93DD5EFF, "[Veikëjo %s(%d) informacija | %s(%d) ]",
+		GetPlayerNameEx(playerid),
+		PlayerInfo[playerid][pId],
+		GetUserNameById(PlayerInfo[playerid][pUserId]),
+		PlayerInfo[playerid][pUserId]
+	);
+	SendFormat(receiverid, 0xFCFCFCFF, "[Amþius: %d], [Tautybë: %s], [Grynieji pinigai: $%d], [Banke: $%d], [Indëlis: $%d]",
+		year-PlayerInfo[playerid][pBirthDate],
+		PlayerInfo[playerid][pOrigin],
+		sd_GetPlayerMoney(playerid), 
+		PlayerInfo[playerid][pBank], 
+		PlayerInfo[playerid][pSavings]
+	);
+	SendFormat(receiverid, 0xFCFCFCFF, "[Lygis: %d (%d/%d)], [Tel. numeris: %d], [Praþaista: %dval] [Spawn vieta: %s]",
+		PlayerInfo[playerid][pLevel],
+		PlayerInfo[playerid][pXP],
+		xp_to_next_lvl,
+
+		PlayerInfo[playerid][pPhoneNumber],
+		PlayerInfo[playerid][pHoursPlayed],
+		GetSpawnTitle(PlayerInfo[playerid][pSpawnType], PlayerInfo[playerid][pSpawnId])
+	);
+
+	if(PlayerInfo[playerid][pFaction] > 0)
+	{
+		SendFormat(receiverid, 0xFCFCFCFF, "[Frakcija: \"%s\" (%d)], [Rangas: %d. \"%s\"]",
+			GetFactionName(PlayerInfo[playerid][pFaction]),
+			PlayerInfo[playerid][pFaction],
+			PlayerInfo[playerid][pJobLevel],
+			GetPlayerFactionRankName(playerid)
+		);
+	}
+	if(PlayerInfo[playerid][pJob] > 0)
+	{
+		SendFormat(receiverid, 0xFCFCFCFF, "[Darbas: \"%s\" > {DADADA}/jobstats{FCFCFC}]", 
+			GetJobName(PlayerInfo[playerid][pJob])
+		);
+	}
+	else SendFormat(receiverid, 0xFCFCFCFF, "[Darbas: joks]");
+
+	if(PlayerInfo[playerid][pGraffitiAllowed] > 0)
+	{
+		SendFormat(receiverid, 0xfcfcfcff, "[Graffiti leidimai: %d]", PlayerInfo[playerid][pGraffitiAllowed]);
+	}
+
+	SendFormat(receiverid, 0xFCFCFCFF, "[Remëjas: %dlvl (%s)] [Vardo keitimai: %d] [Tel nr. keitimai: %d] [Tr. nr. keitimai: %d]", 
+		PlayerInfo[playerid][pDonator],
+		PlayerInfo[playerid][pDonator] > 0 ? (UnixDiffToDays(gettime(), PlayerInfo[playerid][pDonatorTime] + TIME_TO_RESET_DONATOR)) : ("-"),
+		PlayerInfo[playerid][pNameChanges],
+		PlayerInfo[playerid][pNumberChanges],
+		PlayerInfo[playerid][pPlateChanges]);
+
+ 	if(playerid == receiverid)
+	{
+		SendFormat(receiverid, 0xFCFCFCFF, "[Tiekëjas: %s], [Admin. grupës (%s), (%s), (%s)]",
+			GetDealerTypeTitle(PlayerInfo[playerid][pDealer]),
+			GetGroupName(PlayerGroups[playerid][0]),
+			GetGroupName(PlayerGroups[playerid][1]),
+			GetGroupName(PlayerGroups[playerid][2])
+		);
+	}
 	return 1;
+}
+
+stock GetDealerTypeTitle(type)
+{
+	new title[32];
+	switch(type)
+	{
+		case -1: format(title, 12, "joks");
+		case 0: format(title, 12, "guns");
+		case 1: format(title, 12, "drugs");
+		default: format(title, 12, "drugs&guns");
+	}
+	return title;
+}
+
+stock GetSpawnTitle(type, id)
+{
+	new title[32];
+	switch(type)
+	{
+		case SPAWN_TYPE_DEFAULT:
+		{
+			switch(id)
+			{
+				case SPAWN_TYPE_DEFAULT_ID_EAST_LS: 	format(title, sizeof title, "East LS");
+				case SPAWN_TYPE_DEFAULT_ID_WEST_LS: 	format(title, sizeof title, "West LS");
+				case SPAWN_TYPE_DEFAULT_ID_JEFFERSON:	format(title, sizeof title, "Jefferson");
+				default:								format(title, sizeof title, "Áprasta");
+			}
+		}
+		case SPAWN_TYPE_HOUSE:
+		{
+			format(title, sizeof title, "Namas (ID: %d)", id);
+		}
+		case SPAWN_TYPE_BUSINESS:
+		{
+			format(title, sizeof title, "Verslas (ID: %d)", id);
+		}
+		case SPAWN_TYPE_FACTION:
+		{
+			format(title, sizeof title, "Frakcija");
+		}
+	}
+	return title;
 }
 
 stock UnixDiffToDays(from, to)
@@ -23824,7 +23927,7 @@ stock UnixDiffToDays(from, to)
 stock GetPlayerFactionRankName(playerid)
 {
 	new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]),
-		name[24];
+		name[32];
 	strcat(name, "joks");
 	if(factionid != -1)
 	{
@@ -23835,7 +23938,7 @@ stock GetPlayerFactionRankName(playerid)
 
 stock GetJobName(job, bool:bysql = true)
 {
-	new name[24];
+	new name[32];
 	strcat(name, "nëra");
 	if(bysql)
 	{
@@ -26678,10 +26781,10 @@ stock GetJobTaskNameById(job, task)
 			{
 				case JOB_ACTION_TAKE_REPAINT: name = "Paimkite dazus";
 				case JOB_ACTION_REPAINT_VEHICLE: name = "Perdazykite tr. priemone";
-				case JOB_ACTION_TAKE_REPAIR, JOB_ACTION_TAKE_ENGINE, JOB_ACTION_TAKE_ENGINE_REPAIR, JOB_ACTION_TAKE_BATTERY, JOB_ACTION_TAKE_BATTERY_REPAIR: name = "Paimkite dalis";
+				case JOB_ACTION_TAKE_REPAIR, JOB_ACTION_TAKE_ENGINE, JOB_ACTION_TAKE_ENGINE_REPAIR, JOB_ACTION_TAKE_BATTERY, JOB_ACTION_TAKE_BATTERY_REPAIR: name = "Paimkite dalis sandeliuke";
 				case JOB_ACTION_PUT_PARTS_VEHICLE, JOB_ACTION_PUT_BATTERY, JOB_ACTION_PUT_BATTERY_REPAIR, JOB_ACTION_PUT_ENGINE, JOB_ACTION_PUT_ENGINE_REPAIR: name = "Nuneskite dalis";
 				case JOB_ACTION_REPAIR_VEHICLE: name = "Tvarkykite tr. priemone";
-				case JOB_ACTION_TAKE_WHEELS: name = "Paimkite dalis";
+				case JOB_ACTION_TAKE_WHEELS: name = "Paimkite dalis sandeliuke";
 				case JOB_ACTION_PUT_WHEELS_VEHICLE: name = "Nuneskite dalis";
 				case JOB_ACTION_TUNE_VEHICLE: name = "Tuninguokite tr. priemone";
 			}
@@ -26745,21 +26848,28 @@ stock SetVehicleSpeed(vehicleid, mph)
 stock PayDay(playerid)
 {
 	if(PlayerInfo[playerid][pJobContract] > 0) PlayerInfo[playerid][pJobContract]--;
-	new playerjob,
+	new playerjob = NONE,
 		payday = PlayerInfo[playerid][pPayCheck],
-		payday_business = 0;
+		payday_business = 0,
+		job_level = PlayerInfo[playerid][pJobLevel];
+	
+	/** Zaidejas yra darbe */
 	if(PlayerInfo[playerid][pJob] > 0)
 	{
 		playerjob = GetJobArrayIndexById(PlayerInfo[playerid][pJob]);
 		if(playerjob != -1)
 		{
 			payday += Jobs[playerjob][jobPayDay];
-			if(PlayerInfo[playerid][pJob] == JOB_TRUCKER)
-			{
-				payday += (PlayerInfo[playerid][pJobLevel]*100);
-			}
+
+			new Float:multiply = 1 + job_level / 10.0;
+			if(multiply < 1.0) 		multiply = 1.0;
+			else if(multiply > 2.0) multiply = 2.0;
+
+			payday *= multiply;
 		}
 	}
+
+	/** Zaidejas yra frakcijoje */
 	else if(PlayerInfo[playerid][pFaction] > 0)
 	{
 		playerjob = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
@@ -26772,6 +26882,8 @@ stock PayDay(playerid)
 			}
 		}
 	}
+
+
 	new	taxes_vehicle,
 		taxes_houses,
 		taxes_business,
@@ -26781,8 +26893,6 @@ stock PayDay(playerid)
 	// procentai i biudzeta savivaldybes
 	new taxes = GetGVarInt("TaxesToCity", SERVER_VARS_ID);
 	new pay_to_city = payday*taxes/100;
-
-	// savivaldybes procentai i policija
 
 	// ================================================================
 	// MOKESCIAI UZ TRANSPORTO PRIEMONES
@@ -26814,6 +26924,7 @@ stock PayDay(playerid)
 	// ================================================================
 
 	// NUOMA
+	// ================================================================
 	mysql_format(chandler, string, sizeof string, "SELECT HouseId FROM `houses_dubkeys` WHERE PlayerId = '%d' AND Valid = '1' AND Type = '1'", PlayerInfo[playerid][pId]);
 	result = mysql_query(chandler, string, true);
 	new houseid;
@@ -26827,8 +26938,10 @@ stock PayDay(playerid)
 		}
 	}
 	cache_delete(result);
+	// ================================================================
 
 	// VERSLU ALGA
+	// ================================================================
 	mysql_format(chandler, string, sizeof string, "SELECT business_data.id bdata_id, business_data.Name bdata_name, business_dubkeys.Salary bdub_salary FROM `business_data` INNER JOIN `business_dubkeys` ON business_data.id = business_dubkeys.BusinessId WHERE business_dubkeys.PlayerId = '%d' AND business_dubkeys.Salary > '0'", PlayerInfo[playerid][pId]);
 	result = mysql_query(chandler, string, true);
 
@@ -26854,7 +26967,7 @@ stock PayDay(playerid)
 		}
 	}
 	cache_delete(result);
-
+	// ================================================================
 
 	// SAVINGS
 	// ================================================================
@@ -26869,41 +26982,26 @@ stock PayDay(playerid)
 		PlayerInfo[playerid][pBank] += savingsTemp;
 		SendWarning(playerid, "Jûs pasiekëte palûkanø maksimumà "#MAX_SAVINGS_COLLECTED"$. Palûkanos iðimtos automatiðkai.");
 	}
-
 	// ================================================================
 	
-	SendFormat(playerid, 0x55E451ff, "———————————— MAZE BANK ————————————");
-	SendFormat(playerid, 0x55E451ff, "| {F7F7F7}\
-						Gauta alga: $%d, mokeðèiai valstybei: $%d", payday, pay_to_city);
-
-	(taxes_vehicle > 0) && SendFormat(playerid, 0x55E451ff, "| {F7F7F7}\
-						Transporto mokesèiai: $%d", taxes_vehicle);
-
-	(taxes_houses > 0) && SendFormat(playerid, 0x55E451ff, "| {F7F7F7}\
-						Nek. turto mokesèiai: $%d", taxes_houses);
-	
-	(taxes_business > 0) && SendFormat(playerid, 0x55E451ff, "| {F7F7F7}\
-						Verslø mokesèiai: $%d", taxes_business);
-
-	(taxes_rent > 0) && SendFormat(playerid, 0x55E451ff, "| {F7F7F7}\
-						Nuomos mokestis: $%d", taxes_rent);
-	
-	(payday_business > 0) && SendFormat(playerid, 0x55E451ff, "| {F7F7F7}\
-						Alga ið priv. verslø: $%d", payday_business);
-	
-	(savings > 0) && SendFormat(playerid, 0x55E451ff, "| {F7F7F7}\
-						Gautos palûkanos: $%d", savings);
-
-	// format(string, sizeof string, "_~n~__Gauta_alga:_$%d,_mokesciai_valstybei:_$%d~n~", payday, pay_to_city);
-	// if(taxes_vehicle > 0) format(string, sizeof string, "%s__Mokesciai uz tr. priemones:_$%d~n~", string, taxes_vehicle);
-	// if(taxes_houses > 0) format(string, sizeof string, "%s__Mokesciai_uz_nek._turta:_$%d~n~", string, taxes_houses);
-	// if(taxes_business > 0) format(string, sizeof string, "%s__Mokesciai uz verslus:_$%d~n~", string, taxes_business);
-	// if(taxes_rent > 0) format(string, sizeof string, "%s__Nuomos_mokestis:_$%d~n~", string, taxes_rent);
-	// if(payday_business > 0) format(string, sizeof string, "%s__Alga_is_privaciu_verslu:_$%d~n~", string, payday_business);
-	// if(savings > 0) format(string, sizeof string, "%s__Gautos_palukanos:_$%d~n~", string, savings);
 
 
-	payday -= (taxes_vehicle + taxes_houses + taxes_business + pay_to_city + taxes_rent); // galutines sumos skaiciavimas
+	// ================================================================
+	// ZINUTE
+	SendFormat(playerid, 0x55E451ff, "[Bank of Los Santos]");
+	SendFormat(playerid, 0xF7F7F7ff, "[Gauta %s: $%d] [Mokeðèiai valstybei: $%d]", 
+		(playerjob != NONE ? ("alga") : ("paðalpa")),
+		payday, 
+		pay_to_city
+	);
+
+	(taxes_vehicle > 0) && SendFormat(playerid, 0xF7F7F7ff, "[Transporto mokestis: $%d]", taxes_vehicle);
+	(taxes_houses > 0) && SendFormat(playerid, 0xF7F7F7ff, "[Nek. turto mokestis: $%d]", taxes_houses);
+	(taxes_business > 0) && SendFormat(playerid, 0xF7F7F7ff, "[Verslø mokestis: $%d]", taxes_business);
+	(taxes_rent > 0) && SendFormat(playerid, 0xF7F7F7ff, "[Nuoma: $%d]", taxes_rent);
+	(payday_business > 0) && SendFormat(playerid, 0xF7F7F7ff, "[Alga ið verslø: $%d]", payday_business);
+	(savings > 0) && SendFormat(playerid, 0xF7F7F7ff, "[Gautos palûkanos: $%d]", savings);
+
 	if(PlayerInfo[playerid][pJob] != 0)
 	{
 		playerjob = GetJobArrayIndexById(PlayerInfo[playerid][pJob]);
@@ -26912,12 +27010,13 @@ stock PayDay(playerid)
 			if(payday > Jobs[playerjob][jobMaxPayout]) payday = Jobs[playerjob][jobMaxPayout];
 		}
 	}
-	payday += payday_business;
-	PlayerInfo[playerid][pBank] += payday;
-	// format(string, sizeof string, "%s__Galutine_gauta_suma:_$%d~n~__Banko_balansas:_$%d~n~_", string, payday, PlayerInfo[playerid][pBank]);
-	SendFormat(playerid, 0x55E451ff, "| {FFFFFF}Galutinë gauta suma: $%d, balansas: $%d", payday, PlayerInfo[playerid][pBank]);
 
-	SendFormat(playerid, 0x55E451ff, "——————————————————————————————");
+	payday += payday_business;
+	payday -= (taxes_vehicle + taxes_houses + taxes_business + pay_to_city + taxes_rent); // galutines sumos skaiciavimas
+	PlayerInfo[playerid][pBank] += payday;
+
+	SendFormat(playerid, 0xFFFFFFff, "[Galutinë suma: $%d] [Balansas: $%d]", payday, PlayerInfo[playerid][pBank]);
+	// ================================================================
 
 
 	PlayerInfo[playerid][pPayCheck] = 0;
@@ -31614,7 +31713,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				new __tmpskin = GetPlayerSkin(playerid);
 				SetPlayerSkin(playerid, __tmpskin);
 				PlayerTextDrawTextSize(playerid, SpamBarTD_Load[playerid], 0.000000, 14.000000);
-				PlayerTextDrawSetString(playerid, SpamBarTD_Value[playerid], "0%%");
+				PlayerTextDrawSetString(playerid, SpamBarTD_Value[playerid], "0%");
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
 				SpamBarTD_Hide(playerid);
 			}
@@ -38469,7 +38568,7 @@ CMD:setspawn(playerid, params[])
 	else if(strfind(type,"West") != -1)
 	{
 		SaveAccountIntEx(playerid, "SpawnType", 0);
-		SaveAccountIntEx(playerid, "SpawnId", SPAWN_TYPE_DEFAULT_ID_EAST_LS);
+		SaveAccountIntEx(playerid, "SpawnId", SPAWN_TYPE_DEFAULT_ID_WEST_LS);
 		MsgSuccess(playerid, "SERVERIS", "Sëkmingai pakeitëte SPAWN vietà á West Los Santos.");
 	}
 	else if(!strcmp(type,"namas",true))
@@ -39116,7 +39215,7 @@ stock rp_do(playerid, str[], va_args<>)
 	va_format(string, 256, str, va_start<2>);//"* %s (( %s ))", str, GetPlayerNameEx(playerid, true));
 
 	strins(string, "* ", 0);
-	strcat(string, "(( ");
+	strcat(string, " (( ");
 	strcat(string, GetPlayerNameEx(playerid, true));
 	strcat(string, " ))");
 
@@ -40289,8 +40388,13 @@ CMD:jobstats(playerid, params[])
 			}
 		}
 		aprox = minimal_payday + PlayerInfo[playerid][pPayCheck];
-		SendFormat(playerid, -1, "Minimali alga: $%d, Sukauptas uþdarbis: $%d, Galima alga: $%d, Maksimali alga: $%d %s", minimal_payday, PlayerInfo[playerid][pPayCheck], aprox > Jobs[jobid][jobMaxPayout] ? Jobs[jobid][jobMaxPayout] : aprox, Jobs[jobid][jobMaxPayout], (aprox > Jobs[jobid][jobMaxPayout] ? ("(surinkote maksimalià algà)") : ("")) );
-		SendFormat(playerid, -1, "Darbo lygis: %d, Darbo patirtis: %d/%d %s", PlayerInfo[playerid][pJobLevel], PlayerInfo[playerid][pJobXP], nextxp, nextxp == 0 ? ("(jûsø darbe nereikalinga)") : (nextxp == -1 ? ("(maksimalus lygis)") : ("")));
+		SendFormat(playerid, 0xF1F1F1ff, "[Minimali alga: $%d] [Sukauptas uþdarbis: $%d] [Galima alga: $%d] [Maksimali alga: $%d %s]",
+			minimal_payday,
+			PlayerInfo[playerid][pPayCheck],
+			aprox > Jobs[jobid][jobMaxPayout] ? Jobs[jobid][jobMaxPayout] : aprox, Jobs[jobid][jobMaxPayout],
+			(aprox > Jobs[jobid][jobMaxPayout] ? ("(surinkote maksimalià algà)") : (""))
+		);
+		SendFormat(playerid, 0xF1F1F1ff, "[Darbo lygis: %d] [Darbo patirtis: %d/%d %s]", PlayerInfo[playerid][pJobLevel], PlayerInfo[playerid][pJobXP], nextxp, nextxp == 0 ? ("(jûsø darbe nereikalinga)") : (nextxp == -1 ? ("(maksimalus lygis)") : ("")));
 	}
 	return 1;
 }
