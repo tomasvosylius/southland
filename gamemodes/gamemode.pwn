@@ -3941,6 +3941,22 @@ main()
 	amx_antideamx();
 }
 
+stock sd_SetPlayerSkin(playerid, skin)
+{
+    if(0 <= skin <= 311)
+    {
+        PlayerInfo[playerid][pSkin] = skin;
+        return SetPlayerSkin(playerid, skin);
+    }
+    return 1;
+}
+#if defined _ALS_SetPlayerSkin
+    #undef SetPlayerSkin
+#else 
+    #define _ALS_SetPlayerSkin
+#endif 
+#define SetPlayerSkin sd_SetPlayerSkin
+
 amx_wastetimer()
 {
     new b;
