@@ -4217,7 +4217,7 @@ public SecondTimer()
 		changeEffect = true;
 		drugchange = 0;
 	}
-	if(reloadbans >= 15)
+	if(reloadbans >= 60)
 	{
 		SendRconCommand("reloadbans");
 		reloadbans = 0;
