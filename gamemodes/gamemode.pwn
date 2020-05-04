@@ -32977,7 +32977,7 @@ public VehicleGet(playerid, textdraw_index)
 	if((vehicleid = sd_CreateVehicle(model, x, y, z, a, color1, color2, -1, 0)) != INVALID_VEHICLE_ID)
 	{
 		// Iskart updatiname data
-		mysql_query(vehicleid, va_return("UPDATE `vehicles_data` SET SpawnedId = '%d' WHERE id = '%d'", vehicleid, sql_id), false);
+		mysql_query(chandler, va_return("UPDATE `vehicles_data` SET SpawnedId = '%d' WHERE id = '%d'", vehicleid, sql_id), false);
 
 		PlayerTextDrawHide(playerid, VL_FindBox[playerid][textdraw_index]);
 		PlayerTextDrawHide(playerid, VL_SpawnBox[playerid][textdraw_index]);
