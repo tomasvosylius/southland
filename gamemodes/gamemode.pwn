@@ -30757,8 +30757,7 @@ stock IsPlayerInRangeOfPlayer(playerid, receiver, Float:range = 1.0, bool:checkv
 
 stock CheckPlayerid(playerid)
 {
-	// if(IsPlayerNPC(playerid) || !IsPlayerConnected(playerid)) return false;
-	if(!IsPlayerConnected(playerid)) return false;
+	if(IsPlayerNPC(playerid) || !IsPlayerConnected(playerid)) return false;
 	return true;
 }
 
