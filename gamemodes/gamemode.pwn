@@ -1071,7 +1071,8 @@ enum E_PLAYER_EXTRA_DATA
 	peBeforeTazerWeaponId,
 	peBeforeTazerWeaponAmmo,
 	peAcceptedBk,
-	peRequestedBk
+	peRequestedBk,
+	peIsFishing
 };
 new PlayerExtra[MAX_PLAYERS][E_PLAYER_EXTRA_DATA];
 
@@ -37963,12 +37964,18 @@ CMD:fishing(playerid, params[])
 		SendWarning(playerid, "Jûs jau esate prigaudæs 20 þuvø. Parduokite jas /sellfishes");
 		return 1;
 	}
+	if(PlayerExtra[playerid][peIsFishing])
+	{
+		SendError(playerid, "Jau þvejojate.");
+		return 1;
+	}
 	if((item_bait = GetItemSlotInPlayerInventory(playerid, ITEM_BAIT)) != -1)
 	{
 		SetPlayerInventoryItemAmount(playerid, item_bait, InventoryInfo[playerid][item_bait][invAmount]-1);
 		
 		SetTimerEx("FishingTimer", 5000, false, "d", playerid);
 		GameTextForPlayer(playerid, "~w~Zvejojate", 4500, 3);
+		PlayerExtra[playerid][peIsFishing] = true;
 
 		ApplyAnimation(playerid, "SAMP", "FishingIdle", 3.0,1,1,0,0,0);
     	SetPlayerAttachedObject( playerid, 0, 18632, 1, -0.091109, 0.255484, 0.018155, 94.362060, 312.328125, 190.418655, 1.000000, 1.000000, 1.000000 );
@@ -37986,6 +37993,7 @@ public FishingTimer(playerid)
 	if(rand <= 60) success = true;
 	else success = false;
 
+	PlayerExtra[playerid][peIsFishing] = false;
 	TogglePlayerControllable(playerid, 1);
 	ClearAnimations(playerid);
    	RemovePlayerAttachedObject(playerid, 0);
