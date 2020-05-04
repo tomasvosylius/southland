@@ -9,6 +9,8 @@
 /* 
 	Defines
 */
+#include <YSI\y_hooks>
+
 #define HACK_NEW_WEAPON	1001
 #define HACK_NEW_AMMO	1002
 #define HACK_OLD_WEAPON	1003

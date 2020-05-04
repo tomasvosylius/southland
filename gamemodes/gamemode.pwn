@@ -52,7 +52,7 @@ native IsValidVehicle(vehicleid);
 #include <colandreas>
 #include <timestamp>
 #include <timerfix>
-#include <streamer_td>
+// #include <streamer_td>
 #include <mSelection>
 #include <screen>
 #include <requests>
@@ -899,7 +899,7 @@ native gpci(playerid, serial[], len);
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-#define USING_VIRTUAL_PRIVATE_SERVER
+// #define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -3923,6 +3923,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\server/taxi.pwn"
 #include "modules\server/trace.pwn"
 #include "modules\server/paynspray.pwn"
+#include "modules\server/npc.pwn"
 //#include "modules\server/gifts.pwn"
 
 /** Player modules */
@@ -5152,9 +5153,9 @@ public OnPlayerDisconnect(playerid, reason)
 	{
 		call OnPlayerDespawnChar(playerid, reason, 0);
 	}
-    for(new i; i < LIMIT_OF_PLAYER_TEXT_DRAWS; i++)
+    for(new i; i < 256; i++)
     {
-    	pTD_Destroy(playerid, PlayerText:i);
+    	PlayerTextDrawDestroy(playerid, PlayerText:i);
     }
 	return 1;
 }
@@ -7308,6 +7309,8 @@ public OnPlayerRequestClass(playerid, classid)
 	#if SERVER_DEBUG_LEVEL >= 2
 		printf("[debug] OnPlayerRequestClass(%s, %d, %d)", GetPlayerNameEx(playerid), classid, PlayerInfo[playerid][pConnection]);
 	#endif
+	if(IsPlayerNPC(playerid)) return 1;
+
 	if(PlayerInfo[playerid][pConnection] == CONNECTION_STATE_LOGGED)
 	{
 		SpawnPlayerEx(playerid, 0);
@@ -7320,6 +7323,9 @@ public OnPlayerSpawn(playerid)
 	#if SERVER_DEBUG_LEVEL >= 2
 		printf("[debug] OnPlayerSpawn(%s, %d)", GetPlayerNameEx(playerid), PlayerInfo[playerid][pAfterLogin]);
 	#endif
+	
+	if(IsPlayerNPC(playerid)) return 1;
+
 	if(PlayerInfo[playerid][pAfterLogin] == 1)
 	{
 		call OnPlayerSpawnFirstTime(playerid);
@@ -9510,7 +9516,7 @@ public CharControlsLoad(playerid, page, selected)
 		PlayerTextDrawShow(playerid, chars_p_td_bigname[playerid]);
 		
 		is_confirmed && PlayerTextDrawSetString(playerid, chars_p_td_biginfo[playerid], string) || PlayerTextDrawSetString(playerid, chars_p_td_biginfo[playerid], "Sis veikejas yra nepatvirtintas,~n~todel negalite juo zaisti.");
-		PlayerTextDrawSetPosition(playerid, chars_p_td_biginfo[playerid], 362.000000, 132.000000);
+		// PlayerTextDrawSetPosition(playerid, chars_p_td_biginfo[playerid], 362.000000, 132.000000);
 		PlayerTextDrawShow(playerid, chars_p_td_biginfo[playerid]);
 
 		TextDrawShowForPlayer(playerid, chars_g_td_play);
@@ -9650,7 +9656,7 @@ public CharSelectData(playerid, page, id, i)
 		SelectTextDraw(playerid, CHARSELECT_COLOR);
 
 		PlayerTextDrawSetString(playerid, chars_p_td_biginfo[playerid], "Pasirinkite veikeja, kuri norite valdyti");
-		PlayerTextDrawSetPosition(playerid, chars_p_td_biginfo[playerid], 362.000000, 122.000000);
+		// PlayerTextDrawSetPosition(playerid, chars_p_td_biginfo[playerid], 362.000000, 122.000000);
 		PlayerTextDrawShow(playerid, chars_p_td_biginfo[playerid]);
 	}
 	return 1;
@@ -25527,25 +25533,25 @@ public OnPlayerPutInventoryItem(playerid, slotid, to_type, to_itter)
 		{
 			if(IsModelPedal(GetVehicleModel(to_itter))) return SendWarning(playerid, "Tr. priemonë bagaþinës neturi.");
 			result = GiveVehicleInventoryItem(to_itter, itemid, amount, extra, to_slot);
-			rp_me(playerid, _, "padeda daiktà á bagaþinæ, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
+			rp_me(playerid, _, "padeda daiktà á bagaþinæ, kuris atrodo kaip %s.", GetInventoryItemName(itemid, .lower_case = true));
 			SaveVehicleInventory(to_itter);
 		}
 		case INVENTORY_TYPE_DEALER_HOUSE:
 		{
 			result = GiveDealerHouseInventoryItem(to_itter, itemid, amount, extra, to_slot);
-			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
+			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s.", GetInventoryItemName(itemid, .lower_case = true));
 			SaveDealerHouseInventory(to_itter);
 		}
 		case INVENTORY_TYPE_HOUSE:
 		{
 			result = GiveHouseInventoryItem(to_itter, itemid, amount, extra, to_slot);
-			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));
+			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s.", GetInventoryItemName(itemid, .lower_case = true));
 			SaveHouseInventory(to_itter);
 		}
 		case INVENTORY_TYPE_BUSINESS:
 		{
 			result = GiveBusinessInventoryItem(to_itter, itemid, amount, extra, to_slot);
-			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s", GetInventoryItemName(itemid, .lower_case = true));	
+			rp_me(playerid, _, "padeda daiktà á spintelæ, kuris atrodo kaip %s.", GetInventoryItemName(itemid, .lower_case = true));	
 			SaveBusinessInventory(to_itter);
 		}
 	}
@@ -25654,7 +25660,7 @@ public OnPlayerGiveInventoryItem(playerid, slotid)
 			GetPlayerNameEx(playerid, true),
 			amount);
 		
-		rp_me(playerid, _, "perduoda daiktà %s, kuris atrodo kaip %s", GetPlayerNameEx(receiverid, true), GetInventoryItemName(itemid, .lower_case = true));
+		rp_me(playerid, _, "perduoda daiktà %s, kuris atrodo kaip %s.", GetPlayerNameEx(receiverid, true), GetInventoryItemName(itemid, .lower_case = true));
 
 		log_init(true);
 		log_set_table("logs_inventory");
@@ -30751,7 +30757,8 @@ stock IsPlayerInRangeOfPlayer(playerid, receiver, Float:range = 1.0, bool:checkv
 
 stock CheckPlayerid(playerid)
 {
-	if(IsPlayerNPC(playerid) || !IsPlayerConnected(playerid)) return false;
+	// if(IsPlayerNPC(playerid) || !IsPlayerConnected(playerid)) return false;
+	if(!IsPlayerConnected(playerid)) return false;
 	return true;
 }
 
@@ -32540,9 +32547,9 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 	return 1;
 }
 
-forward OnPlayerClickPTextDraw(playerid, PlayerText:playertextid);
-public OnPlayerClickPTextDraw(playerid, PlayerText:playertextid)
+public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 {
+
 	#if SERVER_DEBUG_LEVEL >= 2
 		printf("[debug] OnPlayerClickPlayerTextDraw(%s, %d)", GetPlayerNameEx(playerid), _:playertextid);
 	#endif
@@ -32554,6 +32561,10 @@ public OnPlayerClickPTextDraw(playerid, PlayerText:playertextid)
 			return 1;
 		}
 	}
+
+	static
+		last_V_Get[MAX_PLAYERS];
+
 	for(new td = 0; td < 4; td++)
 	{
 		if(playertextid == VL_FindBox[playerid][td])
@@ -32577,8 +32588,18 @@ public OnPlayerClickPTextDraw(playerid, PlayerText:playertextid)
 		}
 		if(playertextid == VL_SpawnBox[playerid][td])
 		{
+			if(gettime() - last_V_Get[playerid] <= 2)
+			{
+				SendWarning(playerid, "Palaukite!");
+				return 1;
+			}
+
 			new vehiclesql = tmpArray[playerid][(tmpPage_Object[playerid]*4)-(4-td)];
-			if((PlayerInfo[playerid][pDonator] == DONATOR_NONE && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS) || (PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_BRONZE) || (PlayerInfo[playerid][pDonator] == DONATOR_SILVER && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_SILVER) || (PlayerInfo[playerid][pDonator] == DONATOR_GOLD && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_GOLD))
+			if(	(PlayerInfo[playerid][pDonator] == DONATOR_NONE && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS) || 
+				(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_BRONZE) || 
+				(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_SILVER) ||
+				(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_GOLD)
+			)
 			{
 				new string[256];
 				mysql_format(chandler, string, sizeof string, "SELECT \
@@ -32592,8 +32613,10 @@ public OnPlayerClickPTextDraw(playerid, PlayerText:playertextid)
 			}
 			else
 			{
-				return SendError(playerid, "Negalite iðparkuoti daugiau transporto priemoniø.");
+				SendError(playerid, "Negalite iðparkuoti daugiau transporto priemoniø.");
 			}
+
+			last_V_Get[playerid] = gettime();
 			return 1;
 		}
 	}
@@ -32916,9 +32939,14 @@ public VehicleGet(playerid, textdraw_index)
 	if(!cache_num_rows()) return 1;
 	new
 		spawned,
+		sql_id,
 		arrested;
+	
+
+	cache_get_value_name_int(0, "id", sql_id);
 	cache_get_value_name_int(0, "SpawnedId", spawned);
 	cache_get_value_name_int(0, "CrimesCount", arrested);
+	
 	if(arrested > 0)
 	{
 		return SendWarning(playerid, "Ði tr. priemonë yra areðtuota.");
@@ -32948,6 +32976,9 @@ public VehicleGet(playerid, textdraw_index)
 
 	if((vehicleid = sd_CreateVehicle(model, x, y, z, a, color1, color2, -1, 0)) != INVALID_VEHICLE_ID)
 	{
+		// Iskart updatiname data
+		mysql_query(vehicleid, va_return("UPDATE `vehicles_data` SET SpawnedId = '%d' WHERE id = '%d'", vehicleid, sql_id), false);
+
 		PlayerTextDrawHide(playerid, VL_FindBox[playerid][textdraw_index]);
 		PlayerTextDrawHide(playerid, VL_SpawnBox[playerid][textdraw_index]);
 		PlayerTextDrawHide(playerid, VL_FindText[playerid][textdraw_index]);
@@ -33025,7 +33056,6 @@ public VehicleGet(playerid, textdraw_index)
 		}
 
 		PlayerInfo[playerid][pCarsSpawned]++;
-		SaveVehicleIntEx(vehicleid, "SpawnedId", vehicleid);
 		SendFormat(playerid, 0xD9D9D9FF, "Tr. priemonë {FFFFFF}%s{D9D9D9} (%d) sëkmingai iðparkuota.", GetModelName(model), VehicleInfo[vehicleid][vId]);
 
 		log_init(true);
@@ -34217,8 +34247,8 @@ CMD:jetpack(playerid, params[])
 	return 1;
 }
 
+CMD:aod(playerid, params[], help) return pc_cmd_aduty(playerid, "");
 flags:aduty(CMD_TYPE_ADMIN);
-alias:aduty("aod");
 CMD:aduty(playerid, params[])
 {
 	PlayerInfo[playerid][pAdminDuty] = !PlayerInfo[playerid][pAdminDuty];
@@ -40869,6 +40899,7 @@ CMD:buyhouse(playerid, params[])
 		FixHouseLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
 		sd_DestroyDynamicPickup(HouseInfo[houseid][hPickup]);
 		HouseInfo[houseid][hPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_HOUSE, houseid, HouseInfo[houseid][hOwner] > 0 ? (1272) : (1273), 1, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ], HouseInfo[houseid][hOutVW], HouseInfo[houseid][hExterior]);
+		// CreateDynamicPickup(modelid, type, Float:x, Float:y, Float:z, worldid = -1, interiorid = -1, playerid = -1, Float:streamdistance = STREAMER_PICKUP_SD, STREAMER_TAG_AREA areaid = STREAMER_TAG_AREA -1)
 	}
 	else SendWarning(playerid, "Ásitikinkite, kad esate lauke prie namo.");
 	return 1;
