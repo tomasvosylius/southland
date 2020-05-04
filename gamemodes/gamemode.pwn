@@ -2168,10 +2168,11 @@ new Float:MechanicPartSpots[][3] = {
 	{2146.0999, -1915.6182, 13.1938}
 };
 
+#define BASE_PAYDAY_NO_JOB		200
 new Jobs[][E_JOB_DATA] = {
 	// Id 			Name 					  	X 		Y 			Z 			Payday 	Max 	Bonus 	Contract
-	{JOB_MECHANIC, 	"Tr. priemoniø mechanikai", 2170.38, -1909.48, 13.53, 	1200, 	2500, 	10, 	2},
-	{JOB_TRUCKER, 	"Kroviniø iðveþiotojai", 	2432.76, -2097.25, 13.55, 	700, 	2500, 	15, 	2}
+	{JOB_MECHANIC, 	"Tr. priemoniø mechanikai", 2170.38, -1909.48, 13.53, 		400, 	1100, 	10, 	2},
+	{JOB_TRUCKER, 	"Kroviniø iðveþiotojai", 	2432.76, -2097.25, 13.55, 		300, 	1100, 	15, 	2}
 };
 
 new FurnitureTextures[][E_FURNITURE_TEXTURES_DATA] = {
@@ -7327,8 +7328,6 @@ public OnPlayerSpawn(playerid)
 			#endif
 		}
 
-		SetSkinSpawn(playerid, true);
-
 		SetPlayerColor(playerid, 0x99999911);
 
 		SetPlayerSkillLevel(playerid, 0, 1);
@@ -7368,15 +7367,9 @@ public OnPlayerSpawn(playerid)
 			DestroyDynamic3DTextLabel(PlayerExtra[playerid][peDeathLabel]);
 		}
 		PlayerExtra[playerid][peDeathLabel] = INVALID_3DTEXT_ID;
-		SetSkinSpawn(playerid, false);
 	}
-	return 1;
-}
 
-stock SetSkinSpawn(playerid, bool:unfreeze)
-{
 	SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
-	unfreeze && TogglePlayerControllable(playerid, 1);
 	return 1;
 }
 
@@ -26896,6 +26889,8 @@ stock PayDay(playerid)
 		}
 	}
 
+	if(payday == 0 && PlayerInfo[playerid][pJob] == 0) payday = BASE_PAYDAY_NO_JOB;
+
 
 	new	taxes_vehicle,
 		taxes_houses,
@@ -37998,8 +37993,8 @@ public FishingTimer(playerid)
 	return 1;
 }
 
-#define MIN_MONEY_PER_FISH	7
-#define MAX_MONEY_PER_FISH	15
+#define MIN_MONEY_PER_FISH	(4)
+#define MAX_MONEY_PER_FISH	(8)
 
 CMD:sellfishes(playerid, params[])
 {

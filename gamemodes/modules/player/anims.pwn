@@ -152,6 +152,7 @@ hook OnPlayerSpawnFirstTime(playerid)
 
 stock PreloadAnimsForPlayer(playerid)
 {
+	PreloadAnimLib(playerid,"SAMP");
 	PreloadAnimLib(playerid,"AIRPORT");
 	PreloadAnimLib(playerid,"Attractors");
 	PreloadAnimLib(playerid,"BAR");
