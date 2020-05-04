@@ -29822,6 +29822,7 @@ public AccountLoad(playerid)
 		log_set_values("'%d','%e','Uzkrautas veikejas','%s'", LogPlayerId(playerid), LogPlayerName(playerid), GetPlayerIpEx(playerid));
 		log_push();
 
+		SetPlayerArmour(playerid, 0.0);
 		SpawnPlayerEx(playerid, 1, .set = true);
 		TogglePlayerSpectating(playerid, false);
 		SetCameraBehindPlayer(playerid);
@@ -37757,6 +37758,7 @@ CMD:vest(playerid, params[])
 		// uzsidejo
 		if(!IsPlayerAttachedObjectSlotUsed(playerid, 9))
 		{
+			// SetPlayerAttachedObject(playerid, index, modelid, bone, Float:fOffsetX = 0.0, Float:fOffsetY = 0.0, Float:fOffsetZ = 0.0, Float:fRotX = 0.0, Float:fRotY = 0.0, Float:fRotZ = 0.0, Float:fScaleX = 1.0, Float:fScaleY = 1.0, Float:fScaleZ = 1.0, materialcolor1 = 0, materialcolor2 = 0)
 			SetPlayerAttachedObject(playerid, 9, 19142, 1, 0.1, 0.05, 0.0, 0.0, 0.0, 0.0);
 			EditAttachedObject(playerid, 9);
 		}
