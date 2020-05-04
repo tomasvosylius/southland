@@ -38017,7 +38017,7 @@ public FishingTimer(playerid)
 	return 1;
 }
 
-#define MIN_MONEY_PER_FISH	(4)
+#define MIN_MONEY_PER_FISH	(5)
 #define MAX_MONEY_PER_FISH	(8)
 
 CMD:sellfishes(playerid, params[])
