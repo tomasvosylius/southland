@@ -2642,6 +2642,7 @@ CREATE TABLE IF NOT EXISTS `users_data` (
   `DiscordVerified` tinyint(1) NOT NULL,
   `DiscordUser` bigint(20) not null,
   `DiscordCode` varchar(20) not null,
+  `TutorialDone` smallint(2) not null default 0,
   `Salt` varchar(30) NOT NULL,
   `RegisterIp` varchar(19) NOT NULL,
   `RegisterDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

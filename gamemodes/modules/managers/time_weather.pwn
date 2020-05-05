@@ -1,3 +1,5 @@
+#include <YSI\y_hooks>
+
 static 
 	server_SAMP_Time 	= 0,
 	server_SAMP_Weather = 1;
@@ -16,7 +18,7 @@ static _Player_EnableInteriorLight(playerid, bool:enable)
 {
 	if(enable)
 	{
-		SetPlayerWeather(playerid, 6);
+		SetPlayerWeather(playerid, 0);
 		SetPlayerTime(playerid, 12, 0);
 	}
 	else 

@@ -28,6 +28,11 @@ hook OnPlayerConnect(playerid)
         return 1;
     }
 
+    if(isequal(ip, "127.0.0.1", true))
+    {
+        return 1;
+    }
+
     inline check_ip_blacklist()
     {
         if(cache_num_rows())

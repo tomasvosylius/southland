@@ -52,7 +52,7 @@ native IsValidVehicle(vehicleid);
 #include <colandreas>
 #include <timestamp>
 #include <timerfix>
-// #include <streamer_td>
+#include <streamer_td>
 #include <mSelection>
 #include <screen>
 #include <requests>
@@ -1165,7 +1165,8 @@ enum E_PLAYER_DATA
 	pHaveCars,
 	pTaxiLicense,
 	pIp[MAX_PLAYER_IP+1],
-	pDiscordVerified
+	pDiscordVerified,
+	pTutorialDone
 };
 new PlayerInfo[MAX_PLAYERS][E_PLAYER_DATA];
 
@@ -1947,7 +1948,7 @@ new DrugLevelReset[MAX_DRUG_TYPES] = {
 	0 // Methas
 };*/
 
-new Tips[][E_TIP_DATA] = {
+/*new Tips[][E_TIP_DATA] = {
 	{"Ar zinote, kad galite naudoti~n~komandas /enter ir /exit,~n~noredami ieiti arba iseiti is ~n~pastato?"},
 	{"Noredami rasti daugiau siste-~n~mos komandu, rasykite /help~n~ir sistemos pavadinima salia"},
 	{"Pilnus sistemu aprasymus,~n~oficialius projekto gidus ir~n~kita informacija galite~n~rasti forume www."#PROJECT_NAME"."#PROJECT_DOMAIN""},
@@ -1956,7 +1957,7 @@ new Tips[][E_TIP_DATA] = {
 	{"Telefono valdyma galite~n~matyti naudodami /phone arba~n~paspaude mygtuka N"},
 	{"Noredami naudotis bankomatu~n~naudokite komanda /atm salia~n~bankomato"},
 	{"Paimti ismesta daikta nuo~n~zemes naudokite C + ALT~n~mygtukus"}
-};
+};*/
 
 
 new OriginsList[][16] = {
@@ -3901,6 +3902,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core\map\train_ganton.pwn"
 #include "core\map\train_jefferson.pwn"
 #include "core\map\pier.pwn"
+#include "core\map\interiors.pwn"
 // #include "core\map\ganghood_details.pwn"
 // #include "core\map\taxi.pwn"
 // #include "core\map\ls_bus_station.pwn"
@@ -3913,7 +3915,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\lspd.pwn"
 // #include "core\map\downtown_parking.pwn"
 // #include "core\map\mall_parking.pwn"
-// #include "core\map\interiors.pwn"
 // #include "core\map\laundry.pwn"
 // #include "core\map\bank.pwn"
 // #include "core\map\grove.pwn"
@@ -3923,8 +3924,8 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\idlewood_park.pwn"
 
 
-#include "modules\server\managers/worldtime.pwn"
-#include "modules\server\bots/npc.pwn"
+#include "modules\managers/time_weather.pwn"
+#include "modules\bots/npc.pwn"
 #include "modules\server/graffiti.pwn"
 #include "modules\server/thief.pwn"
 #include "modules\server/boombox.pwn"
@@ -3937,6 +3938,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player/proxy.pwn"
 #include "modules\player/ipspam.pwn"
 #include "modules\player/anims.pwn"
+#include "modules\player/newbie.pwn"
 #include "modules\player\ui/speedo.pwn"
 #include "modules\player\ui/leftbox.pwn"
 
@@ -4877,7 +4879,7 @@ public MinuteTimer()
 			}
 			
 			// Jei yra 6-20, atimame 2 valandas.
-			SetWorldTime(hour - (6 <= hour <= 20 > ? 2 : 0));
+			SetWorldTime(hour - ((6 <= hour <= 20) ? 2 : 0) );
 
 			serverHour = hour;
 			stats_police_calls = 0;
@@ -7081,6 +7083,7 @@ public OnPlayerText(playerid, text[])
 			return 0;
 		}
 	#endif
+
 	PlayerExtra[playerid][peAFKTime] = 0;
 	if(text[0] == '@' && HaveCommandPermission(playerid, "a") && text[1] != EOS)
 	{
@@ -7093,7 +7096,10 @@ public OnPlayerText(playerid, text[])
 		SendAdminMessage(0xFFFDA1FF, false, "[%s %s(%d)]: %s", GetGroupName(PlayerGroups[playerid][0]), name, playerid, text);
 		return 0;
 	}
-	else if(text[0] != EOS && PlayerInfo[playerid][pConnection] == CONNECTION_STATE_LOGGED)
+	else if(
+		text[0] != EOS && 
+		!Player_IsInTutorial(playerid) &&
+		PlayerInfo[playerid][pConnection] == CONNECTION_STATE_LOGGED)
 	{
 		if(PlayerExtra[playerid][peMuted] > 0)
 		{
@@ -7344,19 +7350,26 @@ public OnPlayerSpawn(playerid)
 
 		if(PlayerInfo[playerid][pIsApproved])
 		{
-			PreparePlayerLoginNotes(playerid);
+			LoadPlayerLoginNotes(playerid);
 			PreparePlayerVehicles(playerid);
+
 			new string[126];
+
 			mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_inventory` WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
 			mysql_tquery(chandler, string, "PlayerInventoryLoad", "d", playerid);
+
 			mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_clothes` WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
 			mysql_tquery(chandler, string, "PlayerClothesLoad", "d", playerid);
+
 			mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_contacts` WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
 			mysql_tquery(chandler, string, "PlayerContactsLoad", "d", playerid);
+
 			mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_drugs` WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
 			mysql_tquery(chandler, string, "PlayerDrugsLoad", "d", playerid);
+
 			mysql_format(chandler, string, sizeof string, "SELECT `Packed` FROM `players_weapons` WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
 			mysql_tquery(chandler, string, "PlayerWeaponsLoad", "d", playerid);
+
 			#if defined ENABLE_GPS
 				//SendFormat(playerid, 0xFF7300FF, "* {FFAD69}Dël maþesnës apkrovos administratoriams, serverio startavimo metu naudokitës komanda /gps");
 			#endif
@@ -7402,8 +7415,6 @@ public OnPlayerSpawn(playerid)
 		}
 		PlayerExtra[playerid][peDeathLabel] = INVALID_3DTEXT_ID;
 	}
-
-	SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 	return 1;
 }
 
@@ -7867,7 +7878,8 @@ public OnPlayerCommandReceived(playerid, cmd[], params[], flags)
 	#if SERVER_DEBUG_LEVEL >= 2
 		if(!(flags & CMD_TYPE_NOT_LOGGABLE)) printf("[debug] OnPlayerCommandReceived(%s,%s(%s),%d)", GetPlayerNameEx(playerid), cmd, params);
 	#endif
-	if(PlayerInfo[playerid][pConnection] != CONNECTION_STATE_LOGGED)
+	if(	PlayerInfo[playerid][pConnection] != CONNECTION_STATE_LOGGED || 
+		(Player_IsInTutorial(playerid) && !isequal(cmd, "skip", true)))
 	{
 		return 0;
 	}
@@ -9762,6 +9774,7 @@ public CheckRegisterIp(playerid)
 			RegisterIp[19];
 		cache_get_value_name(0, "RegisterIp", RegisterIp);
 		cache_get_value_name_int(0, "DiscordVerified", PlayerInfo[playerid][pDiscordVerified]);
+		cache_get_value_name_int(0, "TutorialDone", PlayerInfo[playerid][pTutorialDone]);
 
 		if(!isequal(RegisterIp, GetPlayerIpEx(playerid)))
 		{
@@ -23783,13 +23796,12 @@ stock GetDealerDrugOrder(playerid)
 
 stock ShowPlayerStats(playerid, receiverid)
 {
-	new year, xp_to_next_lvl;
-	getdate(year, xp_to_next_lvl, xp_to_next_lvl);
-	xp_to_next_lvl = (PlayerInfo[playerid][pLevel] + 1)*4;
-
-	new 
+	new xp_to_next_lvl,
 		year, month, day,
 		hour, minute, second;
+
+	getdate(year, xp_to_next_lvl, xp_to_next_lvl);
+	xp_to_next_lvl = (PlayerInfo[playerid][pLevel] + 1)*4;
 
 	getdate(year, month, day);
 	gettime(hour, minute, second);
@@ -27731,7 +27743,7 @@ stock ChangeVehicleEngineStatus(playerid, vehicleid)
 	VehicleInfo[vehicleid][vEngined] = !VehicleInfo[vehicleid][vEngined];
 	if(VehicleInfo[vehicleid][vEngined] == 0)
 	{
-		UI_LeftBox_Show(playerid, "Variklis ~r~uzgesintas", .time = 3);
+		UI_LeftBox_Show(playerid, "Variklis ~r~uzgesintas");
 		if(VehicleHaveEngine(VehicleInfo[vehicleid][vModel]))
 		{
 			Speedo_Update(playerid, .fuel_level = "DEGALAI:");
@@ -27739,7 +27751,7 @@ stock ChangeVehicleEngineStatus(playerid, vehicleid)
 	}
 	else
 	{
-		UI_LeftBox_Show(playerid, "Variklis ~g~uzvestas", .time = 3);
+		UI_LeftBox_Show(playerid, "Variklis ~g~uzvestas");
 	}
 	new engine, lights, alarm, doors, bonnet, boot, objective;
 	GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
@@ -29064,7 +29076,7 @@ public OnCountPlayerVehicles(playerid)
 	return 1;
 }
 
-stock PreparePlayerLoginNotes(playerid)
+stock LoadPlayerLoginNotes(playerid)
 {
 	new string[126];
 	mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_login_notes` WHERE PlayerId = '%d' AND DidRead = '0'", PlayerInfo[playerid][pId]);
@@ -29788,8 +29800,10 @@ public AccountLoad(playerid)
 		new string[38];
 		format(string, 38, "SVEIKI, %s", strtoupper(GetPlayerNameEx(playerid, true)));
 		InfoBox(playerid, "~g~PRISIJUNGETE", string);
+		
 		PlayerInfo[playerid][pAfterLogin] = 1;
 		PlayerInfo[playerid][pIsApproved] = true;
+
 		if(last_version != CODE_VERSION_P)
 		{
 			SendFormat(playerid, 0xF06C38FF, "Serveris buvo atnaujintas nuo to laiko, kai Jûs paskutiná kartà prisijungëte!");
@@ -29803,7 +29817,6 @@ public AccountLoad(playerid)
 		log_set_values("'%d','%e','Uzkrautas veikejas','%s'", LogPlayerId(playerid), LogPlayerName(playerid), GetPlayerIpEx(playerid));
 		log_push();
 
-		SetPlayerArmour(playerid, 0.0);
 		SpawnPlayerEx(playerid, 1, .set = true);
 		TogglePlayerSpectating(playerid, false);
 		SetCameraBehindPlayer(playerid);
@@ -32520,7 +32533,9 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 	return 1;
 }
 
-public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+// public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
+forward OnPlayerClickPTextDraw(playerid, PlayerText:playertextid);
+public OnPlayerClickPTextDraw(playerid, PlayerText:playertextid)
 {
 
 	#if SERVER_DEBUG_LEVEL >= 2
@@ -38784,7 +38799,8 @@ CMD:takejob(playerid, params[])
 			PlayerInfo[playerid][pJob] = Jobs[i][jobId];
 			PlayerInfo[playerid][pJobLevel] = 1;
 			PlayerInfo[playerid][pJobXP] = 1;
-			SendFormat(playerid, 0xA1FD8DFF, "Sëkmingai ásidarbinote á {66D94D}%s{A1FD8D}. Informacijà rasite {66D94D}/help", Jobs[i][jobName]);
+			SendFormat(playerid, 0xA7CE9EFF, "\
+				Sëkmingai ásidarbinote á {66D94D}%s{A7CE9E}. Informacijà rasite {66D94D}/help{A7CE9E}. Darbà pradëti gali su {66D94D}/duty", Jobs[i][jobName]);
 			log_init(true);
 			log_set_table("logs_jobs");
 			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");

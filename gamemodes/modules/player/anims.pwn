@@ -124,7 +124,7 @@ stock ApplyAnimation_Loop(playerid, animlib[], animname[], Float:speed, bool:loo
 {
 	ApplyAnimation(playerid, animlib, animname, speed, loop, lockx, locky, freeze, time, forcesync);
 	player_UsingLoopAnim[playerid] = true;
-	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim", .time = 3);
+	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim");
 	return 1;
 }
 
@@ -132,7 +132,7 @@ stock ApplyAnimation_Single(playerid, animlib[], animname[], Float:speed, bool:l
 {
 	ApplyAnimation(playerid, animlib, animname, speed, loop, lockx, locky, freeze, time, forcesync);
 	player_UsingSingleAnim[playerid] = true;
-	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim", .time = 3);
+	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim");
 	return 1;
 }
 
@@ -140,7 +140,7 @@ stock ApplyAnimation_Back(playerid, animlib[], animname[], Float:speed, bool:loo
 {
 	ApplyAnimation(playerid, animlib, animname, speed, loop, lockx, locky, freeze, time, forcesync);
 	player_UsingBackAnim[playerid] = back;
-	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim", .time = 3);
+	UI_LeftBox_Show(playerid, "Sustabdyti animacija gali parases ~r~/stopanim");
 	return 1;
 }
 

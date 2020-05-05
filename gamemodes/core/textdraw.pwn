@@ -3606,7 +3606,7 @@ stock BorderHUD_Hide(playerid)
 
 stock CharListTD_Create_Player(playerid)
 {
-	chars_p_td_lessinfo[playerid][0] = CreatePlayerTextDraw(playerid, 149.000000, 274.000000, "Lygis:_10_(2/50_XP)~n~Darbas:_nera~n~Grynieji:_1000$~n~Banke:_1000$");
+	chars_p_td_lessinfo[playerid][0] = CreatePlayerTextDraw(playerid, 149.000000, 274.000000, "Lygis:_10_(2/50_XP)~n~Darbas:_nera~n~Grynieji:_1000$~n~Banke:_1000$", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_lessinfo[playerid][0], 0.199616, 0.900264);
 	PlayerTextDrawAlignment(playerid, chars_p_td_lessinfo[playerid][0], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_lessinfo[playerid][0], -1);
@@ -3617,7 +3617,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_lessinfo[playerid][0], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_lessinfo[playerid][0], 0);
 
-	chars_p_td_smallname[playerid][0] = CreatePlayerTextDraw(playerid, 149.000000, 261.000000, "BENJAMIN_MC_FORBES_TIPO");
+	chars_p_td_smallname[playerid][0] = CreatePlayerTextDraw(playerid, 149.000000, 261.000000, "BENJAMIN_MC_FORBES_TIPO", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_smallname[playerid][0], 0.214855, 1.036798);
 	PlayerTextDrawAlignment(playerid, chars_p_td_smallname[playerid][0], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_smallname[playerid][0], -1);
@@ -3628,7 +3628,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_smallname[playerid][0], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_smallname[playerid][0], 1);
 
-	chars_p_td_charskin[playerid][0] = CreatePlayerTextDraw(playerid, 136.000000, 131.000000, "");
+	chars_p_td_charskin[playerid][0] = CreatePlayerTextDraw(playerid, 136.000000, 131.000000, "", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_charskin[playerid][0], 0.000000, 0.000000);
 	PlayerTextDrawTextSize(playerid, chars_p_td_charskin[playerid][0], 118.000000, 117.000000);
 	PlayerTextDrawAlignment(playerid, chars_p_td_charskin[playerid][0], 1);
@@ -3643,7 +3643,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetPreviewRot(playerid, chars_p_td_charskin[playerid][0], 0.000000, 0.000000, 0.000000, 1.007151);
 
 
-	chars_p_td_smallname[playerid][1] = CreatePlayerTextDraw(playerid, 256.000000, 261.000000, "BENJAMIN_MC_FORBES_TIPO");
+	chars_p_td_smallname[playerid][1] = CreatePlayerTextDraw(playerid, 256.000000, 261.000000, "BENJAMIN_MC_FORBES_TIPO", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_smallname[playerid][1], 0.214855, 1.036798);
 	PlayerTextDrawAlignment(playerid, chars_p_td_smallname[playerid][1], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_smallname[playerid][1], -1);
@@ -3654,7 +3654,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_smallname[playerid][1], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_smallname[playerid][1], 1);
 
-	chars_p_td_lessinfo[playerid][1] = CreatePlayerTextDraw(playerid, 256.599975, 274.000000, "Lygis:_10_(2/50_XP)~n~Darbas:_nera~n~Grynieji:_1000$~n~Banke:_1000$");
+	chars_p_td_lessinfo[playerid][1] = CreatePlayerTextDraw(playerid, 256.599975, 274.000000, "Lygis:_10_(2/50_XP)~n~Darbas:_nera~n~Grynieji:_1000$~n~Banke:_1000$", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_lessinfo[playerid][1], 0.199616, 0.900264);
 	PlayerTextDrawAlignment(playerid, chars_p_td_lessinfo[playerid][1], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_lessinfo[playerid][1], -1);
@@ -3666,7 +3666,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetShadow(playerid, chars_p_td_lessinfo[playerid][1], 0);
 
 
-	chars_p_td_charskin[playerid][1] = CreatePlayerTextDraw(playerid, 244.000000, 130.000000, "");
+	chars_p_td_charskin[playerid][1] = CreatePlayerTextDraw(playerid, 244.000000, 130.000000, "", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_charskin[playerid][1], 0.000000, 0.000000);
 	PlayerTextDrawTextSize(playerid, chars_p_td_charskin[playerid][1], 118.000000, 117.000000);
 	PlayerTextDrawAlignment(playerid, chars_p_td_charskin[playerid][1], 1);
@@ -3680,7 +3680,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetPreviewModel(playerid, chars_p_td_charskin[playerid][1], 154);
 	PlayerTextDrawSetPreviewRot(playerid, chars_p_td_charskin[playerid][1], 0.000000, 0.000000, 0.000000, 1.007151);
 
-	chars_p_td_error[playerid] = CreatePlayerTextDraw(playerid, 325.000000, 351.000000, "~n~_Sis_veikejas_yra_naudojamas!_Pirmiausia_turite_ji~n~_atjungti_nuo_zaidimo.~n~~n~");
+	chars_p_td_error[playerid] = CreatePlayerTextDraw(playerid, 325.000000, 351.000000, "~n~_Sis_veikejas_yra_naudojamas!_Pirmiausia_turite_ji~n~_atjungti_nuo_zaidimo.~n~~n~", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_error[playerid], 0.204571, 0.768000);
 	PlayerTextDrawTextSize(playerid, chars_p_td_error[playerid], 492.000000, 0.000000);
 	PlayerTextDrawAlignment(playerid, chars_p_td_error[playerid], 1);
@@ -3694,7 +3694,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_error[playerid], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_error[playerid], 0);
 
-	chars_p_td_bigname[playerid] = CreatePlayerTextDraw(playerid, 362.000000, 121.000000, "BENJAMIN_MC_FORBES_TIPO");
+	chars_p_td_bigname[playerid] = CreatePlayerTextDraw(playerid, 362.000000, 121.000000, "BENJAMIN_MC_FORBES_TIPO", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_bigname[playerid], 0.238474, 1.117865);
 	PlayerTextDrawAlignment(playerid, chars_p_td_bigname[playerid], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_bigname[playerid], -1);
@@ -3705,7 +3705,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_bigname[playerid], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_bigname[playerid], 1);
 
-	chars_p_td_biginfo[playerid] = CreatePlayerTextDraw(playerid, 362.000000, 132.000000 /*122.000000*/, "Administracijos_grupes:_(Ikurejas)~n~(Administratorius_I)_(Frakciju_valdyb~n~a)~n~Frakcija:_Los_Santos_Police_Dep.~n~Rangas:_Detective_I~n~Turimos_tr._priemones:_3~n~Turimi_namai:_3~n~Turimi_verslai:_3~n~");
+	chars_p_td_biginfo[playerid] = CreatePlayerTextDraw(playerid, 362.000000, 132.000000 /*122.000000*/, "Administracijos_grupes:_(Ikurejas)~n~(Administratorius_I)_(Frakciju_valdyb~n~a)~n~Frakcija:_Los_Santos_Police_Dep.~n~Rangas:_Detective_I~n~Turimos_tr._priemones:_3~n~Turimi_namai:_3~n~Turimi_verslai:_3~n~", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_biginfo[playerid], 0.199616, 0.900264); 
 	PlayerTextDrawAlignment(playerid, chars_p_td_biginfo[playerid], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_biginfo[playerid], -1);
@@ -3716,7 +3716,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_biginfo[playerid], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_biginfo[playerid], 0);
 
-	chars_p_td_page_txt[playerid] = CreatePlayerTextDraw(playerid, 425.000000, 319.000000, "Puslapis:_3/3_antras_pt_kaire_desine");
+	chars_p_td_page_txt[playerid] = CreatePlayerTextDraw(playerid, 425.000000, 319.000000, "Puslapis:_3/3_antras_pt_kaire_desine", .perm = true);
 	PlayerTextDrawLetterSize(playerid, chars_p_td_page_txt[playerid], 0.192761, 0.951466);
 	PlayerTextDrawAlignment(playerid, chars_p_td_page_txt[playerid], 2);
 	PlayerTextDrawColor(playerid, chars_p_td_page_txt[playerid], 255);

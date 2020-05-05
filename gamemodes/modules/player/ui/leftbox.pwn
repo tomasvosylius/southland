@@ -5,8 +5,16 @@ static
     bool:player_UI_Created[MAX_PLAYERS],
     PlayerText:TD_LeftBox[MAX_PLAYERS];
 
-stock UI_LeftBox_Show(playerid, string[], time = 3)
+stock UI_LeftBox_Hide(playerid)
 {
+    (player_UI_Created[playerid]) && PlayerTextDrawDestroy(playerid, TD_LeftBox[playerid]);
+    player_UI_Created[playerid] = false;
+    return 1;
+}
+stock UI_LeftBox_Show(playerid, string[], Float:width = 155.0, Float:time = 3.0)
+{
+    printf("UI_LeftBox_Show(%s): %s", ret_GetPlayerName(playerid), string);
+
     if(player_UI_Created[playerid])
     {
         if(player_Timer[playerid] != Timer:NONE)
@@ -19,7 +27,7 @@ stock UI_LeftBox_Show(playerid, string[], time = 3)
     {
         TD_LeftBox[playerid] = CreatePlayerTextDraw(playerid, 17.000000, 152.000000, string); // 
         PlayerTextDrawLetterSize(playerid, TD_LeftBox[playerid], 0.356249, 1.693331);
-        PlayerTextDrawTextSize(playerid, TD_LeftBox[playerid], 149.000000, 0.000000);
+        PlayerTextDrawTextSize(playerid, TD_LeftBox[playerid], width, 0.000000);
         PlayerTextDrawAlignment(playerid, TD_LeftBox[playerid], 1);
         PlayerTextDrawColor(playerid, TD_LeftBox[playerid], -33);
         PlayerTextDrawUseBox(playerid, TD_LeftBox[playerid], 1);
@@ -32,14 +40,15 @@ stock UI_LeftBox_Show(playerid, string[], time = 3)
     PlayerTextDrawShow(playerid, TD_LeftBox[playerid]);
 
     player_UI_Created[playerid] = true;
-    player_Timer[playerid] = defer PT_HideLeftHud[time * 1000](playerid);
+    if(time > 0.0)
+    {
+        player_Timer[playerid] = defer PT_HideLeftHud[floatround(time * 1000)](playerid);
+    }
 }
 
 timer PT_HideLeftHud[3000](playerid)
 {
-    (player_UI_Created[playerid]) && PlayerTextDrawDestroy(playerid, TD_LeftBox[playerid]);
-    player_UI_Created[playerid] = false;
-    return 1;
+    UI_LeftBox_Hide(playerid);
 }
 
 hook OnPlayerConnect(playerid)
