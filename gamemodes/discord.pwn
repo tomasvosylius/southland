@@ -76,23 +76,25 @@ stock formatlt(const string[])
 	for(new i = 0; i < strlenght; i++)
 	{
 		if(str[i] == 'À') str[i] = 'A';
-		if(str[i] == 'a') str[i] = 'a';
-		if(str[i] == 'È') str[i] = 'C';
-		if(str[i] == 'è') str[i] = 'c';
-		if(str[i] == 'Æ') str[i] = 'E';
-		if(str[i] == 'æ') str[i] = 'e';
-		if(str[i] == 'Ë') str[i] = 'E';
-		if(str[i] == 'ë') str[i] = 'e';
-		if(str[i] == 'Á') str[i] = 'I';
-		if(str[i] == 'á') str[i] = 'i';
-		if(str[i] == 'Ð') str[i] = 'S';
-		if(str[i] == 'ð') str[i] = 's';
-		if(str[i] == 'Ø') str[i] = 'U';
-		if(str[i] == 'ø') str[i] = 'u';
-		if(str[i] == 'Û') str[i] = 'U';
-		if(str[i] == 'û') str[i] = 'u';
-		if(str[i] == 'Þ') str[i] = 'Z';
-		if(str[i] == 'þ') str[i] = 'z';
+		else if(str[i] == 'à') str[i] = 'a';
+		else if(str[i] == 'È') str[i] = 'C';
+		else if(str[i] == 'è') str[i] = 'c';
+		else if(str[i] == 'Æ') str[i] = 'E';
+		else if(str[i] == 'æ') str[i] = 'e';
+		else if(str[i] == 'Ë') str[i] = 'E';
+		else if(str[i] == 'ë') str[i] = 'e';
+		else if(str[i] == 'Á') str[i] = 'I';
+		else if(str[i] == 'á') str[i] = 'i';
+		else if(str[i] == 'Ð') str[i] = 'S';
+		else if(str[i] == 'ð') str[i] = 's';
+		else if(str[i] == 'Ø') str[i] = 'U';
+		else if(str[i] == 'ø') str[i] = 'u';
+		else if(str[i] == 'Û') str[i] = 'U';
+		else if(str[i] == 'û') str[i] = 'u';
+		else if(str[i] == 'Þ') str[i] = 'Z';
+		else if(str[i] == 'þ') str[i] = 'z';
+		else if(str[i] == '—') str[i] = '-';
+        else if(str[i] >= 128) str[i] = ' ';
 	}
 	return str;
 }

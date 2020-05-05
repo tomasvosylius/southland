@@ -27604,7 +27604,7 @@ stock formatlt(string[])
 	for(new i = 0; i < strlenght; i++)
 	{
 		if(str[i] == 'À') str[i] = 'A';
-		if(str[i] == 'a') str[i] = 'a';
+		if(str[i] == 'à') str[i] = 'a';
 		if(str[i] == 'È') str[i] = 'C';
 		if(str[i] == 'è') str[i] = 'c';
 		if(str[i] == 'Æ') str[i] = 'E';
