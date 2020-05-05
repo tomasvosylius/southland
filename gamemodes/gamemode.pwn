@@ -165,10 +165,13 @@ native gpci(playerid, serial[], len);
 #define DEFAULT_STUDIO_NUMBER 			5555
 #define DEFAULT_TAXI_NUMBER 			4114
 #define DEFAULT_TAXI_LICENCE_PRICE		3000
+
+#define DEFAULT_CAR_RENT_PRICE			25
+
 #define WARNS_TO_BAN 					3
 // #define TIP_EVERY_MINUTE				2 // kas kiek minuciu tip rodomas visiems random
 #define TIME_TO_DELETE_DROPS			18000 // 5val.  	60sec= 1mmin // kas kiek UNIX sec issitrins visi objektai
-#define MINUTES_TO_PAYDAY 				15 // kiek minuciu reik prazaist, kad gautum payday
+#define MINUTES_TO_PLAY_FOR_PAYDAY 				15 // kiek minuciu reik prazaist, kad gautum payday
 #define ADMIN_PERMISSIONS_PER_PAGE		18 // kiek permisionu per page rodyt ( << >> )
 #define MAX_FURNITURE_PER_PAGE 			180
 #define MAX_HOUSES_PER_PAGE 			100
@@ -1712,7 +1715,6 @@ new
 	tmpPage_Object[MAX_PLAYERS],
 	last_halfpayday_hour,
 	tmpPhone_InventoryPage[MAX_PLAYERS],
-	AntiSpamLogin[MAX_PLAYERS],
 	tmpPassword[MAX_PLAYERS][128],
 	tmpESC[MAX_PLAYERS],
 	tmpIter[MAX_PLAYERS],
@@ -1742,6 +1744,7 @@ new
 	bool:TextdrawDisabled_InfoBar[MAX_PLAYERS char],
 	bool:TextdrawDisabled_Tips[MAX_PLAYERS char],
 	bool:SeenATMCommand[MAX_PLAYERS char],
+	bool:SeenFillCommand[MAX_PLAYERS char],
 	bool:SeenPayPhoneCommand[MAX_PLAYERS char],
 	TurningEngine[MAX_PLAYERS],
 	Checkpoint[MAX_PLAYERS],
@@ -1755,7 +1758,6 @@ new
 	GoodMobileAreas[18],
 	BadMobileAreas[15],
 	PlayerFreeze[MAX_PLAYERS],
-	PlayerTip[MAX_PLAYERS],
 	Float:LastShellShotVector[MAX_PLAYERS][3],
 	OldVehicle[MAX_PLAYERS],
 	LastShotTime[MAX_PLAYERS],
@@ -2395,7 +2397,6 @@ public OnGameModeInit()
 	// Timers
 	// ==============================================================================
 	SetTimer("SecondTimer", 1000, true);
-	SetTimer("MinuteTimer", 60000, true);
 	SetTimer("MaxSpeedTimer", 300, true);
 	return 1;
 }
@@ -2524,6 +2525,336 @@ stock GetMaxShittyCarSpeed(model)
 	return 100;
 }
 
+ptask PT_CommandSpam[750](playerid)
+{
+	// SPAM
+	if(PlayerExtra[playerid][peSpamTime] > 0)
+	{
+		PlayerExtra[playerid][peSpamTime]--;
+	}
+}
+
+ptask PT_MuteSecond[999](playerid)
+{
+	// Mute
+	if(PlayerExtra[playerid][peMuted] > 0)
+	{
+		if((PlayerExtra[playerid][peMuted]--) <= 0)
+		{
+			SendFormat(playerid, 0x6A68FFFF, "Uþtildymas baigësi.");
+		}
+	}
+}
+ptask PT_DeathTimer[1000](playerid)
+{
+	// Deathscreen
+	if(PlayerExtra[playerid][peDeath] > 0)
+	{
+		PlayerExtra[playerid][peDeath]--;
+
+		new string[86],
+			seconds, minutes;
+		divmod(PlayerExtra[playerid][peDeath], 60, seconds, minutes);
+		format(string, sizeof string, "_~n~~w~KOMOS_BUSENOJE:_~r~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~/die~n~_", seconds, minutes);
+		PlayerTextDrawSetString(playerid, DeathScreenTD[playerid], string);
+		ApplyAnimation(playerid, "CRACK", "crckdeth2", 4.0, 1, 0, 0, 0, 0 );
+		
+		if(PlayerExtra[playerid][peDeath] == 0)
+		{
+			SetPlayerHealth(playerid, 0);
+		}
+	}
+}
+
+ptask PT_CheckJetpack[500](playerid)
+{
+	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK)
+	{
+		if(!IsPlayerInAnyAdminGroup(playerid))
+		{
+			BanPlayer(playerid, "Sistema", "JetPack");
+			return;
+		}
+		else if(!PlayerInfo[playerid][pAdminDuty])
+		{
+			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+		}
+	}
+}
+
+ptask PT_JailSecond[1000](playerid)
+{
+	if(PlayerInfo[playerid][pJailType] > 0)
+	{
+		PlayerInfo[playerid][pJailTime]--;
+		UpdateJailTimer(playerid);
+		if(PlayerInfo[playerid][pJailTime] <= 0)
+		{
+			HideJailTimer(playerid);
+			GameTextForPlayer(playerid, "~w~Esate ~g~paleidziamas~n~~w~is kalejimo", 6000, 1);
+			SetPlayerVirtualWorld(playerid, 0);
+			SetPlayerInterior(playerid, 0);
+			switch(PlayerInfo[playerid][pJailType])
+			{
+				case 1:
+				{
+					// arestine
+					SetPlayerPos(playerid, GetGVarFloat("UnarrestX", SERVER_VARS_ID), GetGVarFloat("UnarrestY", SERVER_VARS_ID), GetGVarFloat("UnarrestZ", SERVER_VARS_ID));
+					SetPlayerVirtualWorld(playerid, GetGVarInt("UnarrestVW"));
+					SetPlayerInterior(playerid, GetGVarInt("UnarrestInt"));
+				}
+				case 2:
+				{
+					// kalejimas
+					SetPlayerPos(playerid, GetGVarFloat("UnjailX", SERVER_VARS_ID), GetGVarFloat("UnjailY", SERVER_VARS_ID), GetGVarFloat("UnjailZ", SERVER_VARS_ID));
+					SetPlayerVirtualWorld(playerid, GetGVarInt("UnjailVW"));
+					SetPlayerInterior(playerid, GetGVarInt("Unjailnt"));
+				}
+				case 3:
+				{
+					// ooc jail
+					SetPlayerPos(playerid, GetGVarFloat("OOCUnjailX", SERVER_VARS_ID), GetGVarFloat("OOCUnjailY", SERVER_VARS_ID), GetGVarFloat("OOCUnjailZ", SERVER_VARS_ID));
+					SetPlayerVirtualWorld(playerid, GetGVarInt("OOCUnjailVW"));
+					SetPlayerInterior(playerid, GetGVarInt("OOCUnjailnt"));
+				}
+			}
+			new string[126];
+			mysql_format(chandler, string, sizeof string, "UPDATE `players_jails` SET Valid = '0' WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
+			mysql_fquery(chandler, string, "JailReset");
+			PlayerInfo[playerid][pJailTime] = 0;
+			PlayerInfo[playerid][pJailType] = 0;
+			log_init(true);
+			log_set_table("logs_players");
+			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`");
+			log_set_values("'%d','%e','Buvo paleistas is kalejimo'", LogPlayerId(playerid), LogPlayerName(playerid));
+			log_push();
+		}
+		else if(PlayerInfo[playerid][pCurrentStatus] == PLAYER_STATUS_DEFAULT)
+		{
+			new Float:x, Float:y, Float:z;
+			GetPlayerPos(playerid, x, y, z);
+			// gal airbrk naudoja
+			switch(PlayerInfo[playerid][pJailType])
+			{
+				case 1:
+				{
+					// arestine
+					if(!IsPlayerInRangeOfPoint(playerid, 50.0, GetGVarFloat("ArrestSpawnX", SERVER_VARS_ID), GetGVarFloat("ArrestSpawnY", SERVER_VARS_ID), GetGVarFloat("ArrestSpawnZ", SERVER_VARS_ID)))
+					{
+						KickPlayer(playerid, "Sistema", "Air-break");
+					}
+				}
+				case 2:
+				{
+					// kalejimas
+					if(!IsPlayerInRangeOfPoint(playerid, 300.0, 168.75, 1415.69, 10.63) && !IsPlayerInRangeOfPoint(playerid, 200.0, GetGVarFloat("JailSpawnX", SERVER_VARS_ID), GetGVarFloat("JailSpawnY", SERVER_VARS_ID), GetGVarFloat("JailSpawnZ", SERVER_VARS_ID)))
+					{
+						KickPlayer(playerid, "Sistema", "Air-break");
+					}
+				}
+				case 3:
+				{
+					// ooc
+					if(!IsPlayerInRangeOfPoint(playerid, 150.0, GetGVarFloat("OOCJailSpawnX", SERVER_VARS_ID), GetGVarFloat("OOCJailSpawnY", SERVER_VARS_ID), GetGVarFloat("OOCJailSpawnZ", SERVER_VARS_ID)))
+					{
+						KickPlayer(playerid, "Sistema", "Air-break");
+					}
+				}
+			}
+		}
+	}
+}
+
+ptask PT_Unfreeze[1000](playerid) 
+{
+	// Sutvarkom uzsaldyma
+	if(PlayerFreeze[playerid] > 0)
+	{
+		PlayerFreeze[playerid]--;
+		if(PlayerFreeze[playerid] == 0)
+		{
+			TogglePlayerControllable(playerid, 1);
+		}
+	}
+}
+
+ptask PT_PhoneSecond[1000](playerid)
+{
+	if(PhoneInfo[playerid][phoneRingingTime] > 0)
+	{
+		PhoneInfo[playerid][phoneRingingTime]--;
+		if(PhoneInfo[playerid][phoneRingingTime] <= 0)
+		{
+			// baiges galimas sujungimo laikas
+			if(PhoneInfo[playerid][phoneRinging] == INVALID_PLAYER_ID)
+			{
+				// skambino neteisingu numeriu, arba rodem 3 sek jau BUSY
+				if(PhoneInfo[playerid][phoneRingType] == 0)
+				{
+					if(GetESCType(playerid) == ESC_TYPE_PHONE)
+					{
+						// sedi telefone
+						PhoneTD_Hide(playerid, PHONE_PAGE_CALLING);
+						PhoneTD_Show(playerid, PHONE_PAGE_MAIN);
+					}
+					else PhoneTD_Hide(playerid);
+				}
+				else
+				{
+					if(GetESCType(playerid) == ESC_TYPE_PAYPHONE)
+					{
+						PayPhoneTD_Prepare(playerid);
+						PayPhoneTD_Show(playerid);
+					}
+				}
+			}
+			else
+			{
+				// skambino kazkam, nepakele.
+				new receiverid = PhoneInfo[playerid][phoneRinging];
+				if(IsPlayerConnected(receiverid))
+				{
+					// tam kuriam skambino viska pasalinam
+					PhoneInfo[receiverid][phoneRinging] = INVALID_PLAYER_ID;
+					PhoneInfo[receiverid][phoneRingingTime] = 0;
+					if(GetESCType(receiverid) == ESC_TYPE_PHONE)
+					{
+						// sedi telefone
+						PhoneTD_Hide(receiverid, PHONE_PAGE_CALLING);
+						PhoneTD_Show(receiverid, PHONE_PAGE_MAIN);
+					}
+					else PhoneTD_Hide(receiverid);
+				}
+				// dabar 3 sekundes rodysim BUSY
+				PhoneInfo[playerid][phoneRingingTime] = 3;
+				PhoneInfo[playerid][phoneRinging] = INVALID_PLAYER_ID;
+				if(PhoneInfo[playerid][phoneRingType] != 0)
+				{
+					if(GetESCType(playerid) == ESC_TYPE_PAYPHONE)
+					{
+						PayPhoneTD_Prepare(playerid);
+						PayPhoneTD_Show(playerid);
+					}
+				}
+			}
+			if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USECELLPHONE) SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+		}
+	}
+	if(PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
+	{
+		new receiverid = PhoneInfo[playerid][phoneTalkingTo],
+			minutes, seconds,
+			string[12];
+		if(!InArray(receiverid, 911, DEFAULT_MECHANIC_NUMBER, DEFAULT_TAXI_NUMBER))
+		{
+			if(!IsPlayerConnected(receiverid))// || GetPlayerMobileAreaStrenght(playerid) == 0)
+			{
+				PhoneInfo[playerid][phoneTalkingTo] =
+				PhoneInfo[receiverid][phoneTalkingTo] = INVALID_PLAYER_ID;
+				PhoneInfo[playerid][phoneCallOwner] =
+				PhoneInfo[receiverid][phoneCallOwner] =
+				PhoneInfo[playerid][phoneEstimated] =
+				PhoneInfo[receiverid][phoneEstimated] = 0;
+				SendFormat(playerid, 0xE77B33FF, "Ryðys nutrûko!");
+				if(IsPlayerConnected(receiverid)) SendFormat(receiverid, 0xE77B33FF, "Ryðys nutrûko!");
+				if(GetESCType(receiverid) == ESC_TYPE_PHONE)
+				{
+					PhoneTD_Hide(receiverid, PHONE_PAGE_CALL);
+					PhoneTD_Show(receiverid, PHONE_PAGE_MAIN);
+				}
+				else PhoneTD_Hide(receiverid);
+				if(GetESCType(playerid) == ESC_TYPE_PHONE)
+				{
+					PhoneTD_Hide(playerid, PHONE_PAGE_CALL);
+					PhoneTD_Show(playerid, PHONE_PAGE_MAIN);
+				}
+				else PhoneTD_Hide(playerid);
+			}
+			else
+			{
+				PhoneInfo[playerid][phoneEstimated]++;
+				divmod(PhoneInfo[playerid][phoneEstimated], 60, minutes, seconds);
+				format(string, sizeof string, "%02d:%02d", minutes, seconds);
+				PlayerTextDrawSetString(playerid, Phone_Estimated[playerid], string);
+			}
+		}
+	}
+}
+
+ptask PT_CommandUsage[1342](playerid)
+{
+	// padarom, kad jei prie bankomato, rasytu naudokite /atm
+	if(!SeenATMCommand{playerid} && GetESCType(playerid) != ESC_TYPE_ATM)
+	{
+		foreach(new atm : ATM)
+		{
+			if(IsPlayerInRangeOfPoint(playerid, 1.5, ATMs[atm][atmX], ATMs[atm][atmY], ATMs[atm][atmZ]))
+			{
+				SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis bankomatu, raðykite /atm");
+				SeenATMCommand{playerid} = true;
+				return;
+			}
+		}
+	}
+	// degalines irgi
+	if(IsPlayerInAnyVehicle(playerid))
+	{
+		foreach(new businessid : Business)
+		{
+			if(BusinessInfo[businessid][bType] == BUSINESS_TYPE_FUEL)
+			{
+				new Float:fillX, Float:fillY, Float:fillZ;
+				if(	(fillX = BusinessInfo[businessid][bExtraX]) != 0.0 && 
+					(fillY = BusinessInfo[businessid][bExtraY]) != 0.0 && 
+					(fillZ = BusinessInfo[businessid][bExtraZ]) != 0.0)
+				{
+					if(IsPlayerInRangeOfPoint(playerid, 10.0, fillX, fillY, fillZ))
+					{
+						SendFormat(playerid, 0xDBDBDBFF, "Norëdami pilti degalus, raðykite /fill");
+						SeenFillCommand{playerid} = true;
+						return;
+					}
+				}
+			}
+		}
+	}
+	// payphone irgi
+	if(!SeenPayPhoneCommand{playerid} && GetESCType(playerid) != ESC_TYPE_PAYPHONE)
+	{
+		foreach(new pp : PayPhone)
+		{
+			if(IsPlayerInRangeOfPoint(playerid, 1.5, PayPhoneInfo[pp][payPhoneX], PayPhoneInfo[pp][payPhoneY], PayPhoneInfo[pp][payPhoneZ]))
+			{
+				SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis taksofonu, raðykite /ucall");
+				SeenPayPhoneCommand{playerid} = true;
+				return;
+			}
+		}
+	}
+}
+
+ptask PT_JobTaskSecond[998](playerid)
+{
+	// Nuimam darbo sekunde atliekamo
+	new playerjobtime = PlayerInfo[playerid][pJobActionTime];
+	if(playerjobtime != 0)
+	{
+		new minutes, seconds, toptext[56];
+		if(playerjobtime > 0)
+		{
+			PlayerInfo[playerid][pJobActionTime]--;
+			playerjobtime--;
+			divmod(PlayerInfo[playerid][pJobActionTime], 60, minutes, seconds);
+			format(toptext, sizeof toptext, "~n~LAIKAS: %02d:%02d", minutes, seconds);
+		}
+		format(toptext, sizeof toptext, "UZDUOTIS: %s%s", GetJobTaskNameById(PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction]), toptext);
+		JobGUI_Update(playerid, toptext);
+		if(playerjobtime == 0)
+		{
+			OnPlayerJobTimeExpired(playerid, PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction], PlayerInfo[playerid][pJobCurrentType]);
+		}
+	}
+}
 
 forward SecondTimer();
 public SecondTimer()
@@ -2549,23 +2880,14 @@ public SecondTimer()
 	foreach(new playerid : Player)
 	{
 		//if(lastarea[playerid] != GetPlayerMobileAreaStrenght(playerid)) { lastarea[playerid] = GetPlayerMobileAreaStrenght(playerid); SendFormat(playerid, -1, "Entered %d zone", lastarea[playerid]); }
+	
 		// Narkotikai, efektai
 		if(player_WaitCharTextdraw[playerid] > 0) player_WaitCharTextdraw[playerid]--;
+
 		new Float:health;
 		DrugTextdrawShowed = false;
 		GetPlayerHealth(playerid, health);
-		if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK)
-		{
-			if(!IsPlayerInAnyAdminGroup(playerid))
-			{
-				BanPlayer(playerid, "Sistema", "JetPack");
-				continue;
-			}
-			else if(!PlayerInfo[playerid][pAdminDuty])
-			{
-				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-			}
-		}
+	
 		for(new i = 0; i < MAX_DRUG_TYPES; i++)
 		{
 			if(PlayerDrugs[playerid][i][drugOnDuty] > 0)
@@ -2604,281 +2926,6 @@ public SecondTimer()
 				GetPlayerPos(PlayerExtra[playerid][peAcceptedBk], BkPosition[ 0 ], BkPosition[ 1 ], BkPosition[ 2 ]);
 				DisablePlayerCheckpoint(playerid);
 				SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_PD_REQUESTEDBK, BkPosition[ 0 ], BkPosition[ 1 ], BkPosition[ 2 ], 5.0);
-			}
-		}
-		// SPAM
-		if(PlayerExtra[playerid][peSpamTime] > 0)
-		{
-			PlayerExtra[playerid][peSpamTime]--;
-		}
-		// Mute
-		if(PlayerExtra[playerid][peMuted] > 0)
-		{
-			PlayerExtra[playerid][peMuted]--;
-			if(PlayerExtra[playerid][peMuted] <= 0)
-			{
-				SendFormat(playerid, 0x6A68FFFF, "Uþtildymas baigësi.");
-			}
-		}
-		// Deathscreen
-		if(PlayerExtra[playerid][peDeath] > 0)
-		{
-			PlayerExtra[playerid][peDeath]--;
-			new string[86],
-				seconds, minutes;
-			divmod(PlayerExtra[playerid][peDeath], 60, seconds, minutes);
-			format(string, sizeof string, "_~n~~w~KOMOS_BUSENOJE:_~r~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~/die~n~_", seconds, minutes);
-			PlayerTextDrawSetString(playerid, DeathScreenTD[playerid], string);
-			ApplyAnimation(playerid, "CRACK", "crckdeth2", 4.0, 1, 0, 0, 0, 0 );
-			if(PlayerExtra[playerid][peDeath] == 0)
-			{
-				SetPlayerHealth(playerid, 0);
-			}
-		}
-		// Sutvarkom uzsaldyma
-		if(PlayerInfo[playerid][pJailType] > 0)
-		{
-			PlayerInfo[playerid][pJailTime]--;
-			UpdateJailTimer(playerid);
-			if(PlayerInfo[playerid][pJailTime] <= 0)
-			{
-				HideJailTimer(playerid);
-				GameTextForPlayer(playerid, "~w~Esate ~g~paleidziamas~n~~w~is kalejimo", 6000, 1);
-				SetPlayerVirtualWorld(playerid, 0);
-				SetPlayerInterior(playerid, 0);
-				switch(PlayerInfo[playerid][pJailType])
-				{
-					case 1:
-					{
-						// arestine
-						SetPlayerPos(playerid, GetGVarFloat("UnarrestX", SERVER_VARS_ID), GetGVarFloat("UnarrestY", SERVER_VARS_ID), GetGVarFloat("UnarrestZ", SERVER_VARS_ID));
-						SetPlayerVirtualWorld(playerid, GetGVarInt("UnarrestVW"));
-						SetPlayerInterior(playerid, GetGVarInt("UnarrestInt"));
-					}
-					case 2:
-					{
-						// kalejimas
-						SetPlayerPos(playerid, GetGVarFloat("UnjailX", SERVER_VARS_ID), GetGVarFloat("UnjailY", SERVER_VARS_ID), GetGVarFloat("UnjailZ", SERVER_VARS_ID));
-						SetPlayerVirtualWorld(playerid, GetGVarInt("UnjailVW"));
-						SetPlayerInterior(playerid, GetGVarInt("Unjailnt"));
-					}
-					case 3:
-					{
-						// ooc jail
-						SetPlayerPos(playerid, GetGVarFloat("OOCUnjailX", SERVER_VARS_ID), GetGVarFloat("OOCUnjailY", SERVER_VARS_ID), GetGVarFloat("OOCUnjailZ", SERVER_VARS_ID));
-						SetPlayerVirtualWorld(playerid, GetGVarInt("OOCUnjailVW"));
-						SetPlayerInterior(playerid, GetGVarInt("OOCUnjailnt"));
-					}
-				}
-				new string[69];
-				mysql_format(chandler, string, sizeof string, "UPDATE `players_jails` SET Valid = '0' WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
-				mysql_fquery(chandler, string, "JailReset");
-				PlayerInfo[playerid][pJailTime] = 0;
-				PlayerInfo[playerid][pJailType] = 0;
-				log_init(true);
-				log_set_table("logs_players");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`");
-				log_set_values("'%d','%e','Buvo paleistas is kalejimo'", LogPlayerId(playerid), LogPlayerName(playerid));
-				log_push();
-			}
-			else if(PlayerInfo[playerid][pCurrentStatus] == PLAYER_STATUS_DEFAULT)
-			{
-				new Float:x, Float:y, Float:z;
-				GetPlayerPos(playerid, x, y, z);
-				// gal airbrk naudoja
-				switch(PlayerInfo[playerid][pJailType])
-				{
-					case 1:
-					{
-						// arestine
-						if(!IsPlayerInRangeOfPoint(playerid, 50.0, GetGVarFloat("ArrestSpawnX", SERVER_VARS_ID), GetGVarFloat("ArrestSpawnY", SERVER_VARS_ID), GetGVarFloat("ArrestSpawnZ", SERVER_VARS_ID)))
-						{
-							KickPlayer(playerid, "Sistema", "Air-break");
-						}
-					}
-					case 2:
-					{
-						// kalejimas
-						if(!IsPlayerInRangeOfPoint(playerid, 300.0, 168.75, 1415.69, 10.63) && !IsPlayerInRangeOfPoint(playerid, 200.0, GetGVarFloat("JailSpawnX", SERVER_VARS_ID), GetGVarFloat("JailSpawnY", SERVER_VARS_ID), GetGVarFloat("JailSpawnZ", SERVER_VARS_ID)))
-						{
-							KickPlayer(playerid, "Sistema", "Air-break");
-						}
-					}
-					case 3:
-					{
-						// ooc
-						if(!IsPlayerInRangeOfPoint(playerid, 150.0, GetGVarFloat("OOCJailSpawnX", SERVER_VARS_ID), GetGVarFloat("OOCJailSpawnY", SERVER_VARS_ID), GetGVarFloat("OOCJailSpawnZ", SERVER_VARS_ID)))
-						{
-							KickPlayer(playerid, "Sistema", "Air-break");
-						}
-					}
-				}
-			}
-		}
-		if(PlayerFreeze[playerid] > 0)
-		{
-			PlayerFreeze[playerid]--;
-			if(PlayerFreeze[playerid] == 0)
-			{
-				TogglePlayerControllable(playerid, 1);
-			}
-		}
-		// Sutvarkom patarimo rodyma
-		if(AntiSpamLogin[playerid] > 0)
-		{
-			AntiSpamLogin[playerid]--;
-		}
-		if(PlayerTip[playerid] > 0)
-		{
-			PlayerTip[playerid]--;
-			if(PlayerTip[playerid] == 0)
-			{
-				HidePlayerTip(playerid);
-			}
-		}
-		// Viskas su telefonais
-		if(PhoneInfo[playerid][phoneRingingTime] > 0)
-		{
-			PhoneInfo[playerid][phoneRingingTime]--;
-			if(PhoneInfo[playerid][phoneRingingTime] <= 0)
-			{
-				// baiges galimas sujungimo laikas
-				if(PhoneInfo[playerid][phoneRinging] == INVALID_PLAYER_ID)
-				{
-					// skambino neteisingu numeriu, arba rodem 3 sek jau BUSY
-					if(PhoneInfo[playerid][phoneRingType] == 0)
-					{
-						if(GetESCType(playerid) == ESC_TYPE_PHONE)
-						{
-							// sedi telefone
-							PhoneTD_Hide(playerid, PHONE_PAGE_CALLING);
-							PhoneTD_Show(playerid, PHONE_PAGE_MAIN);
-						}
-						else PhoneTD_Hide(playerid);
-					}
-					else
-					{
-						if(GetESCType(playerid) == ESC_TYPE_PAYPHONE)
-						{
-							PayPhoneTD_Prepare(playerid);
-							PayPhoneTD_Show(playerid);
-						}
-					}
-				}
-				else
-				{
-					// skambino kazkam, nepakele.
-					new receiverid = PhoneInfo[playerid][phoneRinging];
-					if(IsPlayerConnected(receiverid))
-					{
-						// tam kuriam skambino viska pasalinam
-						PhoneInfo[receiverid][phoneRinging] = INVALID_PLAYER_ID;
-						PhoneInfo[receiverid][phoneRingingTime] = 0;
-						if(GetESCType(receiverid) == ESC_TYPE_PHONE)
-						{
-							// sedi telefone
-							PhoneTD_Hide(receiverid, PHONE_PAGE_CALLING);
-							PhoneTD_Show(receiverid, PHONE_PAGE_MAIN);
-						}
-						else PhoneTD_Hide(receiverid);
-					}
-					// dabar 3 sekundes rodysim BUSY
-					PhoneInfo[playerid][phoneRingingTime] = 3;
-					PhoneInfo[playerid][phoneRinging] = INVALID_PLAYER_ID;
-					if(PhoneInfo[playerid][phoneRingType] != 0)
-					{
-						if(GetESCType(playerid) == ESC_TYPE_PAYPHONE)
-						{
-							PayPhoneTD_Prepare(playerid);
-							PayPhoneTD_Show(playerid);
-						}
-					}
-				}
-				if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USECELLPHONE) SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-			}
-		}
-		if(PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
-		{
-			new receiverid = PhoneInfo[playerid][phoneTalkingTo],
-				minutes, seconds,
-				string[12];
-			if(!InArray(receiverid, 911, DEFAULT_MECHANIC_NUMBER, DEFAULT_TAXI_NUMBER))
-			{
-				if(!IsPlayerConnected(receiverid))// || GetPlayerMobileAreaStrenght(playerid) == 0)
-				{
-					PhoneInfo[playerid][phoneTalkingTo] =
-					PhoneInfo[receiverid][phoneTalkingTo] = INVALID_PLAYER_ID;
-					PhoneInfo[playerid][phoneCallOwner] =
-					PhoneInfo[receiverid][phoneCallOwner] =
-					PhoneInfo[playerid][phoneEstimated] =
-					PhoneInfo[receiverid][phoneEstimated] = 0;
-					SendFormat(playerid, 0xE77B33FF, "Ryðys nutrûko!");
-					if(IsPlayerConnected(receiverid)) SendFormat(receiverid, 0xE77B33FF, "Ryðys nutrûko!");
-					if(GetESCType(receiverid) == ESC_TYPE_PHONE)
-					{
-						PhoneTD_Hide(receiverid, PHONE_PAGE_CALL);
-						PhoneTD_Show(receiverid, PHONE_PAGE_MAIN);
-					}
-					else PhoneTD_Hide(receiverid);
-					if(GetESCType(playerid) == ESC_TYPE_PHONE)
-					{
-						PhoneTD_Hide(playerid, PHONE_PAGE_CALL);
-						PhoneTD_Show(playerid, PHONE_PAGE_MAIN);
-					}
-					else PhoneTD_Hide(playerid);
-				}
-				else
-				{
-					PhoneInfo[playerid][phoneEstimated]++;
-					divmod(PhoneInfo[playerid][phoneEstimated], 60, minutes, seconds);
-					format(string, sizeof string, "%02d:%02d", minutes, seconds);
-					PlayerTextDrawSetString(playerid, Phone_Estimated[playerid], string);
-				}
-			}
-		}
-		// Nuimam darbo sekunde atliekamo
-		new playerjobtime = PlayerInfo[playerid][pJobActionTime];
-		if(playerjobtime != 0)
-		{
-			new minutes, seconds, toptext[56];
-			if(playerjobtime > 0)
-			{
-				PlayerInfo[playerid][pJobActionTime]--;
-				playerjobtime--;
-				divmod(PlayerInfo[playerid][pJobActionTime], 60, minutes, seconds);
-				format(toptext, sizeof toptext, "~n~LAIKAS: %02d:%02d", minutes, seconds);
-			}
-			format(toptext, sizeof toptext, "UZDUOTIS: %s%s", GetJobTaskNameById(PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction]), toptext);
-			JobGUI_Update(playerid, toptext);
-			if(playerjobtime == 0)
-			{
-				OnPlayerJobTimeExpired(playerid, PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction], PlayerInfo[playerid][pJobCurrentType]);
-			}
-		}
-		// padarom, kad jei prie bankomato, rasytu naudokite /atm
-		if(!SeenATMCommand{playerid} && GetESCType(playerid) != ESC_TYPE_ATM)
-		{
-			foreach(new atm : ATM)
-			{
-				if(IsPlayerInRangeOfPoint(playerid, 1.5, ATMs[atm][atmX], ATMs[atm][atmY], ATMs[atm][atmZ]))
-				{
-					SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis bankomatu, raðykite /atm");
-					SeenATMCommand{playerid} = true;
-					break;
-				}
-			}
-		}
-		// payphone irgi
-		if(!SeenPayPhoneCommand{playerid} && GetESCType(playerid) != ESC_TYPE_PAYPHONE)
-		{
-			foreach(new pp : PayPhone)
-			{
-				if(IsPlayerInRangeOfPoint(playerid, 1.5, PayPhoneInfo[pp][payPhoneX], PayPhoneInfo[pp][payPhoneY], PayPhoneInfo[pp][payPhoneZ]))
-				{
-					SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis taksofonu, raðykite /ucall");
-					SeenPayPhoneCommand{playerid} = true;
-					break;
-				}
 			}
 		}
 	}
@@ -2946,71 +2993,101 @@ thread(OldReportsReset);
 thread(UnbanTimeReduce);
 thread(UnbanValidSet);
 
-forward MinuteTimer();
-public MinuteTimer()
+ptask PT_RentMinute[59988](playerid)
 {
-	new unix = gettime();
-	// gilzez
-	/*new delete = -1;
-	foreach(new shell : Shell)
+	if(IsValidVehicle(RentedVeh[playerid]) && RentedBy[RentedVeh[playerid]] == playerid)
 	{
-		if(delete != -1 && delete != shell)
+		GivePlayerMoney(playerid, -DEFAULT_CAR_RENT_PRICE);
+		if(GetPlayerMoney(playerid) < DEFAULT_CAR_RENT_PRICE)
 		{
-			Iter_Remove(Shell, delete);
+			Rent_Cancel(playerid);
+			SendError(playerid, "Tr. priemonës nuomai nebeuþtenka pinigø.");
 		}
-		if(unix-Shells[shell][shellTime] > 43200)//12h 86400) // tai buvo pries 24h
+
+		if(RentTimeUnused[playerid] > 0)
 		{
-			delete = shell;
-			if(IsValidDynamic3DTextLabel(Shells[shell][shellLabel])) DestroyDynamic3DTextLabel(Shells[shell][shellLabel]);
-			if(IsValidDynamicObject(Shells[shell][shellObject])) DestroyDynamicObject(Shells[shell][shellObject]);//, "shells", "minute");
-			Shells[shell][shellLabel] = INVALID_3DTEXT_ID;
-			Shells[shell][shellObject] = INVALID_OBJECT_ID;
-		}
-	}*/
-	// patarimai
-	/*static timefortip;
-	if(timefortip < TIP_EVERY_MINUTE)
-	{
-		timefortip++;
-		if(timefortip >= TIP_EVERY_MINUTE)
-		{
-			timefortip = 0;
-			foreach(new playerid : Player)
+			RentTimeUnused[playerid]--;
+			if(RentTimeUnused[playerid] <= 0)
 			{
-				new randomidx = random(sizeof Tips);
-				ShowPlayerTip(playerid, 10, Tips[randomidx][tipText]);
+				SendFormat(playerid, -1, "Nuomos sutartis nutraukta, kadangi negráþote á tr. priemonæ per 10min.");
+				Rent_Cancel(playerid);
 			}
 		}
-	}*/
+	}
+}
 
-	new string[186];
-	// perdaryti visa sistema
-	// mysql_fquery(chandler, "UPDATE `players_jails` SET `Valid` = '0' WHERE `Date` < ADDDATE(NOW(), INTERVAL -(`JailTime`/60) MINUTE)", "OldJailsReset");
-	mysql_fquery(chandler, "UPDATE `players_reports` SET `Valid` = '0' WHERE `Date` < ADDDATE(NOW(), INTERVAL -5 MINUTE)", "OldReportsReset");
-	mysql_fquery(chandler, "UPDATE `players_bans` SET Valid = 0 WHERE UnbanTime = 0 AND Valid = 1", "UnbanValidSet");
-	mysql_fquery(chandler, "UPDATE `players_bans` SET UnbanTime = UnbanTime-1 WHERE Valid = 1 AND UnbanTime > 0", "UnbanTimeReduce");
-	
+task T_ClearDroppedItems[61024]()
+{
+	new unix = gettime(),
+		string[256];
 
-	// WHERE Unix + "#TIME_TO_DELETE_DROPS" > %d AND Valid = '1'", gettime());
-	
-	// mysql_format(chandler, string, sizeof string, "UPDATE `users_data` SET Donator = '0', DonatorTime = '0' WHERE Donator > '0' AND DonatorTime > '0' AND DonatorTime + "#TIME_TO_RESET_DONATOR" > '%d'", gettime());
-	// mysql_fquery(chandler, string, "DonatorSaved");
-	
 	for(new i = 0; i < MAX_DROPPED_ITEMS; i++)
 	{
 		if(DroppedItems[i][droppedItemId] != 0)
 		{
-			if(DroppedItems[i][droppedItemTime]+TIME_TO_DELETE_DROPS < unix)
+			if(DroppedItems[i][droppedItemTime] + TIME_TO_DELETE_DROPS < unix)
 			{
 				mysql_format(chandler, string, sizeof string, "UPDATE `drops_data` SET Valid = '0' WHERE id = '%d'", DroppedItems[i][droppedItemMysqlId]);
 				mysql_fquery(chandler, string, "DropDeletedAuto");
-				if(IsValidDynamicObject(DroppedItems[i][droppedItemObject])) DestroyDynamicObject(DroppedItems[i][droppedItemObject]);//, "drops", "minute");
+
+				IsValidDynamicObject(DroppedItems[i][droppedItemObject]) && DestroyDynamicObject(DroppedItems[i][droppedItemObject]);//, "drops", "minute");
+				
 				DroppedItems[i][droppedItemId] = 0;
 				DroppedItems[i][droppedItemObject] = INVALID_OBJECT_ID;
+
 				Iter_Remove(DroppedItem, i);
 			}
 		}
 	}
+}
+
+ptask PT_DonatorCheck[12450](playerid)
+{
+	new unix = gettime();
+	if(unix > PlayerInfo[playerid][pDonatorTime] + TIME_TO_RESET_DONATOR && PlayerInfo[playerid][pDonator] > 0)
+	{
+		PlayerInfo[playerid][pDonator] = 0;
+		PlayerInfo[playerid][pDonatorTime] = 0;
+
+		SendFormat(playerid, 0xbababa, "JÛSØ REMËJO STATUSAS BAIGË GALIOTI!");
+	}
+}
+
+ptask PT_PhoneTalkMinute[60001](playerid)
+{
+	// Kalba telefonu, nuimam 1$
+	if(PhoneInfo[playerid][phoneCallOwner] > 0 && PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
+	{
+		// nuimam jam saibu
+		GivePlayerMoney(playerid, -1);
+		if(GetPlayerMoney(playerid) <= 0)
+		{
+			PlayerPhoneHangup(playerid);
+		}
+	}
+}
+
+ptask PT_BusinessFreeEnter[60000](playerid)
+{
+	// Nemokamos verslo iejimo minutes
+	foreach(new businessid : Business)
+	{
+		// verslai
+		if(PlayerNoEnterPriceBusiness[playerid][businessid] > 0) { 
+			// I sita versla gali ieiti nemokamai
+			PlayerNoEnterPriceBusiness[playerid][businessid] -- ;
+		}
+	}
+}
+
+task T_MinuteTimer[60000]()
+{
+	new unix = gettime();
+
+	mysql_fquery(chandler, "UPDATE `players_reports` SET `Valid` = '0' WHERE `Date` < ADDDATE(NOW(), INTERVAL -5 MINUTE)", "OldReportsReset");
+	mysql_fquery(chandler, "UPDATE `players_bans` SET Valid = 0 WHERE UnbanTime = 0 AND Valid = 1", "UnbanValidSet");
+	mysql_fquery(chandler, "UPDATE `players_bans` SET UnbanTime = UnbanTime-1 WHERE Valid = 1 AND UnbanTime > 0", "UnbanTimeReduce");
+	
 	new hour, minute, second, bool:drugsMessage = false;
 	static
 		drugsMessageTime;
@@ -3024,38 +3101,14 @@ public MinuteTimer()
 	gettime(hour, minute, second);
 	foreach(new playerid : Player)
 	{
-		if(unix > PlayerInfo[playerid][pDonatorTime] + TIME_TO_RESET_DONATOR && PlayerInfo[playerid][pDonator] > 0)
-		{
-			PlayerInfo[playerid][pDonator] = 0;
-			PlayerInfo[playerid][pDonatorTime] = 0;
-
-			SendFormat(playerid, 0xbababa, "JÛSØ REMËJO STATUSAS BAIGË GALIOTI!");
-		}
-
-		if(IsValidVehicle(RentedVeh[playerid]) && RentedBy[RentedVeh[playerid]] == playerid)
-		{
-			GivePlayerMoney(playerid, -25);
-			if(GetPlayerMoney(playerid) < 25)
-			{
-				Rent_Cancel(playerid);
-				SendError(playerid, "Tr. priemonës nuomai nebeuþtenka pinigø.");
-			}
-
-			if(RentTimeUnused[playerid] > 0)
-			{
-				RentTimeUnused[playerid]--;
-				if(RentTimeUnused[playerid] <= 0)
-				{
-					SendFormat(playerid, -1, "Nuomos sutartis nutraukta, kadangi negráþote á tr. priemonæ per 10min.");
-					Rent_Cancel(playerid);
-				}
-			}
-		}
-
 		// kad zmogus nesijungtu tik ant payday.
-		if(PlayerInfo[playerid][pConnection] == CONNECTION_STATE_LOGGED) PlayerInfo[playerid][pPayDayTime]++;
-		SeenATMCommand{playerid} = false;
+		if(PlayerInfo[playerid][pConnection] == CONNECTION_STATE_LOGGED)
+		{
+			PlayerInfo[playerid][pPayDayTime]++;
+		}
+		SeenATMCommand{playerid} = 
 		SeenPayPhoneCommand{playerid} = false;
+		SeenFillCommand{playerid} = false;
 		for(new drug = 0; drug < MAX_DRUG_TYPES; drug++)
 		{
 			if(PlayerDrugs[playerid][drug][drugOnDuty] > 0 && unix-PlayerDrugs[playerid][drug][drugUsedLastTime] > 600) // 15 min
@@ -3063,16 +3116,7 @@ public MinuteTimer()
 				ResetDrugStats(playerid, drug);
 			}
 		}
-		// telefonai
-		if(PhoneInfo[playerid][phoneCallOwner] > 0 && PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
-		{
-			// nuimam jam saibu
-			GivePlayerMoney(playerid, -1);
-			if(GetPlayerMoney(playerid) <= 0)
-			{
-				PlayerPhoneHangup(playerid);
-			}
-		}
+
 		// narkotikai
 		if(PlayerDrugs[playerid][DRUG_COCAINE][drugOnDuty] > 0)
 		{
@@ -3124,11 +3168,6 @@ public MinuteTimer()
 				rp_me(playerid, _, "iðspjauna sukramtytà gumà.");
 			}
 		}
-		foreach(new businessid : Business)
-		{
-			// verslai
-			if(PlayerNoEnterPriceBusiness[playerid][businessid] > 0) PlayerNoEnterPriceBusiness[playerid][businessid] -- ;
-		}
 	}
 	if(	(29 <= minute <= 31 && last_halfpayday_hour != serverHour) ||
 		(hour > serverHour) || 
@@ -3147,13 +3186,13 @@ public MinuteTimer()
 		foreach(new playerid : Player)
 		{
 			PlayerInfo[playerid][pFishedLimit] = 0;
-			if(PlayerInfo[playerid][pConnection] == CONNECTION_STATE_LOGGED && PlayerInfo[playerid][pPayDayTime] >= MINUTES_TO_PAYDAY)
+			if(PlayerInfo[playerid][pConnection] == CONNECTION_STATE_LOGGED && PlayerInfo[playerid][pPayDayTime] >= MINUTES_TO_PLAY_FOR_PAYDAY)
 			{
 				PayDay(playerid);
 			}
 			else
 			{
-				SendFormat(playerid, 0xBABABAFF, "Algos negavote, nes neþaidþiate "#MINUTES_TO_PAYDAY"min");
+				SendFormat(playerid, 0xBABABAFF, "Algos negavote, nes neþaidþiate "#MINUTES_TO_PLAY_FOR_PAYDAY"min");
 			}
 		}
 		if(hour > serverHour || (hour == 0 && serverHour == 23))
@@ -3941,7 +3980,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			}
 			else if(RentedBy[vehicleid] == INVALID_PLAYER_ID)
 			{
-				Dialog_Show(playerid, DialogRentMain, DIALOG_STYLE_MSGBOX, "Nuoma", "{BABABA}Ði tr. priemonë yra nuomos.\nAr norite jà iðsinuomoti uþ 25$/min?\nNuomà nutraukti galësite su /cancelvehiclerent", "Taip", "Ne");
+				Dialog_Show(playerid, DialogRentMain, DIALOG_STYLE_MSGBOX, "Nuoma", "{BABABA}Ði tr. priemonë yra nuomos.\nAr norite jà iðsinuomoti uþ "#DEFAULT_CAR_RENT_PRICE"/min?\nNuomà nutraukti galësite su /cancelvehiclerent", "Taip", "Ne");
 			}
 		}
 		if(VehicleInfo[vehicleid][vFaction] == -1)
@@ -24604,7 +24643,7 @@ stock IsItemDrug(itemid)
 	if(InArray(itemid, ITEM_MARIJUANA, ITEM_MDMA, ITEM_CRACK, ITEM_HEROINE, ITEM_METHAMPHETAMINE, ITEM_COCAINE, ITEM_XANAX)) return true;
 	return false;
 }
-
+/*
 stock HidePlayerTip(playerid)
 {
 	TextDrawHideForPlayer(playerid, TipBox_Base);
@@ -24614,8 +24653,7 @@ stock HidePlayerTip(playerid)
 	TextDrawHideForPlayer(playerid, TipBox_LowText);
 	return 1;
 }
-
-/*stock ShowPlayerTip(playerid, seconds, text[], bool:forceshow = false)
+stock ShowPlayerTip(playerid, seconds, text[], bool:forceshow = false)
 {
 	#pragma unused text
 	if(PlayerInfo[playerid][pConnection] != CONNECTION_STATE_LOGGED) return 1;
@@ -28987,7 +29025,6 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 	tmpEditing_Component_DMV[playerid] = 
 	tmpPage_Object[playerid] = 
 	tmpPhone_InventoryPage[playerid] = 
-	AntiSpamLogin[playerid] = 
 	tmpIter[playerid] = 
 	tmpDubStart_Price[playerid] = 0;
 	
@@ -29026,6 +29063,7 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 
 	FurnitureMultiSelectionEnabled{playerid} = 
 	SeenATMCommand{playerid} = 
+	SeenFillCommand{playerid} = 
 	SeenPayPhoneCommand{playerid} = false;
 
 	TurningEngine[playerid] = 
@@ -39702,7 +39740,9 @@ CMD:fill(playerid, params[])
 			if(BusinessInfo[businessid][bType] == BUSINESS_TYPE_FUEL)
 			{
 				new Float:fillX, Float:fillY, Float:fillZ;
-				if((fillX = BusinessInfo[businessid][bExtraX]) != 0.0 && (fillY = BusinessInfo[businessid][bExtraY]) != 0.0 && (fillZ = BusinessInfo[businessid][bExtraZ]) != 0.0)
+				if(	(fillX = BusinessInfo[businessid][bExtraX]) != 0.0 && 
+					(fillY = BusinessInfo[businessid][bExtraY]) != 0.0 && 
+					(fillZ = BusinessInfo[businessid][bExtraZ]) != 0.0)
 				{
 					if(IsVehicleInRangeOfPoint(vehicleid, 10.0, fillX, fillY, fillZ))
 					{
