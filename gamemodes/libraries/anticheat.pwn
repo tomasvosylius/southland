@@ -202,7 +202,7 @@
 // Nustatymai
 #define AC_WEAPONS_TIME 					500 	
 #define AC_MONEY_TIME 						450 	
-#define AC_AIRBREAK_TIME 					400 
+#define AC_AIRBREAK_TIME 					200 
 #define AC_HEALTH_TIME 						800
 #define AC_SPEED_TIME 						250
 #define AC_TELEPORTER_TIME					350
@@ -224,7 +224,7 @@ Enables/disables
 	#define AC_ENABLE_MONEY 					true
 #endif
 #if !defined AC_ENABLE_AIRBREAK
-	#define AC_ENABLE_AIRBREAK 					false
+	#define AC_ENABLE_AIRBREAK 					true
 #endif
 #if !defined AC_ENABLE_HEALTH
 	#define AC_ENABLE_HEALTH 					true
@@ -312,6 +312,9 @@ Settings
 #if !defined AC_IGNORE_PAYNSPRAY_VEHICLE_HP
 	#define AC_IGNORE_PAYNSPRAY_VEHICLE_HP		false
 #endif
+/* Airbrk */
+#define AC_AIRBRK_ON_FOOT_DISTANCE				75.0
+#define AC_AIRBRK_IN_VEHICLE_DISTANCE			50.0
 /* Aim */
 #if !defined AC_AIM_MAX_PACKET_LOSS
 	#define AC_AIM_MAX_PACKET_LOSS 5
@@ -409,9 +412,10 @@ enum E_AC_AIRBREAK
 	Float:e_ac_AirBrkX,
 	Float:e_ac_AirBrkY,
 	Float:e_ac_AirBrkZ,
-	e_ac_AirBrkIgnore,
+	e_ac_AirBrkImmune,
 	e_ac_AirBrkDetected,
-	e_ac_AirBrkLast
+	e_ac_AirBrkLast,
+	e_ac_AirBrkLastChk
 };
 
 enum E_AC_JOINS
@@ -695,7 +699,7 @@ stock FAC_SpawnPlayer(playerid)
 	ac__ReturnState[playerid] = true;
 	ac__IgnoreAfkHealth[playerid] = 
 	ac__PlayerHealth[playerid] = 100.0;
-	ac__AirBreak[playerid][e_ac_AirBrkIgnore] = gettime() + 4;
+	ac__AirBreak[playerid][e_ac_AirBrkImmune] = gettime() + 4;
 	return SpawnPlayer(playerid);
 }
 
@@ -834,7 +838,7 @@ public t_ac__Teleporter()
 			Float:dist = 0.0;
 		AC_playerloop(playerid)
 		{
-			if(	now > ac__AirBreak[playerid][e_ac_AirBrkIgnore] &&
+			if(	now > ac__AirBreak[playerid][e_ac_AirBrkImmune] &&
 				!IsPlayerAFK(playerid) &&
 				_FAC_IsPlayerStatePlaying(playerid) &&
 				(
@@ -882,7 +886,7 @@ public t_ac__Teleporter()
 				if(	(ac__TeleportWarns[playerid]++) >= AC_TELEPORT_WARNINGS || 
 					(dist >= AC_TELEPORT_DISTANCE_INSTA_KICK) )
 				{
-					_FAC_CheatDetected(playerid, CHEAT_TELEPORTER, ac__AirBreak[playerid][e_ac_AirBrkIgnore], floatround(dist));
+					_FAC_CheatDetected(playerid, CHEAT_TELEPORTER, ac__AirBreak[playerid][e_ac_AirBrkImmune], floatround(dist));
 				}
 			}
 			GetPlayerPos(playerid, ac__TpPosX[playerid], ac__TpPosY[playerid], ac__TpPosZ[playerid]);
@@ -1659,7 +1663,7 @@ public t_ac__Health()
 				(newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER))
 			)
 		{
-			ac__AirBreak[playerid][e_ac_AirBrkIgnore] = now + 2;
+			ac__AirBreak[playerid][e_ac_AirBrkImmune] = now + 2;
 		}
 	#endif
 	#if AC_ENABLE_SEAT_CHANGER
@@ -1811,7 +1815,7 @@ stock IsPlayerAFK(playerid)
 
 stock FAC_TogglePlayerSpectating(playerid, toggle)
 {
-	ac__AirBreak[playerid][e_ac_AirBrkIgnore] = gettime() + 4;
+	ac__AirBreak[playerid][e_ac_AirBrkImmune] = gettime() + 4;
 	return TogglePlayerSpectating(playerid, toggle);
 }
 
@@ -2328,19 +2332,19 @@ stock FAC_GivePlayerMoney(playerid, amount)
 stock FAC_SetPlayerVirtualWorld(playerid, worldid)
 {
 	ac__PlayerVW[playerid] = worldid;
-	ac__AirBreak[playerid][e_ac_AirBrkIgnore] = gettime() + 2;
+	ac__AirBreak[playerid][e_ac_AirBrkImmune] = gettime() + 2;
 	return SetPlayerVirtualWorld(playerid, worldid);
 }
 stock FAC_SetPlayerInterior(playerid, interiorid)
 {
 	ac__PlayerInt[playerid] = interiorid;
-	ac__AirBreak[playerid][e_ac_AirBrkIgnore] = gettime() + 2;
+	ac__AirBreak[playerid][e_ac_AirBrkImmune] = gettime() + 2;
 	return SetPlayerInterior(playerid, interiorid);
 }
 
 stock FAC_SetPlayerPos(playerid, Float:x, Float:y, Float:z)
 {
-	ac__AirBreak[playerid][e_ac_AirBrkIgnore] = gettime() + 3;
+	ac__AirBreak[playerid][e_ac_AirBrkImmune] = gettime() + 3;
 	ac__EnteringVehicle[playerid] = FAC_INVALID_VEHICLE_ID;
 	return SetPlayerPos(playerid, x, y, z);
 }
@@ -2351,7 +2355,7 @@ stock FAC_SetVehiclePos(vehicleid, Float:x, Float:y, Float:z)
 	{
 		if(GetPlayerVehicleID(playerid) == vehicleid)
 		{
-			ac__AirBreak[playerid][e_ac_AirBrkIgnore] = gettime() + 5;
+			ac__AirBreak[playerid][e_ac_AirBrkImmune] = gettime() + 5;
 		}
 	}
 	return SetVehiclePos(vehicleid, x, y, z);
@@ -2371,7 +2375,9 @@ public t_ac__AirBreak()
 
 	AC_playerloop(playerid)
 	{
-		if(!IsPlayerConnected(playerid)) continue;
+		if(!IsPlayerConnected(playerid) || IsPlayerNPC(playerid)) continue;
+		
+		/* Sanity checks */
 		GetPlayerPos(playerid, x, y, z);
 		if(x > 0xdbb9f || y > 0xdbb9f || z > 0xdbb9f)
 		{
@@ -2379,7 +2385,11 @@ public t_ac__AirBreak()
 										ac__AirBreak[playerid][e_ac_AirBrkY],
 										ac__AirBreak[playerid][e_ac_AirBrkZ]);
 		}
-		else if(now > ac__AirBreak[playerid][e_ac_AirBrkIgnore] && 
+
+		if(now <= ac__AirBreak[playerid][e_ac_AirBrkLastChk]) continue;
+
+		/* AirBreak check */
+		else if(now > ac__AirBreak[playerid][e_ac_AirBrkImmune] && 
 				!_FAC_IsPlayerSurfing(playerid) &&
 				!_FAC_IsPlayerLeavingCar(playerid))
 		{
@@ -2390,14 +2400,20 @@ public t_ac__AirBreak()
 				case PLAYER_STATE_ONFOOT:
 				{
 					GetPlayerPos(playerid, x, y, z);
-					if((floatabs(ac__AirBreak[playerid][e_ac_AirBrkZ] - z) < 15.0 && floatabs(distance) >= 20.0) && 
-						(floatabs(ac__AirBreak[playerid][e_ac_AirBrkX] - x) >= 20.0 || floatabs(ac__AirBreak[playerid][e_ac_AirBrkY] - y) >= 20.0)) FAC_Airbreak(playerid);
+					if((floatabs(ac__AirBreak[playerid][e_ac_AirBrkZ] - z) < 1.0 && floatabs(distance) >= AC_AIRBRK_ON_FOOT_DISTANCE) && // Nekrenta ir distancija labai pasikeitus
+						(floatabs(ac__AirBreak[playerid][e_ac_AirBrkX] - x) >= 50.0 || floatabs(ac__AirBreak[playerid][e_ac_AirBrkY] - y) >= 50.0))
+					{
+						_FAC_AirbreakDetected(playerid);
+					}
 				}
 				case PLAYER_STATE_DRIVER:
 				{
 					GetVehiclePos(vehicleid, x, y, z);
-					if((!FAC_IsVehicleMoving(vehicleid) && floatabs(distance) >= 20.0) &&
-						(floatabs(ac__AirBreak[playerid][e_ac_AirBrkX] - x) >= 20.0 || floatabs(ac__AirBreak[playerid][e_ac_AirBrkY] - y) >= 20.0)) FAC_Airbreak(playerid);
+					if((!_FAC_IsVehicleMoving(vehicleid) && floatabs(distance) >= AC_AIRBRK_IN_VEHICLE_DISTANCE) &&
+						(floatabs(ac__AirBreak[playerid][e_ac_AirBrkX] - x) >= 40.0 || floatabs(ac__AirBreak[playerid][e_ac_AirBrkY] - y) >= 40.0))
+					{
+						_FAC_AirbreakDetected(playerid);
+					}
 				}
 			}
 		}
@@ -2416,28 +2432,28 @@ public t_ac__AirBreak()
 										ac__AirBreak[playerid][e_ac_AirBrkZ]);
 			}
 		}
+
+		ac__AirBreak[playerid][e_ac_AirBrkLastChk] = now;
 	}	
 	SetTimer("t_ac__AirBreak", AC_AIRBREAK_TIME, false);
 	return 1;
 }
 
-stock FAC_Airbreak(playerid)
+static _FAC_AirbreakDetected(playerid)
 {
-	SendFormat(playerid, -1, "Airbrk");
-
 	new 
 		now = gettime();
-	if(	(ac__AirBreak[playerid][e_ac_AirBrkDetected]++) >= AC_AIRBREAK_MAX_WARNINGS && 
+	if(	(ac__AirBreak[playerid][e_ac_AirBrkDetected] += 1) >= AC_AIRBREAK_MAX_WARNINGS && 
 		(now - ac__AirBreak[playerid][e_ac_AirBrkLast]) < 10)
 	{
 		_FAC_CheatDetected(playerid, CHEAT_AIRBRK);
-		ac__AirBreak[playerid][e_ac_AirBrkIgnore] = now + 3;
+		ac__AirBreak[playerid][e_ac_AirBrkImmune] = now + 3;
 	}
 	ac__AirBreak[playerid][e_ac_AirBrkLast] = now;
 	return 1;
 }
 
-stock FAC_IsVehicleMoving(vehicleid)
+static _FAC_IsVehicleMoving(vehicleid)
 {
 	// Emmet
 	new

@@ -28,7 +28,7 @@ static sd_CheckAfk(playerid)
 	return true;
 }
 
-hook OnPlayerCommandPerformed(playerid, cmd[], params[], result, flags)
+hook OnPlayerCmdPerformed(playerid, cmd[], params[], result, flags)
 {
     player_AFKTime[playerid] = 0;
 }

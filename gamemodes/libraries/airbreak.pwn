@@ -59,7 +59,6 @@ stock Float:GetVehicleSpeed_MPH(playerid)
 forward AirbreakCheck();
 public AirbreakCheck()
 {
-    
     new Float:x, Float:y, Float:z, index, Float:dist[4];
     foreach(new i : Player)
     {
