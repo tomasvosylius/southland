@@ -910,7 +910,7 @@ native gpci(playerid, serial[], len);
 #include "libraries/macros.pwn"
 #include "libraries/als.pwn"
 #include "libraries/anticheat.pwn"
-// #include "libraries/airbreak.pwn"
+#include "libraries/airbreak.pwn"
 #include "libraries/dialog.pwn"
 
 // ==============================================================================
@@ -1024,7 +1024,6 @@ enum E_PLAYER_EXTRA_DATA
 	peSpeedLimit,
 	peBelt,
 	//peDutyObject,
-	peAFKTime,
 	Text3D:peMaskLabel,
 	Text3D:peDeathLabel,
 	Text3D:peDutyLabel,
@@ -1718,7 +1717,6 @@ new
 	tmpSelected[MAX_PLAYERS],
 	tmpDubStart_Price[MAX_PLAYERS],
 	RemoteHash[9],
-	airbrk_count[MAX_PLAYERS],
 	SpectateOn[MAX_PLAYERS],
 	MuteListPM[MAX_PLAYERS][MAX_PLAYERS],
 	//SellVehicleZone,
@@ -2224,6 +2222,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player/cheats.pwn"
 #include "modules\player\ui/speedo.pwn"
 #include "modules\player\ui/leftbox.pwn"
+#include "modules\player/afk.pwn"
 
 // stock FAC_GetWeaponSlot(playerid) return 1;
 // stock RemovePlayerWeaponInSlot(playerid, slot) return 1;
@@ -5354,7 +5353,6 @@ public OnPlayerText(playerid, text[])
 			return 0;
 		}
 	#endif
-	PlayerExtra[playerid][peAFKTime] = 0;
 	if(text[0] == '@' && HaveCommandPermission(playerid, "a") && text[1] != EOS)
 	{
 		strdel(text, 0, (text[1] == ' ' ? 2 : 1));
@@ -6184,7 +6182,6 @@ public OnPlayerCommandPerformed(playerid, cmd[], params[], result, flags)
 {
 	printf("OnPlayerCommandPerformed(%s, %s, %s, %d, %d)", playerid, cmd, params, result, flags);
 
-	PlayerExtra[playerid][peAFKTime] = 0;
 	if(result == -1) { return SendError(playerid, "Tokios komandos nëra. Naudokite /help arba /ask"); }
 	else
 	{
@@ -28865,7 +28862,6 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 
 	OldVehicle[playerid] = INVALID_VEHICLE_ID;
 	tmpSelected[playerid] = -1;
-	airbrk_count[playerid] = 0;
 
 	
 	tmpType_Salon[playerid] = 

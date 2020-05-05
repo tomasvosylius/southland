@@ -224,7 +224,7 @@ Enables/disables
 	#define AC_ENABLE_MONEY 					true
 #endif
 #if !defined AC_ENABLE_AIRBREAK
-	#define AC_ENABLE_AIRBREAK 					true
+	#define AC_ENABLE_AIRBREAK 					false
 #endif
 #if !defined AC_ENABLE_HEALTH
 	#define AC_ENABLE_HEALTH 					true

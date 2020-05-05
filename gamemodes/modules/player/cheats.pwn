@@ -1,4 +1,11 @@
 
+public OnPlayerAirbreak(playerid)
+{
+    if(IsPlayerInAnyAdminGroup(playerid)) return 1;
+    SendFormat(playerid, -1, "AIRBRK DETECTED", reason);
+    return 1;
+}
+
 public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
 {
     printf("OnPlayerCheat(%s, %03d, %d, %d)", GetPlayerNameEx(playerid), code, extra_id_1, extra_id_2);
@@ -33,10 +40,7 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
             ban = true;
             format(reason, sizeof reason, "Ginklø/ammo cheat [%d/%d]", extra_id_1, extra_id_2);
         }
-        case CHEAT_AIRBRK: {
-            format(reason, sizeof reason, "Air-Break");
-            ignore_if_admin = true;
-        }
+
         case CHEAT_FAKE_KILL: {
             format(reason, sizeof reason, "Fake-kill");
         }
