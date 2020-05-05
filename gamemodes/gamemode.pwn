@@ -2797,7 +2797,7 @@ ptask PT_CommandUsage[1342](playerid)
 		}
 	}
 	// degalines irgi
-	if(IsPlayerInAnyVehicle(playerid))
+	if(!SeenFillCommand{playerid} && IsPlayerInAnyVehicle(playerid))
 	{
 		foreach(new businessid : Business)
 		{

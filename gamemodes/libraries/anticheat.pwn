@@ -284,7 +284,7 @@ Enables/disables
 	#define AC_ENABLE_TELEPORTER				false
 #endif 
 #if !defined AC_ENABLE_VW_INT
-	#define AC_ENABLE_VW_INT					true
+	#define AC_ENABLE_VW_INT					false
 #endif 
 /* 
 ****************************
