@@ -131,7 +131,7 @@ native gpci(playerid, serial[], len);
 #define MAX_GFURNITURE_SILVER 			200
 #define MAX_GFURNITURE_GOLD 			300
 // Donators, remejai
-#define MAX_AFK_TIME_NO_DONATOR			2
+#define MAX_AFK_TIME_NO_DONATOR			8
 #define MAX_AFK_TIME_SILVER_USER		14	
 #define MAX_AFK_TIME_GOLD_USER			20
 #define TIME_TO_RESET_DONATOR 			2592000 // 30days
@@ -870,7 +870,7 @@ native gpci(playerid, serial[], len);
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-// #define USING_VIRTUAL_PRIVATE_SERVER
+#define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
