@@ -8101,7 +8101,7 @@ Dialog:DialogUserLogin(playerid, response, listitem, inputtext[])
 		format(string, 60, "%s%s", dialog_Input(), PlayerInfo[playerid][pSalt]);
 		WP_Hash(salted, sizeof salted, string);
 		mysql_format(chandler, string, sizeof string, "\
-			SELECT RegisterIp,DiscordCode,DiscordVerified FROM `users_data` WHERE id = '%d' AND Password = '%e'", PlayerInfo[playerid][pUserId], salted);
+			SELECT RegisterIp,DiscordCode,DiscordVerified,TutorialDone FROM `users_data` WHERE id = '%d' AND Password = '%e'", PlayerInfo[playerid][pUserId], salted);
 		mysql_tquery(chandler, string, "CheckRegisterIp", "d", playerid);
 	}
 	else
