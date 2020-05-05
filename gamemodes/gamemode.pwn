@@ -219,6 +219,8 @@ native gpci(playerid, serial[], len);
 // numeris
 #define PAYPHONE_DEFAULT_NUMBER 		100500
 #define PHONE_DEFAULT_NUMBER 			110000
+// namai
+#define DEFAULT_HOUSE_PICKUP			19605
 // verslai
 #define DEFAULT_BUSINESS_PICKUP			1239	
 #define MAX_BUSINESS_FOR_PLAYER 		2
@@ -2755,8 +2757,10 @@ ptask PT_PhoneSecond[1000](playerid)
 				PhoneInfo[receiverid][phoneCallOwner] =
 				PhoneInfo[playerid][phoneEstimated] =
 				PhoneInfo[receiverid][phoneEstimated] = 0;
+				
 				SendFormat(playerid, 0xE77B33FF, "Ryðys nutrûko!");
 				if(IsPlayerConnected(receiverid)) SendFormat(receiverid, 0xE77B33FF, "Ryðys nutrûko!");
+
 				if(GetESCType(receiverid) == ESC_TYPE_PHONE)
 				{
 					PhoneTD_Hide(receiverid, PHONE_PAGE_CALL);
@@ -3533,10 +3537,11 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 	{
 		if(IsPlayerConnected(call_receiver))
 		{
-			PhoneInfo[call_receiver][phoneTalkingTo] =
-			PhoneInfo[call_receiver][phoneRinging] = INVALID_PLAYER_ID;
-			PhoneInfo[call_receiver][phoneEstimated] =
-			PhoneInfo[call_receiver][phoneRingingTime] = 0;
+			PlayerPhoneHangup(call_receiver);
+			// PhoneInfo[call_receiver][phoneTalkingTo] =
+			// PhoneInfo[call_receiver][phoneRinging] = INVALID_PLAYER_ID;
+			// PhoneInfo[call_receiver][phoneEstimated] =
+			// PhoneInfo[call_receiver][phoneRingingTime] = 0;
 		}
 	}
 	if(IsValidDynamic3DTextLabel(PlayerExtra[playerid][peMaskLabel])) DestroyDynamic3DTextLabel(PlayerExtra[playerid][peMaskLabel]);
@@ -9695,7 +9700,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					businessid = tmpIter[playerid];
 				if(sscanf(inputtext,"d",price) || !(0 <= price <= 500)) return OnDialogResponse(playerid, DIALOG_BM_MAIN, 1, 4, "");
 				BusinessInfo[businessid][bEnterPrice] = price;
-				FixBusinessLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+				Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 				SaveBusinessIntEx(businessid, "EnterPrice", price);
 				MsgSuccess(playerid, "VERSLAS", "Sëkmingai pakeitëte áëjimo kainà á $%d", price);
 				pc_cmd_bmenu(playerid, "");
@@ -9710,7 +9715,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					businessid = tmpIter[playerid];
 				if(sscanf(inputtext,"d",price) || price < 0) OnDialogResponse(playerid, DIALOG_BM_MAIN, 1, 3, "");
 				BusinessInfo[businessid][bSale] = price;
-				FixBusinessLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+				Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 				SaveBusinessIntEx(businessid, "Sale", price);
 				MsgSuccess(playerid, "VERSLAS", "Sëkmingai ádëjote verslà á pardavimà uþ $%d", price);
 				pc_cmd_bmenu(playerid, "");
@@ -10202,7 +10207,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(HouseInfo[tmpIter[playerid]][hSale] > 0)
 						{
 							HouseInfo[tmpIter[playerid]][hSale] = 0;
-							FixHouseLabels(tmpIter[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+							House_FixLabels(tmpIter[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
 							SaveHouseIntEx(tmpIter[playerid], "Sale", 0);
 							log_init(true);
 							log_set_table("logs_houses");
@@ -10275,7 +10280,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					houseid = tmpIter[playerid];
 				if(sscanf(inputtext,"d",price) || price < 0) OnDialogResponse(playerid, DIALOG_HM_MAIN, 1, 4, "");
 				HouseInfo[houseid][hSale] = price;
-				FixHouseLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+				House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
 				SaveHouseIntEx(houseid, "Sale", price);
 				MsgSuccess(playerid, "NAMAS", "Sëkmingai ádëjote namà á pardavimà uþ $%d", price);
 				pc_cmd_hmenu(playerid, "");
@@ -10328,7 +10333,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							// isjungem
 							MsgSuccess(playerid, "NAMO NUOMA", "Namo nuoma iðjungta.");
 						}
-						FixHouseLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+						House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
 						SaveHouseIntEx(houseid, "Rent", HouseInfo[houseid][hRent]);
 						OnDialogResponse(playerid, DIALOG_HM_MAIN, 1, 1, "");
 					}
@@ -10345,7 +10350,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				HouseInfo[tmpIter[playerid]][hRentPrice] = price;
 				SaveHouseIntEx(tmpIter[playerid], "RentPrice", price);
 				MsgSuccess(playerid, "NAMO NUOMA", "Nuomos kaina sëkmingai atnaujinta.");
-				FixHouseLabels(tmpIter[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+				House_FixLabels(tmpIter[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
 				pc_cmd_hmenu(playerid, "");
 			}
 		}
@@ -12987,7 +12992,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
 							foreach(new businessid : Business)
 							{
-								FixBusinessLabels(businessid, 1);
+								Business_FixLabels(businessid, 1);
 							}
 							Streamer_Update(playerid);
 						}
@@ -13002,7 +13007,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
 							foreach(new houseid : House)
 							{
-								FixHouseLabels(houseid, 1);
+								House_FixLabels(houseid, 1);
 							}
 							Streamer_Update(playerid);
 						}
@@ -14324,7 +14329,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new string[126];
 					mysql_format(chandler, string, sizeof string, "UPDATE `houses_data` SET Price = '%d' WHERE id = '%d'", amount, HouseInfo[tmpSelected[playerid]][hId]);
 					mysql_fquery(chandler, string, "HouseUpdated");
-					FixHouseLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+					House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
 					log_init(true);
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
@@ -14352,9 +14357,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						mysql_fquery(chandler, string, "HouseUpdated");
 						MsgSuccess(playerid, "NAMAS", "Paðalinote namo savininkà.");
 						OnDialogResponse(playerid, DIALOG_AM_HOUSES_MAIN, 1, 1, "");
-						FixHouseLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
-						sd_DestroyDynamicPickup(HouseInfo[tmpSelected[playerid]][hPickup]);
-						HouseInfo[tmpSelected[playerid]][hPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_HOUSE, tmpSelected[playerid], HouseInfo[tmpSelected[playerid]][hOwner] > 0 ? (1272) : (1273), 1, HouseInfo[tmpSelected[playerid]][hEnterX], HouseInfo[tmpSelected[playerid]][hEnterY], HouseInfo[tmpSelected[playerid]][hEnterZ], HouseInfo[tmpSelected[playerid]][hOutVW], HouseInfo[tmpSelected[playerid]][hExterior]);
+						House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+						
+						
+						House_CreatePickup(tmpSelected[playerid]);
 					}
 					else
 					{
@@ -14368,9 +14374,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							mysql_fquery(chandler, string, "HouseUpdated");
 							HouseInfo[tmpSelected[playerid]][hOwner] = strval(inputtext);
 							MsgSuccess(playerid, "NAMAS", "Pakeitëte namo savininkà.");
-							FixHouseLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
-							sd_DestroyDynamicPickup(HouseInfo[tmpSelected[playerid]][hPickup]);
-							HouseInfo[tmpSelected[playerid]][hPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_HOUSE, tmpSelected[playerid], HouseInfo[tmpSelected[playerid]][hOwner] > 0 ? (1272) : (1273), 1, HouseInfo[tmpSelected[playerid]][hEnterX], HouseInfo[tmpSelected[playerid]][hEnterY], HouseInfo[tmpSelected[playerid]][hEnterZ], HouseInfo[tmpSelected[playerid]][hOutVW], HouseInfo[tmpSelected[playerid]][hExterior]);
+							House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+							
+							House_CreatePickup(tmpSelected[playerid]);
 							log_set_values("'%d','%e','(AM) Pakeite namo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpSelected[playerid]][hOwner], strval(inputtext));
 						}
 						else
@@ -14394,9 +14400,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						mysql_fquery(chandler, string, "HouseUpdated");
 						HouseInfo[tmpSelected[playerid]][hOwner] = id;
 						MsgSuccess(playerid, "NAMAS", "Pakeitëte namo savininkà.");
-						FixHouseLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
-						sd_DestroyDynamicPickup(HouseInfo[tmpSelected[playerid]][hPickup]);
-						HouseInfo[tmpSelected[playerid]][hPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_HOUSE, tmpSelected[playerid], HouseInfo[tmpSelected[playerid]][hOwner] > 0 ? (1272) : (1273), 1, HouseInfo[tmpSelected[playerid]][hEnterX], HouseInfo[tmpSelected[playerid]][hEnterY], HouseInfo[tmpSelected[playerid]][hEnterZ], HouseInfo[tmpSelected[playerid]][hOutVW], HouseInfo[tmpSelected[playerid]][hExterior]);
+						House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+						
+						House_CreatePickup(tmpSelected[playerid]);
 						log_set_values("'%d','%e','(AM) Pakeite namo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpSelected[playerid]][hOwner], id);
 					}
 					else
@@ -14451,9 +14457,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							new string[186];
 							mysql_format(chandler, string, sizeof string, "UPDATE `houses_data` SET EnterX = '%f', EnterY = '%f', EnterZ = '%f', OutVW = '%d', Exterior = '%d' WHERE id = '%d'", x, y, z, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), HouseInfo[selected][hId]);
 							mysql_fquery(chandler, string, "HouseUpdated");
-							sd_DestroyDynamicPickup(HouseInfo[selected][hPickup]);
-							HouseInfo[selected][hPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_HOUSE, selected, HouseInfo[selected][hOwner] > 0 ? (1272) : (1273), 1, HouseInfo[selected][hEnterX], HouseInfo[selected][hEnterY], HouseInfo[selected][hEnterZ], HouseInfo[selected][hOutVW], HouseInfo[selected][hExterior]);
-							FixHouseLabels(selected, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+							
+							House_CreatePickup(selected);
+							House_FixLabels(selected, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+
 							log_init(true);
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
@@ -14582,8 +14589,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								}
 							}
 							if(last_itter != -1) Iter_Remove(HFurniture, last_itter);
+							
 							if(IsValidDynamic3DTextLabel(HouseInfo[selected][hLabel])) DestroyDynamic3DTextLabel(HouseInfo[selected][hLabel]);
 							sd_DestroyDynamicPickup(HouseInfo[selected][hPickup]);
+
 							log_init(true);
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
@@ -14678,8 +14687,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								HouseInfo[houseid][hVW] = HouseInfo[houseid][hId]+HOUSE_VIRTUAL_WORLD;
 								Iter_Add(House, houseid);
 								MsgSuccess(playerid, "NAMAI", "Sëkmingai sukûrëte namà, kurio ID: %d", HouseInfo[houseid][hId]);
-								FixHouseLabels(houseid, GetGVarInt("EnabledHouseLabels"));
-								HouseInfo[houseid][hPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_HOUSE, houseid, 1273, 1, x, y, z, HouseInfo[houseid][hOutVW], HouseInfo[houseid][hExterior]);
+
+								House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels"));
+								House_CreatePickup(houseid);
 							}
 							else
 							{
@@ -14807,7 +14817,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new string[126];
 					mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET Price = '%d' WHERE id = '%d'", amount, BusinessInfo[tmpSelected[playerid]][bId]);
 					mysql_fquery(chandler, string, "BusinessUpdated");
-					FixBusinessLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+					Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 					log_init(true);
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
@@ -14835,9 +14845,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						mysql_fquery(chandler, string, "BusinessUpdated");
 						MsgSuccess(playerid, "VERSLAS", "Paðalinote verslo savininkà.");
 						OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
-						FixBusinessLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
-						sd_DestroyDynamicPickup(BusinessInfo[tmpSelected[playerid]][bPickup]);
-						BusinessInfo[tmpSelected[playerid]][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, tmpSelected[playerid], DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[tmpSelected[playerid]][bEnterX], BusinessInfo[tmpSelected[playerid]][bEnterY], BusinessInfo[tmpSelected[playerid]][bEnterZ], BusinessInfo[tmpSelected[playerid]][bOutVW], BusinessInfo[tmpSelected[playerid]][bExterior]);
+
+						Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+						Business_CreatePickup(tmpSelected[playerid]);
 					}
 					else
 					{
@@ -14852,9 +14862,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							BusinessInfo[tmpSelected[playerid]][bOwner] = strval(inputtext);
 							MsgSuccess(playerid, "VERSLAS", "Pakeitëte verslo savininkà.");
 							OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
-							FixBusinessLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
-							sd_DestroyDynamicPickup(BusinessInfo[tmpSelected[playerid]][bPickup]);
-							BusinessInfo[tmpSelected[playerid]][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, tmpSelected[playerid], DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[tmpSelected[playerid]][bEnterX], BusinessInfo[tmpSelected[playerid]][bEnterY], BusinessInfo[tmpSelected[playerid]][bEnterZ], BusinessInfo[tmpSelected[playerid]][bOutVW], BusinessInfo[tmpSelected[playerid]][bExterior]);
+							
+							Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+							Business_CreatePickup(tmpSelected[playerid]);
+
 							log_set_values("'%d','%e','(AM) Pakeite verslo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], strval(inputtext));
 						}
 						else
@@ -14879,9 +14890,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						BusinessInfo[tmpSelected[playerid]][bOwner] = id;
 						MsgSuccess(playerid, "VERSLAS", "Pakeitëte verslo savininkà.");
 						OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
-						FixBusinessLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
-						sd_DestroyDynamicPickup(BusinessInfo[tmpSelected[playerid]][bPickup]);
-						BusinessInfo[tmpSelected[playerid]][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, tmpSelected[playerid], DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[tmpSelected[playerid]][bEnterX], BusinessInfo[tmpSelected[playerid]][bEnterY], BusinessInfo[tmpSelected[playerid]][bEnterZ], BusinessInfo[tmpSelected[playerid]][bOutVW], BusinessInfo[tmpSelected[playerid]][bExterior]);
+						
+						Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+						Business_CreatePickup(tmpSelected[playerid]);
+
 						log_set_values("'%d','%e','(AM) Pakeite verslo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], id);
 					}
 					else
@@ -14906,7 +14918,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				mysql_fquery(chandler, string, "BusinessUpdated");
 				format(BusinessInfo[selected][bName], 24, inputtext);
 				MsgSuccess(playerid, "VERSLAS", "Verslo pavadinimas pakeistas.");
-				FixBusinessLabels(selected, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+				Business_FixLabels(selected, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
 				ShowPlayerAdminMenu(playerid);
 				log_init(true);
 				log_set_table("logs_admins");
@@ -15007,9 +15019,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							new string[186];
 							mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET EnterX = '%f', EnterY = '%f', EnterZ = '%f', OutVW = '%d', Exterior = '%d' WHERE id = '%d'", x, y, z, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), BusinessInfo[selected][bId]);
 							mysql_fquery(chandler, string, "BusinessUpdated");
-							sd_DestroyDynamicPickup(BusinessInfo[selected][bPickup]);
-							BusinessInfo[selected][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, selected, DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[selected][bEnterX], BusinessInfo[selected][bEnterY], BusinessInfo[selected][bEnterZ], BusinessInfo[selected][bOutVW], BusinessInfo[selected][bExterior]);
-							FixBusinessLabels(selected, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+							
+							Business_FixLabels(selected, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+							Business_CreatePickup(selected);
+
 							log_init(true);
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
@@ -15350,9 +15363,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							BusinessInfo[businessid][bExterior] = int;
 							BusinessInfo[businessid][bVW] = BUSINESS_VIRTUAL_WORLD+BusinessInfo[businessid][bId];
 							Iter_Add(Business, businessid);
-							FixBusinessLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+							
+							Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+							Business_CreatePickup(businessid);
+							
 							MsgSuccess(playerid, "VERSLAI", "Sëkmingai sukûrëte verslà, kurio ID: %d", BusinessInfo[businessid][bId]);
-							BusinessInfo[businessid][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, businessid, DEFAULT_BUSINESS_PICKUP, 1, x, y, z, BusinessInfo[businessid][bOutVW], BusinessInfo[businessid][bExterior]);
+							
 							log_init(true);
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
@@ -26577,8 +26593,9 @@ public BusinessLoad()
 		cache_get_value_name(i, "Name", BusinessInfo[i][bName], 24);
 		cache_get_value_name(i, "Slogan", BusinessInfo[i][bSlogan], 128);
 
-		BusinessInfo[i][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, i, DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[i][bEnterX], BusinessInfo[i][bEnterY], BusinessInfo[i][bEnterZ], BusinessInfo[i][bOutVW], BusinessInfo[i][bExterior]);
-		FixBusinessLabels(i, enabled_labels);
+		Business_CreatePickup(i);
+		Business_FixLabels(i, enabled_labels);
+
 		Iter_Add(Business, i);
 		LoadBusinessInventory(i);
 	}
@@ -26627,7 +26644,21 @@ public BusinessWaresLoad(businessid)
 	}
 }
 
-stock FixBusinessLabels(i, enabled_labels)
+stock Business_CreatePickup(businessid)
+{
+	sd_DestroyDynamicPickup(BusinessInfo[businessid][bPickup]);
+	BusinessInfo[businessid][bPickup] = sd_CreateDynamicPickup(
+		PICKUP_TYPE_BUSINESS,
+		businessid,
+		DEFAULT_BUSINESS_PICKUP, 1, 
+		BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ], 
+		BusinessInfo[businessid][bOutVW], BusinessInfo[businessid][bExterior]
+	);
+}
+
+
+
+stock Business_FixLabels(i, enabled_labels)
 {
 	if(IsValidDynamic3DTextLabel(BusinessInfo[i][bLabel]))
 	{
@@ -26746,6 +26777,8 @@ public BusinessInventoryLoad(businessid)
 	}
 	return 1;
 }
+
+
 
 stock SaveHouse(houseid, bool:save_inventory)
 {
@@ -26958,8 +26991,10 @@ public HousesLoad()
 
 		HouseInfo[i][hVW] = HouseInfo[i][hId] + HOUSE_VIRTUAL_WORLD;
 		cache_get_value_name_int(i, "OutVW", HouseInfo[i][hOutVW]);
-		HouseInfo[i][hPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_HOUSE, i, HouseInfo[i][hOwner] > 0 ? (1272) : (1273), 1, HouseInfo[i][hEnterX], HouseInfo[i][hEnterY], HouseInfo[i][hEnterZ], HouseInfo[i][hOutVW], HouseInfo[i][hExterior]);
-		FixHouseLabels(i, enabled_labels);
+		
+		House_CreatePickup(i);
+
+		House_FixLabels(i, enabled_labels);
 		Iter_Add(House, i);
 		LoadHouseInventory(i);
 	}
@@ -26967,7 +27002,22 @@ public HousesLoad()
 	return 1;
 }
 
-stock FixHouseLabels(i, enabled_labels)
+stock House_CreatePickup(house)
+{
+	IsValidDynamicPickup(HouseInfo[house][hPickup]) && sd_DestroyDynamicPickup(HouseInfo[house][hPickup]);
+	HouseInfo[house][hPickup] = sd_CreateDynamicPickup(
+		PICKUP_TYPE_HOUSE,
+		house,
+		DEFAULT_HOUSE_PICKUP, // HouseInfo[house][hOwner] > 0 ? (1272) : (1273),
+		1,
+		HouseInfo[house][hEnterX], HouseInfo[house][hEnterY], HouseInfo[house][hEnterZ] - 0.75,
+		HouseInfo[house][hOutVW], HouseInfo[house][hExterior],
+		.streamdistance = 6.0
+	);
+	return 1;
+}
+
+stock House_FixLabels(i, enabled_labels)
 {
 	new string[156];
 	if(IsValidDynamic3DTextLabel(HouseInfo[i][hLabel]))
@@ -39256,9 +39306,9 @@ CMD:buyhouse(playerid, params[])
 		HouseInfo[houseid][hSale] = 0;
 		HouseInfo[houseid][hOwner] = PlayerInfo[playerid][pId];
 		SaveHouseIntEx(houseid, "Owner", PlayerInfo[playerid][pId]);
-		FixHouseLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
-		sd_DestroyDynamicPickup(HouseInfo[houseid][hPickup]);
-		HouseInfo[houseid][hPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_HOUSE, houseid, HouseInfo[houseid][hOwner] > 0 ? (1272) : (1273), 1, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ], HouseInfo[houseid][hOutVW], HouseInfo[houseid][hExterior]);
+		House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+		
+		House_CreatePickup(houseid);
 		// CreateDynamicPickup(modelid, type, Float:x, Float:y, Float:z, worldid = -1, interiorid = -1, playerid = -1, Float:streamdistance = STREAMER_PICKUP_SD, STREAMER_TAG_AREA areaid = STREAMER_TAG_AREA -1)
 	}
 	else SendWarning(playerid, "Ásitikinkite, kad esate lauke prie namo.");
@@ -39325,9 +39375,9 @@ CMD:buybusiness(playerid, params[])
 		BusinessInfo[businessid][bSale] = 0;
 		BusinessInfo[businessid][bOwner] = PlayerInfo[playerid][pId];
 		SaveBusinessIntEx(businessid, "Owner", PlayerInfo[playerid][pId]);
-		FixBusinessLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
-		sd_DestroyDynamicPickup(BusinessInfo[businessid][bPickup]);
-		BusinessInfo[businessid][bPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_BUSINESS, businessid, DEFAULT_BUSINESS_PICKUP, 1, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ], BusinessInfo[businessid][bOutVW], BusinessInfo[businessid][bExterior]);
+		
+		Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+		Business_CreatePickup(businessid);
 	}
 	else SendWarning(playerid, "Ásitikinkite, kad esate lauke prie verslo.");
 	return 1;
