@@ -19,7 +19,8 @@ static sd_CheckAfk(playerid)
             (PlayerInfo[playerid][pDonator] == DONATOR_SILVER && player_AFKTime[playerid] > MAX_AFK_TIME_SILVER_USER) || 
             (PlayerInfo[playerid][pDonator] == DONATOR_GOLD && player_AFKTime[playerid] > MAX_AFK_TIME_GOLD_USER))
         {
-            return KickPlayer(playerid, "Sistema", "AFK");
+            KickPlayer(playerid, "Sistema", "AFK");
+            return;
         }
         else player_AFKTime[playerid] ++;
 	}
