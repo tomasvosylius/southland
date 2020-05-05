@@ -39879,7 +39879,7 @@ public ReportAdded(playerid, cheaterid, reason[])
 		GetPlayerNameEx(cheaterid), cheaterid);
 	SendAdminMessage(0x40EE7DFF, true, string);
 
-	CallRemoteFunction("OnReportAdded", "dddds", playerid, PlayerInfo[playerid][pUserId], cheaterid, PlayerInfo[cheaterid][pUserId], reason);
+	CallRemoteFunction("OnReportAdded", "ddddds", CountDutyAdmins(), playerid, PlayerInfo[playerid][pUserId], cheaterid, PlayerInfo[cheaterid][pUserId], reason);
 	return 1;
 }
 
