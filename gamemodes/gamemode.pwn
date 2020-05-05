@@ -29635,6 +29635,11 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 	{
 		if(IsPlayerInRangeOfPlayer(playerid, damagedid, 10.0) && damagedid != INVALID_PLAYER_ID)
 		{
+			if(IsPlayerInAnyVehicle(damagedid))
+			{
+				RemovePlayerFromVehicle(damagedid);
+			}
+
 			new rand = 15+random(5);
 			PlayerExtra[damagedid][peTazed] = rand;
 			FreezePlayer(damagedid, rand);
@@ -31913,7 +31918,7 @@ CMD:tazer(playerid, params[])
 		if(	PlayerHasWeaponInSlot(playerid, 2) &&
 			ret_GetSlotWeaponGiveType(playerid, 2) != WEAPON_GIVE_TYPE_NO_INVENTORY)
 		{
-			SendWarning(playerid, "Jûs jau turite tazerá arba pistoletà.");
+			SendWarning(playerid, "Jûs jau turite tazerá arba pistoletà rankose.");
 			return 1;
 		}
 		else
@@ -35795,7 +35800,7 @@ CMD:trunkweapon(playerid, params[])
 	if(weaponid != 0)
 	{
 		new wepslot = FAC_GetWeaponSlot(weaponid);
-		if(ret_GetSlotWeaponUniqueId(playerid, wepslot) != WEAPON_GIVE_TYPE_NO_INVENTORY)
+		if(ret_GetSlotWeaponGiveType(playerid, wepslot) != WEAPON_GIVE_TYPE_NO_INVENTORY)
 		{
 			SendWarning(playerid, "Ðis ginklas nëra ið frakcijos tr. priemonës");
 			return 1;
@@ -36979,7 +36984,7 @@ CMD:invweapon(playerid, params[])
 	if(weaponid == 0) return SendError(playerid, "Neturite ginklo rankose.");
 
 	new wepslot = FAC_GetWeaponSlot(weaponid);
-	if(ret_GetSlotWeaponUniqueId(playerid, wepslot) == WEAPON_GIVE_TYPE_NO_INVENTORY)
+	if(ret_GetSlotWeaponGiveType(playerid, wepslot) != WEAPON_GIVE_TYPE_NORMAL)
 	{
 		SendWarning(playerid, "Ðio ginklo pasidëti á inventoriø negalima.");
 		return 1;

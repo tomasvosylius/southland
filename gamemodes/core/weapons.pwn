@@ -214,7 +214,7 @@ stock WPS_ResetPlayerWeapons(playerid)
 #endif 
 #define ResetPlayerWeapons WPS_ResetPlayerWeapons
 
-stock WPS_GivePlayerWeapon(playerid, weaponid, ammo, givetype = 0, uniqueid = 0)
+stock WPS_GivePlayerWeapon(playerid, weaponid, ammo, givetype = WEAPON_GIVE_TYPE_NORMAL, uniqueid = 0)
 {
 	new slot = FAC_GetWeaponSlot(weaponid);
 	if(0 <= slot < sizeof weapon_GiveType[])
