@@ -22135,7 +22135,7 @@ stock ShowPlayerStats(playerid, receiverid)
 	SendFormat(receiverid, 0xFCFCFCFF, "[Amþius: %d], [Tautybë: %s], [Grynieji pinigai: $%d], [Banke: $%d], [Indëlis: $%d]",
 		year-PlayerInfo[playerid][pBirthDate],
 		PlayerInfo[playerid][pOrigin],
-		sd_GetPlayerMoney(playerid), 
+		GetPlayerMoney(playerid), 
 		PlayerInfo[playerid][pBank], 
 		PlayerInfo[playerid][pSavings]
 	);
@@ -26064,7 +26064,7 @@ stock ChangeVehicleEngineStatus(playerid, vehicleid)
 	if(VehicleInfo[vehicleid][vEngined] == 0)
 	{
 		UI_LeftBox_Show(playerid, "Variklis ~r~uzgesintas");
-		if(VehicleHaveEngine(VehicleInfo[vehicleid][vModel]))
+		if(VehicleHaveEngine(GetVehicleModel(vehicleid)))
 		{
 			Speedo_Update(playerid, .fuel_level = "DEGALAI:");
 		}
