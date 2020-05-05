@@ -3,7 +3,7 @@
 static 
     player_AFKTime[MAX_PLAYERS];
 
-ptask CHECK_AFK[1000](playerid)
+ptask CHECK_AFK[60000](playerid)
 {
     if(PlayerInfo[playerid][pIsApproved] && !HaveAdminPermission(playerid, "IgnoreAFKKicker"))
     {
@@ -24,19 +24,6 @@ static sd_CheckAfk(playerid)
         else player_AFKTime[playerid] ++;
 	}
 	else player_AFKTime[playerid] = 0;
-
-	return true;
-}
-
-hook OnPlayerCmdPerformed(playerid, cmd[], params[], result, flags)
-{
-    player_AFKTime[playerid] = 0;
-}
-
-hook OnPlayerText(playerid, text[])
-{
-    player_AFKTime[playerid] = 0;
-    return 0;
 }
 
 hook OnPlayerConnect(playerid)
