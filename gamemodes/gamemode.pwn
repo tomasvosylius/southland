@@ -166,7 +166,7 @@ native gpci(playerid, serial[], len);
 #define DEFAULT_TAXI_NUMBER 			4114
 #define DEFAULT_TAXI_LICENCE_PRICE		3000
 
-#define DEFAULT_CAR_RENT_PRICE			25
+#define DEFAULT_CAR_RENT_PRICE			8
 
 #define WARNS_TO_BAN 					3
 // #define TIP_EVERY_MINUTE				2 // kas kiek minuciu tip rodomas visiems random
@@ -5735,6 +5735,7 @@ public OnPlayerSpawn(playerid)
 		}
 
 		SetPlayerColor(playerid, 0x99999911);
+		SetPlayerArmour(playerid, 0.0);
 
 		SetPlayerSkillLevel(playerid, 0, 1);
 		SetPlayerSkillLevel(playerid, 6, 1);
@@ -6403,7 +6404,7 @@ public LoginHalt(playerid)
 	/*
 	 * Tikrinam ar isvis yra toks useris
 	 */
-	new string[156];
+	new string[256];
 	mysql_format(chandler, string, sizeof string, "\
 		SELECT id,Salt,NameChanges,NumberChanges,PlateChanges,Donator,DonatorTime,\
 		Group1,Group2,Group3 \
@@ -7270,7 +7271,13 @@ public InsertNewChar(playerid)
 	CharCreateTD_Hide(playerid);
 	CharListTD_ShowSelect(playerid, 0, true);
 
-	SendAdminMessage(0xF900CA99, true, "Naujas veikëjas laukia perþiûros! /newchars");
+	if(IsPlayerInAnyAdminGroup(playerid))
+	{
+		// Administratoriu veikejai priimami automatiskai
+		new sql = cache_insert_id();
+		call OnCharAccepted(sql, PlayerInfo[playerid][pUserId], playerid);
+	}
+	else SendAdminMessage(0xF900CA99, true, "Naujas veikëjas laukia perþiûros! /newchars");
 	return 1;
 }
 
@@ -27021,11 +27028,10 @@ stock House_CreatePickup(house)
 	HouseInfo[house][hPickup] = sd_CreateDynamicPickup(
 		PICKUP_TYPE_HOUSE,
 		house,
-		DEFAULT_HOUSE_PICKUP, // HouseInfo[house][hOwner] > 0 ? (1272) : (1273),
+		HouseInfo[house][hOwner] > 0 ? (1272) : (1273), // DEFAULT_HOUSE_PICKUP
 		1,
 		HouseInfo[house][hEnterX], HouseInfo[house][hEnterY], HouseInfo[house][hEnterZ] - 0.75,
-		HouseInfo[house][hOutVW], HouseInfo[house][hExterior],
-		.streamdistance = 6.0
+		HouseInfo[house][hOutVW], HouseInfo[house][hExterior]
 	);
 	return 1;
 }
@@ -29047,6 +29053,9 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 		PlayerInfo[playerid][pNameChanges] =
 		PlayerInfo[playerid][pPlateChanges] = 
 		PlayerInfo[playerid][pNumberChanges] = 0;
+		for(new i = 0; i < MAX_PLAYER_GROUPS; i++) {
+			PlayerGroups[playerid][i] = 0; 
+		}
 	}
 
 	DisabledPM[playerid] = false;
@@ -29065,7 +29074,6 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 	for(new i = 0; i < sizeof tmpArray[]; i++) tmpArray[playerid][i] = -1;
 	for(new i = 0; i < 9; i++) AttachedClothes[playerid][i][attachedInventorySlot] = -1;
 	for(new i = 0; i < 3; i++) LastShellShotVector[playerid][0] = 0.0;
-	for(new i = 0; i < MAX_PLAYER_GROUPS; i++) PlayerGroups[playerid][i] = 0; 
 
 	LastShellItter[playerid] = -1,
 	LastShotTime[playerid] = 0,
@@ -35006,7 +35014,9 @@ stock IsPlayerInMD(playerid)
 }
 stock IsPlayerInPD(playerid)
 {
-	if(IsPlayerInRangeOfPoint(playerid, 100.0, 247.72, 69.94, 1003.64) || IsPlayerInRangeOfPoint(playerid, 100.0, 2275.43, -65.92, 1024.03) || IsPlayerInRangeOfPoint(playerid, 200.0, 2029.57, 2952.76, 6010.15)) return true;
+	if(	IsPlayerInRangeOfPoint(playerid, 100.0, 247.72, 69.94, 1003.64) ||
+		IsPlayerInRangeOfPoint(playerid, 100.0, 2275.43, -65.92, 1024.03) || 
+		IsPlayerInRangeOfPoint(playerid, 200.0, 2029.57, 2952.76, 6010.15)) return true;
 	return false;
 }
 
@@ -37168,9 +37178,7 @@ CMD:leavefaction(playerid, params[])
 			PlayerInfo[playerid][pFactionPermissions][i] = 0;
 		}
 		
-		ClearServerSidedWeapons(playerid);
-
-  		new channel = PlayerInfo[playerid][pRadioChannel];
+		new channel = PlayerInfo[playerid][pRadioChannel];
   		if((900 <= channel < 950) || (950 <= channel < 1000) || (1000 <= channel < 1050)) PlayerInfo[playerid][pRadioChannel] = 0;
 		MsgSuccess(playerid, "FRAKCIJA", "Sëkmingai palikote frakcijà.");
 		if(IsValidDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]))
@@ -37178,6 +37186,8 @@ CMD:leavefaction(playerid, params[])
 			DestroyDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]);
 		}
 		PlayerExtra[playerid][pePoliceBadgeText] = INVALID_3DTEXT_ID;
+
+		ResetServerSidedWeapons(playerid);
 	}
 	else
 	{
@@ -37186,7 +37196,7 @@ CMD:leavefaction(playerid, params[])
 	return 1;
 }
 
-stock ClearServerSidedWeapons(playerid)
+stock ResetServerSidedWeapons(playerid)
 {
 	new
 		data[13][4];
@@ -37196,12 +37206,12 @@ stock ClearServerSidedWeapons(playerid)
 		GetPlayerWeaponData(playerid, i, data[i][0], data[i][1]);
 		GetPlayerWeaponExtraData(playerid, i, data[i][2], data[i][3]);
 	}
+
 	ResetPlayerWeapons(playerid);
+
 	for(new i = 0; i < 13; i++)
 	{
-		if(	data[i][0] > 0 && // Weapon
-			data[i][1] > 0 && // Ammo
-			data[i][2] == WEAPON_GIVE_TYPE_NORMAL) // GiveType
+		if(data[i][0] > 0 && data[i][1] > 0 && data[i][2] == WEAPON_GIVE_TYPE_NORMAL) // GiveType
 		{	
 			GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][3]);
 		}
@@ -38917,7 +38927,7 @@ CMD:duty(playerid, params[])
 				KillTimer(PlayerInfo[playerid][pJobTimer]);
 				if(job == JOB_MECHANIC)
 				{
-					ClearServerSidedWeapons(playerid);
+					ResetServerSidedWeapons(playerid);
 					SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 				}
 				RemovePlayerAttachedObject(playerid, 9);
@@ -38966,7 +38976,7 @@ CMD:duty(playerid, params[])
 					{
 						default:
 						{
-							ClearServerSidedWeapons(playerid);
+							ResetServerSidedWeapons(playerid);
 						}
 					}
 				}

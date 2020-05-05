@@ -11619,7 +11619,7 @@ hook OnGameModeInit()
 	SetDynamicObjectMaterial(tmpobjid, 0, 19480, "signsurf", "sign", 0x00000000);
 	SetDynamicObjectMaterial(tmpobjid, 1, 19480, "signsurf", "sign", 0x00000000);
 	SetDynamicObjectMaterial(tmpobjid, 2, 19480, "signsurf", "sign", 0x00000000);
-	SetDynamicObjectMaterialText(tmpobjid, 0, "REDCOUNTY POLICE", 130, "Quartz MS", 50, 0, 0xFFFFFFFF, 0x00000000, 0);
+	SetDynamicObjectMaterialText(tmpobjid, 0, "LOS SANTOS POLICE", 130, "Quartz MS", 50, 0, 0xFFFFFFFF, 0x00000000, 0);
 	tmpobjid = CreateDynamicObject(19087,2275.014,-45.738,1026.881,0.000,0.000,0.000,-1,-1,-1,300.000,300.000);
 	SetDynamicObjectMaterial(tmpobjid, 0, 18646, "matcolours", "grey-90-percent", 0x00000000);
 	tmpobjid = CreateDynamicObject(19087,2269.820,-45.782,1026.881,0.000,0.000,179.999,-1,-1,-1,300.000,300.000);
