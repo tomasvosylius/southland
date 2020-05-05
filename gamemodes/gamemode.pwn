@@ -2767,6 +2767,7 @@ ptask PT_PhoneSecond[1000](playerid)
 					PhoneTD_Show(receiverid, PHONE_PAGE_MAIN);
 				}
 				else PhoneTD_Hide(receiverid);
+
 				if(GetESCType(playerid) == ESC_TYPE_PHONE)
 				{
 					PhoneTD_Hide(playerid, PHONE_PAGE_CALL);
@@ -3537,7 +3538,19 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 	{
 		if(IsPlayerConnected(call_receiver))
 		{
-			PlayerPhoneHangup(call_receiver);
+			if(IsPlayerConnected(call_receiver)) SendFormat(call_receiver, 0xE77B33FF, "Ryðys nutrûko!");
+
+			PhoneInfo[call_receiver][phoneTalkingTo] = INVALID_PLAYER_ID;
+			PhoneInfo[call_receiver][phoneCallOwner] =
+			PhoneInfo[call_receiver][phoneEstimated] = 0;
+
+			if(GetESCType(call_receiver) == ESC_TYPE_PHONE)
+			{
+				PhoneTD_Hide(call_receiver, PHONE_PAGE_CALL);
+				PhoneTD_Show(call_receiver, PHONE_PAGE_MAIN);
+			}
+			else PhoneTD_Hide(call_receiver);
+		
 			// PhoneInfo[call_receiver][phoneTalkingTo] =
 			// PhoneInfo[call_receiver][phoneRinging] = INVALID_PLAYER_ID;
 			// PhoneInfo[call_receiver][phoneEstimated] =
