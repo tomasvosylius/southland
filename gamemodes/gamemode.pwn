@@ -167,7 +167,7 @@ native gpci(playerid, serial[], len);
 #define DEFAULT_TAXI_NUMBER 			4114
 #define DEFAULT_TAXI_LICENCE_PRICE		3000
 #define WARNS_TO_BAN 					3
-#define TIP_EVERY_MINUTE				2 // kas kiek minuciu tip rodomas visiems random
+// #define TIP_EVERY_MINUTE				2 // kas kiek minuciu tip rodomas visiems random
 #define TIME_TO_DELETE_DROPS			18000 // 5val.  	60sec= 1mmin // kas kiek UNIX sec issitrins visi objektai
 #define MINUTES_TO_PAYDAY 				15 // kiek minuciu reik prazaist, kad gautum payday
 #define ADMIN_PERMISSIONS_PER_PAGE		18 // kiek permisionu per page rodyt ( << >> )
@@ -3917,13 +3917,15 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\deja_vu.pwn"
 // #include "core\map\idlewood_park.pwn"
 
+
+#include "modules\server\managers/worldtime.pwn"
+#include "modules\server\bots/npc.pwn"
 #include "modules\server/graffiti.pwn"
 #include "modules\server/thief.pwn"
 #include "modules\server/boombox.pwn"
 #include "modules\server/taxi.pwn"
 #include "modules\server/trace.pwn"
 #include "modules\server/paynspray.pwn"
-#include "modules\server/npc.pwn"
 //#include "modules\server/gifts.pwn"
 
 /** Player modules */
@@ -4644,7 +4646,7 @@ public MinuteTimer()
 		}
 	}
 	// patarimai
-	static timefortip;
+	/*static timefortip;
 	if(timefortip < TIP_EVERY_MINUTE)
 	{
 		timefortip++;
@@ -4657,7 +4659,7 @@ public MinuteTimer()
 				ShowPlayerTip(playerid, 10, Tips[randomidx][tipText]);
 			}
 		}
-	}
+	}*/
 
 	new string[186];
 	// perdaryti visa sistema
@@ -7925,25 +7927,13 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 public OnPlayerConnect(playerid)
 {
 	#if SERVER_DEBUG_LEVEL >= 2
-		new name[MAX_PLAYER_NAME+1];
-		GetPlayerName(playerid, name, sizeof name);
-		printf("[debug] OnPlayerConnect(%s)", name);
+		printf("[debug] OnPlayerConnect(%s)", ret_GetPlayerName(playerid));
 	#endif
+	
 	if(IsPlayerNPC(playerid))
 	{
-		new IP_NPC[64+1],
-			IP_Server[64+1];
-	    GetServerVarAsString("bind", IP_Server, 64);
-	    GetPlayerIp(playerid, IP_NPC, 64);
-		if(!strlen(IP_Server)) format(IP_Server, 10, "127.0.0.1"); // localhost
-		if(strcmp(IP_NPC, IP_Server, true) != 0)
-		{
-			// remote botas
-		    printf("[NPC] Kicking bot %s", IP_NPC);
-		    Kick(playerid);
-		    return 0;
-		}
-        return 1;
+		SetPlayerColor(playerid, 0x000000FF);
+		return 1;
 	}
 
 	SetPlayerColor(playerid, 0xffffffFF);
@@ -12113,7 +12103,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new amount;
 				if(sscanf(inputtext,"d",amount)) return 0, ShowPlayerBank(playerid);
-				if(MIN_SAVINGS_MONEY_TO_PUT < amount <= MAX_SAVINGS_MONEY_TO_PUT)
+				if(MIN_SAVINGS_MONEY_TO_PUT <= amount <= MAX_SAVINGS_MONEY_TO_PUT)
 				{
 					if(amount > PlayerInfo[playerid][pBank])
 					{
@@ -23788,11 +23778,19 @@ stock ShowPlayerStats(playerid, receiverid)
 	getdate(year, xp_to_next_lvl, xp_to_next_lvl);
 	xp_to_next_lvl = (PlayerInfo[playerid][pLevel] + 1)*4;
 
-	SendFormat(receiverid, 0x93DD5EFF, "[Veikëjo %s(%d) informacija | %s(%d) ]",
+	new 
+		year, month, day,
+		hour, minute, second;
+
+	getdate(year, month, day);
+	gettime(hour, minute, second);
+
+	SendFormat(receiverid, 0x93DD5EFF, "[______%s(%d) informacija %d-%02d-%02d, %02d:%02d:%02d______]",
 		GetPlayerNameEx(playerid),
 		PlayerInfo[playerid][pId],
-		GetUserNameById(PlayerInfo[playerid][pUserId]),
-		PlayerInfo[playerid][pUserId]
+
+		year, month, day,
+		hour, minute, second
 	);
 	SendFormat(receiverid, 0xFCFCFCFF, "[Amþius: %d], [Tautybë: %s], [Grynieji pinigai: $%d], [Banke: $%d], [Indëlis: $%d]",
 		year-PlayerInfo[playerid][pBirthDate],
@@ -23828,10 +23826,11 @@ stock ShowPlayerStats(playerid, receiverid)
 	}
 	else SendFormat(receiverid, 0xFCFCFCFF, "[Darbas: joks]");
 
-	if(PlayerInfo[playerid][pGraffitiAllowed] > 0)
-	{
-		SendFormat(receiverid, 0xfcfcfcff, "[Graffiti leidimai: %d]", PlayerInfo[playerid][pGraffitiAllowed]);
-	}
+	SendFormat(receiverid, 0xfcfcfcff, "[Graffiti leidimai: %d] [Vartotojas: %s (%d)]",
+		PlayerInfo[playerid][pGraffitiAllowed],
+		GetUserNameById(PlayerInfo[playerid][pUserId]),
+		PlayerInfo[playerid][pUserId]
+	);
 
 	SendFormat(receiverid, 0xFCFCFCFF, "[Remëjas: %dlvl (%s)] [Vardo keitimai: %d] [Tel nr. keitimai: %d] [Tr. nr. keitimai: %d]", 
 		PlayerInfo[playerid][pDonator],
@@ -26275,7 +26274,7 @@ stock HidePlayerTip(playerid)
 	return 1;
 }
 
-stock ShowPlayerTip(playerid, seconds, text[], bool:forceshow = false)
+/*stock ShowPlayerTip(playerid, seconds, text[], bool:forceshow = false)
 {
 	#pragma unused text
 	if(PlayerInfo[playerid][pConnection] != CONNECTION_STATE_LOGGED) return 1;
@@ -26291,7 +26290,7 @@ stock ShowPlayerTip(playerid, seconds, text[], bool:forceshow = false)
 		PlayerTip[playerid] = seconds;
 	}
 	return 1;
-}
+}*/
 
 stock HidePlayerVehicleShop(playerid)
 {
@@ -27117,7 +27116,7 @@ stock PayDay(playerid)
 
 stock PlayerEnteredBuilding(playerid)
 {
-	ShowPlayerTip(playerid, 5, Tips[random(sizeof Tips)][tipText]);
+	// ShowPlayerTip(playerid, 5, Tips[random(sizeof Tips)][tipText]);
 	return FreezePlayer(playerid, 3);
 }
 
@@ -27126,40 +27125,6 @@ stock FreezePlayer(playerid, seconds)
 	PlayerFreeze[playerid] = seconds;
 	return TogglePlayerControllable(playerid, 0);
 }
-
-/*stock SendChatMessage(playerid,color,text[],lenght_to_cut = 96)
-{
-    if(strlen(text) >= lenght_to_cut)
-	{
-		new string[129];
-		strmid(string, text, 0, 81);
-		strcat(string, " ...");
-		SendClientMessage(playerid, color, string);
-
-		strmid(string, text, 81, strlen(text));
-		strins(string, "... ", 0);
-		SendClientMessage(playerid, color, string);
-		return 1;
-	}
-    else return SendClientMessage(playerid,color,text);
-}
-stock SendChatMessageToAll(color,text[],lenght_to_cut=96)
-{
-	//foreach(Player, playerid) SendChatMessage(playerid, color, text);
-	if(strlen(text) >= lenght_to_cut)
-	{
-		new string[129];
-		strmid(string, text, 0, 81);
-		strcat(string, " ...");
-		SendClientMessageToAll(color, string);
-
-		strmid(string, text, 81, strlen(text));
-		strins(string, "... ", 0);
-		SendClientMessageToAll(color, string);
-		return 1;
-	}
-    else return SendClientMessageToAll(color,text);
-}*/
 
 stock ProxDetector(Float:radi, playerid, string[], color1, color2, color3, color4, color5)
 {

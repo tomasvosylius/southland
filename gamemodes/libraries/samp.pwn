@@ -1,4 +1,3 @@
-
 stock SendChatMessage(playerid, color, const text[]) return SendClientMessage(playerid, color, text);
 stock SendChatMessageToAll(color, const text[]) return SendClientMessageToAll(color, text);
 
