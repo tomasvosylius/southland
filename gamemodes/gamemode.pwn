@@ -1782,8 +1782,6 @@ new
 	CheckpointData[MAX_PLAYERS],
 	MySQL:chandler,
 	MySQL:log_chandler,
-	ServerWeather,
-	ServerTime,
 	gConnectedPlayers,
 	clskinslist,
 	pdskinslist,
@@ -1835,9 +1833,16 @@ new
 	// Admin char confirm
 	player_NewCharDetails[MAX_PLAYERS], // char ID in `players_new`
 	player_NewCharUserId[MAX_PLAYERS], // char UserId
+
+
+	// Server hour
+	serverHour,
+
 	// DONT CHANGE
 	bool:truebool = true,
-	bool:falsebool = false;
+	bool:falsebool = false
+
+;
 
 new 
 	BroadcastRoles[][32] = {
@@ -4809,13 +4814,15 @@ public MinuteTimer()
 			if(PlayerNoEnterPriceBusiness[playerid][businessid] > 0) PlayerNoEnterPriceBusiness[playerid][businessid] -- ;
 		}
 	}
-	if((29 <= minute <= 31 && last_halfpayday_hour != ServerTime) || hour > ServerTime || (hour == 0 && ServerTime == 23))
-	//if(hour > ServerTime || (hour == 0 && ServerTime == 23))
+	if(	(29 <= minute <= 31 && last_halfpayday_hour != serverHour) ||
+		(hour > serverHour) || 
+		(hour == 0 && serverHour == 23)
+	)
 	{
-		// xx:30 arba xx:00 yra
-		last_halfpayday_hour = ServerTime; // kad nebutu jog 29, 31 iskviecia o 30 praleidzia ir negauna
+		// Yra xx:30 arba xx:00
+		last_halfpayday_hour = serverHour; // kad nebutu jog 29, 31 iskviecia o 30 praleidzia ir negauna
 		
-		if(hour == 0 && ServerTime == 23)
+		if(hour == 0 && serverHour == 23)
 		{
 			// kita diena
 			sd_Remote();
@@ -4833,10 +4840,10 @@ public MinuteTimer()
 				SendFormat(playerid, 0xBABABAFF, "Algos negavote, nes neþaidþiate "#MINUTES_TO_PAYDAY"min");
 			}
 		}
-		if(hour > ServerTime || (hour == 0 && ServerTime == 23))
+		if(hour > serverHour || (hour == 0 && serverHour == 23))
 		{
 			call OnFullPayday();
-			if(hour == 0 && ServerTime == 23) call OnNewDay();
+			if(hour == 0 && serverHour == 23) call OnNewDay();
 			foreach(new businessid : Business)
 			{
 				if(BusinessInfo[businessid][bOwner] > 0)
@@ -4868,9 +4875,11 @@ public MinuteTimer()
 			{
 				SaveFaction(factionid);
 			}
-			// jei 6-20 hour + 2
-			SetWorldTime(hour + (20 > hour >= 6 ? 4 : 1));
-			ServerTime = hour;
+			
+			// Jei yra 6-20, atimame 2 valandas.
+			SetWorldTime(hour - (6 <= hour <= 20 > ? 2 : 0));
+
+			serverHour = hour;
 			stats_police_calls = 0;
 		}
 	}
@@ -27239,8 +27248,9 @@ stock DestroyFurniturePreview(playerid, bool:show = true)
 	/*
 		Funkcija, kuri isjungs ir uzbaigs zaidejui furniture objekto perziura.
 	*/
-	SetPlayerWeather(playerid, ServerWeather);
-	SetPlayerTime(playerid, ServerTime, 0);
+	SetPlayerWeather(playerid, GetWorldWeather());
+	SetPlayerTime(playerid, GetWorldTime(), 0);
+
 	SetPlayerPos(playerid, PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ]);
 	TogglePlayerControllable(playerid, true);
 	SetCameraBehindPlayer(playerid);
@@ -29977,11 +29987,10 @@ stock LoadServer()
 	new hour, minute, second;
 	gettime(hour, minute, second);
 
-	SetWorldTime(hour);
-	ServerTime = hour;
+	serverHour = hour;
 
-	SetWeather(ServerWeather);
-	ServerWeather = 1;
+	SetWorldTime(hour);
+	SetWeather(18);
 
 	mysql_tquery(chandler, "SELECT * FROM `options`", "OptionsLoad");
 	return 1;
@@ -35171,7 +35180,9 @@ CMD:settime(playerid, params[])
 	new time,
 		string[126];
 	if(sscanf(params,"d",time)) return SendUsage(playerid, "/settime [valanda]");
-	SetWorldTime(time);
+
+	if(time < 0) 	SetWorldTime(GetWorldTime());
+	else 			SetWorldTime(time);
 
 	format(string, sizeof string, "[AdmCmd] Administratorius %s pakeitë laikà: %dval", GetPlayerNameEx(playerid), time);
 	SendAdminMessage(0xFF6347AA, false, string);
