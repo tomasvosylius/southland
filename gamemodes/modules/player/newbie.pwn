@@ -24,7 +24,7 @@ static
             {2118.7241,-1774.8286,13.3920}
         },
         {
-            "~w~Cia igysi vairavimo ~y~teises~w~. Uz sio pastato rasi ~b~~h~San News~w~, \
+            "~w~Cia igysi vairavimo ~y~teises. ~w~Uz sio pastato rasi ~b~~h~San_News~w~, \
             kuriame gali deti skelbimus su ~r~/ad",
             5.5,
             {1823.0577,-1739.1483,20.7241},
@@ -32,7 +32,7 @@ static
         },
         {
             "~w~Noredamas pilti degalus, degalineje naudok komanda ~y~/fill~w~",
-            3.5,
+            4.15,
             {1966.2476,-1767.5554,17.1714},
             {1942.7316,-1772.5522,14.5074}
         },
@@ -43,20 +43,20 @@ static
             {2157.2954,-1904.0613,16.7034}
         },
         {
-            "~w~Cia gali isidarbinti ~r~kroviniu isveziotoju~w~ ir neblogai uzdirbti. Visi zaidejai ~g~alga~w~ gauna kas 30min.",
+            "~w~Cia gali isidarbinti ~r~kroviniu isveziotoju~w~ ir neblogai uzdirbti. Visi zaidejai ~g~~h~alga~w~ gauna kas 30min.",
             6.5,
             {2411.3591,-2079.7864,20.2639},
             {2439.9382,-2097.9646,15.0768}
         },
         {
-            "~b~Policija~w~ - tai viena is oficialiu frakciju. I ja gali patekti tik atrankas praeje zmones.\
+            "~b~Policija~w~ - tai viena is oficialiu frakciju. I ja gali patekti tik atrankas praeje zmones. \
             Daugiau apie jas rasi www.southland.lt",
             8.0,
             {1511.1141,-1718.4338,22.7151},
             {1542.1799,-1683.0861,19.4206}
         },
         {
-            "~w~Visas serverio vietas gali rasti parases ~r~~h~/gps~w~. Serverio komandas rasi ~g~/help",
+            "~w~Visas serverio vietas gali rasti parases ~r~~h~/gps.~w~ Serverio komandas rasi ~g~/help",
             4.2,
             {2206.5186,-1696.4133,29.3065},
             {2138.5750,-1729.2648,21.5000}
@@ -102,8 +102,7 @@ stock Tutorial_Start(playerid)
 {  
     player_InTutorial[playerid] = true;
     TogglePlayerSpectating(playerid, true);
-
-    defer PT_SetGuidePoint[200](playerid, 0);
+    Tutorial_Step(playerid, 0);
     return 1;
 }
 

@@ -7345,9 +7345,6 @@ public OnPlayerSpawn(playerid)
 
 	if(PlayerInfo[playerid][pAfterLogin] == 1)
 	{
-		call OnPlayerSpawnFirstTime(playerid);
-		PlayerInfo[playerid][pAfterLogin] = 0;
-
 		if(PlayerInfo[playerid][pIsApproved])
 		{
 			LoadPlayerLoginNotes(playerid);
@@ -7386,6 +7383,9 @@ public OnPlayerSpawn(playerid)
 	  	SetPlayerSkillLevel(playerid, 8, 1000);
 	  	SetPlayerSkillLevel(playerid, 9, 1000);
 	  	SetPlayerSkillLevel(playerid, 10, 1000);
+
+		call OnPlayerSpawnFirstTime(playerid);
+		PlayerInfo[playerid][pAfterLogin] = 0;
 	}
 	if(PlayerInfo[playerid][pCurrentStatus] == PLAYER_STATUS_DEATH)
 	{
@@ -7415,6 +7415,7 @@ public OnPlayerSpawn(playerid)
 		}
 		PlayerExtra[playerid][peDeathLabel] = INVALID_3DTEXT_ID;
 	}
+	if(GetPlayerSkin(playerid) != PlayerInfo[playerid][pSkin]) SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 	return 1;
 }
 
