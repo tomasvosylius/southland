@@ -121,8 +121,18 @@ stock Tutorial_Step(playerid, step)
     
     UI_LeftBox_Show(playerid, GuidePoints[step][guideText], .width = 180.0, .time = 0.0);
 
-    SetPlayerCameraPos(playerid, GuidePoints[step][guidePos][0], GuidePoints[step][guidePos][1], GuidePoints[step][guidePos][2]);
-    SetPlayerCameraLookAt(playerid, GuidePoints[step][guideLook][0], GuidePoints[step][guideLook][1], GuidePoints[step][guideLook][2]);
+    InterpolateCameraPos(playerid, 	
+        GuidePoints[step][guidePos][0], GuidePoints[step][guidePos][1], GuidePoints[step][guidePos][2],
+        GuidePoints[step][guidePos][0], GuidePoints[step][guidePos][1], GuidePoints[step][guidePos][2] + 1.0,
+        10000, CAMERA_CUT);
+
+	InterpolateCameraLookAt(playerid, 
+        GuidePoints[step][guideLook][0], GuidePoints[step][guideLook][1], GuidePoints[step][guideLook][2],
+        GuidePoints[step][guideLook][0], GuidePoints[step][guideLook][1], GuidePoints[step][guideLook][2] + 1.0,
+        10000, CAMERA_CUT);
+
+    // SetPlayerCameraPos(playerid, GuidePoints[step][guidePos][0], GuidePoints[step][guidePos][1], GuidePoints[step][guidePos][2]);
+    // SetPlayerCameraLookAt(playerid, GuidePoints[step][guideLook][0], GuidePoints[step][guideLook][1], GuidePoints[step][guideLook][2]);
 
     defer PT_SetGuidePoint[floatround(GuidePoints[step][guideTime] * 1000)](playerid, step + 1);
     return 1;

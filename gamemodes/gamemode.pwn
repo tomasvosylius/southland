@@ -39865,19 +39865,24 @@ CMD:report(playerid, params[])
 	{
 		SendFormat(playerid, 0xDDDDDDFF, "Sëkmingai iðsiuntëte praneðimà administratoriams.");
 		mysql_format(chandler, string, sizeof string, "INSERT INTO `players_reports` (ReporterId,CheaterId,Reason,Valid) VALUES ('%d','%d','%e','1')", PlayerInfo[playerid][pId], PlayerInfo[receiverid][pId], reason);
-		mysql_tquery(chandler, string, "ReportAdded", "dd", playerid, receiverid);
+		mysql_tquery(chandler, string, "ReportAdded", "dds", playerid, receiverid, reason);
 		cache_delete(result);
 	}
 	return 1;
 }
-forward ReportAdded(playerid, cheaterid);
-public ReportAdded(playerid, cheaterid)
+forward ReportAdded(playerid, cheaterid, reason[]);
+public ReportAdded(playerid, cheaterid, reason[])
 {
 	new string[186];
-	format(string, sizeof string, "%s[%d] praneða apie %s[%d]. Informacijà rasite /reports", GetPlayerNameEx(playerid), playerid, GetPlayerNameEx(cheaterid), cheaterid);
+	format(string, sizeof string, "%s[%d] praneða apie %s[%d]. Informacijà rasite /reports",
+		GetPlayerNameEx(playerid), playerid,
+		GetPlayerNameEx(cheaterid), cheaterid);
 	SendAdminMessage(0x40EE7DFF, true, string);
+
+	CallRemoteFunction("OnReportAdded", "dddds", playerid, PlayerInfo[playerid][pUserId], cheaterid, PlayerInfo[cheaterid][pUserId], reason);
 	return 1;
 }
+
 flags:reports(CMD_TYPE_ADMIN);
 CMD:reports(playerid, params[])
 {

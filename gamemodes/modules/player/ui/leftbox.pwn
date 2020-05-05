@@ -13,7 +13,7 @@ stock UI_LeftBox_Hide(playerid)
 }
 stock UI_LeftBox_Show(playerid, string[], Float:width = 155.0, Float:time = 3.0)
 {
-    printf("UI_LeftBox_Show(%s): %s", ret_GetPlayerName(playerid), string);
+    // printf("UI_LeftBox_Show(%s): %s", ret_GetPlayerName(playerid), string);
 
     if(player_UI_Created[playerid])
     {
