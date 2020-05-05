@@ -27,7 +27,6 @@ native IsValidVehicle(vehicleid);
 //#include <audio>
 #include <FileManager>
 #include <crashdetect>
-#define FOREACH_NO_VEHICLES
 #include <YSI\y_iterate>
 #include <YSI\y_va>
 #include <YSI\y_hooks>
@@ -132,8 +131,8 @@ native gpci(playerid, serial[], len);
 #define MAX_GFURNITURE_SILVER 			200
 #define MAX_GFURNITURE_GOLD 			300
 // Donators, remejai
-#define MAX_AFK_TIME_NO_DONATOR			10
-#define MAX_AFK_TIME_SILVER_USER		15	
+#define MAX_AFK_TIME_NO_DONATOR			2
+#define MAX_AFK_TIME_SILVER_USER		14	
 #define MAX_AFK_TIME_GOLD_USER			20
 #define TIME_TO_RESET_DONATOR 			2592000 // 30days
 
@@ -844,34 +843,6 @@ native gpci(playerid, serial[], len);
 #define ENGINE_UPGRADE					0
 #define BRAKES_UPGRADE					1
 
-#define FURNITURE_CATEGORY_LAMPS 		0
-#define FURNITURE_CATEGORY_DOORS 		1
-#define FURNITURE_CATEGORY_WALLS 		2
-#define FURNITURE_CATEGORY_GLASS 		3
-#define FURNITURE_CATEGORY_PLANT 		4
-#define FURNITURE_CATEGORY_SHELF 		5
-#define FURNITURE_CATEGORY_BAR 			6
-#define FURNITURE_CATEGORY_BOXES	 	7
-#define FURNITURE_CATEGORY_GYM 		 	8
-#define FURNITURE_CATEGORY_CHAIR	 	9
-#define FURNITURE_CATEGORY_GAMBLING	 	10
-#define FURNITURE_CATEGORY_KITCHEN	 	11
-#define FURNITURE_CATEGORY_PICTURE	 	12
-#define FURNITURE_CATEGORY_TABLES	 	13
-#define FURNITURE_CATEGORY_ELECTRONICS 	14
-#define FURNITURE_CATEGORY_OTHER 		15
-#define FURNITURE_CATEGORY_BATH 		16
-#define FURNITURE_CATEGORY_TRASH 		17
-#define FURNITURE_CATEGORY_CURTAIN 		18
-#define FURNITURE_CATEGORY_STAIRS 		19
-
-
-
-#define CLOTHES_CATEGORY_WATCHES 		0
-#define CLOTHES_CATEGORY_ACCESSORIES 	1
-#define CLOTHES_CATEGORY_HATS 			2
-#define CLOTHES_CATEGORY_OTHER			3
-
 #define LOAD_BAR_ENGINE 				1
 
 #define IB_NOT_ENOUGH_MONEY				"NETURITE","PAKANKAMAI PINIGU ($%d)"
@@ -943,6 +914,7 @@ native gpci(playerid, serial[], len);
 #include "libraries/samp.pwn"
 #include "libraries/macros.pwn"
 #include "libraries/als.pwn"
+#include "libraries/anticheat.pwn"
 #include "libraries/dialog.pwn"
 
 // ==============================================================================
@@ -1056,7 +1028,6 @@ enum E_PLAYER_EXTRA_DATA
 	peSpeedLimit,
 	peBelt,
 	//peDutyObject,
-	peAFKTime,
 	Text3D:peMaskLabel,
 	Text3D:peDeathLabel,
 	Text3D:peDutyLabel,
@@ -1082,7 +1053,6 @@ enum E_PLAYER_DATA
 	pUserId,
 	pPassword[130],
 	pSalt[30],
-	pMoney,
 	pGender,
 	pFishes,
 	pFishedLimit,
@@ -1475,9 +1445,6 @@ new BusinessWares[MAX_BUSINESS][MAX_BUSINESS_WARES][E_BUSINESS_WARES_DATA];
 enum E_VEHICLE_DATA
 {
 	vId,
-	vModel,
-	vColor1,
-	vColor2,
 	vOwner,
 	vNumbers[10],
 	Float:vFuel,
@@ -1708,7 +1675,6 @@ new Iterator:House<MAX_HOUSES>,
 	Iterator:HFurniture<MAX_HOUSE_FURNITURES>,
 	Iterator:BFurniture<MAX_BUSINESS_FURNITURES>,
 	Iterator:GFurniture<MAX_GARAGE_FURNITURES>,
-	Iterator:Vehicle<MAX_VEHICLES>,
 	Iterator:Salon<MAX_SALONS>,
 	Iterator:SellVehicle<MAX_SALON_MODELS>,
 	Iterator:DroppedItem<MAX_DROPPED_ITEMS>,
@@ -1757,7 +1723,6 @@ new
 	tmpSelected[MAX_PLAYERS],
 	tmpDubStart_Price[MAX_PLAYERS],
 	RemoteHash[9],
-	airbrk_count[MAX_PLAYERS],
 	SpectateOn[MAX_PLAYERS],
 	MuteListPM[MAX_PLAYERS][MAX_PLAYERS],
 	//SellVehicleZone,
@@ -2120,30 +2085,30 @@ new AvailableWeaponsShop[][3] = {
 };
 
 new FactionWeaponsInTrunk[][E_FACTION_TRUNK_WEAPONS_LIST] = {
-	// Frakcijos tipas 	  	Gun				Ammo 	In Veh? Permissions Modeliai i kuriuos pridet
-	// 												Kuri tikrint
-	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 	300, 	true, 	{0, 0, 0}, 	{596, 597, 598, 599, 560}}, 	// Visiems galima viduj MP5
-	{FACTION_TYPE_POLICE, 	WEAPON_TEARGAS, 5,		false, 	{0, 0, 0}, 	{596, 597, 598, 599, 560, 490, 427, 482}}, // SG visose galima visiems viduj negalima
-	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 	300, 	true, 	{1, 0, 0}, 	{490}},							// SWAT galima viduj MP5
-	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 	300, 	false, 	{1, 0, 0}, 	{427, 482}}, 					// SWAT negalima viduj MP5
-	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 	300, 	false, 	{1, 0, 0}, 	{427, 482}}, 					// SWAT negalima viduj MP5 2x
-	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 	300, 	false, 	{1, 0, 0}, 	{427, 482}}, 					// SWAT negalima viduj MP5 3x
-	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 	300, 	true, 	{0, 1, 0}, 	{426, 445, 491}}, 				// Detektyvams galima viduj MP5
-	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 60, 	true, 	{0, 0, 0}, 	{596, 597, 598, 560}}, 			// Visiems galima viduj SG
-	{FACTION_TYPE_POLICE,	WEAPON_SHOTGUN, 60, 	false, 	{0, 0, 0}, 	{482}},							// Visiems negalima viduj SG
-	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 60, 	true, 	{0, 1, 0}, 	{426, 445, 491}}, 				// Detektyvams viduj galima SG
-	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 60, 	true, 	{1, 0, 0}, 	{490}},							// SWAT galima viduj SG
-	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 60, 	true, 	{1, 0, 0}, 	{490}},							// SWAT galima viduj SG
-	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 60, 	false, 	{1, 0, 0}, 	{427, 482}}, 					// SWAT negalima viduj SG
-	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 50, 	false, 	{1, 0, 0}, 	{427, 482}}, 					// SWAT negalima viduj SG
-	{FACTION_TYPE_POLICE, 	WEAPON_SNIPER, 	20, 	false, 	{1, 0, 0}, 	{490, 427, 482}}, 				// SWAT negalima viduj Sniper
-	{FACTION_TYPE_POLICE, 	WEAPON_SNIPER, 	20, 	false, 	{1, 0, 0}, 	{490, 427, 482}}, 				// SWAT negalima viduj Sniper
-	{FACTION_TYPE_POLICE, 	WEAPON_M4, 		500, 	true, 	{0, 0, 0}, 	{596, 597, 598, 560}}, 			// Visiems galima viduj M4
-	{FACTION_TYPE_POLICE, 	WEAPON_M4, 		500, 	true, 	{1, 0, 0}, 	{490}}, 						// SWAT galima viduj M4
-	{FACTION_TYPE_POLICE, 	WEAPON_M4, 		500, 	false, 	{1, 0, 0}, 	{427, 482}}, 					// SWAT negalima viduj M4
-	{FACTION_TYPE_FIRE, 	WEAPON_SPRAYCAN, 30,	true, 	{0, 0, 0}, 	{416, 490}}, 				// Medikai spray can viduj galima
-	{FACTION_TYPE_FIRE, 	WEAPON_FIREEXTINGUISHER, 200, false, {0, 0, 0}, {407, 544}},					// Gesintuvas mediku amsinose
-	{FACTION_TYPE_FIRE, 	WEAPON_CHAINSAW, 3, 	false, 	{0, 0, 0}, {407, 544}}
+	// Frakcijos tipas 	  	Gun							Ammo 	In Veh? Permissions 	Modeliai i kuriuos pridet
+	// 																	Kuri tikrint
+	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 				300, 	true, 	{0, 0, 0}, 		{596, 597, 598, 599, 560}}, 	// Visiems galima viduj MP5
+	{FACTION_TYPE_POLICE, 	WEAPON_TEARGAS, 			5,		false, 	{0, 0, 0}, 		{596, 597, 598, 599, 560, 490, 427, 482}}, // SG visose galima visiems viduj negalima
+	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 				300, 	true, 	{1, 0, 0}, 		{490}},							// SWAT galima viduj MP5
+	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 				300, 	false, 	{1, 0, 0}, 		{427, 482}}, 					// SWAT negalima viduj MP5
+	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 				300, 	false, 	{1, 0, 0}, 		{427, 482}}, 					// SWAT negalima viduj MP5 2x
+	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 				300, 	false, 	{1, 0, 0}, 		{427, 482}}, 					// SWAT negalima viduj MP5 3x
+	{FACTION_TYPE_POLICE, 	WEAPON_MP5, 				300, 	true, 	{0, 1, 0}, 		{426, 445, 491}}, 				// Detektyvams galima viduj MP5
+	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 			60, 	true, 	{0, 0, 0}, 		{596, 597, 598, 560}}, 			// Visiems galima viduj SG
+	{FACTION_TYPE_POLICE,	WEAPON_SHOTGUN, 			60, 	false, 	{0, 0, 0}, 		{482}},							// Visiems negalima viduj SG
+	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 			60, 	true, 	{0, 1, 0}, 		{426, 445, 491}}, 				// Detektyvams viduj galima SG
+	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 			60, 	true, 	{1, 0, 0}, 		{490}},							// SWAT galima viduj SG
+	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 			60, 	true, 	{1, 0, 0}, 		{490}},							// SWAT galima viduj SG
+	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 			60, 	false, 	{1, 0, 0}, 		{427, 482}}, 					// SWAT negalima viduj SG
+	{FACTION_TYPE_POLICE, 	WEAPON_SHOTGUN, 			50, 	false, 	{1, 0, 0}, 		{427, 482}}, 					// SWAT negalima viduj SG
+	{FACTION_TYPE_POLICE, 	WEAPON_SNIPER, 				20, 	false, 	{1, 0, 0}, 		{490, 427, 482}}, 				// SWAT negalima viduj Sniper
+	{FACTION_TYPE_POLICE, 	WEAPON_SNIPER, 				20, 	false, 	{1, 0, 0}, 		{490, 427, 482}}, 				// SWAT negalima viduj Sniper
+	{FACTION_TYPE_POLICE, 	WEAPON_M4, 					500, 	true, 	{0, 0, 0}, 		{596, 597, 598, 560}}, 			// Visiems galima viduj M4
+	{FACTION_TYPE_POLICE, 	WEAPON_M4, 					500, 	true, 	{1, 0, 0}, 		{490}}, 						// SWAT galima viduj M4
+	{FACTION_TYPE_POLICE, 	WEAPON_M4, 					500, 	false, 	{1, 0, 0}, 		{427, 482}}, 					// SWAT negalima viduj M4
+	{FACTION_TYPE_FIRE, 	WEAPON_SPRAYCAN, 			30,		true, 	{0, 0, 0}, 		{416, 490}}, 				// Medikai spray can viduj galima
+	{FACTION_TYPE_FIRE, 	WEAPON_FIREEXTINGUISHER, 	200, 	false, 	{0, 0, 0}, 		{407, 544}},					// Gesintuvas mediku amsinose
+	{FACTION_TYPE_FIRE, 	WEAPON_CHAINSAW, 			3, 		false, 	{0, 0, 0}, 		{407, 544}}
 };
 
 new Float:FarmerSpots[][3] = {
@@ -2182,1675 +2147,8 @@ new Jobs[][E_JOB_DATA] = {
 	{JOB_TRUCKER, 	"Kroviniø iðveþiotojai", 	2432.76, -2097.25, 13.55, 		300, 	1100, 	15, 	2}
 };
 
-new FurnitureTextures[][E_FURNITURE_TEXTURES_DATA] = {
-	{0, "none", "none"},
-	{3922, "bistro","vent_64"},
-	{3922, "bistro", "Tablecloth"},
-	{3922, "bistro", "sw_wallbrick_01"},
-	{3922, "bistro", "sw_door11"},
-	{3922, "bistro", "StainedGlass"},
-	{3922, "bistro", "rest_wall4"},
-	{3922, "bistro", "Panel"},
-	{3922, "bistro", "mp_snow"},
-	{3922, "bistro", "mottled_grey_64HV"},
-	{3922, "bistro", "marblekb_256128"},
-	{3922, "bistro", "Marble2"},
-	{3922, "bistro", "Marble"},
-	{3922, "bistro", "DinerFloor"},
-	{3922, "bistro", "concretebig3_256"},
-	{3922, "bistro", "Bow_Abattoir_Conc2"},
-	{3922, "bistro", "barbersflr1_LA"},
-	{3945, "alpha_fence", "bistro_alpha"},
-	{3967, "cj_airprt", "ws_stationfloor"},
-	{3967, "cj_airprt", "Slabs"},
-	{3967, "cj_airprt", "Road_blank256HV"},
-	{3967, "cj_airprt", "gun_ceiling3"},
-	{3967, "cj_airprt", "dts_elevator_carpet2"},
-	{3967, "cj_airprt", "cj_white_wall2"},
-	{3967, "cj_airprt", "cj_sheetmetal2"},
-	{3967, "cj_airprt", "CJ_RUBBER"},
-	{3967, "cj_airprt", "CJ_red_COUNTER"},
-	{3967, "cj_airprt", "CJ_POLISHED"},
-	{3967, "cj_airprt", "cj_juank_1"},
-	{3967, "cj_airprt", "CJ_G_CHROME"},
-	{3967, "cj_airprt", "cj_chromepipe"},
-	{3967, "cj_airprt", "CJ_CHROME2"},
-	{3967, "cj_airprt", "CJ_CHIP_M2"},
-	{3967, "cj_airprt", "CJ_BLACK_RUB2"},
-	{3967, "cj_airprt", "ceiling_256"},
-	{3967, "cj_airprt", "bigbrick"},
-	{3967, "cj_airprt", "airportmetalwall256"},
-	{3973, "cj_airprt3", "CJ_BANDEDMETAL"},
-	{3899, "hospital2", "sky33_64hv"},
-	{3899, "hospital2", "plainwoodoor2"},
-	{3899, "hospital2", "notice01_128"},
-	{3899, "hospital2", "newall15128"},
-	{3899, "hospital2", "KeepOut_64"},
-	{3899, "hospital2", "HospitalCarPark_64"},
-	{3899, "hospital2", "hospitalboard_128a"},
-	{3899, "hospital2", "fire_exit128"},
-	{3899, "hospital2", "dustyconcrete128"},
-	{3899, "hospital2", "cutscenebank128"},
-	{3899, "hospital2", "concretenew256"},
-	{3899, "hospital2", "banding9_64HV"},
-	{3899, "hospital2", "AmbulanceParking_64"},
-	{3899, "hospital2", "Alumox64"},
-	{3895, "inditaly", "tenwhite128"},
-	{3896, "indust1", "tarmac_64HV"},
-	{3896, "indust1", "sandytar_64HV"},
-	{3896, "indust1", "LO1road_128"},
-	{3896, "indust1", "indsmallwall64"},
-	{3896, "indust1", "Grass_128HV"},
-	{3896, "indust1", "firewall"},
-	{3961, "lee_kitch", "rack"},
-	{3961, "lee_kitch", "metal6"},
-	{3961, "lee_kitch", "metal5"},
-	{3961, "lee_kitch", "metal2"},
-	{3961, "lee_kitch", "metal1"},
-	{3961, "lee_kitch", "Grass"},
-	{3961, "lee_kitch", "dinerfloor01_128"},
-	{3961, "lee_kitch", "concretebig3_256"},
-	{3948, "libertyhi", "wallmix64HV"},
-	{3948, "libertyhi", "Road_yellowline256HV"},
-	{3948, "libertyhi", "newallktenb1128"},
-	{3948, "libertyhi", "newallkb1128"},
-	{3948, "libertyhi", "newall9-1"},
-	{3948, "libertyhi", "newall10_seamless"},
-	{3948, "libertyhi", "forestfloor3"},
-	{3948, "libertyhi","bricksoftgrey128"},
-	{3905, "libertyhi2", "tenbeigebrick64"},
-	{3905, "libertyhi2", "tenbeige128"},
-	{3905, "libertyhi2", "indtena128"},
-	{3905, "libertyhi2", "artgal_128"},
-	{3905, "libertyhi2", "alleypave_64V"},
-	{3902, "libertyhi3", "taxi_256128"},
-	{3906, "libertyhi5", "walldirtynewa256128"},
-	{3906, "libertyhi5", "wallbrown02_64HV"},
-	{3906, "libertyhi5", "TENterr2_128"},
-    {3906, "libertyhi5", "TENdbrown5_128"},
-    {3906, "libertyhi5", "TENdblue2_128"},
-    {3906, "libertyhi5", "tenabrick64"},
-    {3906, "libertyhi5", "indtena128"},
-    {3906, "libertyhi5", "indten2btm128"},
-    {3906, "libertyhi5", "chipboardgrating64HV"},
-	{3954, "rczero_track", "waterclear256"},
-	{3954, "rczero_track", "sw_grass01"},
-	{3954, "rczero_track","newgrnd1brntrk_128"},
-	{3954, "rczero_track", "grassdeep1blnd"},
-	{3954, "rczero_track", "grassdeep1"},
-	{3954, "rczero_track", "desertstones256grass"},
-	{3954, "rczero_track", "cuntbrnclifftop"},
-	{3954, "rczero_track", "cuntbrncliffbtmbmp"},
-	{3958, "rc_warhoose", "planks01"},
-	{3958, "rc_warhoose", "Gen_Scaffold_Wood_Under"},
-	{3958, "rc_warhoose", "crate128"},
-	{3958, "rc_warhoose", "cj_crates"},
-	{3900, "station", "newall2_16c128"},
-	{3925, "weemap", "ws_oldwall1"},
-	{3925, "weemap", "telepole128"},
-	{3925, "weemap", "sw_shedwindow1"},
-	{3925, "weemap", "steel128"},
-	{3925, "weemap", "skyclouds"},
-	{3925, "weemap", "rocktb128"},
-	{3925, "weemap", "plaintarmac1"},
-	{3925, "weemap", "newall9b_16c128"},
-	{3925, "weemap", "LoadingDoorClean"},
-	{3925, "weemap", "metaldoor01_256"},
-	{3925, "weemap", "des_sherrifwall1"},
-	{3925, "weemap", "corrRoof_64HV"},
-	{3925, "weemap", "concretenewb256"},
-	{3925, "weemap", "chevron_red_64HVa"},
-	{3925, "weemap", "Bow_stained_wall"},
-	{3925, "weemap", "beigehotel_128"},
-	{4522, "roadblkx", "warnsigns2"},
-	{4522, "roadblkx", "BLOCK"},
-	{4242, "seabed", "sw_sand"},
-	{4242, "seabed", "sandnew_law"},
-	{4242, "seabed", "rocktq128_dirt"},
-	{4242, "seabed", "rocktbrn128"},
-	{4242, "seabed", "des_dirt1"},
-	{4242, "seabed", "desertstones256"},
-	{4242, "seabed", "cw2_mounttrailblank"},
-	{3095, "a51jdrx", "bonyrd_skin2"},
-	{3095, "a51jdrx", "sam_camo"},
-	{2928, "a51_imy", "a51_intdoor"},
-	{2928, "a51_imy", "a51_blastdoor"},
-	{2951, "a51_labdoor", "washapartwall1_256"},
-	{2951, "a51_labdoor", "ws_carparkwall2"},
-	{2951, "a51_labdoor", "girder2_grey_64HV"}
-};
-
-new FurnitureColors[][E_FURNITURE_COLORS_DATA] = {
-	{"none", 0},
-	{"Balta", 0xFFFFFFFF},
-	{"Pilka", 0xFFBABABA},
-	{"Juoda", 0xFF000000},
-	{"Raudona", 0xFFFF0000},
-	{"Tamsiai raudona", 0xFFFF0000},
-	{"Oranþinë", 0xFFFF4000},
-	{"Tamsiai oranþinë", 0xFF8A4B08},
-	{"Auksinë", 0xFFFFBF00},
-	{"Geltona", 0xFFFFFF00},
-	{"Salotinë", 0xFFBFFF00},
-	{"Ðviesiai þalia", 0xFF80FF00},
-	{"Þalia", 0xFF3ADF00},
-	{"Tamsiai þalia", 0xFF04B404},
-	{"Tamsesnë þalia", 0xFF0B6121},
-	{"Vandeninë", 0xFF58FAAC},
-	{"Þydra", 0xFF58FAF4},
-	{"Tamsi vandeninë", 0xFF088A85},
-	{"Mëlyna", 0xFF01A9DB},
-	{"Tamsiai mëlyna", 0xFF045FB4},
-	{"Tamsesnë mëlyna", 0xFF08088A},
-	{"Violetinë", 0xFF7401DF},
-	{"Ðviesi violetinë", 0xFF9F81F7},
-	{"Tamsi violetinë", 0xFF4B088A},
-	{"Purpurinë", 0xFFD358F7},
-	{"Ðviesi roþinë", 0xFFF781F3},
-	{"Roþinë", 0xFFDF01D7},
-	{"Tamsi roþinë", 0xFF610B5E}
-};
-
-new FurnitureListNames[][36] = {
-	/* FURNITURE_CATEGORY_LAMPS */ {"Ðviestuvai"},
-	/* FURNITURE_CATEGORY_DOORS */ {"Durys"},
-	/* FURNITURE_CATEGORY_WALLS */ {"Sienos"},
-	/* FURNITURE_CATEGORY_GLASS */ {"Stiklai"},
-	/* FURNITURE_CATEGORY_PLANT */ {"Augalija"},
-	/* FURNITURE_CATEGORY_SHELF */ {"Lentynos"},
-	/* FURNITURE_CATEGORY_BAR */ {"Baro baldai"},
-	/* FURNITURE_CATEGORY_BOXES */ {"Dëþës"},
-	/* FURNITURE_CATEGORY_GYM */ {"Sportas"},
-	/* FURNITURE_CATEGORY_CHAIR */ {"Këdës"},
-	/* FURNITURE_CATEGORY_GAMBLING */ {"Loðimas"},
-	/* FURNITURE_CATEGORY_KITCHEN */ {"Virtuvë"},
-	/* FURNITURE_CATEGORY_PICTURE */ {"Paveikslai"},
-	/* FURNITURE_CATEGORY_TABLES */ {"Stalai"},
-	/* FURNITURE_CATEGORY_ELECTRONICS */ {"Elektronika, technika"},
-	/* FURNITURE_CATEGORY_OTHER */ {"Visa kita"},
-	/* FURNITURE_CATEGORY_BATH */ {"Vonios"},
-	/* FURNITURE_CATEGORY_TRASH */ {"Ðiukðlës"},
-	/* FURNITURE_CATEGORY_CURTAIN */ {"Uþuolaidos"},
-	/* FURNITURE_CATEGORY_STAIRS */ {"Laiptai"}
-};
-
-new FurnitureList[][E_FURNITURE_LIST_DATA] = {
-	{FURNITURE_CATEGORY_LAMPS, "Namu raudona lempa", 3534, 20},
-	{FURNITURE_CATEGORY_LAMPS, "Stalinë paprasta balta lempa", 2196, 15},
-	{FURNITURE_CATEGORY_LAMPS, "Miegamojo stovinti lempa", 2069, 40},
-	{FURNITURE_CATEGORY_LAMPS, "Maþa sienos lempa", 3801, 30},
-	{FURNITURE_CATEGORY_LAMPS, "Paprasta lempa", 3785, 15},
-	{FURNITURE_CATEGORY_LAMPS, "Stalinë maþa lempa", 2107, 10},
-	{FURNITURE_CATEGORY_LAMPS, "Paprasta didelë lempa", 1893, 20},
-	{FURNITURE_CATEGORY_LAMPS, "Stalinë lempa", 2726, 80},
-	{FURNITURE_CATEGORY_LAMPS, "Melynas neonas", 18648, 100},
-	{FURNITURE_CATEGORY_LAMPS, "Roþinis neonas", 18651, 100},
-	{FURNITURE_CATEGORY_LAMPS, "Geltonas neonas", 18650, 100},
-	{FURNITURE_CATEGORY_LAMPS, "Þalias neonas", 18649, 100},
-	{FURNITURE_CATEGORY_LAMPS, "Raudonas neonas", 18647, 100},
-	{FURNITURE_CATEGORY_LAMPS, "Baltas neonas", 18652, 100},
-	{FURNITURE_CATEGORY_LAMPS, "Geltona klubo lempa", 19143, 200},
-	{FURNITURE_CATEGORY_LAMPS, "Oranzine klubo lempa", 19144, 200},
-	{FURNITURE_CATEGORY_LAMPS, "Zalia klubo lempa", 19145, 200},
-	{FURNITURE_CATEGORY_LAMPS, "Rusva klubo lempa", 19148, 200},
-	{FURNITURE_CATEGORY_LAMPS, "Stulpas su balta lempa", 19121, 300},
-	{FURNITURE_CATEGORY_LAMPS, "Stulpas su melyna lempa", 19122, 300},
-	{FURNITURE_CATEGORY_LAMPS, "Stulpas su zalia lempa", 19123, 300},
-	{FURNITURE_CATEGORY_LAMPS, "Stulpas su raudona lempa", 19124, 300},
-	{FURNITURE_CATEGORY_LAMPS, "Stulpas su geltona lempa", 19125, 300},
-	{FURNITURE_CATEGORY_LAMPS, "Namu lempa", 2074, 75},
-	{FURNITURE_CATEGORY_LAMPS, "Lempa ant lubu", 1815, 75},
-
-	{FURNITURE_CATEGORY_DOORS, "Paprastos medinës durys", 1493, 70},
-	{FURNITURE_CATEGORY_DOORS, "Parduotuvës durys", 1496, 80},
-	{FURNITURE_CATEGORY_DOORS, "Durys apklijuotos reklamomis", 1522, 80},
-	{FURNITURE_CATEGORY_DOORS, "Durys su logotipu", 2875, 60},
-	{FURNITURE_CATEGORY_DOORS, "Durys su metalo interpretavimu", 2664, 230},
-	{FURNITURE_CATEGORY_DOORS, "Senos apðiurusios durys", 1492, 20},
-	{FURNITURE_CATEGORY_DOORS, "Kameros durys", 19302, 420},
-	{FURNITURE_CATEGORY_DOORS, "Seifo durys", 2963, 120},
-	{FURNITURE_CATEGORY_DOORS, "Paprastos plastikinës durys", 14819, 140},
-	{FURNITURE_CATEGORY_DOORS, "Modernios durys su logotipu", 2879, 400},
-	{FURNITURE_CATEGORY_DOORS, "Senos barako durys", 3061, 60},
-	{FURNITURE_CATEGORY_DOORS, "Surudijusios metalinës durys", 2952, 40},
-	{FURNITURE_CATEGORY_DOORS, "Naudotos parduotuvës durys", 1532, 40},
-	{FURNITURE_CATEGORY_DOORS, "Solidþios durys", 19860, 140},
-	{FURNITURE_CATEGORY_DOORS, "Paprastos plastikines durys", 2911, 70},
-	{FURNITURE_CATEGORY_DOORS, "Geltonos medinës durys", 1507, 220},
-	{FURNITURE_CATEGORY_DOORS, "Melynos durys", 1505, 220},
-	{FURNITURE_CATEGORY_DOORS, "Metalinës durys su langais", 1495, 70},
-	{FURNITURE_CATEGORY_DOORS, "Konteinerio durys", 2678, 150},
-	{FURNITURE_CATEGORY_DOORS, "Baltos modernios durys", 2948, 250},
-	{FURNITURE_CATEGORY_DOORS, "Melynos modernios durys", 2947, 240},
-	{FURNITURE_CATEGORY_DOORS, "Aukso spalvos durys", 2946, 480},
-	{FURNITURE_CATEGORY_DOORS, "Kajutes durys", 2944, 400},
-	{FURNITURE_CATEGORY_DOORS, "Senos raudonos durys", 2959, 80},
-	{FURNITURE_CATEGORY_DOORS, "Paprastos metalinës durys", 3109, 140},
-	{FURNITURE_CATEGORY_DOORS, "Melynos konteinerio durys", 3062, 400},
-	{FURNITURE_CATEGORY_DOORS, "Vyru tuoleto durys", 2878, 190},
-	{FURNITURE_CATEGORY_DOORS, "Persirengimo kabinos durys", 2873, 140},
-	{FURNITURE_CATEGORY_DOORS, "Modernios juodos durys", 1566, 320},
-	{FURNITURE_CATEGORY_DOORS, "Ofiso durys", 1569, 320},
-	{FURNITURE_CATEGORY_DOORS, "Seifo durys be uþrakto", 2004, 50},
-	{FURNITURE_CATEGORY_DOORS, "Modernios medinës durys", 2877, 460},
-	{FURNITURE_CATEGORY_DOORS, "Dvigubos metalines durys", 1508, 410},
-	{FURNITURE_CATEGORY_DOORS, "Paprastos medines durys", 19802, 150},
-	{FURNITURE_CATEGORY_DOORS, "Seifo durys su uþraktu", 19619, 480},
-	{FURNITURE_CATEGORY_DOORS, "Kazino seifo durys", 19799, 1500},
-	{FURNITURE_CATEGORY_DOORS, "Juodos su uþraktu durys", 13360, 80},
-	{FURNITURE_CATEGORY_DOORS, "Medines motelio durys", 19875, 140},
-	{FURNITURE_CATEGORY_DOORS, "Medinës graþios durys", 14638, 180},
-	{FURNITURE_CATEGORY_DOORS, "Lifto durys", 18757, 270},
-	{FURNITURE_CATEGORY_DOORS, "Durys su stiklu", 19857, 190},
-	{FURNITURE_CATEGORY_DOORS, "Senos durys", 19858, 50},
-	{FURNITURE_CATEGORY_DOORS, "Modernios ofiso durys", 19859, 320},
-	{FURNITURE_CATEGORY_DOORS, "Durys su graþia apdaila", 977, 450},
-	{FURNITURE_CATEGORY_DOORS, "Vietines parduotuvës durys", 1561, 0},
-	{FURNITURE_CATEGORY_DOORS, "Modernios paauksotos durys", 1557, 800},
-	{FURNITURE_CATEGORY_DOORS, "Þaislø parduotuvës durys", 1556, 140},
-	{FURNITURE_CATEGORY_DOORS, "Paprastos juodos durys", 1556, 170},
-	{FURNITURE_CATEGORY_DOORS, "Paprastos durys su metaliniu remu", 1538, 250},
-	{FURNITURE_CATEGORY_DOORS, "Ðarvuotos klubo durys", 1537, 450},
-	{FURNITURE_CATEGORY_DOORS, "Modernios durys", 1536, 490},
-	{FURNITURE_CATEGORY_DOORS, "Virtuvës durys", 1523, 80},
-	{FURNITURE_CATEGORY_DOORS, "Pilkos durys", 1506, 120},
-	{FURNITURE_CATEGORY_DOORS, "Raudonos durys", 1504, 120},
-	{FURNITURE_CATEGORY_DOORS, "Senos durys su skylëmis", 1501, 15},
-	{FURNITURE_CATEGORY_DOORS, "Paprastos parduotuvës durys", 1500, 140},
-	{FURNITURE_CATEGORY_DOORS, "Durys su maþu langeliu", 1499, 240},
-	{FURNITURE_CATEGORY_DOORS, "Paprastos laiptines durys", 1498, 320},
-	{FURNITURE_CATEGORY_DOORS, "Ðarvuotos durys", 1497, 480},
-	{FURNITURE_CATEGORY_DOORS, "Parduotuvës durys su langeliu", 1496, 80},
-	{FURNITURE_CATEGORY_DOORS, "Paprastos kambario durys", 1494, 40},
-
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19447, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19456, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19462, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19463, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19455, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19445, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19446, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19457, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19448, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19449, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19450, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19451, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19453, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19454, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19458, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19435, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19460, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19452, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19461, 100},
-	{FURNITURE_CATEGORY_WALLS, "Ilga siena", 19459, 100},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19368, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19367, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19366, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19370, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19362, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19369, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19371, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19372, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19373, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19365, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19355, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19364, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19353, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19354, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19356, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19357, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19358, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19359, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19360, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19361, 70},
-	{FURNITURE_CATEGORY_WALLS, "Trumpa siena", 19363, 70},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19433, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19437, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19438, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19439, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19440, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19441, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19442, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19443, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19444, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19436, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19434, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19426, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19427, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19428, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19429, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19430, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19431, 50},
-	{FURNITURE_CATEGORY_WALLS, "Plona siena", 19432, 50},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19387, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19392, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19395, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19389, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19390, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19391, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19393, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19397, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19396, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19394, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19388, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19385, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19398, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19383, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19384, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena durims", 19386, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19411, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19399, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19405, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19412, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19400, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19404, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19406, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19401, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19407, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19416, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19408, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19414, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19415, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19417, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19409, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19410, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19402, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19403, 70},
-	{FURNITURE_CATEGORY_WALLS, "Siena langams", 19413, 70},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19376, 150},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19465, 150},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19375, 150},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19377, 150},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19378, 150},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19379, 150},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19464, 150},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19380, 150},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19381, 150},
-	{FURNITURE_CATEGORY_WALLS, "Didele siena", 19382, 150},
-
-	{FURNITURE_CATEGORY_GLASS, "Stiklas su remu", 1649, 100},
-	{FURNITURE_CATEGORY_GLASS, "Didelis stiklas 1", 3857, 150},
-	{FURNITURE_CATEGORY_GLASS, "Didelis stiklas 2", 3858, 150},
-
-	{FURNITURE_CATEGORY_PLANT, "augalas vozone", 2253, 10},
-	{FURNITURE_CATEGORY_PLANT, "augalas vozone 2", 2244, 10},
-	{FURNITURE_CATEGORY_PLANT, "vozonas", 2203, 5},
-	{FURNITURE_CATEGORY_PLANT, "krumas 1", 19837, 10},
-	{FURNITURE_CATEGORY_PLANT, "krumas 2", 19838, 10},
-	{FURNITURE_CATEGORY_PLANT, "krumas 3", 19839, 10},
-	{FURNITURE_CATEGORY_PLANT, "maþas kaktusas", 2194, 15},
-	{FURNITURE_CATEGORY_PLANT, "raudonas vozonas", 2242, 10},
-	{FURNITURE_CATEGORY_PLANT, "vaza", 2245, 15},
-	{FURNITURE_CATEGORY_PLANT, "augalas vozone 3", 2252, 10},
-	{FURNITURE_CATEGORY_PLANT, "raudonas vozonas 2", 2243, 15},
-	{FURNITURE_CATEGORY_PLANT, "gëlë vazoje", 2247, 25},
-	{FURNITURE_CATEGORY_PLANT, "gëlë vazoje", 2250, 25},
-	{FURNITURE_CATEGORY_PLANT, "kaktusas", 755, 30},
-	{FURNITURE_CATEGORY_PLANT, "vozonai", 1807, 30},
-	{FURNITURE_CATEGORY_PLANT, "ilgas raudonas vozonas", 2248, 55},
-	{FURNITURE_CATEGORY_PLANT, "augalas vozone", 15038, 15},
-	{FURNITURE_CATEGORY_PLANT, "augalas vazone", 2241, 15},
-	{FURNITURE_CATEGORY_PLANT, "augalas vazone", 2249, 15},
-	{FURNITURE_CATEGORY_PLANT, "augalas akmenineme vazone", 949, 35},
-	{FURNITURE_CATEGORY_PLANT, "krumas raudoname vozone", 2240, 25},
-	{FURNITURE_CATEGORY_PLANT, "augalas rudame vozone", 2811, 35},
-	{FURNITURE_CATEGORY_PLANT, "krumas vozone", 950, 25},
-	{FURNITURE_CATEGORY_PLANT, "gëlë vazoje", 2251, 20},
-	{FURNITURE_CATEGORY_PLANT, "batlas vozonas", 948, 15},
-	{FURNITURE_CATEGORY_PLANT, "krumas ilgas", 861, 5},
-	{FURNITURE_CATEGORY_PLANT, "gëlë", 2001, 25},
-	{FURNITURE_CATEGORY_PLANT, "krumas vazone", 1361, 80},
-	{FURNITURE_CATEGORY_PLANT, "kabinama gëlë", 3802, 25},
-	{FURNITURE_CATEGORY_PLANT, "gëlë vozone", 631, 25},
-	{FURNITURE_CATEGORY_PLANT, "kabinama gëlë 2", 3810, 25},
-	{FURNITURE_CATEGORY_PLANT, "krumo ðakos", 2345, 25},
-	{FURNITURE_CATEGORY_PLANT, "vozonas", 14804, 50},
-	{FURNITURE_CATEGORY_PLANT, "gëlë vazone", 630, 20},
-	{FURNITURE_CATEGORY_PLANT, "palmë vazone", 633, 55},
-	{FURNITURE_CATEGORY_PLANT, "gëlë vazone", 2010, 25},
-	{FURNITURE_CATEGORY_PLANT, "gëlë", 14834, 30},
-	{FURNITURE_CATEGORY_PLANT, "palmë vozone", 2011, 55},
-	{FURNITURE_CATEGORY_PLANT, "krumai ant sienos", 635, 25},
-	{FURNITURE_CATEGORY_PLANT, "kanapiø krumai", 19473, 200},
-	{FURNITURE_CATEGORY_PLANT, "krumas vozone", 1360, 100},
-	{FURNITURE_CATEGORY_PLANT, "krumeliai", 638, 85},
-	{FURNITURE_CATEGORY_PLANT, "krumas ant sienos", 636, 55},
-	{FURNITURE_CATEGORY_PLANT, "krumai su suoliuku", 1364, 150},
-	{FURNITURE_CATEGORY_PLANT, "kaktusas", 650, 50},
-	{FURNITURE_CATEGORY_PLANT, "dekorativinë gëlë", 3439, 150},
-	{FURNITURE_CATEGORY_PLANT, "palmës", 1597, 500},
-	{FURNITURE_CATEGORY_PLANT, "gëlës", 877, 80},
-	{FURNITURE_CATEGORY_PLANT, "akmuo", 3931, 50},
-	{FURNITURE_CATEGORY_PLANT, "akmuo", 828, 50},
-	{FURNITURE_CATEGORY_PLANT, "augalas", 862, 15},
-
-	{FURNITURE_CATEGORY_SHELF, "spintelë", 2046, 50},
-	{FURNITURE_CATEGORY_SHELF, "komodas", 2021, 50},
-	{FURNITURE_CATEGORY_SHELF, "staliukas su þaliu viduriu", 11688, 100},
-	{FURNITURE_CATEGORY_SHELF, "komodas", 2306, 60},
-	{FURNITURE_CATEGORY_SHELF, "siena nedidelë", 2168, 50},
-	{FURNITURE_CATEGORY_SHELF, "siena nedidelë", 2187, 50},
-	{FURNITURE_CATEGORY_SHELF, "spintelë", 1417, 30},
-	{FURNITURE_CATEGORY_SHELF, "stiklinë lentina", 2210, 55},
-	{FURNITURE_CATEGORY_SHELF, "spinta", 2167, 100},
-	{FURNITURE_CATEGORY_SHELF, "lentyna su dokumentais", 2161, 100},
-	{FURNITURE_CATEGORY_SHELF, "komodas", 1416, 150},
-	{FURNITURE_CATEGORY_SHELF, "lentyna", 1744, 20},
-	{FURNITURE_CATEGORY_SHELF, "spintelës", 2163, 80},
-	{FURNITURE_CATEGORY_SHELF, "metalinës spintelës", 2197, 150},
-	{FURNITURE_CATEGORY_SHELF, "barstalis", 19937, 100},
-	{FURNITURE_CATEGORY_SHELF, "komodas", 2094, 100},
-	{FURNITURE_CATEGORY_SHELF, "komodas", 1741, 100},
-	{FURNITURE_CATEGORY_SHELF, "lentyna su dokumentais", 2191, 150},
-	{FURNITURE_CATEGORY_SHELF, "lentyna su dokumentais", 2162, 150},
-	{FURNITURE_CATEGORY_SHELF, "komodas", 2020, 100},
-	{FURNITURE_CATEGORY_SHELF, "komodas", 1743, 100},
-	{FURNITURE_CATEGORY_SHELF, "lentynos", 2462, 50},
-	{FURNITURE_CATEGORY_SHELF, "komodas", 2087, 100},
-	{FURNITURE_CATEGORY_SHELF, "lentyna su PC ir dok.", 2608, 150},
-	{FURNITURE_CATEGORY_SHELF, "lentyna su knygom", 1742, 120},
-	{FURNITURE_CATEGORY_SHELF, "kamimas", 11724, 300},
-	{FURNITURE_CATEGORY_SHELF, "lentynos", 2502, 100},
-	{FURNITURE_CATEGORY_SHELF, "lentynos", 2482, 100},
-	{FURNITURE_CATEGORY_SHELF, "spintelë", 2088, 50},
-	{FURNITURE_CATEGORY_SHELF, "spintele su lentynom", 2164, 150},
-	{FURNITURE_CATEGORY_SHELF, "lentynos", 2463, 100},
-	{FURNITURE_CATEGORY_SHELF, "lentynos", 2475, 100},
-	{FURNITURE_CATEGORY_SHELF, "gultas", 1255, 150},
-	{FURNITURE_CATEGORY_SHELF, "spinta", 2145, 200},
-	{FURNITURE_CATEGORY_SHELF, "sekcija", 2078, 250},
-	{FURNITURE_CATEGORY_SHELF, "spintos", 2200, 100},
-	{FURNITURE_CATEGORY_SHELF, "spinta", 2307, 150},
-	{FURNITURE_CATEGORY_SHELF, "spinta", 2330, 100},
-	{FURNITURE_CATEGORY_SHELF, "spitna", 2329, 100},
-	{FURNITURE_CATEGORY_SHELF, "lentynos", 2063, 50},
-	{FURNITURE_CATEGORY_SHELF, "spinta", 2025, 150},
-	{FURNITURE_CATEGORY_SHELF, "spinta", 2204, 200},
-	{FURNITURE_CATEGORY_SHELF, "spinta", 2708, 250},
-	{FURNITURE_CATEGORY_SHELF, "stalas su poperiais", 2569, 150},
-	{FURNITURE_CATEGORY_SHELF, "spinta su komodu", 2576, 300},
-	{FURNITURE_CATEGORY_SHELF, "atidaryta spinta", 14556, 60},
-	{FURNITURE_CATEGORY_SHELF, "lentynos su knygom", 14455, 500},
-	{FURNITURE_CATEGORY_SHELF, "tinklas", 1639, 150},
-	{FURNITURE_CATEGORY_SHELF, "didelë siena", 2591, 200},
-	{FURNITURE_CATEGORY_SHELF, "spinta su komodu", 2573, 200},
-	{FURNITURE_CATEGORY_SHELF, "staliukas su lempom", 2562, 150},
-	{FURNITURE_CATEGORY_SHELF, "staliukas su lempom", 2568, 150},
-	{FURNITURE_CATEGORY_SHELF, "roþinis stulpas", 2179, 300},
-	{FURNITURE_CATEGORY_SHELF, "dekoracija", 2179, 500},
-	{FURNITURE_CATEGORY_SHELF, "lentynos su dokumentais", 14632, 300},
-	{FURNITURE_CATEGORY_SHELF, "kaminas", 14640, 300},
-
-	{FURNITURE_CATEGORY_BAR, "metalinis baras", 18090, 2000},
-	{FURNITURE_CATEGORY_BAR, "medinis baras su spintelëm", 14399, 3000},
-	{FURNITURE_CATEGORY_BAR, "Apvalus baras", 14582, 3500},
-	{FURNITURE_CATEGORY_BAR, "baras su ðokimo vietom", 14537, 5000},
-	{FURNITURE_CATEGORY_BAR, "viskio utelis", 19823, 200},
-	{FURNITURE_CATEGORY_BAR, "brendþio butelis", 19824, 300},
-	{FURNITURE_CATEGORY_BAR, "konjeko butelis", 19820, 400},
-	{FURNITURE_CATEGORY_BAR, "viskio butelis", 29821, 300},
-	{FURNITURE_CATEGORY_BAR, "vyno butelis", 19822, 500},
-	{FURNITURE_CATEGORY_BAR, "vyno butelis maþas", 1669, 50},
-	{FURNITURE_CATEGORY_BAR, "alaus butelis", 1486, 5},
-	{FURNITURE_CATEGORY_BAR, "alaus butelis 2", 1517, 5},
-	{FURNITURE_CATEGORY_BAR, "alaus butelis 3", 1512, 5},
-	{FURNITURE_CATEGORY_BAR, "alaus butelis 4", 1544, 5},
-	{FURNITURE_CATEGORY_BAR, "alasu butelis 5", 1951, 5},
-	{FURNITURE_CATEGORY_BAR, "alaus butelis 6", 1543, 5},
-	{FURNITURE_CATEGORY_BAR, "piltuvai su alum", 1541, 50},
-	{FURNITURE_CATEGORY_BAR, "piltuvai su sprunk", 1542, 50},
-	{FURNITURE_CATEGORY_BAR, "alaus baèka", 19812, 100},
-	{FURNITURE_CATEGORY_BAR, "alaus stiklinë", 1666, 2},
-	{FURNITURE_CATEGORY_BAR, "stiklinë", 1455, 5},
-	{FURNITURE_CATEGORY_BAR, "sprunk stiklinë", 1546, 2},
-	{FURNITURE_CATEGORY_BAR, "vyno bokalas", 1667, 2},
-	{FURNITURE_CATEGORY_BAR, "bokalas", 19818, 5},
-	{FURNITURE_CATEGORY_BAR, "bokalas 2", 19819, 5},
-	{FURNITURE_CATEGORY_BAR, "pakabintas butelis", 1511, 10},
-	{FURNITURE_CATEGORY_BAR, "pakabintas butelis", 1488, 10},
-	{FURNITURE_CATEGORY_BAR, "padëklas", 1547, 5},
-	{FURNITURE_CATEGORY_BAR, "padëklas", 1548, 5},
-	{FURNITURE_CATEGORY_BAR, "baras", 11686, 1000},
-	{FURNITURE_CATEGORY_BAR, "medinis baras", 16151, 1500},
-	{FURNITURE_CATEGORY_BAR, "peleninë", 1665, 5},
-	{FURNITURE_CATEGORY_BAR, "peleninë", 1510, 5},
-	{FURNITURE_CATEGORY_BAR, "baro këdës su stalais", 16152, 500},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2450, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2455, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2457, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2454, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2449, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2440, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2434, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2435, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2439, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2441, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2448, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2442, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2444, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2445, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2446, 50},
-	{FURNITURE_CATEGORY_BAR, "barstalis", 2447, 50},
-
-	{FURNITURE_CATEGORY_BOXES, "kulkø dëþutë", 2039, 2},
-	{FURNITURE_CATEGORY_BOXES, "metalinë dëþutë", 2040, 10},
-	{FURNITURE_CATEGORY_BOXES, "dëþë", 2013, 20},
-	{FURNITURE_CATEGORY_BOXES, "atidaryta metalinë dëþutë", 2041, 10},
-	{FURNITURE_CATEGORY_BOXES, "batø dëþë", 2694, 15},
-	{FURNITURE_CATEGORY_BOXES, "atidaryta metalinë dëþutë 2", 2043, 10},
-	{FURNITURE_CATEGORY_BOXES, "atidaryta metalinë dëþutë 3", 2042, 10},
-	{FURNITURE_CATEGORY_BOXES, "þaislø dëþë", 2481, 50},
-	{FURNITURE_CATEGORY_BOXES, "ammo medinë dëþë", 2358, 50},
-	{FURNITURE_CATEGORY_BOXES, "medinë dëþë", 2969, 50},
-	{FURNITURE_CATEGORY_BOXES, "þaislø dëþës", 2468, 25},
-	{FURNITURE_CATEGORY_BOXES, "þaislø dëþës 2", 2476, 25},
-	{FURNITURE_CATEGORY_BOXES, "dëþë su ginklu", 3014, 20},
-	{FURNITURE_CATEGORY_BOXES, "kelios dëþës su ginklu", 3015, 80},
-	{FURNITURE_CATEGORY_BOXES, "atidaryta medinë dëþë", 2359, 25},
-	{FURNITURE_CATEGORY_BOXES, "dëþë", 2912, 15},
-	{FURNITURE_CATEGORY_BOXES, "dëþë", 1271, 15},
-	{FURNITURE_CATEGORY_BOXES, "þaislø dëþës 3", 2479, 20},
-	{FURNITURE_CATEGORY_BOXES, "raudona baèka", 3632, 25},
-	{FURNITURE_CATEGORY_BOXES, "baèka", 923, 25},
-	{FURNITURE_CATEGORY_BOXES, "þaislø dëþës 4", 2483, 25},
-	{FURNITURE_CATEGORY_BOXES, "þaislø dëþës 5", 2464, 25},
-	{FURNITURE_CATEGORY_BOXES, "batø dëþës", 2654, 50},
-	{FURNITURE_CATEGORY_BOXES, "þaislø dëþës 6", 2478, 25},
-	{FURNITURE_CATEGORY_BOXES, "þaislø dëþës 7", 2465, 25},
-	{FURNITURE_CATEGORY_BOXES, "dujos", 930, 150},
-	{FURNITURE_CATEGORY_BOXES, "geltona baèka", 3046, 25},
-	{FURNITURE_CATEGORY_BOXES, "raudonos baèkos", 3633, 80},
-	{FURNITURE_CATEGORY_BOXES, "metalinë ammo dëþë", 964, 500},
-	{FURNITURE_CATEGORY_BOXES, "mëlyna dëþë", 2972, 35},
-	{FURNITURE_CATEGORY_BOXES, "mëlyna dëþë", 2975, 35},
-	{FURNITURE_CATEGORY_BOXES, "durelës nuo konteinerio", 2678, 20},
-	{FURNITURE_CATEGORY_BOXES, "durelës nuo konteinerio 2", 2679, 20},
-	{FURNITURE_CATEGORY_BOXES, "dëþës", 1431, 20},
-	{FURNITURE_CATEGORY_BOXES, "dëþës", 923, 20},
-	{FURNITURE_CATEGORY_BOXES, "sudëtos plytos", 1685, 50},
-	{FURNITURE_CATEGORY_BOXES, "dëþë", 3798, 20},
-	{FURNITURE_CATEGORY_BOXES, "lentyna uþpildyta", 925, 85},
-	{FURNITURE_CATEGORY_BOXES, "lentyna tuðèia", 931, 50},
-	{FURNITURE_CATEGORY_BOXES, "dëþës", 944, 15},
-	{FURNITURE_CATEGORY_BOXES, "dëþë", 2974, 5},
-	{FURNITURE_CATEGORY_BOXES, "apviniota dëþë", 2973, 30},
-	{FURNITURE_CATEGORY_BOXES, "dëþës", 2991, 100},
-	{FURNITURE_CATEGORY_BOXES, "didelë dëþë", 3799, 150},
-	{FURNITURE_CATEGORY_BOXES, "sudëtos dëþës", 3577, 200},
-	{FURNITURE_CATEGORY_BOXES, "kortininës dëþës", 922, 85},
-	{FURNITURE_CATEGORY_BOXES, "daug dëþiø", 3576, 250},
-	{FURNITURE_CATEGORY_BOXES, "lentyna su dëþëm", 942, 200},
-	{FURNITURE_CATEGORY_BOXES, "lentyna su dëþëm 2", 2567, 200},
-	{FURNITURE_CATEGORY_BOXES, "lentyna su dëþëm 3", 939, 200},
-	{FURNITURE_CATEGORY_BOXES, "atidaryta didelë dëþë", 3796, 500},
-	{FURNITURE_CATEGORY_BOXES, "konteineris", 2932, 1000},
-	{FURNITURE_CATEGORY_BOXES, "konteineris 2", 2934, 1000},
-	{FURNITURE_CATEGORY_BOXES, "konteineris 3", 2935, 1000},
-	{FURNITURE_CATEGORY_BOXES, "atidarytas konteineris", 19321, 1000},
-	{FURNITURE_CATEGORY_BOXES, "konteineris 4", 3565, 1000},
-	{FURNITURE_CATEGORY_BOXES, "konteineris 5", 3570, 1000},
-	{FURNITURE_CATEGORY_BOXES, "raudonas konteineris", 2933, 1000},
-	{FURNITURE_CATEGORY_BOXES, "daug dëþiø", 5269, 500},
-	{FURNITURE_CATEGORY_BOXES, "vamþdþiai", 12930, 250},
-	{FURNITURE_CATEGORY_BOXES, "dëþës", 3630, 300},
-	{FURNITURE_CATEGORY_BOXES, "dëþës", 18257, 300},
-	{FURNITURE_CATEGORY_BOXES, "dëþës", 18260, 300},
-	{FURNITURE_CATEGORY_BOXES, "lentyna su dëþëm", 3761, 300},
-	{FURNITURE_CATEGORY_BOXES, "dëþës uþdengtos", 3066, 320},
-	{FURNITURE_CATEGORY_BOXES, "daug dëþiø", 5261, 500},
-	{FURNITURE_CATEGORY_BOXES, "sudëti konteineriai", 8886, 2000},
-	{FURNITURE_CATEGORY_BOXES, "furos priekaba", 3567, 500},
-	{FURNITURE_CATEGORY_BOXES, "furnos priekaba 2", 3568, 500},
-
-	{FURNITURE_CATEGORY_GYM, "spintelës", 14782, 150},
-	{FURNITURE_CATEGORY_GYM, "tribunos", 3819, 200},
-	{FURNITURE_CATEGORY_GYM, "bokso ringas 1", 14780, 1500},
-	{FURNITURE_CATEGORY_GYM, "bokso ringas 2", 14781, 1500},
-	{FURNITURE_CATEGORY_GYM, "bokso ringas 3", 14791, 1500},
-	{FURNITURE_CATEGORY_GYM, "batutas", 14449, 500},
-	{FURNITURE_CATEGORY_GYM, "tatamis", 14787, 500},
-	{FURNITURE_CATEGORY_GYM, "bëgimo takelis", 2627, 250},
-	{FURNITURE_CATEGORY_GYM, "blokinis treniruoklis", 2628, 300},
-	{FURNITURE_CATEGORY_GYM, "ðtangos spaudimo suoliukas", 2629, 350},
-	{FURNITURE_CATEGORY_GYM, "dviratis", 2630, 250},
-	{FURNITURE_CATEGORY_GYM, "paminkðtinimas", 2631, 100},
-	{FURNITURE_CATEGORY_GYM, "paminkðtinimas 2", 2632, 100},
-	{FURNITURE_CATEGORY_GYM, "spintelë", 11729, 150},
-	{FURNITURE_CATEGORY_GYM, "spintelë su atidaryta durele", 11730, 150},
-	{FURNITURE_CATEGORY_GYM, "hantelis", 3071, 200},
-	{FURNITURE_CATEGORY_GYM, "blynas 1", 1945, 50},
-	{FURNITURE_CATEGORY_GYM, "blynas 2", 1942, 50},
-	{FURNITURE_CATEGORY_GYM, "blynas 3", 1943, 50},
-	{FURNITURE_CATEGORY_GYM, "blynas 4", 1944, 50},
-	{FURNITURE_CATEGORY_GYM, "bokso kriauðë", 1985, 150},
-	{FURNITURE_CATEGORY_GYM, "krepðinio kamuolis", 1946, 15},
-	{FURNITURE_CATEGORY_GYM, "Kaðis", 947, 50},
-	{FURNITURE_CATEGORY_GYM, "Kaðis 2", 3496, 50},
-	{FURNITURE_CATEGORY_GYM, "Kaðis 3", 3497, 50},
-
-
-	{FURNITURE_CATEGORY_CHAIR, "medinë këdë", 1811, 50},
-	{FURNITURE_CATEGORY_CHAIR, "medinë këdë 2", 2636, 50},
-	{FURNITURE_CATEGORY_CHAIR, "ofiso këdë", 2310, 80},
-	{FURNITURE_CATEGORY_CHAIR, "raudona lankstoma këdë", 2121, 50},
-	{FURNITURE_CATEGORY_CHAIR, "balta këdë", 1720, 50},
-	{FURNITURE_CATEGORY_CHAIR, "baro këdë", 1716, 50},
-	{FURNITURE_CATEGORY_CHAIR, "baro këdë su atlaðu", 2776, 80},
-	{FURNITURE_CATEGORY_CHAIR, "raudona sofa", 2748, 100},
-	{FURNITURE_CATEGORY_CHAIR, "dalis sofos", 11682, 50},
-	{FURNITURE_CATEGORY_CHAIR, "baro këdë 2", 2350, 50},
-	{FURNITURE_CATEGORY_CHAIR, "vien vietë sofa", 1724, 100},
-	{FURNITURE_CATEGORY_CHAIR, "sofos dalis 2", 2291, 50},
-	{FURNITURE_CATEGORY_CHAIR, "baro këdë 3", 2125, 50},
-	{FURNITURE_CATEGORY_CHAIR, "këdë 1", 1739, 70},
-	{FURNITURE_CATEGORY_CHAIR, "raudona këdë", 2807, 50},
-	{FURNITURE_CATEGORY_CHAIR, "vienvietë sofa 2", 1727, 100},
-	{FURNITURE_CATEGORY_CHAIR, "dvipusë raudona sofa", 2746, 200},
-	{FURNITURE_CATEGORY_CHAIR, "ofiso këdë 2", 1971, 80},
-	{FURNITURE_CATEGORY_CHAIR, "ofiso këdë 3", 19999, 100},
-	{FURNITURE_CATEGORY_CHAIR, "këdë su sterio sistema prieðais", 11665, 500},
-	{FURNITURE_CATEGORY_CHAIR, "pilka lankstoma këdë", 19996, 50},
-	{FURNITURE_CATEGORY_CHAIR, "supamoji këdë", 11734, 50},
-	{FURNITURE_CATEGORY_CHAIR, "balta këdë", 2123, 50},
-	{FURNITURE_CATEGORY_CHAIR, "këdë 3", 2120, 50},
-	{FURNITURE_CATEGORY_CHAIR, "kirpëjo këdë", 2343, 100},
-	{FURNITURE_CATEGORY_CHAIR, "baro këdë su atlaðu 2", 2724, 50},
-	{FURNITURE_CATEGORY_CHAIR, "ofiso këdë 3", 1663, 100},
-	{FURNITURE_CATEGORY_CHAIR, "vienvietë sofa 3", 1705, 100},
-	{FURNITURE_CATEGORY_CHAIR, "vienvietë sofa 4", 1708, 100},
-	{FURNITURE_CATEGORY_CHAIR, "vienvietë sofa 5", 1711, 100},
-	{FURNITURE_CATEGORY_CHAIR, "ofiso këdë 4", 1714, 100},
-	{FURNITURE_CATEGORY_CHAIR, "këdë su ornamentais", 1735, 150},
-	{FURNITURE_CATEGORY_CHAIR, "supamoji këdë 2", 2096, 100},
-	{FURNITURE_CATEGORY_CHAIR, "du pufikai su stalu", 2571, 300},
-	{FURNITURE_CATEGORY_CHAIR, "baro këdë 4", 1805, 50},
-	{FURNITURE_CATEGORY_CHAIR, "pufikas", 2293, 50},
-	{FURNITURE_CATEGORY_CHAIR, "vienvietë sofa 6", 1759, 100},
-	{FURNITURE_CATEGORY_CHAIR, "sofos dalis 3", 2292, 50},
-	{FURNITURE_CATEGORY_CHAIR, "vienvietë sofa 6", 1765, 100},
-	{FURNITURE_CATEGORY_CHAIR, "vienvietë sofa 7", 1758, 100},
-	{FURNITURE_CATEGORY_CHAIR, "vienvietë sofa 8", 1755, 100},
-	{FURNITURE_CATEGORY_CHAIR, "vienvietë sofa 9", 1769, 100},
-	{FURNITURE_CATEGORY_CHAIR, "raudona sofa", 11717, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 1", 1764, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 2", 1763, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 3", 1712, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 4", 1702, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 5", 1706, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 6", 1768, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 7", 1757, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 8", 1713, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 9", 1703, 200},
-	{FURNITURE_CATEGORY_CHAIR, "lova 1", 11720, 150},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 10", 1761, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 11", 1760, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 12", 1756, 200},
-	{FURNITURE_CATEGORY_CHAIR, "sofa 13", 1753, 200},
-	{FURNITURE_CATEGORY_CHAIR, "apvali didelë sofa", 11689, 300},
-	{FURNITURE_CATEGORY_CHAIR, "viengulë lova", 1771, 100},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 1", 2302, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 2", 1794, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 3", 14866, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 4", 1700, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 5", 2300, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 6", 2301, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 7", 2090, 150},
-	{FURNITURE_CATEGORY_CHAIR, "didelë lova", 14446, 300},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 8", 2298, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 9", 2299, 150},
-	{FURNITURE_CATEGORY_CHAIR, "viengulë lova 2", 1812, 100},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 10", 1797, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 11", 1701, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 12", 1745, 150},
-	{FURNITURE_CATEGORY_CHAIR, "Èiuþinis", 1793, 50},
-	{FURNITURE_CATEGORY_CHAIR, "viengulë lova 3", 1796, 100},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 13", 1795, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 14", 1798, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 15", 1799, 150},
-	{FURNITURE_CATEGORY_CHAIR, "viengulë lova 4", 1800, 100},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 16", 1801, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 17", 1802, 150},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 18", 1803, 150},
-	{FURNITURE_CATEGORY_CHAIR, "Èiuþinis 2", 14880, 50},
-	{FURNITURE_CATEGORY_CHAIR, "lova ðirdelës formos", 11731, 200},
-	{FURNITURE_CATEGORY_CHAIR, "gultas", 1646, 50},
-	{FURNITURE_CATEGORY_CHAIR, "dvigulë lova 19", 1725, 150},
-
-
-	{FURNITURE_CATEGORY_GAMBLING, "þetonas 1", 1899, 5},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonas 2", 1909, 5},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonas 3", 1910, 5},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonas 4", 1912, 5},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonas 5", 1913, 5},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonas 6", 1914, 5},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonø stulpelis 1", 1901, 15},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonø stulpelis 2", 1902, 15},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonø stulpelis 3", 1903, 15},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonø stulpelis 4", 1911, 15},
-	{FURNITURE_CATEGORY_GAMBLING, "þetonø stulpelis 5", 1921, 15},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimo kauliukai", 1851, 20},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø ratas", 1979, 200},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø aparatas 1", 1834, 100},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø aparatas 2", 1833, 100},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø aparatas 3", 1835, 100},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø aparatas 4", 1831, 100},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø aparatas 5", 1832, 100},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø aparatas 6", 1838, 100},
-	{FURNITURE_CATEGORY_GAMBLING, "kortø loðimo aparatas 1", 2640, 150},
-	{FURNITURE_CATEGORY_GAMBLING, "kortø loðimo aparatas 2", 2754, 150},
-	{FURNITURE_CATEGORY_GAMBLING, "þaidimø aparatai 1", 2778, 200},
-	{FURNITURE_CATEGORY_GAMBLING, "þaidimø aparatai 2", 2779, 200},
-	{FURNITURE_CATEGORY_GAMBLING, "þaidimø aparatai 3", 2681, 200},
-	{FURNITURE_CATEGORY_GAMBLING, "þaidimø aparatai 4", 2872, 200},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø stalas 1", 2788, 500},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø stalas 2", 19474, 500},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø stalas 3", 1978, 500},
-	{FURNITURE_CATEGORY_GAMBLING, "loðim7 stalas 4", 1824, 500},
-	{FURNITURE_CATEGORY_GAMBLING, "loðimø stalas 5", 1896, 500},
-
-	{FURNITURE_CATEGORY_KITCHEN, "pomidoras", 19577, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "apelsinas", 19574, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "raudonas obuolis", 19575, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "þalias obuolis", 19576, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "mesainis", 2703, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "batonas", 19883, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "mesainis dëþutëje", 2768, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "kava", 19835, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "picos kabalëlis", 2702, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "pieno pakelis", 19569, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "kebabas", 2769, 7},
-	{FURNITURE_CATEGORY_KITCHEN, "mesainio dëþutë", 19811, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "steikas", 19852, 15},
-	{FURNITURE_CATEGORY_KITCHEN, "bananas", 19578, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "sulèiø pakelis", 19563, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "sulèiø pakelis", 19564, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "iðkeptas steikas", 19882, 15},
-	{FURNITURE_CATEGORY_KITCHEN, "keèiupas", 11722, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "garstièios", 11723, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "batonas", 19579, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "uþpakuotas steikas", 19560, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "butelis juodas", 2683, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "pieno butelis", 19570, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "burger shot puodukas", 2647, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "ledu dëþutë", 19567, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "picos dëþë", 19571, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "kiaulës koja", 19847, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "pica", 19580, 15},
-	{FURNITURE_CATEGORY_KITCHEN, "alaus dëþë", 19572, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "burger king pakuotë", 2663, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "donuts spurgø dëþutës", 2342, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "padëklas", 2767, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "picos dëþë", 2814, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "mesainis su kola", 2823, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "dripsniø dëþutë", 19561, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "dripsniø pakuotë", 19562, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "þuvø pirðteliø pakuotë", 19565, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "þuvø pirðteliø pakuotë", 16966, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "padëklas su spurgom", 2222, 25},
-	{FURNITURE_CATEGORY_KITCHEN, "padëklas su pica", 2219, 25},
-	{FURNITURE_CATEGORY_KITCHEN, "atidaryta dripsniø pakuotë", 2821, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "mesainio dëþutës", 2859, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "kiniðkas maistas", 2858, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "atidarytos dëþutës", 2866, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "kiniðkas maistas", 2839, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "daug picø", 2453, 100},
-	{FURNITURE_CATEGORY_KITCHEN, "daug deþuèiø nuo mesainio", 2840, 100},
-	{FURNITURE_CATEGORY_KITCHEN, "tortas", 19525, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "sprunk aparatas", 2427, 100},
-	{FURNITURE_CATEGORY_KITCHEN, "atidaryta picos dëþë", 2860, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "soda aparatas", 1302, 150},
-	{FURNITURE_CATEGORY_KITCHEN, "snacks aparatas", 1776, 150},
-	{FURNITURE_CATEGORY_KITCHEN, "sprunk aparatas", 1775, 150},
-	{FURNITURE_CATEGORY_KITCHEN, "mësos gabalas", 2804, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "indelis", 19993, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "peiliukas", 11716, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "ðakutë", 11715, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "lëkðtë", 11744, 2},
-	{FURNITURE_CATEGORY_KITCHEN, "indai sudëti vienas ant kito", 2864, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "peilis", 19583, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "puodas", 11719, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "neðvarios lëkðtës", 2830, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "ledø indas", 19809, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "puodas 2", 19858, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "puodas 3", 19584, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "neðvarios lëkðtës", 2851, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "indai", 2829, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "indai 2", 2822, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "neðvarus indai", 2831, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "kepimo árankis", 19586, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "puodas 4", 11718, 10},
-	{FURNITURE_CATEGORY_KITCHEN, "kavos aparatas", 117443, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "mikrobangë", 2149, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "indai 2", 2863, 25},
-	{FURNITURE_CATEGORY_KITCHEN, "blenderis", 19830, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "keptuvë", 19581, 15},
-	{FURNITURE_CATEGORY_KITCHEN, "mikro bangë ant sienos", 2421, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "indai", 2865, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "lëkðtës", 2862, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "neðvarus indai", 2850, 5},
-	{FURNITURE_CATEGORY_KITCHEN, "picos krosnis", 2426, 60},
-	{FURNITURE_CATEGORY_KITCHEN, "balta virtuvinë spintele", 2339, 25},
-	{FURNITURE_CATEGORY_KITCHEN, "þalia virtuvinë spintele", 2337, 25},
-	{FURNITURE_CATEGORY_KITCHEN, "raudona orkaitë", 2294, 25},
-	{FURNITURE_CATEGORY_KITCHEN, "auksinë orkaitë", 2135, 25},
-	{FURNITURE_CATEGORY_KITCHEN, "raudonas didelis ðaldytuvas", 2127, 100},
-	{FURNITURE_CATEGORY_KITCHEN, "baltas didelis ðaldytuvas", 2131, 100},
-	{FURNITURE_CATEGORY_KITCHEN, "sprunk ðaldytuvas", 2453, 65},
-	{FURNITURE_CATEGORY_KITCHEN, "þalia virtuvinë spintelë", 2157, 25},
-	{FURNITURE_CATEGORY_KITCHEN, "kriauklë", 19927, 58},
-	{FURNITURE_CATEGORY_KITCHEN, "barstalis", 19928, 85},
-	{FURNITURE_CATEGORY_KITCHEN, "ilgas barstalis", 19929, 100},
-	{FURNITURE_CATEGORY_KITCHEN, "barstalis", 19926, 85},
-	{FURNITURE_CATEGORY_KITCHEN, "kampinis barstalis", 19926, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "dumø trauka", 19924, 50},
-	{FURNITURE_CATEGORY_KITCHEN, "keptuvë", 19923, 150},
-	{FURNITURE_CATEGORY_KITCHEN, "ðaldytuvas", 19916, 85},
-	{FURNITURE_CATEGORY_KITCHEN, "viriklë", 19915, 150},
-	{FURNITURE_CATEGORY_KITCHEN, "raudona viriklë", 2294, 200},
-	{FURNITURE_CATEGORY_KITCHEN, "pica", 19580, 15},
-
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 1", 2282, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 2", 2277, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 3", 2274, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 4", 2280, 50},
-	{FURNITURE_CATEGORY_PICTURE, "Paveikslas su taxi", 2254, 100},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 5", 2275, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 6", 2276, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 7", 2278, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 8", 2279, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 9", 2281, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 10", 2272, 0},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 11", 2283, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 12", 2284, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 13", 2285, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 14", 2286, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 15", 2287, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 16", 2288, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 17", 2273, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 18", 2271, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 19", 2261, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 20", 2255, 50},
-	{FURNITURE_CATEGORY_PICTURE, "didelis paveiklsas su palmëm", 2256, 150},
-	{FURNITURE_CATEGORY_PICTURE, "spalvotas paveikslas", 2257, 150},
-	{FURNITURE_CATEGORY_PICTURE, "didelis paveiksmas su miestu", 2258, 150},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 21", 2259, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 22", 2260, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 23", 2262, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 24", 2270, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 25", 2263, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 26", 2264, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 27", 2265, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 28", 2266, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 29", 2267, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 30", 2268, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 31", 2269, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas 32", 2289, 50},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas su las santos miestu", 19172, 150},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas su san fierro miestu", 19173, 150},
-	{FURNITURE_CATEGORY_PICTURE, "paveikslas su las santos miestu 2", 19174, 150},
-	{FURNITURE_CATEGORY_PICTURE, "peveikslas su san fierro miestu 2", 19175, 150},
-	{FURNITURE_CATEGORY_PICTURE, "áremintas vonila diskas", 19617, 200},
-	{FURNITURE_CATEGORY_PICTURE, "diskas kabint ant sienos 1", 1960, 25},
-	{FURNITURE_CATEGORY_PICTURE, "diskas kabint ant sienos 2", 1961, 25},
-	{FURNITURE_CATEGORY_PICTURE, "diskas kabint ant sienos 3", 1962, 25},
-	{FURNITURE_CATEGORY_PICTURE, "lenda su baltu pagrindu", 2616, 50},
-	{FURNITURE_CATEGORY_PICTURE, "balta lenta", 19805, 100},
-	{FURNITURE_CATEGORY_PICTURE, "lenta su árankiais", 19815, 200},
-	{FURNITURE_CATEGORY_PICTURE, "didelë stovinti lenta", 3077, 200},
-	{FURNITURE_CATEGORY_PICTURE, "lenta su mëlynu pagrindu", 2737, 50},
-	{FURNITURE_CATEGORY_PICTURE, "lenta apklijuota lapais 1", 2612, 50},
-	{FURNITURE_CATEGORY_PICTURE, "lenta apklijuota lapais 2", 2611, 50},
-	{FURNITURE_CATEGORY_PICTURE, "popierus kabint ant sienos", 2615, 20},
-	{FURNITURE_CATEGORY_PICTURE, "diplomas", 2684, 10},
-	{FURNITURE_CATEGORY_PICTURE, "lipdukas", 2685, 5},
-	{FURNITURE_CATEGORY_PICTURE, "lipdukas 2", 2686, 5},
-	{FURNITURE_CATEGORY_PICTURE, "fire exit þenklas", 11710, 20},
-	{FURNITURE_CATEGORY_PICTURE, "exit þenklas", 11711, 20},
-	{FURNITURE_CATEGORY_PICTURE, "lipdukas 3", 2687, 5},
-	{FURNITURE_CATEGORY_PICTURE, "OPEN", 2714, 20},
-	{FURNITURE_CATEGORY_PICTURE, "plakatas 1", 2587, 5},
-	{FURNITURE_CATEGORY_PICTURE, "lipdukas 6", 2661, 5},
-	{FURNITURE_CATEGORY_PICTURE, "FOR SALE", 19470, 10},
-	{FURNITURE_CATEGORY_PICTURE, "reklamos stendas", 2599, 5},
-	{FURNITURE_CATEGORY_PICTURE, "stendas su burgeriu", 2456, 5},
-	{FURNITURE_CATEGORY_PICTURE, "lipdukas 7", 2660, 5},
-	{FURNITURE_CATEGORY_PICTURE, "BINCO lipdukas", 2720, 5},
-	{FURNITURE_CATEGORY_PICTURE, "99cent lipdukas", 2719, 5},
-	{FURNITURE_CATEGORY_PICTURE, "burger shot lentelë", 2641, 10},
-	{FURNITURE_CATEGORY_PICTURE, "pizza stacked lentelë", 2646, 10},
-	{FURNITURE_CATEGORY_PICTURE, "cluckin bell lentelë", 2766, 10},
-	{FURNITURE_CATEGORY_PICTURE, "pizza stacked menu", 2645, 10},
-	{FURNITURE_CATEGORY_PICTURE, "ilgas lipdukas 1", 2655, 5},
-	{FURNITURE_CATEGORY_PICTURE, "ilgas lipdukas 2", 2656, 5},
-	{FURNITURE_CATEGORY_PICTURE, "ilgas lipdukas 3", 2657, 5},
-	{FURNITURE_CATEGORY_PICTURE, "ilgas lipdukas 4", 2658, 5},
-	{FURNITURE_CATEGORY_PICTURE, "ilgas lipdukas 5", 2695, 5},
-	{FURNITURE_CATEGORY_PICTURE, "ilgas lipdukas 6", 2696, 5},
-	{FURNITURE_CATEGORY_PICTURE, "ilgas lipdukas 7", 2697, 5},
-	{FURNITURE_CATEGORY_PICTURE, "reklama ant stovo", 1443, 10},
-	{FURNITURE_CATEGORY_PICTURE, "donuts reklama", 2715, 5},
-	{FURNITURE_CATEGORY_PICTURE, "donuts reklama 2", 2716, 5},
-	{FURNITURE_CATEGORY_PICTURE, "donuts reklama 3", 2717, 5},
-	{FURNITURE_CATEGORY_PICTURE, "pizza stacked reklama 1", 2667, 5},
-	{FURNITURE_CATEGORY_PICTURE, "pizza stacked reklama 2", 2668, 5},
-	{FURNITURE_CATEGORY_PICTURE, "pizza stacked reklama 3", 2666, 5},
-	{FURNITURE_CATEGORY_PICTURE, "þemëlapis ant stovo", 1444, 10},
-	{FURNITURE_CATEGORY_PICTURE, "geltonas plakatas", 2580, 10},
-	{FURNITURE_CATEGORY_PICTURE, "BOBO lipdukas", 2659, 5},
-	{FURNITURE_CATEGORY_PICTURE, "kortoninë figurëlë 1", 2692, 20},
-	{FURNITURE_CATEGORY_PICTURE, "kortoninë figurëlë 2", 2693, 20},
-	{FURNITURE_CATEGORY_PICTURE, "BOBO didelis lipdukas", 2662, 20},
-	{FURNITURE_CATEGORY_PICTURE, "vëleva 1", 2048, 20},
-	{FURNITURE_CATEGORY_PICTURE, "vëleva 2", 2047, 20},
-	{FURNITURE_CATEGORY_PICTURE, "reklama", 3468, 25},
-	{FURNITURE_CATEGORY_PICTURE, "rekalam 2", 3467, 25},
-	{FURNITURE_CATEGORY_PICTURE, "lipdukas 24/7", 19329, 5},
-	{FURNITURE_CATEGORY_PICTURE, "MONKEY plakatas", 19328, 5},
-	{FURNITURE_CATEGORY_PICTURE, "CokOpops plakatas", 19327, 5},
-	{FURNITURE_CATEGORY_PICTURE, "didelis plakatas", 2691, 10},
-	{FURNITURE_CATEGORY_PICTURE, "pizza stacked menu 2", 2665, 50},
-	{FURNITURE_CATEGORY_PICTURE, "FOR LEASE", 11289, 50},
-	{FURNITURE_CATEGORY_PICTURE, "lentele su tekstu", 7313, 100},
-	{FURNITURE_CATEGORY_PICTURE, "ðirdelë", 7093, 100},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 1", 1528, 5},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 2", 1529, 5},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 3", 1531, 5},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 4", 18660, 5},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 5", 18661, 5},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 6", 18662, 5},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 7", 18663, 5},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 8", 18665, 5},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 9", 18666, 5},
-	{FURNITURE_CATEGORY_PICTURE, "grafiti 10", 18667, 5},
-	{FURNITURE_CATEGORY_PICTURE, "didelis grafiti", 2447, 5 },
-	{FURNITURE_CATEGORY_PICTURE, "Amerikos vëlevos", 2614, 50},
-	{FURNITURE_CATEGORY_PICTURE, "vëleva 1", 2048, 25},
-	{FURNITURE_CATEGORY_PICTURE, "vëleva 2", 2047, 25},
-
-	{FURNITURE_CATEGORY_TABLES, "stalas su raudonomis linijomis", 2644, 100},
-	{FURNITURE_CATEGORY_TABLES, "Staliukas", 2370, 50},
-	{FURNITURE_CATEGORY_TABLES, "stiklinis staliukas", 1827, 150},
-	{FURNITURE_CATEGORY_TABLES, "biljardo stalas", 2964, 250},
-	{FURNITURE_CATEGORY_TABLES, "staliukas 2", 2319, 50},
-	{FURNITURE_CATEGORY_TABLES, "didelis stalas", 11691, 200},
-	{FURNITURE_CATEGORY_TABLES, "biljardo stalas su lempa ir stovu", 14651, 300},
-	{FURNITURE_CATEGORY_TABLES, "kavos staliukas 1", 1820, 50},
-	{FURNITURE_CATEGORY_TABLES, "kavos staliukas 2", 2083, 50},
-	{FURNITURE_CATEGORY_TABLES, "kavos staliukas 3", 1814, 50},
-	{FURNITURE_CATEGORY_TABLES, "ilgas medinis stalas", 2357, 100},
-	{FURNITURE_CATEGORY_TABLES, "Ofiso stalas su PC", 2165, 200},
-	{FURNITURE_CATEGORY_TABLES, "stalas", 2115, 50},
-	{FURNITURE_CATEGORY_TABLES, "kavos staliukas 4", 2111, 50},
-	{FURNITURE_CATEGORY_TABLES, "baltas stalas", 2030, 150},
-	{FURNITURE_CATEGORY_TABLES, "stalas su sofomis ið ðono", 2027, 200},
-	{FURNITURE_CATEGORY_TABLES, "staliukas", 2699, 100},
-	{FURNITURE_CATEGORY_TABLES, "kavos staliukas 5", 1817, 50},
-	{FURNITURE_CATEGORY_TABLES, "staliukas 2", 1433, 100},
-	{FURNITURE_CATEGORY_TABLES, "staliukas 3", 1516, 100},
-	{FURNITURE_CATEGORY_TABLES, "kavos staliukas su sofa", 2571, 300},
-	{FURNITURE_CATEGORY_TABLES, "stalas su vaisais", 3041, 150},
-	{FURNITURE_CATEGORY_TABLES, "stalas 2", 2747, 100},
-	{FURNITURE_CATEGORY_TABLES, "stalas su këdëm ið ðono", 1432, 150},
-	{FURNITURE_CATEGORY_TABLES, "raudonas didelis stalas", 2762, 100},
-	{FURNITURE_CATEGORY_TABLES, "raudonas maþas stalas", 1763, 50},
-	{FURNITURE_CATEGORY_TABLES, "staliukas su këdëm ið ðono", 1825, 150},
-	{FURNITURE_CATEGORY_TABLES, "didelis stalas", 19922, 200},
-	{FURNITURE_CATEGORY_TABLES, "didelis þalias stalas", 11690, 200},
-	{FURNITURE_CATEGORY_TABLES, "stalas su veidrodþius", 14869, 150},
-	{FURNITURE_CATEGORY_TABLES, "stalas su dviem këdëm", 2799, 150},
-	{FURNITURE_CATEGORY_TABLES, "stalas su staltese", 2764, 100},
-	{FURNITURE_CATEGORY_TABLES, "stalas televizoriui 1", 2313, 100},
-	{FURNITURE_CATEGORY_TABLES, "stalas televizoriui 2", 2315, 100},
-	{FURNITURE_CATEGORY_TABLES, "stalas televizoriui 3", 2321, 100},
-	{FURNITURE_CATEGORY_TABLES, "stalas", 2637, 200},
-	{FURNITURE_CATEGORY_TABLES, "kavos staliukas", 2725, 50},
-	{FURNITURE_CATEGORY_TABLES, "stalas su dokumentais ir PC", 2604, 200},
-	{FURNITURE_CATEGORY_TABLES, "ofiso stalas 1", 2181, 150},
-	{FURNITURE_CATEGORY_TABLES, "ofiso stalas 2", 2308, 150},
-	{FURNITURE_CATEGORY_TABLES, "ofiso stalas 3", 2206, 150},
-	{FURNITURE_CATEGORY_TABLES, "ofiso stalas 4", 2185, 150},
-	{FURNITURE_CATEGORY_TABLES, "ofiso stalas 5", 2184, 150},
-	{FURNITURE_CATEGORY_TABLES, "ofiso stalas 6", 2008, 150},
-	{FURNITURE_CATEGORY_TABLES, "Stalas 2", 1737, 120},
-	{FURNITURE_CATEGORY_TABLES, "spalvotas stalas", 1770, 120},
-	{FURNITURE_CATEGORY_TABLES, "stalas 3", 2031, 150},
-	{FURNITURE_CATEGORY_TABLES, "stalas 4", 2080, 150},
-	{FURNITURE_CATEGORY_TABLES, "metalinis stalas", 936, 200},
-	{FURNITURE_CATEGORY_TABLES, "metalinis stalas", 937, 200},
-	{FURNITURE_CATEGORY_TABLES, "stalas 5", 2029, 150},
-	{FURNITURE_CATEGORY_TABLES, "apvalus stalas", 2109, 200},
-	{FURNITURE_CATEGORY_TABLES, "ilgas apvalus stalas", 2208, 200},
-	{FURNITURE_CATEGORY_TABLES, "baltas didelis stalas", 2118, 200},
-	{FURNITURE_CATEGORY_TABLES, "kepimo stalas", 2451, 150},
-	{FURNITURE_CATEGORY_TABLES, "gaminimo stalas 1", 1419, 150},
-	{FURNITURE_CATEGORY_TABLES, "gaminimo stalas 2", 2418, 150},
-
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1781, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 14772, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1518, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1747, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1751, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1752, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius su lentyna", 2091, 260},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius su lentyna", 2297, 260},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius su lentyna", 2296, 260},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius su lentyna", 2093, 260},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius ant stovo", 14532, 200},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius ant staliuko", 1717, 280},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius kabint ant sienos", 2596, 200},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius su dvd", 2595, 300},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 2322, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1429, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1748, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1749, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1750, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1786, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1786, 300},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1791, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "televizorius", 1792, 300},
-	{FURNITURE_CATEGORY_ELECTRONICS, "auksinis televizorius", 2224, 1000},
-	{FURNITURE_CATEGORY_ELECTRONICS, "plazminis televizorius", 19786, 1000},
-	{FURNITURE_CATEGORY_ELECTRONICS, "plazminis televizorius 2", 19787, 1000},
-	{FURNITURE_CATEGORY_ELECTRONICS, "staliukas su dvd", 2313, 200},
-	{FURNITURE_CATEGORY_ELECTRONICS, "þaidimø konsolë", 2028, 320},
-	{FURNITURE_CATEGORY_ELECTRONICS, "stalas su PC", 2008, 400},
-	{FURNITURE_CATEGORY_ELECTRONICS, "stalas su PC", 2165, 400},
-	{FURNITURE_CATEGORY_ELECTRONICS, "stalas su PC", 2181, 400},
-	{FURNITURE_CATEGORY_ELECTRONICS, "mechanikø PC", 19903, 850},
-	{FURNITURE_CATEGORY_ELECTRONICS, "laptopas", 19893, 350},
-	{FURNITURE_CATEGORY_ELECTRONICS, "uþdarytas laptopas", 19894, 350},
-	{FURNITURE_CATEGORY_ELECTRONICS, "valdimo blokas", 19273, 200},
-	{FURNITURE_CATEGORY_ELECTRONICS, "garso kalonëlë", 2231, 330},
-	{FURNITURE_CATEGORY_ELECTRONICS, "laikrodis ant sienos", 19825, 80},
-	{FURNITURE_CATEGORY_ELECTRONICS, "naminis telefonas", 11705, 200},
-	{FURNITURE_CATEGORY_ELECTRONICS, "antena", 2192, 50},
-	{FURNITURE_CATEGORY_ELECTRONICS, "garso kalonëlë", 19616, 200},
-	{FURNITURE_CATEGORY_ELECTRONICS, "mikrofonas", 19610, 60},
-	{FURNITURE_CATEGORY_ELECTRONICS, "kalonëlë", 2233, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "garso kalonëlë", 2232, 330},
-	{FURNITURE_CATEGORY_ELECTRONICS, "gitara", 19317, 300},
-	{FURNITURE_CATEGORY_ELECTRONICS, "girata", 19318, 300},
-	{FURNITURE_CATEGORY_ELECTRONICS, "DJ pultas", 1957, 500},
-	{FURNITURE_CATEGORY_ELECTRONICS, "garso kalonëlë", 19612, 330},
-	{FURNITURE_CATEGORY_ELECTRONICS, "garso kalonëlë", 19613, 330},
-	{FURNITURE_CATEGORY_ELECTRONICS, "garso kalonëlë", 19614, 330},
-	{FURNITURE_CATEGORY_ELECTRONICS, "garso kalonëlë", 19615, 330},
-	{FURNITURE_CATEGORY_ELECTRONICS, "pultas", 19920, 50},
-	{FURNITURE_CATEGORY_ELECTRONICS, "pultas", 2344, 50},
-	{FURNITURE_CATEGORY_ELECTRONICS, "ðviesos jungiklis", 19827, 20},
-	{FURNITURE_CATEGORY_ELECTRONICS, "ðviesos jungiklis", 19828, 20},
-	{FURNITURE_CATEGORY_ELECTRONICS, "ðviesos jungiklis", 19829, 20},
-	{FURNITURE_CATEGORY_ELECTRONICS, "ðviesos jungiklis", 19826, 20},
-	{FURNITURE_CATEGORY_ELECTRONICS, "elektros lizdas", 19814, 30},
-	{FURNITURE_CATEGORY_ELECTRONICS, "elektros lizdas", 19813, 30},
-	{FURNITURE_CATEGORY_ELECTRONICS, "naminis telefonas", 19807, 90},
-	{FURNITURE_CATEGORY_ELECTRONICS, "fotoporatas", 19623, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "klavetura", 19808, 30},
-	{FURNITURE_CATEGORY_ELECTRONICS, "naminis telefonas", 11728, 120},
-	{FURNITURE_CATEGORY_ELECTRONICS, "koseèiø grotuvas", 1718, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "dvd", 1719, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "grotuvas", 2102, 180},
-	{FURNITURE_CATEGORY_ELECTRONICS, "dvd", 1790, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "dvd", 1783, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "dvd", 1787, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "dvd", 1785, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "dvd", 1788, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "dvd", 1782, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "stacionarus PC", 2190, 450},
-	{FURNITURE_CATEGORY_ELECTRONICS, "audio centras", 2101, 300},
-	{FURNITURE_CATEGORY_ELECTRONICS, "grotuvas", 2226, 300},
-	{FURNITURE_CATEGORY_ELECTRONICS, "audio centras", 1839, 200},
-	{FURNITURE_CATEGORY_ELECTRONICS, "audio centras", 2225, 150},
-	{FURNITURE_CATEGORY_ELECTRONICS, "audio centras", 2227, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "grotuvas", 2103, 250},
-	{FURNITURE_CATEGORY_ELECTRONICS, "garso kalonëlë", 2230, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "audio centras", 2104, 600},
-	{FURNITURE_CATEGORY_ELECTRONICS, "kalonëlë", 2229, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "senas grotuvas", 2100, 320},
-	{FURNITURE_CATEGORY_ELECTRONICS, "spausdintuvas", 2186, 500},
-	{FURNITURE_CATEGORY_ELECTRONICS, "telefonas", 18865, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "telefonas", 18866, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "telefonas", 18867, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "telefonas", 18868, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "telefonas", 18869, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "telefonas", 18874, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "telefonas", 18872, 100},
-	{FURNITURE_CATEGORY_ELECTRONICS, "peidþeris", 18875, 50},
-	{FURNITURE_CATEGORY_ELECTRONICS, "Televizoriai", 2606, 500},
-
-	{FURNITURE_CATEGORY_BATH, "kriauklë 1", 2515, 150},
-	{FURNITURE_CATEGORY_BATH, "kriauklë 2", 2150, 150},
-	{FURNITURE_CATEGORY_BATH, "kriauklë 3", 2518, 150},
-	{FURNITURE_CATEGORY_BATH, "kriauklë 4", 2523, 150},
-	{FURNITURE_CATEGORY_BATH, "kriauklë 5", 2524, 150},
-	{FURNITURE_CATEGORY_BATH, "kriauklë 6", 2739, 150},
-	{FURNITURE_CATEGORY_BATH, "kriauklë 7", 11709, 150},
-	{FURNITURE_CATEGORY_BATH, "kriauklë virtuvei 1", 2136, 200},
-	{FURNITURE_CATEGORY_BATH, "kriauklë virtuvei 2", 2013, 200},
-	{FURNITURE_CATEGORY_BATH, "kriauklë virtuvei 3", 2130, 200},
-	{FURNITURE_CATEGORY_BATH, "kriauklë virtuvei 4", 2132, 200},
-	{FURNITURE_CATEGORY_BATH, "kriauklë virtuvei 5", 2336, 200},
-	{FURNITURE_CATEGORY_BATH, "klozetas 1", 2528, 75},
-	{FURNITURE_CATEGORY_BATH, "klozetas 2", 2521, 75},
-	{FURNITURE_CATEGORY_BATH, "klozetas 3", 2525, 75},
-	{FURNITURE_CATEGORY_BATH, "klozetas 4", 2602, 75},
-	{FURNITURE_CATEGORY_BATH, "klozetas 5", 2738, 75},
-	{FURNITURE_CATEGORY_BATH, "klozetas 6", 2514, 75},
-	{FURNITURE_CATEGORY_BATH, "vone 1", 2097, 150},
-	{FURNITURE_CATEGORY_BATH, "vone 2", 2526, 150},
-	{FURNITURE_CATEGORY_BATH, "vone 3", 2516, 150},
-	{FURNITURE_CATEGORY_BATH, "vone 4", 2519, 150},
-	{FURNITURE_CATEGORY_BATH, "vone 5", 2522, 150},
-	{FURNITURE_CATEGORY_BATH, "vone ðirdelës formos", 11732, 350},
-	{FURNITURE_CATEGORY_BATH, "duðas 1", 2527, 200},
-	{FURNITURE_CATEGORY_BATH, "duðas 2", 2520, 200},
-	{FURNITURE_CATEGORY_BATH, "duðas 3", 2517, 200},
-	{FURNITURE_CATEGORY_BATH, "duðas 4", 14494, 200},
-
-	{FURNITURE_CATEGORY_TRASH, "dëþë", 917, 5},
-	{FURNITURE_CATEGORY_TRASH, "dëþës pagrindas", 916, 5},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðledëþë su pelenine", 1549, 25},
-	{FURNITURE_CATEGORY_TRASH, "sulankstita dëþë", 926, 10},
-	{FURNITURE_CATEGORY_TRASH, "kortoninë dëþë", 2968, 10},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðliø maiðas", 1265, 2},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðledëþë", 1329, 30},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðledëþë", 1330, 30},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðledëþë", 1328, 30},
-	{FURNITURE_CATEGORY_TRASH, "kortoninë dëþë", 1220, 2},
-	{FURNITURE_CATEGORY_TRASH, "dujø balionas", 1370, 0},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðledëþë", 1347, 25},
-	{FURNITURE_CATEGORY_TRASH, "metalinë ðiukðledëþë", 1359, 25},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðledëþë su ðiukðlëm", 1442, 25},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1337, 50},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1339, 50},
-	{FURNITURE_CATEGORY_TRASH, "palete", 1448, 30},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1430, 40},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1409, 40},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðledëþë", 1300, 50},
-	{FURNITURE_CATEGORY_TRASH, "sudegus viriklë", 1777, 35},
-	{FURNITURE_CATEGORY_TRASH, "sudegus viriklë", 1773, 35},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðledëþë", 1371, 100},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðlës", 2673, 2},
-	{FURNITURE_CATEGORY_TRASH, "veþimëlis", 1572, 60},
-	{FURNITURE_CATEGORY_TRASH, "veþimëlis", 1349, 60},
-	{FURNITURE_CATEGORY_TRASH, "padanga", 1327, 15},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðlës", 2674, 2},
-	{FURNITURE_CATEGORY_TRASH, "suspaustos ðiukðlës", 19772, 20},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1372, 80},
-	{FURNITURE_CATEGORY_TRASH, "padëklai", 1338, 20},
-	{FURNITURE_CATEGORY_TRASH, "dëþë", 1224, 15},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðlës", 2672, 2},
-	{FURNITURE_CATEGORY_TRASH, "buteliai", 3119, 2},
-	{FURNITURE_CATEGORY_TRASH, "paletës", 1450, 30},
-	{FURNITURE_CATEGORY_TRASH, "konteineris su ðiukðlëm", 1439, 50},
-	{FURNITURE_CATEGORY_TRASH, "paletës", 1449, 30},
-	{FURNITURE_CATEGORY_TRASH, "plytos", 852, 15},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðlës", 2670, 2},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1332, 25},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1344, 25},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1333, 25},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1331, 25},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðlës", 852, 10},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1345, 25},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 3035, 25},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1236, 25},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1227, 25},
-	{FURNITURE_CATEGORY_TRASH, "konteineris", 1335, 25},
-	{FURNITURE_CATEGORY_TRASH, "nuolauþos", 851, 5},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðlës", 2677, 2},
-	{FURNITURE_CATEGORY_TRASH, "dëþës", 1440, 15},
-	{FURNITURE_CATEGORY_TRASH, "nuolauþos", 849, 15},
-	{FURNITURE_CATEGORY_TRASH, "dëþës", 1441, 20},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðlës", 2675, 2},
-	{FURNITURE_CATEGORY_TRASH, "konteineris su mediena", 910, 55},
-	{FURNITURE_CATEGORY_TRASH, "dëþës", 1438, 100},
-	{FURNITURE_CATEGORY_TRASH, "stogo danga", 3302, 100},
-	{FURNITURE_CATEGORY_TRASH, "paletë", 1219, 20},
-	{FURNITURE_CATEGORY_TRASH, "dëþës", 1299, 50},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðlës", 2671, 2},
-	{FURNITURE_CATEGORY_TRASH, "lentos", 1462, 10},
-	{FURNITURE_CATEGORY_TRASH, "ðiukðlës", 2676, 2},
-	{FURNITURE_CATEGORY_TRASH, "tuðèias konteineris", 19589, 150},
-	{FURNITURE_CATEGORY_TRASH, "pilnas konteineris", 1358, 150},
-	{FURNITURE_CATEGORY_TRASH, "konteineris didelis", 1365, 100},
-	{FURNITURE_CATEGORY_TRASH, "sprogus maðina", 12957, 350},
-	{FURNITURE_CATEGORY_TRASH, "maðinos pagrindas", 3593, 350},
-	{FURNITURE_CATEGORY_TRASH, "maðinos pagrindas", 3594, 350},
-	{FURNITURE_CATEGORY_TRASH, "nuolauþos", 3098, 60},
-	{FURNITURE_CATEGORY_TRASH, "nuolauþos", 3099, 60},
-
-	{FURNITURE_CATEGORY_CURTAIN, "Uzdarytos uzuolaidos", 2558, 150},
-	{FURNITURE_CATEGORY_CURTAIN, "Atidarytos uzuolaidos", 2559, 150},
-	{FURNITURE_CATEGORY_CURTAIN, "Uzuolaidos 1", 14752, 150},
-	{FURNITURE_CATEGORY_CURTAIN, "Langas 1", 3032, 100},
-	{FURNITURE_CATEGORY_CURTAIN, "Langas 2", 3034, 100},
-	{FURNITURE_CATEGORY_CURTAIN, "Dideles uzdarytos uzuolaidos", 2560, 200},
-	{FURNITURE_CATEGORY_CURTAIN, "Dideles atidarytos uzuolaidos", 2561, 200},
-	{FURNITURE_CATEGORY_CURTAIN, "Langai 1", 14902, 350},
-	{FURNITURE_CATEGORY_CURTAIN, "Langai 2", 18072, 350},
-
-	{FURNITURE_CATEGORY_STAIRS, "Mazi laiptai", 1472, 300},
-	{FURNITURE_CATEGORY_STAIRS, "Laiptai su tureklu", 8572, 400},
-	{FURNITURE_CATEGORY_STAIRS, "Ilgi laiptai", 14394, 500},
-	{FURNITURE_CATEGORY_STAIRS, "Pasisukantys laiptai", 14395, 600},
-	{FURNITURE_CATEGORY_STAIRS, "Laiptai", 14387, 400},
-	{FURNITURE_CATEGORY_STAIRS, "Labai dideli laiptai 1", 3399, 700},
-	{FURNITURE_CATEGORY_STAIRS, "Labai dideli laiptai 2", 14411, 700},
-	{FURNITURE_CATEGORY_STAIRS, "Ratu pasisukantys laiptai", 13749, 600},
-
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3002, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3100, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3101, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3102, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3103, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3104, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3105, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3106, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3003, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 2995, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 2996, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 2997, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 2998, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 2999, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3000, 2},
-	{FURNITURE_CATEGORY_OTHER, "biliardo kamuoliukas", 3001, 2},
-	{FURNITURE_CATEGORY_OTHER, "cigaretë", 19625, 2},
-	{FURNITURE_CATEGORY_OTHER, "ranktas", 11746, 5},
-	{FURNITURE_CATEGORY_OTHER, "kortelë", 19792, 2},
-	{FURNITURE_CATEGORY_OTHER, "cigara", 3044, 10},
-	{FURNITURE_CATEGORY_OTHER, "biletëlis", 2953, 1},
-	{FURNITURE_CATEGORY_OTHER, "rankðluostis susuktas", 11747, 15},
-	{FURNITURE_CATEGORY_OTHER, "kaseka", 3027, 12},
-	{FURNITURE_CATEGORY_OTHER, "apkaba", 19995, 50},
-	{FURNITURE_CATEGORY_OTHER, "antrankiai", 11749, 50},
-	{FURNITURE_CATEGORY_OTHER, "muilas", 19874, 5},
-	{FURNITURE_CATEGORY_OTHER, "aukso luitas", 19941, 1500},
-	{FURNITURE_CATEGORY_OTHER, "bintø sëþutë", 11748, 10},
-	{FURNITURE_CATEGORY_OTHER, "cigareèiø pakelis", 19896, 8},
-	{FURNITURE_CATEGORY_OTHER, "cigareèiø pakelis", 19897, 8},
-	{FURNITURE_CATEGORY_OTHER, "kremas", 2751, 3},
-	{FURNITURE_CATEGORY_OTHER, "toletinis", 19873, 5},
-	{FURNITURE_CATEGORY_OTHER, "pinigai", 1212, 100},
-	{FURNITURE_CATEGORY_OTHER, "fire", 2961, 15},
-	{FURNITURE_CATEGORY_OTHER, "spina", 19804, 50},
-	{FURNITURE_CATEGORY_OTHER, "dippo", 19998, 15},
-	{FURNITURE_CATEGORY_OTHER, "mechaninis raktas", 19627, 10},
-	{FURNITURE_CATEGORY_OTHER, "elektro ðokeris", 18642, 10},
-	{FURNITURE_CATEGORY_OTHER, "tattoo maðinitë", 2711, 150},
-	{FURNITURE_CATEGORY_OTHER, "þibintas", 18641, 10},
-	{FURNITURE_CATEGORY_OTHER, "kryþius", 11712, 5},
-	{FURNITURE_CATEGORY_OTHER, "bokso pirðtinë", 19555, 15},
-	{FURNITURE_CATEGORY_OTHER, "bokso pirðtinë", 19556, 15},
-	{FURNITURE_CATEGORY_OTHER, "ginklas dëkle", 19773, 1000},
-	{FURNITURE_CATEGORY_OTHER, "purðkiklis", 2752, 20},
-	{FURNITURE_CATEGORY_OTHER, "telefonas", 2967, 120},
-	{FURNITURE_CATEGORY_OTHER, "laikrodis", 2710, 500},
-	{FURNITURE_CATEGORY_OTHER, "hantelis", 3072, 150},
-	{FURNITURE_CATEGORY_OTHER, "tepalai", 19621, 50},
-	{FURNITURE_CATEGORY_OTHER, "ginklas", 2044, 1000},
-	{FURNITURE_CATEGORY_OTHER, "grandinë", 2680, 30},
-	{FURNITURE_CATEGORY_OTHER, "medicininë dëþutë", 11738, 100},
-	{FURNITURE_CATEGORY_OTHER, "bomba", 1654, 300},
-	{FURNITURE_CATEGORY_OTHER, "dëþë", 19918, 55},
-	{FURNITURE_CATEGORY_OTHER, "fenas", 2750, 70},
-	{FURNITURE_CATEGORY_OTHER, "smëlio pilis", 1610, 5},
-	{FURNITURE_CATEGORY_OTHER, "klavetura", 19808, 25},
-	{FURNITURE_CATEGORY_OTHER, "stalinë lempa", 2196, 25},
-	{FURNITURE_CATEGORY_OTHER, "paketas", 2891, 20},
-	{FURNITURE_CATEGORY_OTHER, "taikinis", 2056, 2},
-	{FURNITURE_CATEGORY_OTHER, "dujø balionas", 19816, 200},
-	{FURNITURE_CATEGORY_OTHER, "gaublys", 19159, 150},
-	{FURNITURE_CATEGORY_OTHER, "bomba", 1252, 300},
-	{FURNITURE_CATEGORY_OTHER, "malka", 19793, 50},
-	{FURNITURE_CATEGORY_OTHER, "lempa", 2740, 50},
-	{FURNITURE_CATEGORY_OTHER, "paketas", 1575, 10},
-	{FURNITURE_CATEGORY_OTHER, "paketas", 1579, 10},
-	{FURNITURE_CATEGORY_OTHER, "kibiras", 2713, 30},
-	{FURNITURE_CATEGORY_OTHER, "batas", 11735, 15},
-	{FURNITURE_CATEGORY_OTHER, "paketas", 2663, 5},
-	{FURNITURE_CATEGORY_OTHER, "plyta", 11708, 5},
-	{FURNITURE_CATEGORY_OTHER, "DJ pultas", 1958, 250},
-	{FURNITURE_CATEGORY_OTHER, "lagaminas", 1210, 100},
-	{FURNITURE_CATEGORY_OTHER, "kulkos", 2061, 250},
-	{FURNITURE_CATEGORY_OTHER, "þurnalai", 2855, 50},
-	{FURNITURE_CATEGORY_OTHER, "kalonëlë", 1840, 50},
-	{FURNITURE_CATEGORY_OTHER, "lauþtuvas", 18633, 25},
-	{FURNITURE_CATEGORY_OTHER, "kortoninë maðinitë", 2485, 20},
-	{FURNITURE_CATEGORY_OTHER, "deganèios malkos", 19632, 35},
-	{FURNITURE_CATEGORY_OTHER, "viðèiuko kaukë", 19137, 25},
-	{FURNITURE_CATEGORY_OTHER, "kelnës", 2384, 25},
-	{FURNITURE_CATEGORY_OTHER, "kelnës", 2386, 25},
-	{FURNITURE_CATEGORY_OTHER, "þaislai", 2488, 25},
-	{FURNITURE_CATEGORY_OTHER, "þaislai", 2490, 25},
-	{FURNITURE_CATEGORY_OTHER, "maiðas su anglim", 19573, 55},
-	{FURNITURE_CATEGORY_OTHER, "padëklas", 2726, 10},
-	{FURNITURE_CATEGORY_OTHER, "bomba", 2636, 500},
-	{FURNITURE_CATEGORY_OTHER, "biljardo forma", 2965, 5},
-	{FURNITURE_CATEGORY_OTHER, "lemputë", 2707, 5},
-	{FURNITURE_CATEGORY_OTHER, "kagaminas", 19624, 50},
-	{FURNITURE_CATEGORY_OTHER, "vaza", 14705, 100},
-	{FURNITURE_CATEGORY_OTHER, "þvakë", 2868, 60},
-	{FURNITURE_CATEGORY_OTHER, "lempa", 2726, 25},
-	{FURNITURE_CATEGORY_OTHER, "papuga", 19078, 100},
-	{FURNITURE_CATEGORY_OTHER, "dekoracija", 2870, 150},
-	{FURNITURE_CATEGORY_OTHER, "lemenë", 19515, 20},
-	{FURNITURE_CATEGORY_OTHER, "peilis", 19590, 300},
-	{FURNITURE_CATEGORY_OTHER, "kasos aparatas", 2753, 400},
-	{FURNITURE_CATEGORY_OTHER, "nuotraukos", 2828, 50},
-	{FURNITURE_CATEGORY_OTHER, "gesintuvas", 2690, 25},
-	{FURNITURE_CATEGORY_OTHER, "vynas su taurëm", 1670, 90},
-	{FURNITURE_CATEGORY_OTHER, "knygos", 2854, 80},
-	{FURNITURE_CATEGORY_OTHER, "akomuletoriai", 2057, 150},
-	{FURNITURE_CATEGORY_OTHER, "beisbolo lazda", 19914, 20},
-	{FURNITURE_CATEGORY_OTHER, "knygos", 1824, 55},
-	{FURNITURE_CATEGORY_OTHER, "þaislai", 2471, 10},
-	{FURNITURE_CATEGORY_OTHER, "lempa ant stalo", 2238, 150},
-	{FURNITURE_CATEGORY_OTHER, "krepðis", 19594, 15},
-	{FURNITURE_CATEGORY_OTHER, "kamera", 1886, 250},
-	{FURNITURE_CATEGORY_OTHER, "kuvalda", 19631, 100},
-	{FURNITURE_CATEGORY_OTHER, "manikenas", 2411, 50},
-	{FURNITURE_CATEGORY_OTHER, "pakabinta maikë", 2705, 25},
-	{FURNITURE_CATEGORY_OTHER, "pakabinta maikë", 2706, 25},
-	{FURNITURE_CATEGORY_OTHER, "rubai", 3007, 15},
-	{FURNITURE_CATEGORY_OTHER, "kriauklë", 2782, 150},
-	{FURNITURE_CATEGORY_OTHER, "kaukë", 11704, 15},
-	{FURNITURE_CATEGORY_OTHER, "ginklas", 2035, 1000},
-	{FURNITURE_CATEGORY_OTHER, "dëþë su vaisiais", 19636, 100},
-	{FURNITURE_CATEGORY_OTHER, "dëþë su vaisiais", 19637, 100},
-	{FURNITURE_CATEGORY_OTHER, "dëþë su vaisiais", 19638, 100},
-	{FURNITURE_CATEGORY_OTHER, "þurnalai", 2826, 25},
-	{FURNITURE_CATEGORY_OTHER, "þurnalai", 2816, 25},
-	{FURNITURE_CATEGORY_OTHER, "knygos", 2853, 55},
-	{FURNITURE_CATEGORY_OTHER, "riedlentë", 19878, 60},
-	{FURNITURE_CATEGORY_OTHER, "poperiai", 2059, 25},
-	{FURNITURE_CATEGORY_OTHER, "sudëti krepðiai", 1885, 100},
-	{FURNITURE_CATEGORY_OTHER, "taikinis", 2049, 20},
-	{FURNITURE_CATEGORY_OTHER, "taikinis", 2050, 20},
-	{FURNITURE_CATEGORY_OTHER, "taikinis", 2051, 20},
-	{FURNITURE_CATEGORY_OTHER, "þaislai", 2501, 20},
-	{FURNITURE_CATEGORY_OTHER, "maiðas su pinigais", 1550, 1000},
-	{FURNITURE_CATEGORY_OTHER, "tattoo staliukas", 14679, 500},
-	{FURNITURE_CATEGORY_OTHER, "pakabinta striukë", 2704, 100},
-	{FURNITURE_CATEGORY_OTHER, "pakabintas megztinis", 2689, 50},
-	{FURNITURE_CATEGORY_OTHER, "liektuvas", 2470, 55},
-	{FURNITURE_CATEGORY_OTHER, "kastuvas", 2228, 20},
-	{FURNITURE_CATEGORY_OTHER, "seifo durelës", 2204, 500},
-	{FURNITURE_CATEGORY_OTHER, "instrukcija su ginklais", 2055, 20},
-	{FURNITURE_CATEGORY_OTHER, "rankðluoðèiai", 11707, 75},
-	{FURNITURE_CATEGORY_OTHER, "stovas", 19871, 15},
-	{FURNITURE_CATEGORY_OTHER, "pakabinti rubai", 2399, 50},
-	{FURNITURE_CATEGORY_OTHER, "pakabinti rubai", 2374, 50},
-	{FURNITURE_CATEGORY_OTHER, "pakabinti rubai", 2383, 50},
-	{FURNITURE_CATEGORY_OTHER, "seifo durelës", 19616, 500},
-	{FURNITURE_CATEGORY_OTHER, "planas", 3017, 20},
-	{FURNITURE_CATEGORY_OTHER, "liektuvas", 2469, 120},
-	{FURNITURE_CATEGORY_OTHER, "snaiperis", 2036, 1500},
-	{FURNITURE_CATEGORY_OTHER, "ant stalo árankai ir kita", 2801, 150},
-	{FURNITURE_CATEGORY_OTHER, "árankiø dëþë", 19900, 50},
-	{FURNITURE_CATEGORY_OTHER, "pakabintos kelnës", 2390, 50},
-	{FURNITURE_CATEGORY_OTHER, "pakabintos kelnës", 2401, 50},
-	{FURNITURE_CATEGORY_OTHER, "pakabintos kelnës", 2397, 50},
-	{FURNITURE_CATEGORY_OTHER, "pakabintos kelnës", 2378, 50},
-	{FURNITURE_CATEGORY_OTHER, "pakabintos kelnës", 2391, 50},
-	{FURNITURE_CATEGORY_OTHER, "pakabintos kelnës", 2391, 50},
-	{FURNITURE_CATEGORY_OTHER, "ðluota", 2712, 20},
-	{FURNITURE_CATEGORY_OTHER, "maiðas", 2060, 20},
-	{FURNITURE_CATEGORY_OTHER, "ðienas", 1453, 50},
-	{FURNITURE_CATEGORY_OTHER, "kranas", 16332, 150},
-	{FURNITURE_CATEGORY_OTHER, "dumø maðina", 2780, 200},
-	{FURNITURE_CATEGORY_OTHER, "kasos aparatas", 2941, 500},
-	{FURNITURE_CATEGORY_OTHER, "metalo gabalas", 19843, 100},
-	{FURNITURE_CATEGORY_OTHER, "metalo gabalas", 19844, 100},
-	{FURNITURE_CATEGORY_OTHER, "metalo gabalas", 19845, 100},
-	{FURNITURE_CATEGORY_OTHER, "metalo gabalas", 19846, 100},
-	{FURNITURE_CATEGORY_OTHER, "seifas be dureliø", 19618, 500},
-	{FURNITURE_CATEGORY_OTHER, "ðluota", 19622, 20},
-	{FURNITURE_CATEGORY_OTHER, "poperiai ant sienos", 2615, 2},
-	{FURNITURE_CATEGORY_OTHER, "kanalizacija", 2983, 150},
-	{FURNITURE_CATEGORY_OTHER, "stovas", 219919, 20},
-	{FURNITURE_CATEGORY_OTHER, "keisasi", 2000, 250},
-	{FURNITURE_CATEGORY_OTHER, "variklis", 19917, 800},
-	{FURNITURE_CATEGORY_OTHER, "ðtanga", 2913, 200},
-	{FURNITURE_CATEGORY_OTHER, "baterija", 11721, 200},
-	{FURNITURE_CATEGORY_OTHER, "generatorius", 920, 300},
-	{FURNITURE_CATEGORY_OTHER, "ðvesofotras", 1262, 550},
-	{FURNITURE_CATEGORY_OTHER, "dëþës PRO", 2652, 50},
-	{FURNITURE_CATEGORY_OTHER, "mikrofono stovas", 19611, 20},
-	{FURNITURE_CATEGORY_OTHER, "liektuvo sedinë", 1562, 50},
-	{FURNITURE_CATEGORY_OTHER, "baterija", 1738, 120},
-	{FURNITURE_CATEGORY_OTHER, "keisai", 2007, 200},
-	{FURNITURE_CATEGORY_OTHER, "veþimas", 2994, 100},
-	{FURNITURE_CATEGORY_OTHER, "veþimas", 1789, 100},
-	{FURNITURE_CATEGORY_OTHER, "susuktos kanapës", 2901, 500},
-	{FURNITURE_CATEGORY_OTHER, "mokëjimo aparatas", 962, 250},
-	{FURNITURE_CATEGORY_OTHER, "ventilecija", 914, 50},
-	{FURNITURE_CATEGORY_OTHER, "telefonas laukinis", 1216, 250},
-	{FURNITURE_CATEGORY_OTHER, "stovas", 2491, 120},
-	{FURNITURE_CATEGORY_OTHER, "planas", 3111, 20},
-	{FURNITURE_CATEGORY_OTHER, "ðaldytuvas", 2360, 120},
-	{FURNITURE_CATEGORY_OTHER, "DJ pultas", 14820, 320},
-	{FURNITURE_CATEGORY_OTHER, "figura", 1584, 50},
-	{FURNITURE_CATEGORY_OTHER, "þvakës", 2669, 100},
-	{FURNITURE_CATEGORY_OTHER, "keli teelvizoriai", 2606, 200},
-	{FURNITURE_CATEGORY_OTHER, "didelë kriauklë", 11709, 250},
-	{FURNITURE_CATEGORY_OTHER, "objektai ant stalo", 1964, 100},
-	{FURNITURE_CATEGORY_OTHER, "ðaldytuvas", 1973, 200},
-	{FURNITURE_CATEGORY_OTHER, "nesamonë", 933, 200},
-	{FURNITURE_CATEGORY_OTHER, "atidarytas seifas su pinigais", 1829, 1000},
-	{FURNITURE_CATEGORY_OTHER, "kilimas", 2833, 50},
-	{FURNITURE_CATEGORY_OTHER, "kilimas", 2834, 50},
-	{FURNITURE_CATEGORY_OTHER, "kilimas", 2836, 50},
-	{FURNITURE_CATEGORY_OTHER, "lentyna su þurnalais", 2579, 60},
-	{FURNITURE_CATEGORY_OTHER, "lentyna su þurnalais", 2579, 60},
-	{FURNITURE_CATEGORY_OTHER, "kamera", 1622, 50},
-	{FURNITURE_CATEGORY_OTHER, "staliukas su dëþëm", 2698, 150},
-	{FURNITURE_CATEGORY_OTHER, "kablis", 2590, 180},
-	{FURNITURE_CATEGORY_OTHER, "laivas", 2484, 220},
-	{FURNITURE_CATEGORY_OTHER, "barikada", 1424, 100},
-	{FURNITURE_CATEGORY_OTHER, "sienelë", 2509, 50},
-	{FURNITURE_CATEGORY_OTHER, "stalas su kompu", 1999, 250},
-	{FURNITURE_CATEGORY_OTHER, "vitrina", 2480, 100},
-	{FURNITURE_CATEGORY_OTHER, "þiuronas", 951, 50},
-	{FURNITURE_CATEGORY_OTHER, "ATM", 2942, 500},
-	{FURNITURE_CATEGORY_OTHER, "GTA þemëlapis", 19166, 100},
-	{FURNITURE_CATEGORY_OTHER, "karvë", 19833, 200},
-	{FURNITURE_CATEGORY_OTHER, "gultas", 1645, 100},
-	{FURNITURE_CATEGORY_OTHER, "iðtikiðimas", 3431, 50},
-	{FURNITURE_CATEGORY_OTHER, "uþuolaidos", 2558, 50},
-	{FURNITURE_CATEGORY_OTHER, "uþuolaidos", 2559, 50},
-	{FURNITURE_CATEGORY_OTHER, "liustra", 19806, 500},
-	{FURNITURE_CATEGORY_OTHER, "liustra", 11726, 500},
-	{FURNITURE_CATEGORY_OTHER, "stalas su kompu", 2008, 250},
-	{FURNITURE_CATEGORY_OTHER, "þuvitës", 1601, 250},
-	{FURNITURE_CATEGORY_OTHER, "vintiletorius", 1661, 85},
-	{FURNITURE_CATEGORY_OTHER, "kaminas", 11724, 200},
-	{FURNITURE_CATEGORY_OTHER, "ðakaliai", 841, 50},
-	{FURNITURE_CATEGORY_OTHER, "rankðluostis", 1641, 25},
-	{FURNITURE_CATEGORY_OTHER, "aparatas", 1302, 200},
-	{FURNITURE_CATEGORY_OTHER, "uþtvara", 2773, 50},
-	{FURNITURE_CATEGORY_OTHER, "rankðluotis", 1642, 25},
-	{FURNITURE_CATEGORY_OTHER, "banglentë", 2404, 35},
-	{FURNITURE_CATEGORY_OTHER, "banglentë", 2405, 35},
-	{FURNITURE_CATEGORY_OTHER, "banglentë", 2410, 35},
-	{FURNITURE_CATEGORY_OTHER, "banglentë", 2406, 35},
-	{FURNITURE_CATEGORY_OTHER, "lavonas", 19944, 50},
-	{FURNITURE_CATEGORY_OTHER, "kelmai", 14872, 50},
-	{FURNITURE_CATEGORY_OTHER, "vamþdþiai", 927, 25},
-	{FURNITURE_CATEGORY_OTHER, "aparatas", 1776, 150},
-	{FURNITURE_CATEGORY_OTHER, "kabilka rubams", 2371, 100},
-	{FURNITURE_CATEGORY_OTHER, "ðienas", 1454, 100},
-	{FURNITURE_CATEGORY_OTHER, "sprunk aparatas", 1775, 250},
-	{FURNITURE_CATEGORY_OTHER, "prekibstalis", 2577, 200},
-	{FURNITURE_CATEGORY_OTHER, "ligoninës gultas", 1997, 250},
-	{FURNITURE_CATEGORY_OTHER, "pagalis", 3503, 50},
-	{FURNITURE_CATEGORY_OTHER, "stalas su kompu", 2165, 200},
-	{FURNITURE_CATEGORY_OTHER, "karstas", 19339, 150},
-	{FURNITURE_CATEGORY_OTHER, "purvina", 19898, 50},
-	{FURNITURE_CATEGORY_OTHER, "þaislinis arkliukas", 1173, 180},
-	{FURNITURE_CATEGORY_OTHER, "patranka", 2064, 800},
-	{FURNITURE_CATEGORY_OTHER, "kabilka", 2372, 100},
-	{FURNITURE_CATEGORY_OTHER, "stalas su kompu", 2185, 220},
-	{FURNITURE_CATEGORY_OTHER, "jûros þvaigþdë", 902, 100},
-	{FURNITURE_CATEGORY_OTHER, "antena", 3031, 250},
-	{FURNITURE_CATEGORY_OTHER, "statula", 2745, 200},
-	{FURNITURE_CATEGORY_OTHER, "kopeèios", 1428, 50},
-	{FURNITURE_CATEGORY_OTHER, "WC", 2984, 250},
-	{FURNITURE_CATEGORY_OTHER, "bugnai", 19609, 1500},
-	{FURNITURE_CATEGORY_OTHER, "áranga", 3386, 300},
-	{FURNITURE_CATEGORY_OTHER, "áranga", 3387, 300},
-	{FURNITURE_CATEGORY_OTHER, "áranga", 3388, 300},
-	{FURNITURE_CATEGORY_OTHER, "áranga", 3389, 300},
-	{FURNITURE_CATEGORY_OTHER, "sportinë taðë", 2919, 20},
-	{FURNITURE_CATEGORY_OTHER, "kabikla", 2708, 100},
-	{FURNITURE_CATEGORY_OTHER, "lentos", 3260, 70},
-	{FURNITURE_CATEGORY_OTHER, "aitvaras", 2487, 20},
-	{FURNITURE_CATEGORY_OTHER, "grotos", 19304, 50},
-	{FURNITURE_CATEGORY_OTHER, "spinta su instrumentais", 19899, 250},
-	{FURNITURE_CATEGORY_OTHER, "langas", 3034, 100},
-	{FURNITURE_CATEGORY_OTHER, "kilimas ið tigro", 1828, 200},
-	{FURNITURE_CATEGORY_OTHER, "kiniðka siena", 2755, 100},
-	{FURNITURE_CATEGORY_OTHER, "ðienas", 14875, 300},
-	{FURNITURE_CATEGORY_OTHER, "ðvieèianèios grindis", 19128, 300},
-	{FURNITURE_CATEGORY_OTHER, "batu lentina", 2625, 100},
-	{FURNITURE_CATEGORY_OTHER, "þibintas su kaukule", 3524, 100},
-	{FURNITURE_CATEGORY_OTHER, "stulpas", 3529, 150},
-	{FURNITURE_CATEGORY_OTHER, "judanti lentelë", 7313, 150},
-	{FURNITURE_CATEGORY_OTHER, "kolona", 19943, 00},
-	{FURNITURE_CATEGORY_OTHER, "maðina", 10281, 100},
-	{FURNITURE_CATEGORY_OTHER, "fontanas", 3515, 300},
-	{FURNITURE_CATEGORY_OTHER, "kaukulë", 6865, 100},
-	{FURNITURE_CATEGORY_OTHER, "Virvë", 19087, 20},
-	{FURNITURE_CATEGORY_OTHER, "Virvë", 19088, 20},
-	{FURNITURE_CATEGORY_OTHER, "Virvë", 19089, 20},
-	{FURNITURE_CATEGORY_OTHER, "tinklas", 2945, 50},
-	{FURNITURE_CATEGORY_OTHER, "stiklas", 19325, 100}
-};
-
-
-new ClothesListNames[][37] = {
-	/* CLOTHES_CATEGORY_WATCHES */ 		{"Laikrodþiai"},
-	/* CLOTHES_CATEGORY_ACCESORIES */ 	{"Aksesuarai, akiniai"},
-	/* CLOTHES_CATEGORY_HATS */ 		{"Kepurës, ðalmai, skrybelës, skarelës"},
-	/* CLOTHES_CATEGORY_OTHER */		{"Kita"}
-};
-
-new ClothesList[][E_CLOTHES_LIST_DATA] = {
-	{CLOTHES_CATEGORY_WATCHES, "Auksinis „Rolex“ laikrodis", 19039, 18000},
-	{CLOTHES_CATEGORY_WATCHES, "Sidabro spalvos laikrodis", 19040, 5000},
-	{CLOTHES_CATEGORY_WATCHES, "Paauksuotas laikrodis", 19041, 13000},
-	{CLOTHES_CATEGORY_WATCHES, "Aukso spalvos laikrodis", 19042, 15000},
-	{CLOTHES_CATEGORY_WATCHES, "Sidabrinis laikrodis", 19043, 9000},
-	{CLOTHES_CATEGORY_WATCHES, "Violetinis ismanusis laikrodis", 19044, 3000},
-	{CLOTHES_CATEGORY_WATCHES, "Rozinis ismanusis laikrodis", 19045, 2200},
-	{CLOTHES_CATEGORY_WATCHES, "Zalias ismanusis laikrodis", 19046, 2800},
-	{CLOTHES_CATEGORY_WATCHES, "Neoninis ismanusis laikrodis", 19047, 3400},
-	{CLOTHES_CATEGORY_WATCHES, "Gyvatës odos laikrodis", 19053, 3400},
-	{CLOTHES_CATEGORY_WATCHES, "Spalvotas laikrodis", 19052, 3400},
-	{CLOTHES_CATEGORY_WATCHES, "Orandþinis su juodu laikrodis", 19051, 3400},
-	{CLOTHES_CATEGORY_WATCHES, "Mëlynas laikrodis", 19050, 3400},
-	{CLOTHES_CATEGORY_WATCHES, "Daugiaspalvis laikrodis", 19049, 3400},
-	{CLOTHES_CATEGORY_WATCHES, "Mëlynas laikrodis", 19048, 3400},
- 	{CLOTHES_CATEGORY_ACCESSORIES, "Juodi policijos akiniai", 19138, 50},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Raudoni policijos akiniai", 19139, 50},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Melyni policijos akiniai", 19140, 50},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Kuprinë", 19559, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Didelë taðë", 11745, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Taðë", 2919, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Lagaminas", 1210, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Paraðiuto kuprinë", 371, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Roþinis ðalmas", 18979, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Þalia karnavalo kaukë", 19038, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 1", 19022, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 2", 19023, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 3", 19024, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 4", 19025, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 5", 19026, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 6", 19027, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 7", 19028, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 8", 19029, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 9", 19030, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 10", 19031, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 11", 19032, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai nuo saulës", 19033, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 12", 19034, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Akiniai 13", 19035, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Pirato akis", 19085, 40},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Ðalmas", 18645, 100},
-	{CLOTHES_CATEGORY_ACCESSORIES, "Liemene", 19904, 20},
-	{CLOTHES_CATEGORY_HATS, "Kalëdø senio kepurë", 19064, 79},
-	{CLOTHES_CATEGORY_HATS, "Policijos kepurë 4", 19521, 79},
-	{CLOTHES_CATEGORY_HATS, "Ruda skrubëlë", 19098, 79},
-	{CLOTHES_CATEGORY_HATS, "Juoda skrybëlë", 19096, 79},
-	{CLOTHES_CATEGORY_HATS, "Juoda kapurë", 19069, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepurë", 19068, 79},
-	{CLOTHES_CATEGORY_HATS, "Vyriðka ðviesi kepurë", 18969, 79},
-	{CLOTHES_CATEGORY_HATS, "Ðviesi kepurë", 18968, 79},
-	{CLOTHES_CATEGORY_HATS, "Didelë skrybëlë", 18962, 79},
-	{CLOTHES_CATEGORY_HATS, "Mëlyna kepurë su snapu", 18957, 79},
-	{CLOTHES_CATEGORY_HATS, "Ðviesi skrybëlë su juoda juosta", 18951, 79},
-	{CLOTHES_CATEGORY_HATS, "Juoda paprasta skrybëlë", 18947, 79},
-	{CLOTHES_CATEGORY_HATS, "Pilka skrybëlë", 18945, 79},
-	{CLOTHES_CATEGORY_HATS, "Raudona skrybëlë", 18944, 79},
-	{CLOTHES_CATEGORY_HATS, "Burtininko skrybëlë", 19528, 99},
-	{CLOTHES_CATEGORY_HATS, "Juoda kepure", 18953, 50},
-	{CLOTHES_CATEGORY_HATS, "Salotine kepure", 18954, 50},
-	{CLOTHES_CATEGORY_HATS, "100 gangster kepure", 19067, 109},
-	{CLOTHES_CATEGORY_HATS, "Juoda kepure kandonke", 19554, 75},
-	{CLOTHES_CATEGORY_HATS, "Kaire bokso pirstine", 18955, 25},
-	{CLOTHES_CATEGORY_HATS, "Desine bokso pirstine", 18956, 25},
-	{CLOTHES_CATEGORY_HATS, "Bokso salmas", 18952, 199},
-	{CLOTHES_CATEGORY_HATS, "„Zoro“ kauke", 18974, 13},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 1", 18891, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 2", 18892, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 3", 18893, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 4", 18894, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 5", 18895, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 6", 18896, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 7", 18897, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 8", 18898, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 9", 18899, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 10", 18901, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 11", 18902, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 12", 18903, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 13", 18904, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 14", 18905, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 15", 18906, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 16", 18907, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 17", 18908, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 18", 18909, 99},
-	{CLOTHES_CATEGORY_HATS, "Skarele ant galvos 19", 18910, 99},
-	{CLOTHES_CATEGORY_HATS, "Policijos kepure 1", 18636, 49},
-	{CLOTHES_CATEGORY_HATS, "Policijos kepure 2", 19161, 49},
-	{CLOTHES_CATEGORY_HATS, "Policijos kepure 3", 18912, 49},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 1", 18926, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 2", 18927, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 3", 18928, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 4", 18929, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 5", 18930, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 6", 18931, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 7", 18932, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 8", 18933, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 9", 18934, 79},
-	{CLOTHES_CATEGORY_HATS, "Kepure su snapu 10", 18935, 79},
-	{CLOTHES_CATEGORY_HATS, "Vilkiko vairuotojo kepure", 18961, 79},
-	{CLOTHES_CATEGORY_HATS, "Picerijos berniuko kepure", 19558, 79},
-	{CLOTHES_CATEGORY_HATS, "Salmas geltonas", 19160, 25},
-	{CLOTHES_CATEGORY_HATS, "Salmas pilkas", 19093, 25},
-	{CLOTHES_CATEGORY_OTHER, "Paper bag", 2663, 10},
-	{CLOTHES_CATEGORY_OTHER, "Paper cup", 2647, 10},
-	{CLOTHES_CATEGORY_OTHER, "Kebabas", 2769, 10},
-	{CLOTHES_CATEGORY_OTHER, "Kava", 19835, 10},
-	{CLOTHES_CATEGORY_OTHER, "Alus1", 1486, 10},
-	{CLOTHES_CATEGORY_OTHER, "Alus2", 1543, 10},
-	{CLOTHES_CATEGORY_OTHER, "Bokalas", 1666, 10},
-	{CLOTHES_CATEGORY_OTHER, "Cocktail taure", 19819, 10},
-	{CLOTHES_CATEGORY_OTHER, "Litras viskio", 19820, 20},
-	{CLOTHES_CATEGORY_OTHER, "Plaktukas", 18635, 10},
-	{CLOTHES_CATEGORY_OTHER, "Lauþtuvas", 18634, 10},
-	{CLOTHES_CATEGORY_OTHER, "Keptuvë", 19584, 10},
-	{CLOTHES_CATEGORY_OTHER, "Wrench", 19627, 10},
-	{CLOTHES_CATEGORY_OTHER, "Skateboardas", 19878, 100}
-};
+#include "core/furniture_list.pwn"
+#include "core/clothes_list.pwn"
 
 enum E_NEW_CHAR_QUESTIONS
 {
@@ -3867,8 +2165,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 
 #include "core/weapons.pwn"
 #include "core/logs.pwn"
-#include "core/airbreak.pwn"
-#include "core/anticheat.pwn"
 #include "core/textdraw.pwn"
 #include "core/vehicle.pwn"
 #include "core/player.pwn"
@@ -3885,6 +2181,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 //#include "core\map\central_hotel.pwn"
 // #include "core\map\empty_houses.pwn"
 
+#include "core\map\interiors.pwn"
 #include "core\map\school.pwn"
 #include "core\map\squatters.pwn"
 #include "core\map\china_town.pwn"
@@ -3903,15 +2200,15 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "core\map\train_jefferson.pwn"
 #include "core\map\pier.pwn"
 #include "core\map\interiors.pwn"
+#include "core\map\ls_bus_station.pwn"
+#include "core\map\ls_dump.pwn"
+#include "core\map\ls_logistics.pwn"
 // #include "core\map\ganghood_details.pwn"
 // #include "core\map\taxi.pwn"
-// #include "core\map\ls_bus_station.pwn"
 // #include "core\map\corona_small.pwn"
 // #include "core\map\corona_big.pwn"
-// #include "core\map\ls_dump.pwn"
 // #include "core\map\park.pwn"
 // #include "core\map\mall.pwn"
-// #include "core\map\ls_logistics.pwn"
 // #include "core\map\lspd.pwn"
 // #include "core\map\downtown_parking.pwn"
 // #include "core\map\mall_parking.pwn"
@@ -3939,8 +2236,15 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player/ipspam.pwn"
 #include "modules\player/anims.pwn"
 #include "modules\player/newbie.pwn"
+#include "modules\player/cheats.pwn"
 #include "modules\player\ui/speedo.pwn"
 #include "modules\player\ui/leftbox.pwn"
+#include "modules\player/afk.pwn"
+
+// stock FAC_GetWeaponSlot(playerid) return 1;
+// stock RemovePlayerWeaponInSlot(playerid, slot) return 1;
+// stock PlayerHasWeaponInSlot(playerid, slot) return false;
+// stock GetVehicleColor(playerid, &color1,&color2) color1=color2=random(100);
 
 main()
 {
@@ -3989,6 +2293,8 @@ amx_antideamx()
 
 public OnGameModeExit()
 {
+	new 
+		col1, col2;
 	for(new vehicleid = 1, vehicle_limit = GetVehiclePoolSize(); vehicleid <= vehicle_limit; vehicleid++)
 	{
 		if(IsValidVehicle(vehicleid))
@@ -3996,8 +2302,9 @@ public OnGameModeExit()
 			if(VehicleInfo[vehicleid][vFaction] > 0)
 			{
 				SaveServerVehicleFloatEx(vehicleid, "KM", VehicleInfo[vehicleid][vKM]);
-				SaveServerVehicleIntEx(vehicleid, "Color1", VehicleInfo[vehicleid][vColor1]);
-				SaveServerVehicleIntEx(vehicleid, "Color2", VehicleInfo[vehicleid][vColor2]);
+				GetVehicleColor(vehicleid, col1, col2);
+				SaveServerVehicleIntEx(vehicleid, "Color1", col1);
+				SaveServerVehicleIntEx(vehicleid, "Color2", col2);
 			}
 			else if(VehicleInfo[vehicleid][vJob] == 0)
 			{
@@ -4089,7 +2396,6 @@ public OnGameModeInit()
 	// ==============================================================================
 	SetTimer("SecondTimer", 1000, true);
 	SetTimer("MinuteTimer", 60000, true);
-	SetTimer("SecondTimerVehicle", 1000, true);
 	SetTimer("MaxSpeedTimer", 300, true);
 	return 1;
 }
@@ -4110,7 +2416,7 @@ ptask PT_VehicleSpeedo[200](playerid)
 		(Recalculate_Mileage[playerid] > 0) && (Recalculate_Mileage[playerid] = 0);
 		return;
 	}
-	if(!VehicleHaveEngine(VehicleInfo[vehicleid][vModel]) || !VehicleInfo[vehicleid][vEngined])
+	if(!VehicleHaveEngine(GetVehicleModel(vehicleid)) || !VehicleInfo[vehicleid][vEngined])
 	{
 		// Transportas neturi variklio
 		return;
@@ -4149,7 +2455,7 @@ ptask PT_VehicleSpeedo[200](playerid)
 			VehicleInfo[vehicleid][vKM] += distance/500.0;
 			VehicleInfo[vehicleid][vLastMileageX] = currentX,
 			VehicleInfo[vehicleid][vLastMileageY] = currentY;
-			consumption = VehicleFuelUsageList[VehicleInfo[vehicleid][vModel]-400] * 3;
+			consumption = VehicleFuelUsageList[GetVehicleModel(vehicleid)-400] * 3;
 			if(VehicleInfo[vehicleid][vFuel] > 0.0)
 			{
 				if(VehicleInfo[vehicleid][vFuel] < consumption) VehicleInfo[vehicleid][vFuel] = 0;
@@ -4167,7 +2473,7 @@ ptask PT_VehicleSpeedo[200](playerid)
 		if(VehicleInfo[vehicleid][vFuel] >= 0.0)
 		{
 			format(string, sizeof string, "DEGALAI: %s", 
-				ConvertFuelToString(VehicleInfo[vehicleid][vFuel], VehicleFuelCapacityList[VehicleInfo[vehicleid][vModel]-400]));
+				ConvertFuelToString(VehicleInfo[vehicleid][vFuel], VehicleFuelCapacityList[GetVehicleModel(vehicleid)-400]));
 		}
 		Speedo_Update(playerid, .fuel_level = string);
 	}
@@ -4189,8 +2495,13 @@ public MaxSpeedTimer()
 			new vehicleid = GetPlayerVehicleID(playerid);
 			if(VehicleInfo[vehicleid][vEngined])
 			{
-				new speed = GetVehicleSpeed(vehicleid);
-				if(PlayerExtra[playerid][peSpeedLimit] > 0 && speed > PlayerExtra[playerid][peSpeedLimit])
+				new speed = GetVehicleSpeed(vehicleid),
+					model = GetVehicleModel(vehicleid);
+				if(
+					(PlayerExtra[playerid][peSpeedLimit] > 0 && speed > PlayerExtra[playerid][peSpeedLimit])
+					||
+					(IsModelShitty(model) && speed > GetMaxShittyCarSpeed(model))
+				)
 				{
 					SetVehicleSpeed(vehicleid, speed - 20);
 				}
@@ -4200,15 +2511,19 @@ public MaxSpeedTimer()
 	return 1;
 }
 
-forward SecondTimerVehicle();
-public SecondTimerVehicle()
+stock IsModelShitty(model)
 {
-	foreach(new vehicleid : Vehicle)
-	{
-		sd_CheckVehicleHealth(vehicleid);
+	switch(model) {
+		case 542, 543, 549: return true;
 	}
-	return 1;
+	return false;
 }
+stock GetMaxShittyCarSpeed(model)
+{
+	#pragma unused model
+	return 100;
+}
+
 
 forward SecondTimer();
 public SecondTimer()
@@ -4601,7 +2916,7 @@ public OnPlayerJobTimeExpired(playerid, jobid, actionid, type)
 			SendFormat(playerid, 0xFF6666FF, "Nespëjote nuvaþiuoti á darbo vietà per nustatytà laikà.");
 			PlayerInfo[playerid][pJobDuty] = 0;
 			RemovePlayerFromVehicle(playerid);
-			sd_SetVehicleToRespawn(PlayerInfo[playerid][pJobVehicle]);
+			SetVehicleToRespawn(PlayerInfo[playerid][pJobVehicle]);
 			ResetPlayerJobTask(playerid);
 		}
 		if(PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_TAKE_BAG || PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_PUT_BAG)
@@ -4636,7 +2951,7 @@ public MinuteTimer()
 {
 	new unix = gettime();
 	// gilzez
-	new delete = -1;
+	/*new delete = -1;
 	foreach(new shell : Shell)
 	{
 		if(delete != -1 && delete != shell)
@@ -4651,7 +2966,7 @@ public MinuteTimer()
 			Shells[shell][shellLabel] = INVALID_3DTEXT_ID;
 			Shells[shell][shellObject] = INVALID_OBJECT_ID;
 		}
-	}
+	}*/
 	// patarimai
 	/*static timefortip;
 	if(timefortip < TIP_EVERY_MINUTE)
@@ -4709,7 +3024,6 @@ public MinuteTimer()
 	gettime(hour, minute, second);
 	foreach(new playerid : Player)
 	{
-		sd_CheckAfk(playerid);
 		if(unix > PlayerInfo[playerid][pDonatorTime] + TIME_TO_RESET_DONATOR && PlayerInfo[playerid][pDonator] > 0)
 		{
 			PlayerInfo[playerid][pDonator] = 0;
@@ -4720,8 +3034,8 @@ public MinuteTimer()
 
 		if(IsValidVehicle(RentedVeh[playerid]) && RentedBy[RentedVeh[playerid]] == playerid)
 		{
-			sd_GivePlayerMoney(playerid, -25);
-			if(sd_GetPlayerMoney(playerid) < 25)
+			GivePlayerMoney(playerid, -25);
+			if(GetPlayerMoney(playerid) < 25)
 			{
 				Rent_Cancel(playerid);
 				SendError(playerid, "Tr. priemonës nuomai nebeuþtenka pinigø.");
@@ -4753,8 +3067,8 @@ public MinuteTimer()
 		if(PhoneInfo[playerid][phoneCallOwner] > 0 && PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
 		{
 			// nuimam jam saibu
-			sd_GivePlayerMoney(playerid, -1);
-			if(sd_GetPlayerMoney(playerid) <= 0)
+			GivePlayerMoney(playerid, -1);
+			if(GetPlayerMoney(playerid) <= 0)
 			{
 				PlayerPhoneHangup(playerid);
 			}
@@ -5049,15 +3363,6 @@ public PickupWeaponsList(playerid)
 }
 
 
-public OnPlayerAirbreak(playerid)
-{
-	if(IsPlayerInAnyAdminGroup(playerid)) return 1;
-	if(airbrk_count[playerid] >= 3)
-	{
-		KickPlayer(playerid, "Sistema", "Air-break");
-	}
-	return 1;
-}
 
 forward PickupDrugsList(playerid);
 public PickupDrugsList(playerid)
@@ -5361,7 +3666,9 @@ public OnVehicleSpawn(vehicleid)
 	#endif
 	if(VehicleInfo[vehicleid][vOwner] <= 0)
 	{
-		sd_ChangeVehicleColor(vehicleid, VehicleInfo[vehicleid][vColor1], VehicleInfo[vehicleid][vColor2]);
+		new col1,col2;
+		GetVehicleColor(vehicleid, col1, col2);
+		ChangeVehicleColor(vehicleid, col1, col2);
 	}
 	if(IsVehicleServer(vehicleid))
 	{
@@ -5373,11 +3680,10 @@ public OnVehicleSpawn(vehicleid)
 		if(strlen(VehicleInfo[vehicleid][vUnitText]))
 		{
 			new Float:x, Float:z, Float:y;
-			GetVehicleModelInfo(VehicleInfo[vehicleid][vModel], VEHICLE_MODEL_INFO_SIZE, x, y, z);
+			GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, x, y, z);
 			VehicleInfo[vehicleid][vUnitLabel] = CreateDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitText], 0xFFFFFFFF, 0.425*x, (-0.45*y), (-0.1*z), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
 		}
 	}
-	AcVehicleData[vehicleid][VehicleHealth] = 1000.0;
 	RentedBy[vehicleid] = INVALID_PLAYER_ID;
 	return 1;
 }
@@ -5398,7 +3704,7 @@ public OnVehicleDeath(vehicleid, killerid)
 		log_init(true);
 		log_set_table("logs_vehicles");
 		log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Insurance`");
-		log_set_values("'%d','%e','%d','%s','Susprogdino tr. priemone','%d'", LogPlayerId(killerid), LogPlayerName(killerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]), VehicleInfo[vehicleid][vInsurance]);
+		log_set_values("'%d','%e','%d','%s','Susprogdino tr. priemone','%d'", LogPlayerId(killerid), LogPlayerName(killerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vInsurance]);
 		log_push();
 		new owner;
 		if((owner = FindPlayerBySql(VehicleInfo[vehicleid][vOwner])) != INVALID_PLAYER_ID)
@@ -5407,7 +3713,7 @@ public OnVehicleDeath(vehicleid, killerid)
 			new numbers[56];
 			if(strlen(VehicleInfo[vehicleid][vNumbers])) format(numbers, sizeof numbers, VehicleInfo[vehicleid][vNumbers]);
 			else numbers = "neregistruota";
-			SendFormat(owner, 0xBABABAFF, "Jûsø tr. priemonë {FFFFFF}%s{BABABA}(%s) buvo sunaikinta.", GetModelName(VehicleInfo[vehicleid][vModel]), numbers);
+			SendFormat(owner, 0xBABABAFF, "Jûsø tr. priemonë {FFFFFF}%s{BABABA}(%s) buvo sunaikinta.", GetModelName(GetVehicleModel(vehicleid)), numbers);
 		}
 		VehicleInfo[vehicleid][vInsurance]--;
 		if(VehicleInfo[vehicleid][vInsurance] < 0)
@@ -5422,7 +3728,7 @@ public OnVehicleDeath(vehicleid, killerid)
 			}
 			else
 			{
-				format(string, sizeof string, "Jûsø tr. priemonë %s (numeriai: %s) buvo sunaikinta negráþtamai.", GetModelName(VehicleInfo[vehicleid][vModel]), VehicleInfo[vehicleid][vNumbers]);
+				format(string, sizeof string, "Jûsø tr. priemonë %s (numeriai: %s) buvo sunaikinta negráþtamai.", GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vNumbers]);
 				AddPlayerLoginNote(VehicleInfo[vehicleid][vOwner], -1, string);
 			}
 		}
@@ -5466,7 +3772,7 @@ public OnVehicleDeath(vehicleid, killerid)
 			}
 		}
 		NullVehicle(vehicleid);
-		sd_DestroyVehicle(vehicleid);
+		DestroyVehicle(vehicleid);
 	}
 	else
 	{
@@ -5480,7 +3786,7 @@ public OnVehicleDeath(vehicleid, killerid)
 			if(IsPlayerConnected(by))
 			{
 				SendFormat(by, 0x80DFABFF, "Jûsø nuomos tr. priemonë buvo susprogdinta. Gavote $500 baudà.");
-				sd_GivePlayerMoney(by, -500);
+				GivePlayerMoney(by, -500);
 				Rent_Cancel(by);
 			}
 		}
@@ -5492,7 +3798,7 @@ public OnVehicleDeath(vehicleid, killerid)
 		}
 		SaveServerVehicleFloatEx(vehicleid, "KM", VehicleInfo[vehicleid][vKM]);
 
-		sd_SetVehicleToRespawn(vehicleid);
+		SetVehicleToRespawn(vehicleid);
 	}
 	if(IsVehicleServer(vehicleid))
 	{
@@ -5556,22 +3862,13 @@ public OnVehicleStreamIn(vehicleid, forplayerid)
 	return 1;
 }
 
-public OnPlayerWeaponCheat(playerid, weaponid, ammo)
-{
-	new 
-		string[126];
-	format(string, sizeof string, "Ginklø cheat [%d/%d]", weaponid, ammo);
-	BanPlayer(playerid, "Sistema", string);
-	return 1;
-}
-
 stock Rent_Cancel(playerid)
 {
 	new 
 		vehicleid = RentedVeh[playerid];
 	if(IsValidVehicle(vehicleid))
 	{
-		sd_SetVehicleToRespawn(vehicleid);
+		SetVehicleToRespawn(vehicleid);
 		RentedBy[vehicleid] = INVALID_PLAYER_ID;
 	}
 	RentTimeUnused[playerid] = 0;
@@ -5617,7 +3914,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			model = GetVehicleModel(GetPlayerVehicleID(playerid));
 		if(IsModelPlane(model))
 		{
-			sd_GivePlayerWeapon(playerid, WEAPON_PARACHUTE, 1, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+			GivePlayerWeapon(playerid, WEAPON_PARACHUTE, 1, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 		}
 	}
 
@@ -5686,7 +3983,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 				}
 			}
 		}
-		if(VehicleHaveEngine(VehicleInfo[vehicleid][vModel]))
+		if(VehicleHaveEngine(GetVehicleModel(vehicleid)))
 		{
 			new string[26];
 			format(string, sizeof string, "RIDA: %0.1fKM", VehicleInfo[vehicleid][vKM]);
@@ -5740,10 +4037,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	if(oldstate == PLAYER_STATE_DRIVER && newstate != PLAYER_STATE_DRIVER)
 	{
 		//OldVehicle[playerid] = INVALID_VEHICLE_ID;
-		if(OldVehicle[playerid] != INVALID_VEHICLE_ID)
-		{
-			sd_CheckVehicleHealth(OldVehicle[playerid]);
-		}
+
 		Speedo_Hide(playerid);
 		if(RentedVeh[playerid] != INVALID_VEHICLE_ID && OldVehicle[playerid] == RentedVeh[playerid])
 		{
@@ -5888,15 +4182,14 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 		for(new i = 0; i < 13; i++)
 		{
 			GetPlayerWeaponData(playerid, i, weapons[i][0], weapons[i][1]);
-			weapons[i][2] = sd_GetSlotWeaponType(playerid, i);
-			weapons[i][3] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
+			GetPlayerWeaponExtraData(playerid, i, weapons[i][2], weapons[i][3]);
 		}
-		sd_ResetPlayerWeapons(playerid);
+		ResetPlayerWeapons(playerid);
 		for(new i = 0; i < 13; i++)
 		{
 			if(weapons[i][0] != 46)
 			{
-				sd_GivePlayerWeapon(playerid, weapons[i][0], weapons[i][1]);
+				GivePlayerWeapon(playerid, weapons[i][0], weapons[i][1], weapons[i][2], weapons[i][3]);
 			}
 		}
     }
@@ -5904,8 +4197,22 @@ public OnPlayerExitVehicle(playerid, vehicleid)
     {
     	if(PlayerInfo[playerid][pJob] == VehicleInfo[vehicleid][vJob] && PlayerInfo[playerid][pJobVehicle] == vehicleid)
     	{
-    		if( (PlayerInfo[playerid][pJob] == JOB_TRUCKER && !InArray(PlayerInfo[playerid][pJobCurrentAction], JOB_ACTION_UNLOAD_CARGO, JOB_ACTION_LOAD_CARGO, JOB_ACTION_CARGO_CRATES_TAKE, JOB_ACTION_CARGO_CRATES_TAKE, JOB_ACTION_CARGO_LEAVE_CAR)) ||
-    			(PlayerInfo[playerid][pJob] == JOB_FARMER && !InArray(PlayerInfo[playerid][pJobCurrentAction], JOB_ACTION_COLLECT_COMBAIN)))
+    		if( (
+					PlayerInfo[playerid][pJob] == JOB_TRUCKER && 
+					!InArray(PlayerInfo[playerid][pJobCurrentAction], 
+							JOB_ACTION_UNLOAD_CARGO,
+							JOB_ACTION_LOAD_CARGO, 
+							JOB_ACTION_CARGO_CRATES_TAKE,
+							JOB_ACTION_CARGO_CRATES_TAKE,
+							JOB_ACTION_CARGO_LEAVE_CAR)
+				) 
+				||
+    			(
+					PlayerInfo[playerid][pJob] == JOB_FARMER && 
+					!InArray(PlayerInfo[playerid][pJobCurrentAction], 
+							JOB_ACTION_COLLECT_COMBAIN)
+				)
+			)
     		{
 	    		PlayerInfo[playerid][pJobVehicle] = INVALID_VEHICLE_ID;
 	    	}
@@ -5916,7 +4223,7 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 public OnVehicleMod(playerid, vehicleid, componentid)
 {
 	KickPlayer(playerid, "Sistema", "Tr. priemonës tuningavimas");
-	sd_SetVehicleToRespawn(vehicleid);
+	SetVehicleToRespawn(vehicleid);
 	return 1;
 }
 
@@ -5999,7 +4306,7 @@ public OnPlayerSprayAtVehicle(playerid, vehicleid)
 			GameTextForPlayer(playerid, string, 600, 3);
 			if(PlayerInfo[playerid][pJobActionIndex] >= 1000)
 			{
-				sd_ChangeVehicleColor(jobvehicleid, PlayerInfo[playerid][pJobCurrentType], PlayerInfo[playerid][pJobDestination]);
+				ChangeVehicleColor(jobvehicleid, PlayerInfo[playerid][pJobCurrentType], PlayerInfo[playerid][pJobDestination]);
 				SaveVehicleIntEx(vehicleid, "Color1", PlayerInfo[playerid][pJobCurrentType]);
 				SaveVehicleIntEx(vehicleid, "Color2", PlayerInfo[playerid][pJobDestination]);
 				SendFormat(playerid, 0x9BC154FF, "Sëkmingai perdaþëte tr. priemonæ.");
@@ -6130,7 +4437,7 @@ public OnPlayerEnterCheckpoint(playerid)
 						{
 							return 0;
 						}
-						sd_SetVehicleToRespawn(vehicleid);
+						SetVehicleToRespawn(vehicleid);
 						if(health < 995.0)
 						{
 							MsgError(playerid, "VAIRAVIMO MOKYKLA", "Egzamino neiðlaikëte, kadangi tr. priemonë per daug sudauþyta.");
@@ -6173,7 +4480,7 @@ public OnPlayerEnterCheckpoint(playerid)
 								SendFormat(playerid, 0x8BD5FFFF, "Sveikiname sëkmingai iðlaikius {48AFEB}pilotavimo{8BD5FF} egzaminà.");
 							}
 						}
-						sd_GivePlayerMoney(playerid, -DEFAULT_DMV_PRICE);
+						GivePlayerMoney(playerid, -DEFAULT_DMV_PRICE);
 						tmpEditing_Component_DMV[playerid] = 0;
 						DisablePlayerCheckpointEx(playerid);
 					}
@@ -6341,7 +4648,7 @@ public OnPlayerEnterCheckpoint(playerid)
 				ResetPlayerJobTask(playerid);
 				PlayerExtra[playerid][peJobDutyCooldown] = 0;
 				MsgSuccess(playerid, "UÞSAKYMAS", "Sëkmingai pristatëte kroviná. Gavote $%d", money);
-				sd_GivePlayerMoney(playerid, money);
+				GivePlayerMoney(playerid, money);
 			}
 			else
 			{
@@ -6408,7 +4715,7 @@ public OnPlayerEnterCheckpoint(playerid)
 					price = CargoList[cargo][cargoPrice]/4;
 				}
 			}
-			sd_GivePlayerMoney(playerid, -price);
+			GivePlayerMoney(playerid, -price);
 			MsgSuccess(playerid, "UÞSAKYMAS", "Sëkmingai pakrovëte kroviná. Sumokëjote $%d", price);
 			PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_UNLOAD_CARGO;
 			PlayerInfo[playerid][pJobVehicle] = vehicleid;
@@ -6443,7 +4750,7 @@ public OnPlayerEnterCheckpoint(playerid)
 		{
 			if(!IsPlayerInAnyVehicle(playerid)) return InfoBox(playerid, IB_NOT_IN_VEHICLE);
 			new vehicleid = GetPlayerVehicleID(playerid);
-			if(VehicleTrunkSpace[((VehicleInfo[vehicleid][vModel])-400)] < TRUNKS_SPACE_POLICE_WEAPONS) return MsgWarning(playerid, "UÞSAKYMAS", "Tr. priemonë nepakankamai talpi.");
+			if(VehicleTrunkSpace[((GetVehicleModel(vehicleid))-400)] < TRUNKS_SPACE_POLICE_WEAPONS) return MsgWarning(playerid, "UÞSAKYMAS", "Tr. priemonë nepakankamai talpi.");
 			new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
 			if(factionid == -1) return 0;
 			else
@@ -6612,7 +4919,7 @@ public OnPlayerEnterCheckpoint(playerid)
 				DisablePlayerCheckpointEx(playerid);
 				return ResetPlayerJobTask(playerid, true);
 			}
-			if(sd_CheckIfSlotUsed(playerid, 9))
+			if(PlayerHasWeaponInSlot(playerid, 9))
 			{
 				return SendWarning(playerid, "Pasidëkite ginklà á inventoriø ir bandykite dar kartà.");
 			}
@@ -6667,7 +4974,7 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			if(PlayerInfo[playerid][pJobActionIndex] == 0)
 			{
-				sd_GivePlayerMoney(playerid, -tmpDubStart_Price[playerid]);
+				GivePlayerMoney(playerid, -tmpDubStart_Price[playerid]);
 			}
 			PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_PUT_WHEELS_VEHICLE;
 			PlayerInfo[playerid][pJobActionTime] = 30;
@@ -7083,8 +5390,6 @@ public OnPlayerText(playerid, text[])
 			return 0;
 		}
 	#endif
-
-	PlayerExtra[playerid][peAFKTime] = 0;
 	if(text[0] == '@' && HaveCommandPermission(playerid, "a") && text[1] != EOS)
 	{
 		strdel(text, 0, (text[1] == ' ' ? 2 : 1));
@@ -7400,12 +5705,12 @@ public OnPlayerSpawn(playerid)
 		mysql_tquery(chandler, string, "PlayerClothesLoad", "d", playerid);
 		new percents = randomEx(0, 15),
 			money;
-		if(percents > 0 && sd_GetPlayerMoney(playerid) > 50)
+		if(percents > 0 && GetPlayerMoney(playerid) > 50)
 		{
-			money = sd_GetPlayerMoney(playerid)/100*percents;
+			money = GetPlayerMoney(playerid)/100*percents;
 			SendFormat(playerid, 0xF27C45FF, "Pametëte %dproc. ($%d) turëtø grynøjø pinigø.", percents, money);
 		}
-		sd_GivePlayerMoney(playerid, -150 - money);
+		GivePlayerMoney(playerid, -150 - money);
 		SetCameraBehindPlayer(playerid);
 		PlayerInfo[playerid][pCurrentStatus] = 0;
 		for(new td = 0; td < 4; td++) TextDrawHideForPlayer(playerid, DrugEffect[td]);
@@ -7650,7 +5955,7 @@ public PlayerWeaponsLoad(playerid)
 			if(data[i][0] != 0 && data[i][1] > 0)
 			{
 				if(data[i][2] == WEAPON_GIVE_TYPE_NO_INVENTORY && PlayerInfo[playerid][pFaction] <= 0) { continue; }
-				sd_GivePlayerWeapon(playerid, data[i][0], data[i][1], data[i][2], data[i][3]);
+				GivePlayerWeapon(playerid, data[i][0], data[i][1], data[i][2], data[i][3]);
 			}
 		}
 	}
@@ -7919,7 +6224,8 @@ public OnPlayerCommandReceived(playerid, cmd[], params[], flags)
 
 public OnPlayerCommandPerformed(playerid, cmd[], params[], result, flags)
 {
-	PlayerExtra[playerid][peAFKTime] = 0;
+	printf("OnPlayerCommandPerformed(%s, %s, %s, %d, %d)", playerid, cmd, params, result, flags);
+
 	if(result == -1) { return SendError(playerid, "Tokios komandos nëra. Naudokite /help arba /ask"); }
 	else
 	{
@@ -10335,7 +8641,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					new vehicleid = tmpIter[playerid];
 					new money = floatround(VehicleInfo[vehicleid][vPrice]/2.5);
-					if(money > 0) sd_GivePlayerMoney(playerid, money);
+					if(money > 0) GivePlayerMoney(playerid, money);
 					new string[356];
 					mysql_format(chandler, string, sizeof string, "DELETE FROM `vehicles_data` WHERE id = '%d'; DELETE IGNORE FROM `vehicles_inventory` WHERE VehicleId = '%d'; DELETE IGNORE FROM `vehicles_dubkeys` WHERE VehicleId = '%d'", VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vId]);
 					mysql_fquery(chandler, string, "VehicleDeletedEx");
@@ -10345,9 +8651,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_init(true);
 					log_set_table("logs_vehicles");
 					log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Amount`");
-					log_set_values("'%d','%e','%d','%e','Pardave tr. priemone serveriui','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]), money);
+					log_set_values("'%d','%e','%d','%e','Pardave tr. priemone serveriui','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), money);
 					log_push();
-					sd_DestroyVehicle(vehicleid);
+					DestroyVehicle(vehicleid);
 				}
 			}
 		}
@@ -10554,13 +8860,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(IsPlayerInAnyVehicle(playerid))
 					{
 						if(!VehicleWeaponsInventory[vehicleid][listitem][ftwAllowedInVehicle]) return SendWarning(playerid, "Ðio ginklo tr. priemonës viduje paimti negalite.");
-						sd_GivePlayerWeapon(playerid, VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId], VehicleWeaponsInventory[vehicleid][listitem][ftwAmmo], WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+						GivePlayerWeapon(playerid, VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId], VehicleWeaponsInventory[vehicleid][listitem][ftwAmmo], WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 						format(string, sizeof string, "paima ginklà %s nuo stovo.", GetInventoryItemName(VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId]));
 						log_set_values("'%d','%e','%d','%e','Paeme ginkla is /weptrunk','%d','%d','Viduj'", PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), LogPlayerId(playerid), LogPlayerName(playerid), VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId], VehicleWeaponsInventory[vehicleid][listitem][ftwAmmo]);
 					}
 					else
 					{
-						sd_GivePlayerWeapon(playerid, VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId], VehicleWeaponsInventory[vehicleid][listitem][ftwAmmo], WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+						GivePlayerWeapon(playerid, VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId], VehicleWeaponsInventory[vehicleid][listitem][ftwAmmo], WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 						format(string, sizeof string, "paima ginklà %s ið bagaþinës.", GetInventoryItemName(VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId]));
 						log_set_values("'%d','%e','%d','%e','Paeme ginkla is /weptrunk','%d','%d','Lauke'", PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), LogPlayerId(playerid), LogPlayerName(playerid), VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId], VehicleWeaponsInventory[vehicleid][listitem][ftwAmmo]);
 					}
@@ -10609,7 +8915,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				factionid;
 			if(response)
 			{
-				sd_GivePlayerMoney(playerid, -amount);
+				GivePlayerMoney(playerid, -amount);
 			}
 			else
 			{
@@ -10637,7 +8943,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if(response)
 			{
-				sd_GivePlayerMoney(playerid, -PlayerExtra[playerid][peFilling]);
+				GivePlayerMoney(playerid, -PlayerExtra[playerid][peFilling]);
 			}
 			else
 			{
@@ -10656,13 +8962,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new businessid = tmpIter[playerid],
 					weaponid = AvailableWeaponsShop[listitem][0],
-					wepslot = sd_GetWeaponSlot(weaponid);
-				if(sd_GetPlayerMoney(playerid) < AvailableWeaponsShop[listitem][2]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, AvailableWeaponsShop[listitem][2]);
-				if(sd_CheckIfSlotUsed(playerid, wepslot)) return SendWarning(playerid, "Ginklà ðiame slote jau turite, praðome já pasidëti.");
-				sd_GivePlayerWeapon(playerid, weaponid, AvailableWeaponsShop[listitem][1], WEAPON_GIVE_TYPE_NORMAL, -1); // nauja ID duodam
+					wepslot = FAC_GetWeaponSlot(weaponid);
+				if(GetPlayerMoney(playerid) < AvailableWeaponsShop[listitem][2]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, AvailableWeaponsShop[listitem][2]);
+				if(PlayerHasWeaponInSlot(playerid, wepslot)) return SendWarning(playerid, "Ginklà ðiame slote jau turite, praðome já pasidëti.");
+				GivePlayerWeapon(playerid, weaponid, AvailableWeaponsShop[listitem][1], WEAPON_GIVE_TYPE_NORMAL, -1); // nauja ID duodam
 				SendFormat(playerid, 0xD0ED88FF, "Nusipirkote ginklà {C8F25E}%s{D0ED88}", GetInventoryItemName(weaponid));
 				BusinessInfo[businessid][bBudget] += AvailableWeaponsShop[listitem][2];
-				sd_GivePlayerMoney(playerid, -AvailableWeaponsShop[listitem][2]);
+				GivePlayerMoney(playerid, -AvailableWeaponsShop[listitem][2]);
 				log_init(true);
 				log_set_table("logs_business");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`,`ExtraId`,`ExtraString`");
@@ -10680,10 +8986,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					businessid = tmpIter[playerid];
 				if((slot = GetFreeClothesSlot(playerid)) != -1)
 				{
-					if(sd_GetPlayerMoney(playerid) < ClothesList[selected][clothesListPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, ClothesList[selected][clothesListPrice]);
+					if(GetPlayerMoney(playerid) < ClothesList[selected][clothesListPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, ClothesList[selected][clothesListPrice]);
 					ClothesInventory[playerid][slot] = ClothesList[selected][clothesListModel];
 					BusinessInfo[businessid][bBudget] += ClothesList[selected][clothesListPrice];
-					sd_GivePlayerMoney(playerid, -ClothesList[selected][clothesListPrice]);
+					GivePlayerMoney(playerid, -ClothesList[selected][clothesListPrice]);
 					MsgSuccess(playerid, "DRABUÞIAI", "Daiktas sëkmingai nupirktas");
 					log_init(true);
 					log_set_table("logs_clothes");
@@ -10715,7 +9021,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								new amount = 1,
 									bw_id = BusinessWares[businessid][i][bWareId];
 								if(bw_id == ITEM_PHONE && IsItemInPlayerInventory(playerid, ITEM_PHONE)) return SendWarning(playerid, "Telefonà jau turite.");
-								if(sd_GetPlayerMoney(playerid) < BusinessWares[businessid][i][bWarePrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, BusinessWares[businessid][i][bWarePrice]);
+								if(GetPlayerMoney(playerid) < BusinessWares[businessid][i][bWarePrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, BusinessWares[businessid][i][bWarePrice]);
 								for(new aw = 0; aw < MAX_AVAILABLE_WARES; aw++)
 								{
 									if(AvailableWares[aw][awItem] == bw_id)
@@ -10726,7 +9032,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								}
 								GivePlayerInventoryItem(playerid, bw_id, amount, 0, slot);
 								SendFormat(playerid, 0xD0ED88FF, "> Nusipirkote daiktà {C8F25E}%s{D0ED88}", GetInventoryItemName(bw_id));
-								sd_GivePlayerMoney(playerid, -BusinessWares[businessid][i][bWarePrice]);
+								GivePlayerMoney(playerid, -BusinessWares[businessid][i][bWarePrice]);
 								BusinessInfo[businessid][bBudget] += BusinessWares[businessid][i][bWarePrice];
 								rp_me(playerid, _, "padeda daiktus ant prekystalio.");
 								return 1;
@@ -10902,8 +9208,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						// clothes
 						if(HouseInfo[tmpIter[playerid]][hUpdateClothes] > 0) return MsgError(playerid, "NAMAS", "Ðá atnaujinimà jau esate ásirengæ."), pc_cmd_hmenu(playerid, "");
-						if(sd_GetPlayerMoney(playerid) < HOUSE_UPDATE_CLOTHES_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HOUSE_UPDATE_CLOTHES_PRICE), pc_cmd_hmenu(playerid, "");
-						sd_GivePlayerMoney(playerid, -HOUSE_UPDATE_CLOTHES_PRICE);
+						if(GetPlayerMoney(playerid) < HOUSE_UPDATE_CLOTHES_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HOUSE_UPDATE_CLOTHES_PRICE), pc_cmd_hmenu(playerid, "");
+						GivePlayerMoney(playerid, -HOUSE_UPDATE_CLOTHES_PRICE);
 						HouseInfo[tmpIter[playerid]][hUpdateClothes] = 1;
 						SaveHouseIntEx(tmpIter[playerid], "UpdateClothes", 1);
 						MsgSuccess(playerid, "NAMAS", "Sëkmingai árengëte atnaujinimà.");
@@ -10918,8 +9224,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						// seifas
 						if(HouseInfo[tmpIter[playerid]][hUpdateSafe] > 0) return MsgError(playerid, "NAMAS", "Ðá atnaujinimà jau esate ásirengæ."), pc_cmd_hmenu(playerid, "");
-						if(sd_GetPlayerMoney(playerid) < HOUSE_UPDATE_SAFE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HOUSE_UPDATE_SAFE_PRICE), pc_cmd_hmenu(playerid, "");
-						sd_GivePlayerMoney(playerid, -HOUSE_UPDATE_SAFE_PRICE);
+						if(GetPlayerMoney(playerid) < HOUSE_UPDATE_SAFE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HOUSE_UPDATE_SAFE_PRICE), pc_cmd_hmenu(playerid, "");
+						GivePlayerMoney(playerid, -HOUSE_UPDATE_SAFE_PRICE);
 						HouseInfo[tmpIter[playerid]][hUpdateSafe] = 1;
 						SaveHouseIntEx(tmpIter[playerid], "UpdateSafe", 1);
 						MsgSuccess(playerid, "NAMAS", "Sëkmingai árengëte atnaujinimà.");
@@ -10934,8 +9240,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						// eat
 						if(HouseInfo[tmpIter[playerid]][hUpdateEat] > 0) return MsgError(playerid, "NAMAS", "Ðá atnaujinimà jau esate ásirengæ."), pc_cmd_hmenu(playerid, "");
-						if(sd_GetPlayerMoney(playerid) < HOUSE_UPDATE_EAT_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HOUSE_UPDATE_EAT_PRICE), pc_cmd_hmenu(playerid, "");
-						sd_GivePlayerMoney(playerid, -HOUSE_UPDATE_EAT_PRICE);
+						if(GetPlayerMoney(playerid) < HOUSE_UPDATE_EAT_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HOUSE_UPDATE_EAT_PRICE), pc_cmd_hmenu(playerid, "");
+						GivePlayerMoney(playerid, -HOUSE_UPDATE_EAT_PRICE);
 						HouseInfo[tmpIter[playerid]][hUpdateEat] = 1;
 						SaveHouseIntEx(tmpIter[playerid], "UpdateEat", 1);
 						MsgSuccess(playerid, "NAMAS", "Sëkmingai árengëte atnaujinimà.");
@@ -10984,7 +9290,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(sscanf(inputtext,"d",amount) || amount < 0) return OnDialogResponse(playerid, DIALOG_HM_SAFE_MAIN, 1, 1, "");
 				if(amount > HouseInfo[tmpIter[playerid]][hSafe]) return SendError(playerid, "Tiek pinigø banko seife nëra."), OnDialogResponse(playerid, DIALOG_HM_SAFE_MAIN, 1, 1, "");
 				HouseInfo[tmpIter[playerid]][hSafe] -= amount;
-				sd_GivePlayerMoney(playerid, amount);
+				GivePlayerMoney(playerid, amount);
 				pc_cmd_hmenu(playerid, "");
 				MsgSuccess(playerid, "NAMAS", "Paëmëte $%d ið seifo.", amount);
 				SaveHouseIntEx(tmpIter[playerid], "Safe", HouseInfo[tmpIter[playerid]][hSafe]);
@@ -11002,8 +9308,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new amount;
 				if(sscanf(inputtext,"d",amount) || amount < 0) return OnDialogResponse(playerid, DIALOG_HM_SAFE_MAIN, 1, 2, "");
-				if(amount > sd_GetPlayerMoney(playerid)) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount), OnDialogResponse(playerid, DIALOG_HM_SAFE_MAIN, 1, 2, "");
-				sd_GivePlayerMoney(playerid, -amount);
+				if(amount > GetPlayerMoney(playerid)) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount), OnDialogResponse(playerid, DIALOG_HM_SAFE_MAIN, 1, 2, "");
+				GivePlayerMoney(playerid, -amount);
 				HouseInfo[tmpIter[playerid]][hSafe] += amount;
 				pc_cmd_hmenu(playerid, "");
 				MsgSuccess(playerid, "NAMAS", "Padëjote $%d á seifà.", amount);
@@ -11502,10 +9808,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SendWarning(playerid, "Biudþete tiek pinigø nëra.");
 					return pc_cmd_bmenu(playerid, "");
 				}
-				sd_GivePlayerMoney(playerid, amount);
+				GivePlayerMoney(playerid, amount);
 				BusinessInfo[businessid][bBudget] -= amount;
 				SaveBusinessIntEx(businessid, "Budget", BusinessInfo[businessid][bBudget]);
-				SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
+				SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 				log_init(true);
 				log_set_table("logs_business");
 				log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`Amount`");
@@ -11523,15 +9829,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new amount,
 					businessid = tmpIter[playerid];
 				if(sscanf(inputtext,"d",amount) || amount < 1) return OnDialogResponse(playerid, DIALOG_BM_BUDGET_MAIN, 1, 1, "");
-				if(sd_GetPlayerMoney(playerid) < amount)
+				if(GetPlayerMoney(playerid) < amount)
 				{
 					InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
 					return pc_cmd_bmenu(playerid, "");
 				}
-				sd_GivePlayerMoney(playerid, -amount);
+				GivePlayerMoney(playerid, -amount);
 				BusinessInfo[businessid][bBudget] += amount;
 				SaveBusinessIntEx(businessid, "Budget", BusinessInfo[businessid][bBudget]);
-				SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
+				SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 				log_init(true);
 				log_set_table("logs_business");
 				log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`Amount`");
@@ -12080,10 +10386,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				// padeti
 				new amount;
 				if(sscanf(inputtext,"d",amount)) return 0, ShowPlayerBank(playerid);
-				if(0 < amount <= sd_GetPlayerMoney(playerid))
+				if(0 < amount <= GetPlayerMoney(playerid))
 				{
 					PlayerInfo[playerid][pBank] += amount;
-					sd_GivePlayerMoney(playerid, -amount);
+					GivePlayerMoney(playerid, -amount);
 					MsgSuccess(playerid, "BANKAS", "Padëjote $%d á sàskaità.", amount);
 					new string[126];
 					mysql_format(chandler, string, sizeof string, "INSERT INTO `players_bank_history` (`PlayerId`,`String`,`Amount`) VALUES ('%d','pinigø padëjimas banke','%d')", PlayerInfo[playerid][pId], amount);
@@ -12106,7 +10412,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(0 < amount <= PlayerInfo[playerid][pBank])
 				{
 					PlayerInfo[playerid][pBank] -= amount;
-					sd_GivePlayerMoney(playerid, amount);
+					GivePlayerMoney(playerid, amount);
 					MsgSuccess(playerid, "BANKAS", "Nusiëmëte $%d ið sàskaitos.", amount);
 					new string[126];
 					mysql_format(chandler, string, sizeof string, "INSERT INTO `players_bank_history` (`PlayerId`,`String`,`Amount`) VALUES ('%d','pinigø nuëmimas banke','%d')", PlayerInfo[playerid][pId], amount);
@@ -12168,13 +10474,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(PlayerInfo[playerid][pBankCard] <= 0)
 						{
 							// susikurti rodem jam
-							if(sd_GetPlayerMoney(playerid) < DEFAULT_BANK_CARD_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BANK_CARD_PRICE);
+							if(GetPlayerMoney(playerid) < DEFAULT_BANK_CARD_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BANK_CARD_PRICE);
 							else
 							{
 								MsgSuccess(playerid, "BANKAS", "Ásigijote banko kortelæ. Jûsø sàskaitos numeris: "#DEFAULT_IBAN_PREFIX"%d", GetPlayerIBAN(PlayerInfo[playerid][pId]));
 								PlayerInfo[playerid][pBankCard] = 1;
 								SaveAccountIntEx(playerid, "BankCard", 1);
-								sd_GivePlayerMoney(playerid, -DEFAULT_BANK_CARD_PRICE);
+								GivePlayerMoney(playerid, -DEFAULT_BANK_CARD_PRICE);
 								ShowPlayerBank(playerid);
 							}
 						}
@@ -12346,10 +10652,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				// padeti
 				new amount;
 				if(sscanf(inputtext,"d",amount)) return 0;
-				if(0 < amount <= sd_GetPlayerMoney(playerid))
+				if(0 < amount <= GetPlayerMoney(playerid))
 				{
 					PlayerInfo[playerid][pBank] += amount;
-					sd_GivePlayerMoney(playerid, -amount);
+					GivePlayerMoney(playerid, -amount);
 					MsgSuccess(playerid, "BANKOMATAS", "Padëjote $%d á sàskaità.", amount);
 					log_init(true);
 					log_set_table("logs_money");
@@ -12370,7 +10676,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(0 < amount <= PlayerInfo[playerid][pBank])
 				{
 					PlayerInfo[playerid][pBank] -= amount;
-					sd_GivePlayerMoney(playerid, amount);
+					GivePlayerMoney(playerid, amount);
 					MsgSuccess(playerid, "BANKOMATAS", "Nusiëmëte $%d ið sàskaitos.", amount);
 					log_init(true);
 					log_set_table("logs_money");
@@ -13116,7 +11422,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						MsgSuccess(playerid, "JUODOJI RINKA", "Tr. priemonë iðtrinta.");
 						if(IsValidVehicle(server))
 						{
-							sd_DestroyVehicle(server);
+							DestroyVehicle(server);
 						}
 						OnDialogResponse(playerid, DIALOG_AM_BM_DEALER_EDIT_MAIN, 1, 2, "");
 						log_init(true);
@@ -13466,7 +11772,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					cache_get_value_name_int(0, "Model", model);
 					cache_get_value_name_int(0, "Price", price);
 					cache_delete(result);
-					if(sd_GetPlayerMoney(playerid) < price)
+					if(GetPlayerMoney(playerid) < price)
 					{
 						pc_cmd_dealermenu(playerid, "");
 						return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
@@ -13474,7 +11780,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					else
 					{
 						BuyVehicle(playerid, model, GetModelName(model), price, random(56), random(56), 0, -1, 0, 1, DEFAULT_ANY_SALON_X, DEFAULT_ANY_SALON_Y, DEFAULT_ANY_SALON_Z, DEFAULT_ANY_SALON_A);
-						sd_GivePlayerMoney(playerid, -price);
+						GivePlayerMoney(playerid, -price);
 					}
 				}
 				if(cache_is_valid(result)) cache_delete(result);
@@ -13755,7 +12061,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								cache_delete(result);
 							}
 						}
-						if(sd_GetPlayerMoney(playerid) < final_price)
+						if(GetPlayerMoney(playerid) < final_price)
 						{
 							InfoBox(playerid, IB_NOT_ENOUGH_MONEY, final_price);
 							return OnDialogResponse(playerid, DIALOG_DM_GUNS_ORDER_LIST, 1, tmpTexture_MarkStart_CP[playerid], "");
@@ -13764,7 +12070,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							if(final_weapon_list[0] <= 0) return SendWarning(playerid, "Nepasirinkote ginklø.");
 							SendFormat(playerid, 0xBABABAFF, "Jûsø uþsakymas kainavo $%d, atðaukus uþsakymà pinigø neatgausite.", final_price);
-							sd_GivePlayerMoney(playerid, -final_price);
+							GivePlayerMoney(playerid, -final_price);
 							format(string, 2, "");
 							for(new i = 0; i < MAX_WEAPONS_PER_ORDER; i++)
 							{
@@ -13809,7 +12115,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								total_price += data_price*how_much_of_this_kind;
 							}
 						}
-						if(sd_GetPlayerMoney(playerid) < total_price)
+						if(GetPlayerMoney(playerid) < total_price)
 						{
 							InfoBox(playerid, IB_NOT_ENOUGH_MONEY);
 							return OnDialogResponse(playerid, DIALOG_DM_GUNS_ORDER_LIST, 1, tmpTexture_MarkStart_CP[playerid], "");
@@ -13818,7 +12124,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							if(!anyweapons) return SendWarning(playerid, "Nepasirinkote ginklø.");
 							SendFormat(playerid, 0xBABABAFF, "Jûsø uþsakymas kainavo $%d, atðaukus uþsakymà pinigø neatgausite.", total_price);
-							sd_GivePlayerMoney(playerid, -total_price);
+							GivePlayerMoney(playerid, -total_price);
 
 							format(string, 2, "");
 							for(new i = 0; i < MAX_WEAPONS_PER_ORDER; i++)
@@ -13892,7 +12198,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								}
 							}
 						}
-						if(sd_GetPlayerMoney(playerid) < total_price)
+						if(GetPlayerMoney(playerid) < total_price)
 						{
 							InfoBox(playerid, IB_NOT_ENOUGH_MONEY);
 							return OnDialogResponse(playerid, DIALOG_DM_DRUGS_ORDER_LIST, 1, tmpTexture_MarkStart_CP[playerid], "");
@@ -13901,7 +12207,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							if(!anydrugs) return SendWarning(playerid, "Nepasirinkote narkotikø.");
 							SendFormat(playerid, 0xBABABAFF, "Jûsø uþsakymas kainavo $%d, atðaukus uþsakymà pinigø neatgausite.", total_price);
-							sd_GivePlayerMoney(playerid, -total_price);
+							GivePlayerMoney(playerid, -total_price);
 							format(string, 2, "");
 							for(new i = 0; i < MAX_DRUGS_PER_ORDER; i++)
 							{
@@ -14029,7 +12335,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							string[126];
 						mysql_format(chandler, string, sizeof string, "UPDATE `dealers_houses_data` SET Owner = '0' WHERE id = '%d'", DealerHouseInfo[selected][dealerHouseId]);
 						mysql_fquery(chandler, string, "DealerSaved");
-						sd_GivePlayerMoney(playerid, DealerHouseInfo[selected][dealerHousePrice]/2);
+						GivePlayerMoney(playerid, DealerHouseInfo[selected][dealerHousePrice]/2);
 						SendFormat(playerid, 0x79DF75FF, "Sëkmingai pardavëte namà.");
 						log_init(true);
 						log_set_table("logs_dealer_houses");
@@ -17798,21 +16104,27 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if(response)
 			{
-				new olddata[E_VEHICLE_DATA],
-					model,
+				new model,
 					oldvehicleid = tmpIter[playerid],
 					vehicleid = INVALID_VEHICLE_ID;
 				if(sscanf(inputtext,"d",model) || model < 400 || model > 612) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 2, "");
-				new Float:x, Float:y, Float:z, Float:a;
+				
+				new Float:x, Float:y, Float:z, Float:a,
+					col1, col2;
+
 				GetVehiclePos(oldvehicleid, x, y, z);
 				GetVehicleZAngle(oldvehicleid, a);
-				olddata = VehicleInfo[oldvehicleid];
-				vehicleid = sd_CreateVehicle(model, x, y, z, a, olddata[vColor1], olddata[vColor2], olddata[vRespawnTime], olddata[vAddSiren]);
-				VehicleInfo[vehicleid] = olddata;
-				VehicleInfo[vehicleid][vModel] = model;
+				GetVehicleColor(oldvehicleid, col1, col2);
+
+
+				vehicleid = CreateVehicle(model, x, y, z, a, col1, col2, VehicleInfo[oldvehicleid][vRespawnTime], VehicleInfo[oldvehicleid][vAddSiren]);
+
+				VehicleInfo[vehicleid] = VehicleInfo[oldvehicleid];
 				SaveServerVehicleIntEx(vehicleid, "Model", model);
-				sd_DestroyVehicle(oldvehicleid);
+
+				DestroyVehicle(oldvehicleid);
 				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
+				
 				log_init(true);
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
@@ -17827,7 +16139,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new color1, color2, vehicleid = tmpIter[playerid];
 				if(sscanf(inputtext,"dd",color1,color2)) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 3, "");
-				sd_ChangeVehicleColor(vehicleid, color1, color2);
+				ChangeVehicleColor(vehicleid, color1, color2);
 				if(VehicleInfo[vehicleid][vOwner] <= 0)
 				{
 					SaveServerVehicleIntEx(vehicleid, "Color1", color1);
@@ -17862,7 +16174,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SetVehicleNumberPlate(vehicleid, numbers);
 				SaveServerVehicleIntEx(vehicleid, "JobId", jobid);
 				MsgSuccess(playerid, "TRANSPORTAS", "Tr. priemonë priskirta darbui, kurio ID: %d.", jobid);
-				sd_SetVehicleToRespawn(vehicleid);
+				SetVehicleToRespawn(vehicleid);
 				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 				log_init(true);
 				log_set_table("logs_admins");
@@ -17890,9 +16202,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				MsgSuccess(playerid, "TRANSPORTAS", "Tr. priemonë priskirta frakcijai, kurios MySQL numeris: %d.", factionid);
 				new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
 				for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
-				//PutFactionWeaponsInVehicle(vehicleid);
-				sd_SetVehicleToRespawn(vehicleid);
+				
+				SetVehicleToRespawn(vehicleid);
 				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
+
 				log_init(true);
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
@@ -18067,20 +16380,26 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID || (IsPlayerInAnyVehicle(playerid) && (vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID))
 							{
 								tmpIter[playerid] = vehicleid;
-								new Float:x, Float:y, Float:z, Float:a,
-									olddata[E_VEHICLE_DATA],
-									newvehicleid;
+								new Float:x, Float:y, Float:z, Float:a, model,
+									newvehicleid,
+									col1, col2;
+
+								model = GetVehicleModel(vehicleid);
 								GetVehiclePos(vehicleid, x, y, z);
 								GetVehicleZAngle(vehicleid, a);
+								GetVehicleColor(vehicleid, col1, col2);
+
 								SaveServerVehicleFloatEx(vehicleid, "X", x);
 								SaveServerVehicleFloatEx(vehicleid, "Y", y);
 								SaveServerVehicleFloatEx(vehicleid, "Z", z);
 								SaveServerVehicleFloatEx(vehicleid, "A", a);
-								olddata = VehicleInfo[vehicleid];
-								newvehicleid = sd_CreateVehicle(olddata[vModel], x, y, z, a, olddata[vColor1], olddata[vColor2], olddata[vRespawnTime], olddata[vAddSiren]);
-								VehicleInfo[newvehicleid] = olddata;
-								sd_DestroyVehicle(vehicleid);
+								
+								newvehicleid = CreateVehicle(model, x, y, z, a, col1, col2, VehicleInfo[vehicleid][vRespawnTime], VehicleInfo[vehicleid][vAddSiren]);
+								VehicleInfo[newvehicleid] = VehicleInfo[vehicleid];
+
+								DestroyVehicle(vehicleid);
 								MsgSuccess(playerid, "TRANSPORTAS", "Vieta sëkmingai iðsaugota.");
+
 								log_init(true);
 								log_set_table("logs_admins");
 								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
@@ -18112,7 +16431,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								new string[126];
 								mysql_format(chandler, string, sizeof string, "DELETE IGNORE FROM `vehicles_server` WHERE id = '%d'", VehicleInfo[vehicleid][vId]);
 								mysql_fquery(chandler, string, "VehicleDeletedEx");
-								sd_DestroyVehicle(vehicleid);
+								DestroyVehicle(vehicleid);
 								OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 								MsgSuccess(playerid, "TRANSPORTAS", "Sëkmingai iðtrynëte tr. priemonæ.");
 								ShowPlayerAdminMenu(playerid);
@@ -19948,28 +18267,28 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 0:
 					{
 						if(PlayerInfo[playerid][pJobLevel] <= 1) return SendWarning(playerid, "Ðaunamieji ginklai leidþiami tik nuo 2 rango.");
-						if(!sd_CheckIfSlotUsed(playerid, sd_GetWeaponSlot(WEAPON_DEAGLE))) sd_GivePlayerWeapon(playerid, WEAPON_DEAGLE, 70, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+						if(!PlayerHasWeaponInSlot(playerid, FAC_GetWeaponSlot(WEAPON_DEAGLE))) GivePlayerWeapon(playerid, WEAPON_DEAGLE, 70, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 						log_set_values("'%d','%e','Pasieme ginkla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), WEAPON_DEAGLE);
 					}
 					case 1:
 					{
-						if(!sd_CheckIfSlotUsed(playerid, sd_GetWeaponSlot(WEAPON_NITESTICK))) sd_GivePlayerWeapon(playerid, WEAPON_NITESTICK, 1, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+						if(!PlayerHasWeaponInSlot(playerid, FAC_GetWeaponSlot(WEAPON_NITESTICK))) GivePlayerWeapon(playerid, WEAPON_NITESTICK, 1, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 						log_set_values("'%d','%e','Pasieme ginkla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), WEAPON_NITESTICK);
 					}
 					case 2:
 					{
-						if(!sd_CheckIfSlotUsed(playerid, sd_GetWeaponSlot(WEAPON_SPRAYCAN))) sd_GivePlayerWeapon(playerid, WEAPON_SPRAYCAN, 500, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+						if(!PlayerHasWeaponInSlot(playerid, FAC_GetWeaponSlot(WEAPON_SPRAYCAN))) GivePlayerWeapon(playerid, WEAPON_SPRAYCAN, 500, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 						log_set_values("'%d','%e','Pasieme ginkla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), WEAPON_SPRAYCAN);
 					}
 					case 3:
 					{
 						if(PlayerInfo[playerid][pJobLevel] <= 1) return SendWarning(playerid, "Ðaunamieji ginklai leidþiami tik nuo 2 rango.");
-						if(!sd_CheckIfSlotUsed(playerid, sd_GetWeaponSlot(WEAPON_SHOTGUN))) sd_GivePlayerWeapon(playerid, WEAPON_SHOTGUN, 30, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+						if(!PlayerHasWeaponInSlot(playerid, FAC_GetWeaponSlot(WEAPON_SHOTGUN))) GivePlayerWeapon(playerid, WEAPON_SHOTGUN, 30, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 						log_set_values("'%d','%e','Pasieme ginkla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), WEAPON_SHOTGUN);
 					}
 					case 4:
 					{
-						if(!sd_CheckIfSlotUsed(playerid, sd_GetWeaponSlot(WEAPON_CAMERA))) sd_GivePlayerWeapon(playerid, WEAPON_CAMERA, 1000, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+						if(!PlayerHasWeaponInSlot(playerid, FAC_GetWeaponSlot(WEAPON_CAMERA))) GivePlayerWeapon(playerid, WEAPON_CAMERA, 1000, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 						log_set_values("'%d','%e','Pasieme ginkla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), WEAPON_CAMERA);
 					}
 				}
@@ -20238,7 +18557,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							SaveAccountIntEx(receiverid, "JobLevel", 0);
 							SaveAccountIntEx(receiverid, "PoliceBadge", 0);
 						
-							sd_ResetPlayerWeapons(receiverid);
+							ResetPlayerWeapons(receiverid);
 
 							PlayerExtra[receiverid][peTazer] = 0;
 						}
@@ -20485,7 +18804,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							tmpArray[playerid][id] = vehicleid;
 							id++;
-							format(line, sizeof line, "%d.\t%s\t%s\n", id, GetModelName(VehicleInfo[vehicleid][vModel]), VehicleInfo[vehicleid][vNumbers]);
+							format(line, sizeof line, "%d.\t%s\t%s\n", id, GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vNumbers]);
 							strcat(string, line);
 						}
 					}
@@ -20569,7 +18888,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(listitem == 1)
 				{
 					// minimalus rangas
-					MsgInfo(playerid, "FRAKCIJA", "Pasirinkite rangà, nuo kurio leisite vairuoti %s", GetModelName(VehicleInfo[tmpArray[playerid][tmpSelected[playerid]]][vModel]));
+					MsgInfo(playerid, "FRAKCIJA", "Pasirinkite rangà, nuo kurio leisite vairuoti %s", GetModelName(GetVehicleModel(tmpArray[playerid][tmpSelected[playerid]])));
 					new string[1024],
 						factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
 					for(new i = 0; i < MAX_FACTION_RANKS; i++)
@@ -20601,21 +18920,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
 						GetVehiclePos(vehicleid, x, y, z);
 						GetVehicleZAngle(vehicleid, a);
+						GetVehicleColor(vehicleid, color1, color2);
 						VehicleInfo[vehicleid][vSyncX] = x;
 						VehicleInfo[vehicleid][vSyncY] = y;
 						VehicleInfo[vehicleid][vSyncZ] = z;
 						VehicleInfo[vehicleid][vSyncA] = a;
 						id = VehicleInfo[vehicleid][vId];
-						color1 = VehicleInfo[vehicleid][vColor1];
 						addtype = VehicleInfo[vehicleid][vExtraId];
-						color2 = VehicleInfo[vehicleid][vColor2];
 						addsiren = VehicleInfo[vehicleid][vAddSiren];
 						respawntime = VehicleInfo[vehicleid][vRespawnTime];
 						price = VehicleInfo[vehicleid][vPrice];
 						km = VehicleInfo[vehicleid][vKM];
 						model = GetVehicleModel(vehicleid);
 						format(string, sizeof string, VehicleInfo[vehicleid][vUnitText]);
-						sd_DestroyVehicle(vehicleid);
+						DestroyVehicle(vehicleid);
 						new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
 						for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
 
@@ -20627,7 +18945,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(strlen(string))
 						{
 							new Float:mx, Float:mz, Float:my;
-							GetVehicleModelInfo(VehicleInfo[newvehicleid][vModel], VEHICLE_MODEL_INFO_SIZE, mx, my, mz);
+							GetVehicleModelInfo(GetVehicleModel(newvehicleid), VEHICLE_MODEL_INFO_SIZE, mx, my, mz);
 							VehicleInfo[newvehicleid][vUnitLabel] = CreateDynamic3DTextLabel(string, 0xFFFFFFFF, 0.425*mx, (-0.45*my), (-0.1*mz), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
 						}
 
@@ -20680,7 +18998,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(money < 0) money = 0;
 						mysql_format(chandler, string, sizeof string, "DELETE FROM `vehicles_server` WHERE id = '%d'", VehicleInfo[vehicleid][vId]);
 						mysql_fquery(chandler, string, "VehicleDeletedEx");
-						sd_DestroyVehicle(vehicleid);
+						DestroyVehicle(vehicleid);
 						MsgSuccess(playerid, "FRAKCIJA", "Tr. priemonë parduota, gavote $%d.", money);
 					}
 				}
@@ -20699,7 +19017,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new vehicleid = tmpArray[playerid][tmpSelected[playerid]];
 				if(IsValidVehicle(vehicleid))
 				{
-					sd_ChangeVehicleColor(vehicleid, col1, col2);
+					ChangeVehicleColor(vehicleid, col1, col2);
 					SaveServerVehicleIntEx(vehicleid, "Color1", col1);
 					SaveServerVehicleIntEx(vehicleid, "Color2", col2);
 					MsgSuccess(playerid, "FRAKCIJA", "Tr. priemonë perdaþyta.");
@@ -20724,7 +19042,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				/*new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
 				for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
 				PutFactionWeaponsInVehicle(vehicleid);*/
-				MsgSuccess(playerid, "FRAKCIJA", "Nustatëte minimalø rangà á %s tr. priemonei %s", FactionRankNames[factionid][listitem], GetModelName(VehicleInfo[vehicleid][vModel]));
+				MsgSuccess(playerid, "FRAKCIJA", "Nustatëte minimalø rangà á %s tr. priemonei %s", FactionRankNames[factionid][listitem], GetModelName(GetVehicleModel(vehicleid)));
 				pc_cmd_fmenu(playerid, "");
 				log_init(true);
 				log_set_table("logs_factions");
@@ -20777,7 +19095,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						else
 						{
 							new Float:x, Float:z, Float:y;
-							GetVehicleModelInfo(VehicleInfo[vehicleid][vModel], VEHICLE_MODEL_INFO_SIZE, x, y, z);
+							GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, x, y, z);
 							VehicleInfo[vehicleid][vUnitLabel] = CreateDynamic3DTextLabel(inputtext, 0xFFFFFFFF, 0.425*x, (-0.45*y), (-0.1*z), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
 						}
 						format(VehicleInfo[vehicleid][vUnitText], 15, inputtext);
@@ -20807,7 +19125,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(listitem == 1)
 				{
 					new string[126];
-					format(string, sizeof string, "{E4E4E4}Áveskite kieká pinigø, kurá norite padëti á biudþetà.\nRankose turite: {AFEE9E}$%d", sd_GetPlayerMoney(playerid));
+					format(string, sizeof string, "{E4E4E4}Áveskite kieká pinigø, kurá norite padëti á biudþetà.\nRankose turite: {AFEE9E}$%d", GetPlayerMoney(playerid));
 					ShowPlayerDialog(playerid, DIALOG_FM_BUDGET_PUT, DIALOG_STYLE_INPUT, "Frakcijos biudþetas", string, "Tæsti", "Atðaukti");
 				}
 				else if(listitem == 2)
@@ -20827,9 +19145,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new amount, factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
 				if(sscanf(inputtext,"d",amount)) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "");
-				if(sd_GetPlayerMoney(playerid) < amount || amount < 0) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "") , InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
+				if(GetPlayerMoney(playerid) < amount || amount < 0) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "") , InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
 				FactionInfo[factionid][fBudget] += amount;
-				sd_GivePlayerMoney(playerid, -amount);
+				GivePlayerMoney(playerid, -amount);
 				MsgSuccess(playerid, "FRAKCIJA", "Padëjote $%d á frakcijos biudþetà.", amount);
 				OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "");
 				SaveFactionIntEx(factionid, "Budget", FactionInfo[factionid][fBudget]);
@@ -20849,7 +19167,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(sscanf(inputtext,"d",amount)) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 2, "");
 				if(FactionInfo[factionid][fBudget] < amount || amount < 0) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 2, "") , InfoBox(playerid, "NEPAKANKAMAI", "PINIGU BIUDZETE");
 				FactionInfo[factionid][fBudget] -= amount;
-				sd_GivePlayerMoney(playerid, amount);
+				GivePlayerMoney(playerid, amount);
 				MsgSuccess(playerid, "FRAKCIJA", "Paëmete $%d ið frakcijos biudþeto.", amount);
 				OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 2, "");
 				SaveFactionIntEx(factionid, "Budget", FactionInfo[factionid][fBudget]);
@@ -20867,7 +19185,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new color1, color2;
 				if(sscanf(inputtext,"dd",color1,color2)) return ShowPlayerDialog(playerid, DIALOG_MECHANIC_SELECT_COLORS, DIALOG_STYLE_INPUT, "Perdaþymas", "{FFFFFF}Áveskite abiejø spalvø kodà, pvz: 0 10\n{BABABA}(wiki.sa-mp.com/wiki/Vehicle_Color_IDs)", "Tæsti", "Atðaukti");
-				//if((weaponid = sd_CheckIfSlotUsed(playerid, 9)) != 0)
+				//if((weaponid = PlayerHasWeaponInSlot(playerid, 9)) != 0)
 				//{
 					//return SendWarning(playerid, "pasidëkite ginklà %s á inventoriø ir bandykite dar kartà.", GetWeaponName(weaponid));
 				//}
@@ -20879,11 +19197,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					DisablePlayerCheckpointEx(playerid);
 					return ResetPlayerJobTask(playerid, true);
 				}
-				sd_GivePlayerWeapon(playerid, 41, 7500, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+				GivePlayerWeapon(playerid, 41, 7500, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 				new Float:x, Float:y, Float:z;
 				GetPosFrontVehicle(PlayerInfo[playerid][pJobVehicle], x, y, z, 1.5);
 				SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_REPAINT_VEHICLE, x, y, z, 2.3);
-				sd_GivePlayerMoney(playerid, -DEFAULT_REPAINT_PRICE);
+				GivePlayerMoney(playerid, -DEFAULT_REPAINT_PRICE);
 				PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_REPAINT_VEHICLE;
 				PlayerInfo[playerid][pJobActionTime] = 60;
 				PlayerInfo[playerid][pJobActionIndex] = 0;
@@ -21483,11 +19801,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								format(name, 34, gFurnitureInfo[selected][gfName]);
 							}
 						}
-						if(sd_GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
+						if(GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
 						else
 						{
 							//BuyFurniture(playerid, tmpType_Salon[playerid], ownerid, FurnitureList[tmpSelected[playerid]][furnitureListPrice], FurnitureList[tmpSelected[playerid]][furnitureListModel], FurnitureList[tmpSelected[playerid]][furnitureListName], FurnitureListNames[FurnitureList[tmpSelected[playerid]][furnitureListCategory]], PlayerInfo[playerid][pPosX]+2.0, PlayerInfo[playerid][pPosY]+2.0, PlayerInfo[playerid][pPosZ]+1.0, 0.0, 0.0, 0.0);
-							sd_GivePlayerMoney(playerid, -price);
+							GivePlayerMoney(playerid, -price);
 							BuyFurniture(playerid, tmpType_Salon[playerid], owner, price, model, name, "Duplikuoti", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
 						}
 					}
@@ -21503,7 +19821,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							case 1:
 							{
 								price = hFurnitureInfo[tmpSelected[playerid]][hfPrice]/2;
-								sd_GivePlayerMoney(playerid, price);
+								GivePlayerMoney(playerid, price);
 								format(name, sizeof name, hFurnitureInfo[tmpSelected[playerid]][hfName]);
 								Iter_Remove(HFurniture, tmpSelected[playerid]);
 								mysql_format(chandler, string, sizeof string, "DELETE FROM `houses_furniture` WHERE id = '%d'", hFurnitureInfo[tmpSelected[playerid]][hfId]);
@@ -21516,7 +19834,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							{
 								price = bFurnitureInfo[tmpSelected[playerid]][bfPrice]/2;
 								new businessid = FindBusinessBySql(bFurnitureInfo[tmpSelected[playerid]][bfOwner]);
-								sd_GivePlayerMoney(playerid, price);
+								GivePlayerMoney(playerid, price);
 								format(name, sizeof name, bFurnitureInfo[tmpSelected[playerid]][bfName]);
 								Iter_Remove(BFurniture, tmpSelected[playerid]);
 								mysql_format(chandler, string, sizeof string, "DELETE FROM `business_furniture` WHERE id = '%d'", bFurnitureInfo[tmpSelected[playerid]][bfId]);
@@ -21528,7 +19846,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							case 3:
 							{
 								price = gFurnitureInfo[tmpSelected[playerid]][gfPrice]/2;
-								sd_GivePlayerMoney(playerid, price);
+								GivePlayerMoney(playerid, price);
 								format(name, sizeof name, gFurnitureInfo[tmpSelected[playerid]][gfName]);
 								Iter_Remove(GFurniture, tmpSelected[playerid]);
 								mysql_format(chandler, string, sizeof string, "DELETE FROM `garages_furniture` WHERE id = '%d'", gFurnitureInfo[tmpSelected[playerid]][gfId]);
@@ -23619,10 +21937,10 @@ stock SendWeaponsOrderTo(playerid, invtype, selected)
 				{
 					for(new i = 0; i < count; i++)
 					{
-						new unique_id_of_this_weapons = sd_InsertWeaponId(playerid, weapons[i], GetAmmoAmountForOrder(weapons[i]), WEAPON_GIVE_TYPE_NORMAL);
-						if(unique_id_of_this_weapons != -1)
+						new unique_wep_id = CreateUniqueWeaponId(playerid, weapons[i], GetAmmoAmountForOrder(weapons[i]), WEAPON_GIVE_TYPE_NORMAL);
+						if(unique_wep_id != -1)
 						{
-							GiveDealerHouseInventoryItem(selected, weapons[i], GetAmmoAmountForOrder(weapons[i]), unique_id_of_this_weapons);
+							GiveDealerHouseInventoryItem(selected, weapons[i], GetAmmoAmountForOrder(weapons[i]), unique_wep_id);
 						}
 					}
 					mysql_format(chandler, string, sizeof string, "UPDATE `dealers_guns_orders` SET Valid = '0' WHERE Valid = '1' AND PlayerId = '%d'", PlayerInfo[playerid][pId]);
@@ -23636,10 +21954,10 @@ stock SendWeaponsOrderTo(playerid, invtype, selected)
 				{
 					for(new i = 0; i < count; i++)
 					{
-						new unique_id_of_this_weapons = sd_InsertWeaponId(playerid, weapons[i], GetAmmoAmountForOrder(weapons[i]), WEAPON_GIVE_TYPE_NORMAL);
-						if(unique_id_of_this_weapons != -1)
+						new unique_wep_id = CreateUniqueWeaponId(playerid, weapons[i], GetAmmoAmountForOrder(weapons[i]), WEAPON_GIVE_TYPE_NORMAL);
+						if(unique_wep_id != -1)
 						{
-							GiveVehicleInventoryItem(selected, weapons[i], GetAmmoAmountForOrder(weapons[i]), unique_id_of_this_weapons);
+							GiveVehicleInventoryItem(selected, weapons[i], GetAmmoAmountForOrder(weapons[i]), unique_wep_id);
 						}
 					}
 					mysql_format(chandler, string, sizeof string, "UPDATE `dealers_guns_orders` SET Valid = '0' WHERE Valid = '1' AND PlayerId = '%d'", PlayerInfo[playerid][pId]);
@@ -24180,11 +22498,12 @@ stock SavePlayerHoldingWeapons(playerid)
 	new
 		packed[512],
 		string[512],
-		data[2];
+		data[4];
 	for(new i = 0; i < 13; i++)
 	{
-		sd_GetPlayerWeaponData(playerid, i, data[0], data[1]);
-		format(packed, sizeof packed, "%s%d|%d|%d|%d|", packed, data[0], data[1], ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType], ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId]);
+		GetPlayerWeaponData(playerid, i, data[0], data[1]);
+		GetPlayerWeaponExtraData(playerid, i, data[2], data[3]);
+		format(packed, sizeof packed, "%s%d|%d|%d|%d|", packed, data[0], data[1], data[2], data[3]);
 	}
 	mysql_format(chandler, string, sizeof string, "UPDATE `players_weapons` SET Packed = '%e' WHERE PlayerId = '%d'", packed, PlayerInfo[playerid][pId]);
 	mysql_fquery(chandler, string, "WeaponsSaved");
@@ -24266,7 +22585,7 @@ stock PlayerPhoneSMS(playerid, receiver_number, text[])
 	{
 		if(receiver_number == DEFAULT_STUDIO_NUMBER)
 		{	
-			if(sd_GetPlayerMoney(playerid) < 5) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, 5);
+			if(GetPlayerMoney(playerid) < 5) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, 5);
 			
 			new 
 				string[512];
@@ -24277,7 +22596,7 @@ stock PlayerPhoneSMS(playerid, receiver_number, text[])
 			mysql_format(chandler, string, sizeof string, "INSERT INTO `san_news_sms` (`PlayerNumber`,`Text`) VALUES ('%d','%e')", PlayerInfo[playerid][pPhoneNumber], text);
 			mysql_tquery(chandler, string, "SanNewsSMSAdd");
 
-			sd_GivePlayerMoney(playerid, -5);
+			GivePlayerMoney(playerid, -5);
 
 			new factionid = GetFactionArrayIndexByType(FACTION_TYPE_SAN_NEWS);
 			if(factionid != -1)
@@ -24287,7 +22606,7 @@ stock PlayerPhoneSMS(playerid, receiver_number, text[])
 		}	
 		else
 		{
-			if(sd_GetPlayerMoney(playerid) < 1) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, 1);
+			if(GetPlayerMoney(playerid) < 1) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, 1);
 			new sender_number = PlayerInfo[playerid][pPhoneNumber],
 				string[256];
 
@@ -24307,7 +22626,7 @@ stock PlayerPhoneSMS(playerid, receiver_number, text[])
 			mysql_format(chandler, string, sizeof string, "INSERT INTO `players_sms` (`SenderNumber`,`ReceiverNumber`,`Text`,`Notification`) VALUES ('%d','%d','%e','%d')", sender_number, receiver_number, text, PhoneInfo[receiver][phoneDisabled] > 0 ? (1) : (0));
 			mysql_fquery(chandler, string, "SMSAdded");
 
-			sd_GivePlayerMoney(playerid, -1);
+			GivePlayerMoney(playerid, -1);
 		}
 	}
 	else
@@ -25292,7 +23611,7 @@ stock AddServerVehicle(model, factionid, jobid, addedby, Float:x, Float:y, Float
 	{
 		if(FactionInfo[factionid][fType] == FACTION_TYPE_POLICE) addsiren = 1;
 	}
-	new vehicleid = sd_CreateVehicle(model, x, y, z, a, color1, color2, respawntime, addsiren),
+	new vehicleid = CreateVehicle(model, x, y, z, a, color1, color2, respawntime, addsiren),
 		string[256];
 	if(factionid != -1) VehicleInfo[vehicleid][vFaction] = FactionInfo[factionid][fId];
 	if(jobid != -1) VehicleInfo[vehicleid][vJob] = Jobs[jobid][jobId];
@@ -25762,7 +24081,7 @@ public OnPlayerUseInventoryItem(playerid, slotid)
 
 	if(1 <= itemid <= 46)
 	{
-		sd_GivePlayerWeapon(playerid, itemid, amount, WEAPON_GIVE_TYPE_NORMAL, extra);
+		GivePlayerWeapon(playerid, itemid, amount, WEAPON_GIVE_TYPE_NORMAL, extra);
 		SendFormat(playerid, 0xBABABAFF, "Iðsitraukëte ginklà: %s (%d kulkø)", GetInventoryItemName(itemid), amount);
 		ClearPlayerInventorySlot(playerid, slotid);
 
@@ -26656,7 +24975,7 @@ stock ResetPlayerJobTask(playerid, bool:resetvehiclevar = true)
 	{
 		if(PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_REPAINT_VEHICLE)
 		{
-			sd_ClearWeaponSlot(playerid, 9);
+			RemovePlayerWeaponInSlot(playerid, 9);
 		}
 		if(PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_TUNE_VEHICLE || PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_TAKE_WHEELS)
 		{
@@ -27793,6 +26112,7 @@ stock StartLoadBar(playerid, type, time)
 	LoadBarInfo[playerid][barValue] = 0;
 	PlayerTextDrawShow(playerid, LoadBar_Base[playerid]);
 	PlayerTextDrawShow(playerid, LoadBar_LoadFull[playerid]);
+	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], 0.0, 3.0);
 	PlayerTextDrawShow(playerid, LoadBar_Loaded[playerid]);
 	PlayerTextDrawShow(playerid, LoadBar_Text[playerid]);
 	return LoadBarInfo[playerid][barTimer] = SetTimerEx("UpdateLoadBar", time/10, true, "d", playerid);
@@ -27858,6 +26178,7 @@ stock ParkVehicle(vehicleid, Float:health = -1.0, bool:use_sync = true)
 	new
 		panels, doors, lights, tires,
 		Float:x, Float:y, Float:z, Float:a,
+		col1, col2,
 		damage[50],
 		string[312];
 
@@ -27877,11 +26198,14 @@ stock ParkVehicle(vehicleid, Float:health = -1.0, bool:use_sync = true)
 		GetVehiclePos(vehicleid, x, y, z);
 		GetVehicleZAngle(vehicleid, a);
 	}
-
+	GetVehicleColor(vehicleid, col1, col2);
 	GetVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
 	format(damage, sizeof damage, "%d/%d/%d/%d/%d/", panels, doors, lights, tires, floatround(health));
 
-	mysql_format(chandler, string, sizeof string, "UPDATE `vehicles_data` SET Color1 = '%d', Color2 = '%d', X = '%f', Y = '%f', Z = '%f', A = '%f', Damage = '%e', SpawnedId = '0', Fuel = '%f', KM = '%f', VW = '%d', Interior = '%d' WHERE id = '%d'", VehicleInfo[vehicleid][vColor1], VehicleInfo[vehicleid][vColor2], x, y, z, a, damage, VehicleInfo[vehicleid][vFuel], VehicleInfo[vehicleid][vKM], GetVehicleVirtualWorld(vehicleid), VehicleInfo[vehicleid][vInt], VehicleInfo[vehicleid][vId]);
+	mysql_format(chandler, string, sizeof string, "\
+		UPDATE `vehicles_data` SET Color1 = '%d', Color2 = '%d', X = '%f', Y = '%f', Z = '%f', A = '%f', \
+		Damage = '%e', SpawnedId = '0', Fuel = '%f', KM = '%f', VW = '%d', Interior = '%d' WHERE id = '%d'",
+		col1, col2, x, y, z, a, damage, VehicleInfo[vehicleid][vFuel], VehicleInfo[vehicleid][vKM], GetVehicleVirtualWorld(vehicleid), VehicleInfo[vehicleid][vInt], VehicleInfo[vehicleid][vId]);
 	mysql_fquery(chandler, string, "VehicleParked");
 
 	if(IsValidDynamicObject(vehicle_Taxi_Object[vehicleid]))
@@ -27904,7 +26228,7 @@ stock ParkVehicle(vehicleid, Float:health = -1.0, bool:use_sync = true)
 	SaveVehicleInventory(vehicleid);
 
 	NullVehicle(vehicleid);
-	sd_DestroyVehicle(vehicleid);
+	DestroyVehicle(vehicleid);
 	return 1;
 }
 
@@ -29434,7 +27758,7 @@ stock LoadServerVehicles(bool:restart = false)
 				VehicleInfo[vehicleid][vFaction] = 0;
 				VehicleInfo[vehicleid][vRequiredLevel] = 0;
 			}
-			sd_DestroyVehicle(vehicleid);
+			DestroyVehicle(vehicleid);
 		}
 	}
 	mysql_tquery(chandler, "SELECT * FROM `vehicles_server`", "ServerVehiclesLoad");
@@ -29458,7 +27782,7 @@ public ServerVehiclesLoad()
 		cache_get_value_name_int(i, "AddSiren", addsiren);
 		cache_get_value_name_int(i, "FactionId", factionid);
 		if(factionid > 0 && FactionInfo[GetFactionArrayIndexById(factionid)][fType] == FACTION_TYPE_POLICE) addsiren = 1;
-		new vehicleid = sd_CreateVehicle(model, x, y, z, a, color1, color2, 0, addsiren);
+		new vehicleid = CreateVehicle(model, x, y, z, a, color1, color2, 0, addsiren);
 		if(vehicleid == INVALID_VEHICLE_ID) { continue; }
 		VehicleInfo[vehicleid][vFaction] = factionid;
 		cache_get_value_name_int(i, "JobId", VehicleInfo[vehicleid][vJob]);
@@ -29472,10 +27796,9 @@ public ServerVehiclesLoad()
 		if(strlen(VehicleInfo[vehicleid][vUnitText]))
 		{
 			new Float:mx, Float:mz, Float:my;
-			GetVehicleModelInfo(VehicleInfo[vehicleid][vModel], VEHICLE_MODEL_INFO_SIZE, mx, my, mz);
+			GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, mx, my, mz);
 			VehicleInfo[vehicleid][vUnitLabel] = CreateDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitText], 0xFFFFFFFF, 0.425*mx, (-0.45*my), (-0.1*mz), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
 		}
-		VehicleInfo[vehicleid][vModel] = model;
 		VehicleInfo[vehicleid][vFuel] = float(VehicleFuelCapacityList[model-400]);
 		VehicleInfo[vehicleid][vSyncX] = x;
 		VehicleInfo[vehicleid][vSyncY] = y;
@@ -29483,8 +27806,7 @@ public ServerVehiclesLoad()
 		VehicleInfo[vehicleid][vSyncA] = a;
 		VehicleInfo[vehicleid][vEngineStatus] =
 		VehicleInfo[vehicleid][vBatteryStatus] = 100.0;
-		VehicleInfo[vehicleid][vColor1] = color1;
-		VehicleInfo[vehicleid][vColor2] = color2;
+		
 		new numbers[10];
 		if(VehicleInfo[vehicleid][vJob] != 0)
 		{
@@ -29587,7 +27909,7 @@ stock SaveAccount(playerid, bool:save_inventory = false, bool:save_groups = true
 	GetPlayerFacingAngle(playerid, a);
 	mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET X = '%f', Y = '%f', Z = '%f', A = '%f', Skin = '%d', XP = '%d', Level = '%d', SideJob = '%d',", x, y, z, a, PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pXP], PlayerInfo[playerid][pLevel], PlayerInfo[playerid][pSideJob]);
 	mysql_format(chandler, string, sizeof string, "%sJob = '%d', JobContract = '%d', JobXP = '%d', JobLevel = '%d', PayCheck = '%d', HaveCars = '%d', PayDayCollected = '%d',", string, PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobContract], PlayerInfo[playerid][pJobXP], PlayerInfo[playerid][pJobLevel], PlayerInfo[playerid][pPayCheck], PlayerInfo[playerid][pHaveCars], PlayerInfo[playerid][pPayDayCollected]);
-	mysql_format(chandler, string, sizeof string, "%sMoney = '%d', Faction = '%d', PayDayTime = '%d', Savings = '%d', Bank = '%d', VW = '%d', Interior = '%d', FactionLeader = '%d',", string, sd_GetPlayerMoney(playerid), PlayerInfo[playerid][pFaction], PlayerInfo[playerid][pPayDayTime], PlayerInfo[playerid][pSavings], PlayerInfo[playerid][pBank], GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), PlayerInfo[playerid][pFactionLeader]);
+	mysql_format(chandler, string, sizeof string, "%sMoney = '%d', Faction = '%d', PayDayTime = '%d', Savings = '%d', Bank = '%d', VW = '%d', Interior = '%d', FactionLeader = '%d',", string, GetPlayerMoney(playerid), PlayerInfo[playerid][pFaction], PlayerInfo[playerid][pPayDayTime], PlayerInfo[playerid][pSavings], PlayerInfo[playerid][pBank], GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), PlayerInfo[playerid][pFactionLeader]);
 	mysql_format(chandler, string, sizeof string, "%sHoursPlayed = '%d', BankCard = '%d', PoliceBadge = '%d', FactionPermission1 = '%d', FactionPermission2 = '%d', FactionPermission3 = '%d',", string, PlayerInfo[playerid][pHoursPlayed], PlayerInfo[playerid][pBankCard], PlayerInfo[playerid][pPoliceBadge], PlayerInfo[playerid][pFactionPermissions][0], PlayerInfo[playerid][pFactionPermissions][1], PlayerInfo[playerid][pFactionPermissions][2]);
 	mysql_format(chandler, string, sizeof string, "%sPhoneNumber = '%d', JailTime = '%d', JailType = '%d', Fishes = '%d', FishedLimit = '%d'", string, PlayerInfo[playerid][pPhoneNumber], PlayerInfo[playerid][pJailTime], PlayerInfo[playerid][pJailType], PlayerInfo[playerid][pFishes], PlayerInfo[playerid][pFishedLimit]);
 	mysql_format(chandler, string, sizeof string, "%s WHERE id = '%d'", string, PlayerInfo[playerid][pId]);
@@ -29779,7 +28101,7 @@ public AccountLoad(playerid)
 		}
 		new tmpint;
 		cache_get_value_name_int(0, "Money", tmpint);
-		sd_GivePlayerMoney(playerid, tmpint);
+		GivePlayerMoney(playerid, tmpint);
 		cache_get_value_name_int(0, "Skin", PlayerInfo[playerid][pSkin]);
 		//if(!(0 <= PlayerInfo[playerid][pSkin] <= 311)) PlayerInfo[playerid][pSkin] = 1;
 		cache_get_value_name_int(0, "Interior", PlayerInfo[playerid][pInterior]);
@@ -30533,8 +28855,6 @@ stock HaveVehicleKey(playerid, vehicleid, bool:check_only_owner = false, bool:ca
 stock NullVehicle(vehicleid)
 {
 	VehicleInfo[vehicleid][vId] =
-	VehicleInfo[vehicleid][vColor1] =
-	VehicleInfo[vehicleid][vColor2] =
 	VehicleInfo[vehicleid][vOwner] =
 	VehicleInfo[vehicleid][vLock] =
 	VehicleInfo[vehicleid][vInsurance] =
@@ -30660,7 +28980,6 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 
 	OldVehicle[playerid] = INVALID_VEHICLE_ID;
 	tmpSelected[playerid] = -1;
-	airbrk_count[playerid] = 0;
 
 	
 	tmpType_Salon[playerid] = 
@@ -30715,9 +29034,8 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 
 	new __reset_Inventory[E_INVENTORY_DATA];
 	for(new i = 0; i < MAX_INVENTORY_SLOTS; i++) InventoryInfo[playerid][i] = __reset_Inventory;
-	sd_ResetPlayerWeapons(playerid);
-	ac__PlayerIgnoreWeaponAC[playerid] = 2;
-	sd_ResetPlayerMoney(playerid);
+	ResetPlayerWeapons(playerid);
+	ResetPlayerMoney(playerid);
 	#if defined BETA_TEST_MODE
 		CollectingReportBugData[playerid] = false;
 		format(CollectedReportBugData[playerid], 1, "");
@@ -30873,7 +29191,6 @@ public GetUniqueNumbersLeft()
 
 stock sd_Prepare()
 {
-	//Iter_Add(Vehicle, 0);
 	DisableInteriorEnterExits();
 	EnableStuntBonusForAll(0);
 	ShowPlayerMarkers(0);
@@ -31671,11 +29988,12 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	}
 	if(PRESSED(KEY_FIRE))
 	{
+		new vehicleid = GetPlayerVehicleID(playerid);
 		if(PlayerExtra[playerid][peFilling] > 0)
 		{
 			return PayForFuel(playerid, PlayerExtra[playerid][peFillingAt]);
 		}
-		if(IsPlayerInAnyVehicle(playerid) && VehicleHaveEngine(VehicleInfo[GetPlayerVehicleID(playerid)][vModel]))
+		if(IsPlayerInAnyVehicle(playerid) && VehicleHaveEngine(GetVehicleModel(vehicleid)))
 		{
 			EngineTurning(playerid);
 		}
@@ -31713,11 +30031,11 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				{
 					new engine, lights, alarm, doors, bonnet, boot, objective;
 					GetVehicleParamsEx(jobvehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
-					sd_RepairVehicle(jobvehicleid);
+					RepairVehicle(jobvehicleid);
 					SetVehicleParamsEx(jobvehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
 					SendFormat(playerid, 0x9BC154FF, "Sëkmingai sutvarkëte tr. priemonæ.");
 					ResetPlayerJobTask(playerid, true);
-					sd_GivePlayerMoney(playerid, -DEFAULT_REPAIR_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_REPAIR_PRICE);
 					rp_me(playerid, _, "sutaiso transporto priemonæ.");
 				}
 				else
@@ -31787,7 +30105,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				SendFormat(playerid, 0x9BC154FF, "Sëkmingai sutvarkëte tr. priemonës variklá.");
 				ResetPlayerJobTask(playerid, true);
 
-				sd_GivePlayerMoney(playerid, -floatround((100-VehicleInfo[jobvehicleid][vEngineStatus]))*MECHANICS_REPAIR_ENGINE_PRICE);
+				GivePlayerMoney(playerid, -floatround((100-VehicleInfo[jobvehicleid][vEngineStatus]))*MECHANICS_REPAIR_ENGINE_PRICE);
 				rp_me(playerid, _, "pabaigia taisyti transporto priemonës variklá.");
 
 				VehicleInfo[jobvehicleid][vEngineStatus] = 100.0;
@@ -31814,7 +30132,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 				SendFormat(playerid, 0x9BC154FF, "Sëkmingai sutvarkëte tr. priemonës akumuliatoriø.");
 				ResetPlayerJobTask(playerid, true);
-				sd_GivePlayerMoney(playerid, -floatround((100-VehicleInfo[jobvehicleid][vEngineStatus]))*MECHANICS_REPAIR_BATTERY_PRICE);
+				GivePlayerMoney(playerid, -floatround((100-VehicleInfo[jobvehicleid][vEngineStatus]))*MECHANICS_REPAIR_BATTERY_PRICE);
 				rp_me(playerid, _, "pabaigia taisyti transporto priemonës akumuliatoriø.");
 
 				VehicleInfo[jobvehicleid][vBatteryStatus] = 100.0;
@@ -31842,7 +30160,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				SendFormat(playerid, 0x9BC154FF, "Sëkmingai pakeitëte tr. priemonës variklá.");
 				ResetPlayerJobTask(playerid, true);
 
-				sd_GivePlayerMoney(playerid, -MECHANICS_CHANGE_ENGINE_PRICE);
+				GivePlayerMoney(playerid, -MECHANICS_CHANGE_ENGINE_PRICE);
 				rp_me(playerid, _, "pabaigia keisti transporto priemonës variklá.");
 
 				VehicleInfo[jobvehicleid][vEngineStatus] = 100.0;
@@ -31869,7 +30187,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 				SendFormat(playerid, 0x9BC154FF, "Sëkmingai pakeitëte tr. priemonës akumuliatoriø.");
 				ResetPlayerJobTask(playerid, true);
-				sd_GivePlayerMoney(playerid, -MECHANICS_CHANGE_BATTERY_PRICE);
+				GivePlayerMoney(playerid, -MECHANICS_CHANGE_BATTERY_PRICE);
 				rp_me(playerid, _, "pabaigia keisti transporto priemonës akumuliatoriø.");
 
 				VehicleInfo[jobvehicleid][vBatteryStatus] = 100.0;
@@ -32315,10 +30633,10 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 				new type = tmpType_Salon[playerid]-1;
 				tmpTexture_MarkStart_CP[playerid] = 0;
 				tmpEditing_Component_DMV[playerid] = 1;
-				if(sd_GetPlayerMoney(playerid) < DEFAULT_DMV_PRICE)
+				if(GetPlayerMoney(playerid) < DEFAULT_DMV_PRICE)
 				{
 					RemovePlayerFromVehicle(playerid);
-					sd_SetVehicleToRespawn(GetPlayerVehicleID(playerid));
+					SetVehicleToRespawn(GetPlayerVehicleID(playerid));
 					return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_DMV_PRICE);
 				}
 				SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_DMV, DmvCheckpoints[type][0][0], DmvCheckpoints[type][0][1], DmvCheckpoints[type][0][2], 2.3);
@@ -32366,7 +30684,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 		}
 		if(clickedid == Furniture_BuyBase)
 		{
-			if(sd_GetPlayerMoney(playerid) < FurnitureList[tmpSelected[playerid]][furnitureListPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, FurnitureList[tmpSelected[playerid]][furnitureListPrice]);
+			if(GetPlayerMoney(playerid) < FurnitureList[tmpSelected[playerid]][furnitureListPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, FurnitureList[tmpSelected[playerid]][furnitureListPrice]);
 			if( (tmpType_Salon[playerid] == 1 && GetClosestHouseInCoords(PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ], playerid, 70.0, CHECK_TYPE_INSIDE) == tmpIter[playerid] && HaveHouseKey(playerid, tmpIter[playerid], "P_FurnitureControl")) ||
 				(tmpType_Salon[playerid] == 2 && GetClosestBusinessInCoords(PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ], playerid, 70.0, CHECK_TYPE_INSIDE) == tmpIter[playerid] && HaveBusinessKey(playerid, tmpIter[playerid], "P_FurnitureControl")) || 
 				(tmpType_Salon[playerid] == 3 && GetClosestGarageInCoords(PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ], playerid, 70.0, CHECK_TYPE_INSIDE) == tmpIter[playerid] && GarageInfo[tmpIter[playerid]][gOwner] == PlayerInfo[playerid][pId]))
@@ -32380,7 +30698,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 					case 3: ownerid = GarageInfo[tmpIter[playerid]][gId];
 				}
 				BuyFurniture(playerid, tmpType_Salon[playerid], ownerid, FurnitureList[tmpSelected[playerid]][furnitureListPrice], FurnitureList[tmpSelected[playerid]][furnitureListModel], FurnitureList[tmpSelected[playerid]][furnitureListName], FurnitureListNames[FurnitureList[tmpSelected[playerid]][furnitureListCategory]], PlayerInfo[playerid][pPosX]+2.0, PlayerInfo[playerid][pPosY]+2.0, PlayerInfo[playerid][pPosZ]+1.0, 0.0, 0.0, 0.0);
-				sd_GivePlayerMoney(playerid, -FurnitureList[tmpSelected[playerid]][furnitureListPrice]);
+				GivePlayerMoney(playerid, -FurnitureList[tmpSelected[playerid]][furnitureListPrice]);
 			}
 			return 1;
 		}
@@ -32494,24 +30812,24 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 			// perka mech dali
 			switch(tmpSelected[playerid]-1)
 			{
-				case 0: if(sd_GetPlayerMoney(playerid) < MECHANICS_SHADOW_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_SHADOW_PRICE);
-				case 1: if(sd_GetPlayerMoney(playerid) < MECHANICS_MEGA_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_MEGA_PRICE);
-				case 2: if(sd_GetPlayerMoney(playerid) < MECHANICS_RIMSHINE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_RIMSHINE_PRICE);
-				case 3: if(sd_GetPlayerMoney(playerid) < MECHANICS_WIRES_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_WIRES_PRICE);
-				case 4: if(sd_GetPlayerMoney(playerid) < MECHANICS_CLASSIC_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_CLASSIC_PRICE);
-				case 5: if(sd_GetPlayerMoney(playerid) < MECHANICS_TWIST_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_TWIST_PRICE);
-				case 6: if(sd_GetPlayerMoney(playerid) < MECHANICS_CUTTER_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_CUTTER_PRICE);
-				case 7: if(sd_GetPlayerMoney(playerid) < MECHANICS_SWITCH_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_SWITCH_PRICE);
-				case 8: if(sd_GetPlayerMoney(playerid) < MECHANICS_GROVE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_GROVE_PRICE);
-				case 9: if(sd_GetPlayerMoney(playerid) < MECHANICS_IMPORT_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_IMPORT_PRICE);
-				case 10: if(sd_GetPlayerMoney(playerid) < MECHANICS_DOLLAR_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_DOLLAR_PRICE);
-				case 11: if(sd_GetPlayerMoney(playerid) < MECHANICS_TRANCE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_TRANCE_PRICE);
-				case 12: if(sd_GetPlayerMoney(playerid) < MECHANICS_ATOMIC_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_ATOMIC_PRICE);
-				case 13: if(sd_GetPlayerMoney(playerid) < MECHANICS_AHAB_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_AHAB_PRICE);
-				case 14: if(sd_GetPlayerMoney(playerid) < MECHANICS_VIRTUAL_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_VIRTUAL_PRICE);
-				case 15: if(sd_GetPlayerMoney(playerid) < MECHANICS_ACCESS_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_ACCESS_PRICE);
-				case 16: if(sd_GetPlayerMoney(playerid) < MECHANICS_OFFROAD_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_OFFROAD_PRICE);
-				case 17: if(sd_GetPlayerMoney(playerid) < MECHANICS_HIDRAULICS_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_HIDRAULICS_PRICE);
+				case 0: if(GetPlayerMoney(playerid) < MECHANICS_SHADOW_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_SHADOW_PRICE);
+				case 1: if(GetPlayerMoney(playerid) < MECHANICS_MEGA_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_MEGA_PRICE);
+				case 2: if(GetPlayerMoney(playerid) < MECHANICS_RIMSHINE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_RIMSHINE_PRICE);
+				case 3: if(GetPlayerMoney(playerid) < MECHANICS_WIRES_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_WIRES_PRICE);
+				case 4: if(GetPlayerMoney(playerid) < MECHANICS_CLASSIC_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_CLASSIC_PRICE);
+				case 5: if(GetPlayerMoney(playerid) < MECHANICS_TWIST_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_TWIST_PRICE);
+				case 6: if(GetPlayerMoney(playerid) < MECHANICS_CUTTER_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_CUTTER_PRICE);
+				case 7: if(GetPlayerMoney(playerid) < MECHANICS_SWITCH_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_SWITCH_PRICE);
+				case 8: if(GetPlayerMoney(playerid) < MECHANICS_GROVE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_GROVE_PRICE);
+				case 9: if(GetPlayerMoney(playerid) < MECHANICS_IMPORT_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_IMPORT_PRICE);
+				case 10: if(GetPlayerMoney(playerid) < MECHANICS_DOLLAR_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_DOLLAR_PRICE);
+				case 11: if(GetPlayerMoney(playerid) < MECHANICS_TRANCE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_TRANCE_PRICE);
+				case 12: if(GetPlayerMoney(playerid) < MECHANICS_ATOMIC_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_ATOMIC_PRICE);
+				case 13: if(GetPlayerMoney(playerid) < MECHANICS_AHAB_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_AHAB_PRICE);
+				case 14: if(GetPlayerMoney(playerid) < MECHANICS_VIRTUAL_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_VIRTUAL_PRICE);
+				case 15: if(GetPlayerMoney(playerid) < MECHANICS_ACCESS_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_ACCESS_PRICE);
+				case 16: if(GetPlayerMoney(playerid) < MECHANICS_OFFROAD_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_OFFROAD_PRICE);
+				case 17: if(GetPlayerMoney(playerid) < MECHANICS_HIDRAULICS_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, MECHANICS_HIDRAULICS_PRICE);
 			}
 			new vehicleid = GetPlayerVehicleID(playerid);
 			PlayerInfo[playerid][pJobVehicle] = vehicleid;
@@ -32524,7 +30842,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 			HidePlayerMechTune(playerid);
 			JobGUI_Show(playerid);
 			new string[126];
-			format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(VehicleInfo[vehicleid][vModel])));
+			format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(GetVehicleModel(vehicleid))));
 			JobGUI_Update(playerid, .bottext = string);
 			new spot = PlayerInfo[playerid][pJobDestination] = random(sizeof MechanicPartSpots);
 			SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_WHEELS, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
@@ -32701,13 +31019,13 @@ public OnPlayerClickPTextDraw(playerid, PlayerText:playertextid)
 		if(tmpSelected[playerid] != -1)
 		{
 			new price = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehiclePrice];
-			if(sd_GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
+			if(GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
 			new donator_requirement = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehicleDonator];
 			if(PlayerInfo[playerid][pDonator] < donator_requirement) return SendWarning(playerid, "Ðiai tr. priemonei reikalingas %d remëjo lygis.", donator_requirement);
 			new model = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehicleModel];
 			if(PlayerInfo[playerid][pHaveCars] >= MAX_OWNED_VEHICLES) return SendWarning(playerid, "Jau turite "#MAX_OWNED_VEHICLES" tr. priemoniø.");
 			BuyVehicle(playerid, model, GetModelName(model), price, VehicleShopColors[random(sizeof VehicleShopColors)], VehicleShopColors[random(sizeof VehicleShopColors)], 0, tmpType_Salon[playerid], donator_requirement);
-			sd_GivePlayerMoney(playerid, -price);
+			GivePlayerMoney(playerid, -price);
 		}
 		return 1;
 	}
@@ -32963,7 +31281,7 @@ public VehicleGet(playerid, textdraw_index)
 	cache_get_value_name_int(0, "Color2", color2),
 	cache_get_value_name_int(0, "Model", model);
 
-	if((vehicleid = sd_CreateVehicle(model, x, y, z, a, color1, color2, -1, 0)) != INVALID_VEHICLE_ID)
+	if((vehicleid = CreateVehicle(model, x, y, z, a, color1, color2, -1, 0)) != INVALID_VEHICLE_ID)
 	{
 		// Iskart updatiname data
 		mysql_query(chandler, va_return("UPDATE `vehicles_data` SET SpawnedId = '%d' WHERE id = '%d'", vehicleid, sql_id), false);
@@ -33000,7 +31318,7 @@ public VehicleGet(playerid, textdraw_index)
 		cache_get_value_name(0, "Damage", numbers, 50);
 		sscanf(numbers, "p</>ddddd", panels, doors, lights, tires, health);
 		UpdateVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
-		sd_SetVehicleHealth(vehicleid, float(health));
+		SetVehicleHealth(vehicleid, float(health));
 
 		SetVehicleNumberPlate(vehicleid, VehicleInfo[vehicleid][vNumbers]);
 
@@ -33021,7 +31339,7 @@ public VehicleGet(playerid, textdraw_index)
 		new vw, int;
 		cache_get_value_name_int(0, "VW", vw);
 		cache_get_value_name_int(0, "Interior", int);
-		sd_LinkVehicleToInterior(vehicleid, int);
+		LinkVehicleToInterior(vehicleid, int);
 		SetVehicleVirtualWorld(vehicleid, vw);
 		VehicleInfo[vehicleid][vSyncX] = x;
 		VehicleInfo[vehicleid][vSyncY] = y;
@@ -33050,7 +31368,7 @@ public VehicleGet(playerid, textdraw_index)
 		log_init(true);
 		log_set_table("logs_vehicles");
 		log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ExtraString`,`ActionText`");
-		log_set_values("'%d','%e','%d','%e','%e','Isparkavo tr. priemone'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]), VehicleInfo[vehicleid][vNumbers]);
+		log_set_values("'%d','%e','%d','%e','%e','Isparkavo tr. priemone'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vNumbers]);
 		log_push();
 	}
 	else
@@ -33337,6 +31655,18 @@ public php_kick(string[])
 COMMANDS
 */
 
+CMD:charity(playerid, params[])
+{
+	new amount;
+	if(sscanf(params,"d",amount) || amount < 0) return SendUsage(playerid, "/charity [kiekis]");
+	if(GetPlayerMoney(playerid) < amount) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
+
+	GivePlayerMoney(playerid, -amount);
+	SendFormat(playerid, 0xb0df67ff, "Paaukojote $%d", amount);
+	return 1;
+}
+
+
 CMD:vradio(playerid, params[])
 {
 	if(!IsPlayerInAnyVehicle(playerid)) return InfoBox(playerid, IB_NOT_IN_VEHICLE);
@@ -33394,7 +31724,7 @@ CMD:stop(playerid, params[])
 			case JOB_ACTION_REPAINT_VEHICLE:
 			{
 				PlayerInfo[playerid][pJobVehicle] = INVALID_VEHICLE_ID;
-				sd_ClearWeaponSlot(playerid, 9);
+				RemovePlayerWeaponInSlot(playerid, 9);
 			}
 			case JOB_ACTION_PUT_BAG, JOB_ACTION_PUT_PARTS_VEHICLE, JOB_ACTION_PUT_WHEELS_VEHICLE, JOB_ACTION_CARGO_CRATES_PUT, JOB_ACTION_PUT_ENGINE, JOB_ACTION_PUT_BATTERY, JOB_ACTION_PUT_ENGINE_REPAIR, JOB_ACTION_PUT_BATTERY_REPAIR:
 			{
@@ -33468,10 +31798,10 @@ CMD:tazer(playerid, params[])
 	{
 		PlayerExtra[playerid][peTazer] = 0;
 		rp_me(playerid, _, "ásideda tazerá.");
-		sd_ClearWeaponSlot(playerid, 2);
+		RemovePlayerWeaponInSlot(playerid, 2);
 		if(PlayerExtra[playerid][peBeforeTazerWeaponId] != 0 && PlayerExtra[playerid][peBeforeTazerWeaponAmmo] > 0)
 		{
-			sd_GivePlayerWeapon(playerid, PlayerExtra[playerid][peBeforeTazerWeaponId], PlayerExtra[playerid][peBeforeTazerWeaponAmmo], WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+			GivePlayerWeapon(playerid, PlayerExtra[playerid][peBeforeTazerWeaponId], PlayerExtra[playerid][peBeforeTazerWeaponAmmo], WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 			PlayerExtra[playerid][peBeforeTazerWeaponId] =
 			PlayerExtra[playerid][peBeforeTazerWeaponAmmo] = 0;
 		}
@@ -33479,18 +31809,19 @@ CMD:tazer(playerid, params[])
 	}
 	else
 	{
-		if(sd_CheckIfSlotUsed(playerid, 2) && sd_GetSlotWeaponType(playerid, 2) != WEAPON_GIVE_TYPE_NO_INVENTORY)
+		if(	PlayerHasWeaponInSlot(playerid, 2) &&
+			ret_GetSlotWeaponGiveType(playerid, 2) != WEAPON_GIVE_TYPE_NO_INVENTORY)
 		{
 			SendWarning(playerid, "Jûs jau turite tazerá arba pistoletà.");
 			return 1;
 		}
 		else
 		{
-			sd_GetPlayerWeaponData(playerid, 2, PlayerExtra[playerid][peBeforeTazerWeaponId], PlayerExtra[playerid][peBeforeTazerWeaponAmmo]);
+			GetPlayerWeaponData(playerid, 2, PlayerExtra[playerid][peBeforeTazerWeaponId], PlayerExtra[playerid][peBeforeTazerWeaponAmmo]);
 			//SendFormat(playerid, -1, "%d %d", PlayerExtra[playerid][peBeforeTazerWeaponId], PlayerExtra[playerid][peBeforeTazerWeaponAmmo]);
-			sd_ClearWeaponSlot(playerid, 2);
+			RemovePlayerWeaponInSlot(playerid, 2);
 			PlayerExtra[playerid][peTazer] = 1;
-			sd_GivePlayerWeapon(playerid, 23, 10, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
+			GivePlayerWeapon(playerid, 23, 10, WEAPON_GIVE_TYPE_NO_INVENTORY, 0);
 			rp_me(playerid, _, "iðsitraukia tazerá ið dëklo ir já uþtaiso.");
 		}
 	}
@@ -34207,18 +32538,6 @@ public OnDialogPerformed(playerid, dialog[], response, success)
 	return 1;
 }
 
-/*
-CMD:createattach(playerid, params[])
-{
-	new Float:x, Float:y, Float:z,
-		Float:rx, Float:ry, Float:rz;
-	sscanf(params,"ffffff", x, y, z, rx, ry, rz);
-	static objtempdel;
-	DestroyObject(objtempdel);
-	objtempdel = CreateObject(19078, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); // 18693
-	return AttachObjectToPlayer(objtempdel, playerid, x, y, z, rx, ry, rz);
-}*/
-
 CMD:ahelp(playerid, params[]) return pc_cmd_help(playerid, "admin");
 
 flags:jetpack(CMD_TYPE_ADMIN);
@@ -34296,8 +32615,8 @@ CMD:rfc(playerid, params[])
 		if(used[vehicleid] > 0) { continue; }
 		if(VehicleInfo[vehicleid][vFaction] == mysql)
 		{
-			sd_SetVehicleToRespawn(vehicleid);
-			VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[VehicleInfo[vehicleid][vModel]-400];
+			SetVehicleToRespawn(vehicleid);
+			VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[GetVehicleModel(vehicleid)-400];
 		}
 	}
 	log_init(true);
@@ -34321,7 +32640,7 @@ CMD:rtc(playerid, params[])
 	new
 		vehicleid;
 	if((vehicleid = GetClosestVehicle(playerid, 5.0)) == INVALID_VEHICLE_ID) return InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
-	sd_SetVehicleToRespawn(vehicleid);
+	SetVehicleToRespawn(vehicleid);
 	log_init(true);
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
@@ -34347,8 +32666,8 @@ CMD:rjc(playerid, params[])
 		if(VehicleInfo[vehicleid][vJob] == mysql)
 		{
 			if(used[vehicleid] > 0) { continue; }
-			sd_SetVehicleToRespawn(vehicleid);
-			VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[VehicleInfo[vehicleid][vModel]-400];
+			SetVehicleToRespawn(vehicleid);
+			VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[GetVehicleModel(vehicleid)-400];
 		}
 	}
 	log_init(true);
@@ -34372,7 +32691,7 @@ CMD:rac(playerid, params[])
 		if(used[vehicleid] > 0) { continue; }
 		new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
 		for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
-		sd_SetVehicleToRespawn(vehicleid);
+		SetVehicleToRespawn(vehicleid);
 	}
 	SendFormatToAll(0xF7F7F7FF, "%s {EEEEEE}atstatë visas serverio tr. priemones", GetPlayerNameEx(playerid, false));
 	return 1;
@@ -34558,7 +32877,7 @@ public OnDonationLoad(playerid, userid)
 				}
 				else
 				{
-					sd_GivePlayerMoney(playerid, 50000);
+					GivePlayerMoney(playerid, 50000);
 					format(service, sizeof service, "50'000$");
 				}
 			}
@@ -34570,7 +32889,7 @@ public OnDonationLoad(playerid, userid)
 				}
 				else
 				{
-					sd_GivePlayerMoney(playerid, 100000);
+					GivePlayerMoney(playerid, 100000);
 					format(service, sizeof service, "100'000$");
 				}
 			}
@@ -34582,7 +32901,7 @@ public OnDonationLoad(playerid, userid)
 				}
 				else
 				{
-					sd_GivePlayerMoney(playerid, 200000);
+					GivePlayerMoney(playerid, 200000);
 					format(service, sizeof service, "200'000$");
 				}
 			}
@@ -34594,7 +32913,7 @@ public OnDonationLoad(playerid, userid)
 				}
 				else
 				{
-					sd_GivePlayerMoney(playerid, 500000);
+					GivePlayerMoney(playerid, 500000);
 					format(service, sizeof service, "500'000$");
 				}
 			}
@@ -34964,7 +33283,7 @@ CMD:gotobb(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new vehicleid = GetPlayerVehicleID(playerid);
-		sd_LinkVehicleToInterior(vehicleid, 0);
+		LinkVehicleToInterior(vehicleid, 0);
 		SetVehicleVirtualWorld(vehicleid, 0);
 		SetVehiclePos(vehicleid, 217.23, -146.81, 1.58);
 	}
@@ -34983,7 +33302,7 @@ CMD:gotopc(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new vehicleid = GetPlayerVehicleID(playerid);
-		sd_LinkVehicleToInterior(vehicleid, 0);
+		LinkVehicleToInterior(vehicleid, 0);
 		SetVehicleVirtualWorld(vehicleid, 0);
 		SetVehiclePos(vehicleid, 2245, 45, 26.3);
 	}
@@ -35002,7 +33321,7 @@ CMD:gotomg(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new vehicleid = GetPlayerVehicleID(playerid);
-		sd_LinkVehicleToInterior(vehicleid, 0);
+		LinkVehicleToInterior(vehicleid, 0);
 		SetVehicleVirtualWorld(vehicleid, 0);
 		SetVehiclePos(vehicleid, 1320.6263,301.6599,19.5547);
 	}
@@ -35021,7 +33340,7 @@ CMD:gotols(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new vehicleid = GetPlayerVehicleID(playerid);
-		sd_LinkVehicleToInterior(vehicleid, 0);
+		LinkVehicleToInterior(vehicleid, 0);
 		SetVehicleVirtualWorld(vehicleid, 0);
 		SetVehiclePos(vehicleid, 1968.5505,-1760.6094,13.5469);
 	}
@@ -35040,7 +33359,7 @@ CMD:gotolv(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new vehicleid = GetPlayerVehicleID(playerid);
-		sd_LinkVehicleToInterior(vehicleid, 0);
+		LinkVehicleToInterior(vehicleid, 0);
 		SetVehicleVirtualWorld(vehicleid, 0);
 		SetVehiclePos(vehicleid, 2160.7722,2010.2777,10.8203);
 	}
@@ -35059,7 +33378,7 @@ CMD:gotodl(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new vehicleid = GetPlayerVehicleID(playerid);
-		sd_LinkVehicleToInterior(vehicleid, 0);
+		LinkVehicleToInterior(vehicleid, 0);
 		SetVehicleVirtualWorld(vehicleid, 0);
 		SetVehiclePos(vehicleid, 672.0616,-522.2325,16.3359);
 	}
@@ -35078,7 +33397,7 @@ CMD:gotofc(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new vehicleid = GetPlayerVehicleID(playerid);
-		sd_LinkVehicleToInterior(vehicleid, 0);
+		LinkVehicleToInterior(vehicleid, 0);
 		SetVehicleVirtualWorld(vehicleid, 0);
 		SetVehiclePos(vehicleid, -304.8648,1009.3004,19.5938);
 	}
@@ -35097,7 +33416,7 @@ CMD:gotosf(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new vehicleid = GetPlayerVehicleID(playerid);
-		sd_LinkVehicleToInterior(vehicleid, 0);
+		LinkVehicleToInterior(vehicleid, 0);
 		SetVehicleVirtualWorld(vehicleid, 0);
 		SetVehiclePos(vehicleid, -2019.4305,153.3443,28.2948);
 	}
@@ -35116,7 +33435,7 @@ CMD:gotoprison(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new vehicleid = GetPlayerVehicleID(playerid);
-		sd_LinkVehicleToInterior(vehicleid, 0);
+		LinkVehicleToInterior(vehicleid, 0);
 		SetVehicleVirtualWorld(vehicleid, 0);
 		SetVehiclePos(vehicleid, 295.3034,1422.0356,9.9720);
 	}
@@ -35208,19 +33527,21 @@ flags:giveweapon(CMD_TYPE_ADMIN);
 CMD:giveweapon(playerid, params[])
 {
 	new receiverid, weaponid, ammo, useunique;
-	if(sscanf(params, "uddd", receiverid, weaponid, ammo, useunique) || !(0 <= useunique <= 1) ||  ammo < 0 || sd_GetWeaponSlot(weaponid) == 0xFFFF) return SendUsage(playerid, "/giveweapon [þaidëjas] [ginklo id] [ammo] [ar naudot unikalø nr 0/1]");
+	if(sscanf(params, "uddd", receiverid, weaponid, ammo, useunique) || !(0 <= useunique <= 1) ||  ammo < 0 || FAC_GetWeaponSlot(weaponid) == 0xFFFF) return SendUsage(playerid, "/giveweapon [þaidëjas] [ginklo id] [ammo] [ar naudot unikalø nr 0/1]");
 	if(!CheckPlayerid(receiverid)) return InfoBox(playerid, IB_WRONG_PLAYER);
 	if(ammo == 0)
 	{
-		sd_ClearWeaponSlot(playerid, sd_GetWeaponSlot(weaponid));
+		RemovePlayerWeaponInSlot(playerid, FAC_GetWeaponSlot(weaponid));
 	}
 	else
 	{
-		sd_GivePlayerWeapon(receiverid, weaponid, ammo, WEAPON_GIVE_TYPE_NORMAL, (useunique ? -1 : 0));
+		GivePlayerWeapon(receiverid, weaponid, ammo, WEAPON_GIVE_TYPE_NORMAL, (useunique ? -1 : 0));
 	}
+	
 	new string[256];
 	format(string, sizeof string, "[AdmCmd] Administratorius %s davë ginklà þaidëjui %s (%s/%d/%d)", GetPlayerNameEx(playerid), GetPlayerNameEx(receiverid), GetInventoryItemName(weaponid), ammo, useunique);
 	SendAdminMessage(0xFF6347AA, false, string);
+
 	log_init(true);
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`");
@@ -35234,7 +33555,7 @@ CMD:givemoney(playerid, params[])
 	new receiverid, amount;
 	if(sscanf(params, "ud", receiverid, amount)) return SendUsage(playerid, "/givemoney [þaidëjas] [kiekis]");
 	if(!CheckPlayerid(receiverid)) return InfoBox(playerid, IB_WRONG_PLAYER);
-	sd_GivePlayerMoney(receiverid, amount);
+	GivePlayerMoney(receiverid, amount);
 	new string[256];
 	format(string, sizeof string, "[AdmCmd] Administratorius %s davë pinigø þaidëjui %s (%d)", GetPlayerNameEx(playerid), GetPlayerNameEx(receiverid), amount);
 	SendAdminMessage(0xFF6347AA, false, string);
@@ -35483,13 +33804,15 @@ stock KickPlayer(playerid, adminname[], reason[])
 	ClearChat(playerid, 10);
 	SendACMessage(0xFF6347AA, false, "[AdmCmd] %s iðmetë þaidëjà %s ið serverio.", adminname, GetPlayerNameEx(playerid));
 	SendACMessage(0xFF6347AA, false, "Prieþastis: %s", reason);
-	log_init(true);
-	new string[126];
+
+	new string[56];
 	format(string, sizeof string, "Ismestas nuo %s", adminname);
+	log_init(true);
 	log_set_table("logs_players");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%e','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string, reason);
 	log_push();
+
 	KickEx(playerid);
 	return 1;
 }
@@ -35652,7 +33975,7 @@ CMD:goto(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		SetVehiclePos(GetPlayerVehicleID(playerid), x, y, z+0.5);
-		sd_LinkVehicleToInterior(GetPlayerVehicleID(playerid), GetPlayerInterior(receiverid));
+		LinkVehicleToInterior(GetPlayerVehicleID(playerid), GetPlayerInterior(receiverid));
 		SetVehicleVirtualWorld(GetPlayerVehicleID(playerid), GetPlayerVirtualWorld(receiverid));
 	}
 	else
@@ -35693,7 +34016,7 @@ CMD:gethere(playerid, params[])
 	{
 		vehicleid = GetPlayerVehicleID(receiverid);
 		SetVehiclePos(vehicleid, x, y, z+0.5);
-		sd_LinkVehicleToInterior(vehicleid, GetPlayerInterior(playerid));
+		LinkVehicleToInterior(vehicleid, GetPlayerInterior(playerid));
 		SetVehicleVirtualWorld(vehicleid, GetPlayerVirtualWorld(playerid));
 	}
 	log_init(true);
@@ -35715,7 +34038,7 @@ CMD:getcar(playerid, params[])
 	if(sscanf(params,"d",vehicleid))
 	{
 		if(!IsValidVehicle(OldVehicle[playerid])) return SendUsage(playerid, "/getcar [id]");
-		sd_LinkVehicleToInterior(OldVehicle[playerid], GetPlayerInterior(playerid));
+		LinkVehicleToInterior(OldVehicle[playerid], GetPlayerInterior(playerid));
 		SetVehicleVirtualWorld(OldVehicle[playerid], GetPlayerVirtualWorld(playerid));
 		new Float:x, Float:y, Float:z;
 		GetPlayerPos(playerid, x, y, z);
@@ -35724,7 +34047,7 @@ CMD:getcar(playerid, params[])
 	else
 	{
 		if(!IsValidVehicle(vehicleid)) return InfoBox(playerid, IB_WRONG_VEHICLE);
-		sd_LinkVehicleToInterior(vehicleid, GetPlayerInterior(playerid));
+		LinkVehicleToInterior(vehicleid, GetPlayerInterior(playerid));
 		SetVehicleVirtualWorld(vehicleid, GetPlayerVirtualWorld(playerid));
 		new Float:x, Float:y, Float:z;
 		GetPlayerPos(playerid, x, y, z);
@@ -35990,8 +34313,8 @@ CMD:aheal(playerid, params[])
 	new vehicle;
 	if((vehicle = GetPlayerVehicleID(receiverid)) != INVALID_VEHICLE_ID)
 	{
-		sd_RepairVehicle(vehicle);
-		sd_SetVehicleHealth(vehicle, 1000.0);
+		RepairVehicle(vehicle);
+		SetVehicleHealth(vehicle, 1000.0);
 	}
 	log_init(true);
 	log_set_table("logs_admins");
@@ -36156,7 +34479,7 @@ CMD:acceptfrisk(playerid, params[])
 	}
 	else
 	{
-		new string[2];
+		new data[4];
 		rp_me(owner, _, "apieðko %s.", GetPlayerNameEx(playerid, true, false));
 		SendFormat(playerid, 0xB4E6B4FF, "%s jus apieðko.", GetPlayerNameEx(owner, true, false));
 		SendFormat(owner, 0xFFFFFFFF, "__________________ Þaidëjo {FF672B}%s{FFFFFF} daiktai __________________", GetPlayerNameEx(playerid, true, false));
@@ -36167,13 +34490,17 @@ CMD:acceptfrisk(playerid, params[])
 		SendFormat(owner, 0xF7FF7BFF, "Ginklai rankose:");
 		for(new i = 0; i < 13; i++)
 		{
-			sd_GetPlayerWeaponData(playerid, i, string[0], string[1]);
-			if(string[0] > 0 && string[1] > 0)
+			GetPlayerWeaponData(playerid, i, data[0], data[1]);
+			GetPlayerWeaponData(playerid, i, data[2], data[3]);
+			if(data[0] > 0 && data[1] > 0)
 			{
-				SendFormat(owner, 0xBABABAFF, "%s (%d kulkø)%s", GetInventoryItemName(string[0]), string[1], ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NO_INVENTORY ? (" ((frakcijos))") : (""));
+				SendFormat(owner, 0xBABABAFF, "%s (%d kulkø)%s",
+					GetInventoryItemName(data[0]),
+					data[1],
+					data[2] == WEAPON_GIVE_TYPE_NO_INVENTORY ? (" ((frakcijos))") : (""));
 			}
 		}
-		SendFormat(owner, 0xBABABAFF, "Pinigai rankose: $%d", sd_GetPlayerMoney(playerid));
+		SendFormat(owner, 0xBABABAFF, "Pinigai rankose: $%d", GetPlayerMoney(playerid));
 	}
 	return 1;
 }
@@ -36247,14 +34574,14 @@ CMD:afrisk(playerid, params[])
 		odata[2];
 	for(new i = 0; i < 13; i++)
 	{
-		sd_GetPlayerWeaponData(receiverid, i, data[0], data[1]);
+		GetPlayerWeaponData(receiverid, i, data[0], data[1]);
 		GetPlayerWeaponData(receiverid, i, odata[0], odata[1]);
 		if(data[0] > 0 && data[1] > 0)
 		{
 			SendFormat(playerid, 0xBABABAFF, "%s (%d kulkø) (ir %d %dk.)", GetInventoryItemName(data[0]), data[1], odata[0], odata[1]);
 		}
 	}
-	SendFormat(playerid, 0xBABABAFF, "Pinigai rankose: $%d", sd_GetPlayerMoney(receiverid));
+	SendFormat(playerid, 0xBABABAFF, "Pinigai rankose: $%d", GetPlayerMoney(receiverid));
 	log_init(true);
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
@@ -36705,8 +35032,8 @@ CMD:respawncars(playerid, params[])
 		{
 			new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
 			for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
-			sd_SetVehicleToRespawn(vehicleid);
-			VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[VehicleInfo[vehicleid][vModel]-400];
+			SetVehicleToRespawn(vehicleid);
+			VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[GetVehicleModel(vehicleid)-400];
 		}
 	}
 	SendFormatToAll(0xF7F7F7FF, "%s{EEEEEE} frakcijos lyderis atstatë visas frakcijos tr. priemones", GetFactionName(factionid, false));
@@ -36729,8 +35056,8 @@ CMD:payticket(playerid, params[])
 		if(!HaveVehicleKey(playerid, vehicleid, .check_only_owner = false, .canbejob = false, .ignore_admin_perm = true)) return SendWarning(playerid, "Neturite ðios tr. priemonës rakteliø.");
 		if(VehicleInfo[vehicleid][vTicket] > 0)
 		{
-			if(sd_GetPlayerMoney(playerid) < VehicleInfo[vehicleid][vTicket]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, VehicleInfo[vehicleid][vTicket]);
-			sd_GivePlayerMoney(playerid, -VehicleInfo[vehicleid][vTicket]);
+			if(GetPlayerMoney(playerid) < VehicleInfo[vehicleid][vTicket]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, VehicleInfo[vehicleid][vTicket]);
+			GivePlayerMoney(playerid, -VehicleInfo[vehicleid][vTicket]);
 			MsgSuccess(playerid, "BAUDA", "Sëkmingai susimokëjote uþ baudà.");
 			foreach(new factionid : Faction)
 			{
@@ -36860,7 +35187,7 @@ CMD:takeweapons(playerid, params[])
 	if(sscanf(params,"u",receiverid)) return SendUsage(playerid, "/takeweapons [þaidëjas]");
 	if(!CheckPlayerid(receiverid)) return InfoBox(playerid, IB_WRONG_PLAYER);
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 5.0)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
-	sd_ResetPlayerWeapons(receiverid);
+	ResetPlayerWeapons(receiverid);
 	for(new slot = 0; slot < MAX_INVENTORY_SLOTS; slot++)
 	{
 		if(0 < InventoryInfo[receiverid][slot][invId] < 50) ClearPlayerInventorySlot(receiverid, slot);
@@ -36900,7 +35227,7 @@ CMD:atakeweapons(playerid, params[])
 		receiverid;
 	if(sscanf(params,"u",receiverid)) return SendUsage(playerid, "/atakeweapons [þaidëjas]");
 	if(!CheckPlayerid(receiverid)) return InfoBox(playerid, IB_WRONG_PLAYER);
-	sd_ResetPlayerWeapons(receiverid);
+	ResetPlayerWeapons(receiverid);
 	for(new slot = 0; slot < MAX_INVENTORY_SLOTS; slot++)
 	{
 		if(0 < InventoryInfo[receiverid][slot][invId] < 50) ClearPlayerInventorySlot(receiverid, slot);
@@ -37153,7 +35480,7 @@ CMD:items(playerid, params[])
 	if(factionid == -1 || FactionInfo[factionid][fType] != FACTION_TYPE_SAN_NEWS) return SendWarning(playerid, "Jûsø frakcija ðios negalimybës neturi.");
 	if(IsPlayerInRangeOfPoint(playerid, 10.0, 197.23, -135.49, 1011.09)) return SendError(playerid, "Nesate darbo patalpose.");
 
-	sd_GivePlayerWeapon(playerid, WEAPON_CAMERA, 20, WEAPON_GIVE_TYPE_NO_INVENTORY);
+	GivePlayerWeapon(playerid, WEAPON_CAMERA, 20, WEAPON_GIVE_TYPE_NO_INVENTORY);
 	rp_me(playerid, _, "pasiima darbo árankius.");
 	SendFormat(playerid, 0xBABABAFF, "Pasiëmete darbo árankius.");
 	return 1;
@@ -37366,15 +35693,14 @@ CMD:trunkweapon(playerid, params[])
 	if(v_factionid == -1 || !(FactionInfo[v_factionid][fType] == FACTION_TYPE_POLICE || FactionInfo[v_factionid][fType] == FACTION_TYPE_FIRE)) return SendWarning(playerid, "Tr. priemonë netinkama.");
 	if(weaponid != 0)
 	{
-		sd_CheckWeaponCheat(playerid, weaponid, false);
-		new wepslot = sd_GetWeaponSlot(weaponid);
-		if(sd_GetWeaponType(playerid, weaponid) != WEAPON_GIVE_TYPE_NO_INVENTORY)
+		new wepslot = FAC_GetWeaponSlot(weaponid);
+		if(ret_GetSlotWeaponUniqueId(playerid, wepslot) != WEAPON_GIVE_TYPE_NO_INVENTORY)
 		{
 			SendWarning(playerid, "Ðis ginklas nëra ið frakcijos tr. priemonës");
 			return 1;
 		}
 		new model = GetVehicleModel(vehicleid);
-		sd_GetPlayerWeaponData(playerid, wepslot, ammo, ammo);
+		GetPlayerWeaponData(playerid, wepslot, ammo, ammo);
 
 		for(new l = 0; l < sizeof FactionWeaponsInTrunk; l++)
 		{
@@ -37414,7 +35740,7 @@ CMD:trunkweapon(playerid, params[])
 									{
 										VehicleWeaponsInventory[vehicleid][inv][ftwPermission][p_inv] = FactionWeaponsInTrunk[l][ftwListPermission][p_inv];
 									}
-									sd_ClearWeaponSlot(playerid, wepslot);
+									RemovePlayerWeaponInSlot(playerid, wepslot);
 									MsgSuccess(playerid, "GINKLAI", "Sëkmingai padëjote ginklà.");
 									rp_me(playerid, _, "padeda ginklà á tr. priemonës ginklø stovà.");
 									return 1;
@@ -37535,7 +35861,7 @@ CMD:arrest(playerid, params[])
 	if(!CheckPlayerid(receiverid) || receiverid == playerid) return InfoBox(playerid, IB_WRONG_PLAYER);
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 5.0)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
 	if(!IsPlayerInRangeOfPoint(playerid, 25.0, GetGVarFloat("ArrestX", SERVER_VARS_ID), GetGVarFloat("ArrestY", SERVER_VARS_ID), GetGVarFloat("ArrestZ", SERVER_VARS_ID))) return SendWarning(playerid, "Nesate kalëjime.");
-	sd_GivePlayerMoney(receiverid, -price);
+	GivePlayerMoney(receiverid, -price);
 	JailPlayer(receiverid, GetPlayerNameEx(playerid, true, true), "", time, .type = 1);
 	SendFormatToAll(0x6BBFFFFF, "Policininkas %s uþdarë %s á areðtinæ %d minutëm.", GetPlayerNameEx(playerid, true, true), GetPlayerNameEx(receiverid, true, true), time);
 	SendFormat(receiverid, 0x6BBFFFFF, "Jûs buvote pasodintas á kalëjimà. Laikas: %dmin, bauda: $%d", time, price);
@@ -37568,7 +35894,7 @@ CMD:prison(playerid, params[])
 	if(!CheckPlayerid(receiverid) || receiverid == playerid) return InfoBox(playerid, IB_WRONG_PLAYER);
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 5.0)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
 	if(!IsPlayerInRangeOfPoint(playerid, 25.0, GetGVarFloat("JailX", SERVER_VARS_ID), GetGVarFloat("JailY", SERVER_VARS_ID), GetGVarFloat("JailZ", SERVER_VARS_ID))) return SendWarning(playerid, "Nesate kalëjime.");
-	sd_GivePlayerMoney(receiverid, -price);
+	GivePlayerMoney(receiverid, -price);
 	JailPlayer(receiverid, GetPlayerNameEx(playerid, true, true), "", time, .type = 2);
 	SendFormatToAll(0x6BBFFFFF, "Policininkas %s pasodino %s á kalëjimà %d minutëm.", GetPlayerNameEx(playerid, true, true), GetPlayerNameEx(receiverid, true, true), time);
 	SendFormat(receiverid, 0x6BBFFFFF, "Jûs buvote pasodintas á kalëjimà. Laikas: %dmin, bauda: $%d", time, price);
@@ -37631,7 +35957,7 @@ CMD:arrestcar(playerid, params[])
 		ownerid = FindPlayerBySql(owner);
 	if(ownerid != INVALID_PLAYER_ID)
 	{
-		SendFormat(playerid, 0xF7FF7BFF, "Jûsø tr. priemonë %s(%s) buvo konfiskuota.", GetModelName(VehicleInfo[vehicleid][vModel]), VehicleInfo[vehicleid][vNumbers]);
+		SendFormat(playerid, 0xF7FF7BFF, "Jûsø tr. priemonë %s(%s) buvo konfiskuota.", GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vNumbers]);
 		PlayerInfo[ownerid][pCarsSpawned]--;
 	}
 	SendFormat(playerid, 0xF7FF7BFF, "Konfiskavote tr. priemonæ.");
@@ -37654,7 +35980,7 @@ CMD:arrestcar(playerid, params[])
 	SaveVehicleFloatEx(vehicleid, "Y", y);
 	SaveVehicleFloatEx(vehicleid, "Z", z);
 	NullVehicle(vehicleid);
-	sd_DestroyVehicle(vehicleid);*/
+	DestroyVehicle(vehicleid);*/
 	return 1;
 }
 thread(VehicleArrested);
@@ -38060,7 +36386,7 @@ CMD:sellfishes(playerid, params[])
 			money += randomEx(MIN_MONEY_PER_FISH, MAX_MONEY_PER_FISH);
 		}
 
-		sd_GivePlayerMoney(playerid, money);
+		GivePlayerMoney(playerid, money);
 		PlayerInfo[playerid][pFishedLimit] += money;
 		PlayerInfo[playerid][pFishes] = 0;
 
@@ -38326,7 +36652,7 @@ CMD:setunit(playerid, params[])
 			else
 			{
 				new Float:x, Float:z, Float:y;
-				GetVehicleModelInfo(VehicleInfo[vehicleid][vModel], VEHICLE_MODEL_INFO_SIZE, x, y, z);
+				GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, x, y, z);
 				VehicleInfo[vehicleid][vUnitLabel] = CreateDynamic3DTextLabel(params, 0xFFFFFFFF, 0.425*x, (-0.45*y), (-0.1*z), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
 			}
 			format(VehicleInfo[vehicleid][vUnitText], 15, params);
@@ -38551,29 +36877,28 @@ CMD:invweapon(playerid, params[])
 	// if(IsPlayerInAnyVehicle(playerid)) return SendWarning(playerid, "Negalite padëti ginklo tr. priemonëje.");
 	if(weaponid == 0) return SendError(playerid, "Neturite ginklo rankose.");
 
-	sd_CheckWeaponCheat(playerid, weaponid, false);
-	new wepslot = sd_GetWeaponSlot(weaponid);
-	if(sd_GetWeaponType(playerid, weaponid) == WEAPON_GIVE_TYPE_NO_INVENTORY)
+	new wepslot = FAC_GetWeaponSlot(weaponid);
+	if(ret_GetSlotWeaponUniqueId(playerid, wepslot) == WEAPON_GIVE_TYPE_NO_INVENTORY)
 	{
 		SendWarning(playerid, "Ðio ginklo pasidëti á inventoriø negalima.");
 		return 1;
 	}
-	if(sd_CheckIfSlotUsed(playerid, wepslot))
+	if(PlayerHasWeaponInSlot(playerid, wepslot))
 	{
 		new slot = GetPlayerFreeInventorySlot(playerid);
 		if(slot != -1)
 		{
 			new unused, ammo;
-			sd_GetPlayerWeaponData(playerid, wepslot, unused, ammo);
-			GivePlayerInventoryItem(playerid, weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid), .slotid = slot);
+			GetPlayerWeaponData(playerid, wepslot, unused, ammo);
+			GivePlayerInventoryItem(playerid, weaponid, ammo, ret_GetSlotWeaponUniqueId(playerid, wepslot), .slotid = slot);
 
 			log_init(true);
 			log_set_table("logs_inventory");
 			log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
-			log_set_values("'%d','%e','-1','Padejo ginkla i inventoriu','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), weaponid, ammo, sd_GetWeaponUniqueId(playerid, weaponid));
+			log_set_values("'%d','%e','-1','Padejo ginkla i inventoriu','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), weaponid, ammo, ret_GetSlotWeaponUniqueId(playerid, wepslot));
 			log_push();
 
-			sd_ClearWeaponSlot(playerid, wepslot);
+			RemovePlayerWeaponInSlot(playerid, wepslot);
 			SendFormat(playerid, 0xBABABAFF, "Ginklas padëtas á inventoriø.");
 		}
 		else
@@ -38758,24 +37083,24 @@ CMD:leavefaction(playerid, params[])
 stock ClearServerSidedWeapons(playerid)
 {
 	new
-		data[13][3];
-	ac__PlayerIgnoreWeaponAC[playerid] = 2;
+		data[13][4];
+
 	for(new i = 0; i < 13; i++)
 	{
-		if(ac__PlayerWeapons[playerid][i][e_ac_WeaponGiveType] == WEAPON_GIVE_TYPE_NORMAL)
-		{
-			sd_GetPlayerWeaponData(playerid, i, data[i][0], data[i][1]);
-			data[i][2] = ac__PlayerWeapons[playerid][i][e_ac_WeaponUniqueId];
-		}
+		GetPlayerWeaponData(playerid, i, data[i][0], data[i][1]);
+		GetPlayerWeaponExtraData(playerid, i, data[i][2], data[i][3]);
 	}
-	sd_ResetPlayerWeapons(playerid);
+	ResetPlayerWeapons(playerid);
 	for(new i = 0; i < 13; i++)
 	{
-		if(data[i][0] > 0 && data[i][1] > 0)
+		if(	data[i][0] > 0 && // Weapon
+			data[i][1] > 0 && // Ammo
+			data[i][2] == WEAPON_GIVE_TYPE_NORMAL) // GiveType
 		{	
-			sd_GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][2]);
+			GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][3]);
 		}
 	}
+	return 1;
 }
 
 alias:takejob("isidarbinti");
@@ -38987,13 +37312,13 @@ CMD:pay(playerid, params[])
 	if(!CheckPlayerid(receiverid) || playerid == receiverid) return InfoBox(playerid, IB_WRONG_PLAYER);
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 5.0) || IsPlayerSpectatedBy(playerid, receiverid)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
 	if(PlayerInfo[playerid][pHoursPlayed] < 2 || PlayerInfo[receiverid][pHoursPlayed] < 2) return SendWarning(playerid, "Jûs arba þaidëjas nesate praþaidæs 2.");
-	if(sd_GetPlayerMoney(playerid) < amount) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
-	sd_GivePlayerMoney(receiverid, amount);
-	sd_GivePlayerMoney(playerid, -amount);
+	if(GetPlayerMoney(playerid) < amount) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
+	GivePlayerMoney(receiverid, amount);
+	GivePlayerMoney(playerid, -amount);
 	SendFormat(playerid, 0x1EC600FF, "Padavëte %s $%d", GetPlayerNameEx(receiverid, true), amount);
 	SendFormat(receiverid, 0x1EC600FF, "Gavote $%d ið %s", amount, GetPlayerNameEx(playerid, true));
-	SaveAccountIntEx(receiverid, "Money", sd_GetPlayerMoney(receiverid));
-	SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
+	SaveAccountIntEx(receiverid, "Money", GetPlayerMoney(receiverid));
+	SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 	ApplyAnimation_Single(playerid, "DEALER", "shop_pay", 4.0, false, true, true, true, false);
 	log_init(true);
 	log_set_table("logs_money");
@@ -39413,7 +37738,7 @@ CMD:exit(playerid, params[])
 			{
 				if(GarageInfo[garage][gLocked] == 0)
 				{
-					sd_LinkVehicleToInterior(vehicleid, GarageInfo[garage][gExterior]);
+					LinkVehicleToInterior(vehicleid, GarageInfo[garage][gExterior]);
 					SetVehicleVirtualWorld(vehicleid, GarageInfo[garage][gOutVW]);
 					SetVehiclePos(vehicleid, GarageInfo[garage][gCarEnterX], GarageInfo[garage][gCarEnterY], GarageInfo[garage][gCarEnterZ]);
 					SetVehicleZAngle(vehicleid, GarageInfo[garage][gCarEnterA]);
@@ -39475,7 +37800,7 @@ CMD:exit(playerid, params[])
 			new vehicleid = GetPlayerVehicleID(playerid);
 			if(vehicleid != INVALID_VEHICLE_ID && GetPlayerVehicleSeat(playerid) == 0  && IsPlayerInAnyVehicle(playerid))
 			{
-				sd_LinkVehicleToInterior(vehicleid, ParkingInfo[parking][parkingExterior]);
+				LinkVehicleToInterior(vehicleid, ParkingInfo[parking][parkingExterior]);
 				SetVehicleVirtualWorld(vehicleid, ParkingInfo[parking][parkingOutVW]);
 				SetVehiclePos(vehicleid, ParkingInfo[parking][parkingEnterX], ParkingInfo[parking][parkingEnterY], ParkingInfo[parking][parkingEnterZ]);				
 
@@ -39549,7 +37874,7 @@ CMD:enter(playerid, params[])
 				}		
 				if(BusinessInfo[businessid][bEnterPrice] > 0 && PlayerNoEnterPriceBusiness[playerid][businessid] <= 0)
 				{
-					sd_GivePlayerMoney(playerid, -BusinessInfo[businessid][bEnterPrice]);
+					GivePlayerMoney(playerid, -BusinessInfo[businessid][bEnterPrice]);
 					BusinessInfo[businessid][bBudget] += BusinessInfo[businessid][bEnterPrice];
 					PlayerNoEnterPriceBusiness[playerid][businessid] = 10;
 					SendFormat(playerid, 0xFFD688FF, "Sumokëjote áëjimo mokestá $%d. 10 minuèiø á verslà galësite áeiti nemokamai.", BusinessInfo[businessid][bEnterPrice]);
@@ -39598,7 +37923,7 @@ CMD:enter(playerid, params[])
 				{
 					if(IsValidVehicle(vehicleid))
 					{
-						sd_LinkVehicleToInterior(vehicleid, GarageInfo[garage][gInterior]);
+						LinkVehicleToInterior(vehicleid, GarageInfo[garage][gInterior]);
 						SetVehicleVirtualWorld(vehicleid, GarageInfo[garage][gVW]);
 						SetVehiclePos(vehicleid, GarageInfo[garage][gCarExitX], GarageInfo[garage][gCarExitY], GarageInfo[garage][gCarExitZ]);
 						SetVehicleZAngle(vehicleid, GarageInfo[garage][gCarExitA]);
@@ -39660,7 +37985,7 @@ CMD:enter(playerid, params[])
 			new vehicleid = GetPlayerVehicleID(playerid);
 			if(vehicleid != INVALID_VEHICLE_ID && GetPlayerVehicleSeat(playerid) == 0 && IsPlayerInAnyVehicle(playerid))
 			{
-				sd_LinkVehicleToInterior(vehicleid, ParkingInfo[parking][parkingInterior]);
+				LinkVehicleToInterior(vehicleid, ParkingInfo[parking][parkingInterior]);
 				SetVehicleVirtualWorld(vehicleid, ParkingInfo[parking][parkingVW]);
 				SetVehiclePos(vehicleid, ParkingInfo[parking][parkingExitX], ParkingInfo[parking][parkingExitY], ParkingInfo[parking][parkingExitZ]);				
 
@@ -39707,7 +38032,7 @@ CMD:trunk(playerid, params[])
 	{
 		if(boot == 0) return SendWarning(playerid, "Tr. priemonës bagaþinë uþdaryta (/trunko)");
 	}
-	if(VehicleTrunkSpace[VehicleInfo[vehicleid][vModel]-400] <= 0) return SendError(playerid, "Tr. priemonë neturi bagaþinës.");
+	if(VehicleTrunkSpace[GetVehicleModel(vehicleid)-400] <= 0) return SendError(playerid, "Tr. priemonë neturi bagaþinës.");
 	ShowPlayerInventory(playerid, INVENTORY_TYPE_VEHICLE, vehicleid);
 	return 1;
 }
@@ -40277,7 +38602,7 @@ CMD:repairengine(playerid, params[])
 	PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_ENGINE_REPAIR;
 	JobGUI_Show(playerid);
 	new string[126];
-	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(VehicleInfo[vehicleid][vModel])));
+	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(GetVehicleModel(vehicleid))));
 	JobGUI_Update(playerid, .bottext = string);
 	new spot = PlayerInfo[playerid][pJobDestination] = random(sizeof MechanicPartSpots);
 	SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_ENGINE, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
@@ -40296,7 +38621,7 @@ CMD:changeengine(playerid, params[])
 	PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_ENGINE;
 	JobGUI_Show(playerid);
 	new string[126];
-	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(VehicleInfo[vehicleid][vModel])));
+	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(GetVehicleModel(vehicleid))));
 	JobGUI_Update(playerid, .bottext = string);
 	new spot = PlayerInfo[playerid][pJobDestination] = random(sizeof MechanicPartSpots);
 	SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_ENGINE, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
@@ -40317,7 +38642,7 @@ CMD:repairbattery(playerid, params[])
 	PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_BATTERY_REPAIR;
 	JobGUI_Show(playerid);
 	new string[126];
-	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(VehicleInfo[vehicleid][vModel])));
+	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(GetVehicleModel(vehicleid))));
 	JobGUI_Update(playerid, .bottext = string);
 	new spot = PlayerInfo[playerid][pJobDestination] = random(sizeof MechanicPartSpots);
 	SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_BATTERY, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
@@ -40336,7 +38661,7 @@ CMD:changebattery(playerid, params[])
 	PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_BATTERY;
 	JobGUI_Show(playerid);
 	new string[126];
-	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(VehicleInfo[vehicleid][vModel])));
+	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(GetVehicleModel(vehicleid))));
 	JobGUI_Update(playerid, .bottext = string);
 	new spot = PlayerInfo[playerid][pJobDestination] = random(sizeof MechanicPartSpots);
 	SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_BATTERY, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
@@ -40385,7 +38710,7 @@ CMD:repair(playerid, params[])
 	if((vehicleid = GetPlayerVehicleID(playerid)) == INVALID_VEHICLE_ID || !IsPlayerInAnyVehicle(playerid)) return InfoBox(playerid, IB_NOT_IN_VEHICLE);
 	if(MECHANIC_REPAIR_ZONE_RADIUS <= GetVehicleDistanceFromPoint(vehicleid, DEFAULT_MECHANIC_REPAIR_SPOT)) return InfoBox(playerid, IB_NOT_IN_MECHANICS);
 	if(VehicleInfo[vehicleid][vFaction] == -1) return SendWarning(playerid, "Ðios tr. priemonës negalite tvarkyti.");
-	if(sd_GetPlayerMoney(playerid) < DEFAULT_REPAIR_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_REPAIR_PRICE);
+	if(GetPlayerMoney(playerid) < DEFAULT_REPAIR_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_REPAIR_PRICE);
 	PlayerInfo[playerid][pJobVehicle] = vehicleid;
 	PlayerInfo[playerid][pJobActionIndex] = 0;
 	PlayerInfo[playerid][pJobCurrentType] = 3;
@@ -40394,7 +38719,7 @@ CMD:repair(playerid, params[])
 	PlayerInfo[playerid][pJobActionTime] = 30;
 	JobGUI_Show(playerid);
 	new string[126];
-	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(VehicleInfo[vehicleid][vModel])));
+	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(GetVehicleModel(vehicleid))));
 	JobGUI_Update(playerid, .bottext = string);
 	new spot = PlayerInfo[playerid][pJobDestination] = random(sizeof MechanicPartSpots);
 	SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_REPAIR, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
@@ -40409,13 +38734,13 @@ CMD:repaint(playerid, params[])
 	if(PlayerInfo[playerid][pJobDuty] == 0) return InfoBox(playerid, IB_NOT_ON_JOB_DUTY);
 	if((vehicleid = GetPlayerVehicleID(playerid)) == INVALID_VEHICLE_ID || !IsPlayerInAnyVehicle(playerid)) return InfoBox(playerid, IB_NOT_IN_VEHICLE);
 	if(MECHANIC_REPAINT_ZONE_RADIUS <= GetVehicleDistanceFromPoint(vehicleid, DEFAULT_MECHANIC_REPAINT_SPOT)) return InfoBox(playerid, IB_NOT_IN_MECHANICS);
-	if(sd_GetPlayerMoney(playerid) < DEFAULT_REPAINT_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_REPAINT_PRICE);
+	if(GetPlayerMoney(playerid) < DEFAULT_REPAINT_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_REPAINT_PRICE);
 	PlayerInfo[playerid][pJobVehicle] = vehicleid;
 	PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_REPAINT;
 	PlayerInfo[playerid][pJobActionTime] = 30;
 	JobGUI_Show(playerid);
 	new string[126];
-	format(string, sizeof string, "~n~~n~PERDAZOMA TR. PRIEMONE: %s", strtoupper(GetModelName(VehicleInfo[vehicleid][vModel])));
+	format(string, sizeof string, "~n~~n~PERDAZOMA TR. PRIEMONE: %s", strtoupper(GetModelName(GetVehicleModel(vehicleid))));
 	JobGUI_Update(playerid, .bottext = string);
 	new spot = PlayerInfo[playerid][pJobDestination] = random(sizeof MechanicPartSpots);
 	SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_REPAINT, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
@@ -40518,7 +38843,7 @@ CMD:duty(playerid, params[])
 						case JOB_FARMER:
 						{
 							RemovePlayerFromVehicle(playerid);
-							sd_SetVehicleToRespawn(vehicleid);
+							SetVehicleToRespawn(vehicleid);
 						}
 					}
 				}
@@ -40740,12 +39065,12 @@ CMD:buydealerhouse(playerid, params[])
 				if(DealerHouseInfo[houseid][dealerHouseOwner] > 0) return SendWarning(playerid, "Ðis konspiracinis namas jau uþimtas.");
 				if(DealerHouseInfo[houseid][dealerHouseType] == PlayerInfo[playerid][pDealer] || PlayerInfo[playerid][pDealer] == 2 || DealerHouseInfo[houseid][dealerHouseType] == 2)
 				{
-					if(sd_GetPlayerMoney(playerid) < DealerHouseInfo[houseid][dealerHousePrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DealerHouseInfo[houseid][dealerHousePrice]);
+					if(GetPlayerMoney(playerid) < DealerHouseInfo[houseid][dealerHousePrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DealerHouseInfo[houseid][dealerHousePrice]);
 					new string[126];
 					mysql_format(chandler, string, sizeof string, "UPDATE `dealers_houses_data` SET Owner = '%d' WHERE id = '%d'", PlayerInfo[playerid][pId], DealerHouseInfo[houseid][dealerHouseId]);
 					mysql_fquery(chandler, string, "DealerHouseSaved");
 					DealerHouseInfo[houseid][dealerHouseOwner] = PlayerInfo[playerid][pId];
-					sd_GivePlayerMoney(playerid, -DealerHouseInfo[houseid][dealerHousePrice]);
+					GivePlayerMoney(playerid, -DealerHouseInfo[houseid][dealerHousePrice]);
 					MsgSuccess(playerid, "KONSPIRACINIAI NAMAI", "Sëkmingai nusipirkote konspiraciná namà uþ $%d", DealerHouseInfo[houseid][dealerHousePrice]);
 					log_init(true);
 					log_set_table("logs_dealer_houses");
@@ -40815,7 +39140,7 @@ CMD:renthouse(playerid, params[])
 			if(HouseInfo[houseid][hOwner] == PlayerInfo[playerid][pId]) return SendError(playerid, "Ðio namo savininkas esate jûs.");
 			if(HouseInfo[houseid][hRent] > 0)
 			{
-				if(sd_GetPlayerMoney(playerid) < HouseInfo[houseid][hRentPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HouseInfo[houseid][hRentPrice]);
+				if(GetPlayerMoney(playerid) < HouseInfo[houseid][hRentPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HouseInfo[houseid][hRentPrice]);
 				mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `houses_dubkeys` WHERE HouseId = '%d' AND Valid = '1' AND Type = '1'", HouseInfo[houseid][hId]);
 				result = mysql_query(chandler, string, true);
 				if(cache_num_rows() >= HouseInfo[houseid][hRentLimit])
@@ -40854,17 +39179,17 @@ CMD:buyhouse(playerid, params[])
 		log_init(true);
 		if(HouseInfo[houseid][hOwner] > 0 && HouseInfo[houseid][hSale] > 0)
 		{
-			if(sd_GetPlayerMoney(playerid) < HouseInfo[houseid][hSale]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HouseInfo[houseid][hSale]);
-			sd_GivePlayerMoney(playerid, -HouseInfo[houseid][hSale]);
-			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
+			if(GetPlayerMoney(playerid) < HouseInfo[houseid][hSale]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HouseInfo[houseid][hSale]);
+			GivePlayerMoney(playerid, -HouseInfo[houseid][hSale]);
+			SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 			// pardavineja savininkas
 			new oldowner = INVALID_PLAYER_ID;
 			if((oldowner = FindPlayerBySql(HouseInfo[houseid][hOwner])) != INVALID_PLAYER_ID)
 			{
 				SendFormat(oldowner, 0xFFCD6EFF, "------------------------------------------------------------------------");
 				SendFormat(oldowner, 0xFFCD6EFF, "%s nupirko Jûsø namà uþ $%d", GetPlayerNameEx(playerid, .roleplay = true, .ignoremask = true), HouseInfo[houseid][hSale]);
-				sd_GivePlayerMoney(oldowner, HouseInfo[houseid][hSale]);
-				SaveAccountIntEx(oldowner, "Money", sd_GetPlayerMoney(oldowner));
+				GivePlayerMoney(oldowner, HouseInfo[houseid][hSale]);
+				SaveAccountIntEx(oldowner, "Money", GetPlayerMoney(oldowner));
 			}
 			else
 			{
@@ -40881,9 +39206,9 @@ CMD:buyhouse(playerid, params[])
 		}
 		else if(HouseInfo[houseid][hOwner] <= 0)
 		{
-			if(sd_GetPlayerMoney(playerid) < HouseInfo[houseid][hPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HouseInfo[houseid][hPrice]);
-			sd_GivePlayerMoney(playerid, -HouseInfo[houseid][hPrice]);
-			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
+			if(GetPlayerMoney(playerid) < HouseInfo[houseid][hPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, HouseInfo[houseid][hPrice]);
+			GivePlayerMoney(playerid, -HouseInfo[houseid][hPrice]);
+			SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 			MsgSuccess(playerid, "NAMAS", "Sëkmingai nusipirkote namà uþ $%d", HouseInfo[houseid][hPrice]);
 			log_set_table("logs_houses");
 			log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
@@ -40923,17 +39248,17 @@ CMD:buybusiness(playerid, params[])
 		log_init(true);
 		if(BusinessInfo[businessid][bOwner] > 0 && BusinessInfo[businessid][bSale] > 0)
 		{
-			if(sd_GetPlayerMoney(playerid) < BusinessInfo[businessid][bSale]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, BusinessInfo[businessid][bSale]);
-			sd_GivePlayerMoney(playerid, -BusinessInfo[businessid][bSale]);
-			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
+			if(GetPlayerMoney(playerid) < BusinessInfo[businessid][bSale]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, BusinessInfo[businessid][bSale]);
+			GivePlayerMoney(playerid, -BusinessInfo[businessid][bSale]);
+			SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 			// pardavineja senas savininkas
 			new oldowner = INVALID_PLAYER_ID;
 			if((oldowner = FindPlayerBySql(BusinessInfo[businessid][bOwner])) != INVALID_PLAYER_ID)
 			{
 				SendFormat(oldowner, 0xFFCD6EFF, "------------------------------------------------------------------------");
 				SendFormat(oldowner, 0xFFCD6EFF, "%s nupirko Jûsø verslà \"%s\" uþ $%d", GetPlayerNameEx(playerid, .roleplay = true, .ignoremask = true), BusinessInfo[businessid][bName], BusinessInfo[businessid][bSale]);
-				sd_GivePlayerMoney(oldowner, BusinessInfo[businessid][bSale]);
-				SaveAccountIntEx(oldowner, "Money", sd_GetPlayerMoney(oldowner));
+				GivePlayerMoney(oldowner, BusinessInfo[businessid][bSale]);
+				SaveAccountIntEx(oldowner, "Money", GetPlayerMoney(oldowner));
 			}
 			else
 			{
@@ -40950,9 +39275,9 @@ CMD:buybusiness(playerid, params[])
 		}
 		else if(BusinessInfo[businessid][bOwner] <= 0)
 		{
-			if(sd_GetPlayerMoney(playerid) < BusinessInfo[businessid][bPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, BusinessInfo[businessid][bPrice]);
-			sd_GivePlayerMoney(playerid, -BusinessInfo[businessid][bPrice]);
-			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
+			if(GetPlayerMoney(playerid) < BusinessInfo[businessid][bPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, BusinessInfo[businessid][bPrice]);
+			GivePlayerMoney(playerid, -BusinessInfo[businessid][bPrice]);
+			SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 			MsgSuccess(playerid, "VERSLAS", "Sëkmingai nusipirkote verslà uþ $%d", BusinessInfo[businessid][bPrice]);
 			log_set_table("logs_business");
 			log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`Amount`");
@@ -40981,17 +39306,17 @@ CMD:buygarage(playerid, params[])
 		log_init(true);
 		if(GarageInfo[garageid][gOwner] > 0 && GarageInfo[garageid][gSale] > 0)
 		{
-			if(sd_GetPlayerMoney(playerid) < GarageInfo[garageid][gSale]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, GarageInfo[garageid][gSale]);
-			sd_GivePlayerMoney(playerid, -GarageInfo[garageid][gSale]);
-			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
+			if(GetPlayerMoney(playerid) < GarageInfo[garageid][gSale]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, GarageInfo[garageid][gSale]);
+			GivePlayerMoney(playerid, -GarageInfo[garageid][gSale]);
+			SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 			// pardavineja senas savininkas
 			new oldowner = INVALID_PLAYER_ID;
 			if((oldowner = FindPlayerBySql(GarageInfo[garageid][gOwner])) != INVALID_PLAYER_ID)
 			{
 				SendFormat(oldowner, 0xFFCD6EFF, "------------------------------------------------------------------------");
 				SendFormat(oldowner, 0xFFCD6EFF, "%s nupirko Jûsø garaþà uþ $%d", GetPlayerNameEx(playerid, .roleplay = true, .ignoremask = true), GarageInfo[garageid][gSale]);
-				sd_GivePlayerMoney(oldowner, GarageInfo[garageid][gSale]);
-				SaveAccountIntEx(oldowner, "Money", sd_GetPlayerMoney(oldowner));
+				GivePlayerMoney(oldowner, GarageInfo[garageid][gSale]);
+				SaveAccountIntEx(oldowner, "Money", GetPlayerMoney(oldowner));
 			}
 			else
 			{
@@ -41007,9 +39332,9 @@ CMD:buygarage(playerid, params[])
 		}
 		else if(GarageInfo[garageid][gOwner] <= 0)
 		{
-			if(sd_GetPlayerMoney(playerid) < GarageInfo[garageid][gPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, GarageInfo[garageid][gPrice]);
-			sd_GivePlayerMoney(playerid, -GarageInfo[garageid][gPrice]);
-			SaveAccountIntEx(playerid, "Money", sd_GetPlayerMoney(playerid));
+			if(GetPlayerMoney(playerid) < GarageInfo[garageid][gPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, GarageInfo[garageid][gPrice]);
+			GivePlayerMoney(playerid, -GarageInfo[garageid][gPrice]);
+			SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 			MsgSuccess(playerid, "GARAÞAS", "Sëkmingai nusipirkote garaþà uþ $%d", GarageInfo[garageid][gPrice]);
 			log_set_table("logs_garages");
 			log_set_keys("`PlayerId`,`PlayerName`,`GarageId`,`ActionText`,`Amount`");
@@ -41076,68 +39401,68 @@ CMD:buyfood(playerid, params[])
 			{
 				case 1:
 				{
-					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_STEAK_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_STEAK_PRICE);
+					if(GetPlayerMoney(playerid) < DEFAULT_BAR_STEAK_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_STEAK_PRICE);
 					add = 45.0;
 					strcat(foodname, "kepsná");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_STEAK_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_STEAK_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_STEAK_PRICE;
 				}
 				case 2:
 				{
-					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_SNACK_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_SNACK_PRICE);
+					if(GetPlayerMoney(playerid) < DEFAULT_BAR_SNACK_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_SNACK_PRICE);
 					add = 15.0;
 					strcat(foodname, "uþkandëlæ");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_SNACK_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_SNACK_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_SNACK_PRICE;
 				}
 				case 3:
 				{
-					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_SANDWICH_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_SANDWICH_PRICE);
+					if(GetPlayerMoney(playerid) < DEFAULT_BAR_SANDWICH_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_SANDWICH_PRICE);
 					add = 15.0;
 					strcat(foodname, "sumuðtiná");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_SANDWICH_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_SANDWICH_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_SANDWICH_PRICE;
 				}
 				case 4:
 				{
-					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_PIZZA_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_PIZZA_PRICE);
+					if(GetPlayerMoney(playerid) < DEFAULT_BAR_PIZZA_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_PIZZA_PRICE);
 					add = 25.0;
 					strcat(foodname, "picà");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_PIZZA_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_PIZZA_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_PIZZA_PRICE;
 				}
 				case 5:
 				{
-					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_PANCAKES_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_PANCAKES_PRICE);
+					if(GetPlayerMoney(playerid) < DEFAULT_BAR_PANCAKES_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_PANCAKES_PRICE);
 					add = 20.0;
 					strcat(foodname, "blynø");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_PANCAKES_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_PANCAKES_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_PANCAKES_PRICE;
 				}
 				case 6:
 				{
-					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_BEER_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_BEER_PRICE);
+					if(GetPlayerMoney(playerid) < DEFAULT_BAR_BEER_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_BEER_PRICE);
 					add = 0.01;
 					strcat(foodname, "alaus");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_BEER_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_BEER_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_BEER_PRICE;
 					SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_BEER);
 				}
 				case 7:
 				{
-					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_JUICE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_JUICE_PRICE);
+					if(GetPlayerMoney(playerid) < DEFAULT_BAR_JUICE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_JUICE_PRICE);
 					add = 2.0;
 					strcat(foodname, "sulèiø");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_JUICE_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_JUICE_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_JUICE_PRICE;
 					SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_SPRUNK);
 				}
 				case 8:
 				{
-					if(sd_GetPlayerMoney(playerid) < DEFAULT_BAR_WINE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_WINE_PRICE);
+					if(GetPlayerMoney(playerid) < DEFAULT_BAR_WINE_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_BAR_WINE_PRICE);
 					add = 0.5;
 					strcat(foodname, "vyno");
-					sd_GivePlayerMoney(playerid, -DEFAULT_BAR_WINE_PRICE);
+					GivePlayerMoney(playerid, -DEFAULT_BAR_WINE_PRICE);
 					BusinessInfo[businessid][bBudget] += DEFAULT_BAR_WINE_PRICE;
 					SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_WINE);
 				}
@@ -41213,7 +39538,7 @@ CMD:ad(playerid, params[])
 {
 	new string[256];
 	if(sscanf(params,"s[256]",string)) return SendUsage(playerid, "/ad [tekstas]");
-	if(sd_GetPlayerMoney(playerid) < DEFAULT_AD_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_AD_PRICE);
+	if(GetPlayerMoney(playerid) < DEFAULT_AD_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_AD_PRICE);
 	if(PlayerExtra[playerid][peAdCooldown]+60 > gettime() && PlayerInfo[playerid][pDonator] <= 0) return SendWarning(playerid, "/ad galite naudoti kas minutæ.");
 	if(IsPlayerInRangeOfPoint(playerid, 10.0, GetGVarFloat("AdX", SERVER_VARS_ID), GetGVarFloat("AdY", SERVER_VARS_ID), GetGVarFloat("AdZ", SERVER_VARS_ID)) && GetPlayerVirtualWorld(playerid) == GetGVarInt("AdVW", SERVER_VARS_ID) && GetPlayerInterior(playerid) == GetGVarInt("AdInt", SERVER_VARS_ID))
 	{
@@ -41227,7 +39552,7 @@ CMD:ad(playerid, params[])
 		{
 			FactionInfo[factionid][fBudget] += DEFAULT_AD_PRICE;
 		}
-		sd_GivePlayerMoney(playerid, -DEFAULT_AD_PRICE);
+		GivePlayerMoney(playerid, -DEFAULT_AD_PRICE);
 	}
 	else SendWarning(playerid, "Nesate /ad vietoje.");
 	return 1;
@@ -41239,7 +39564,7 @@ CMD:cad(playerid, params[])
 		string[256],
 		businessid;
 	if(sscanf(params,"s[256]",string)) return SendUsage(playerid, "/cad [tekstas]");
-	if(sd_GetPlayerMoney(playerid) < DEFAULT_AD_PRICE*2) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_AD_PRICE);
+	if(GetPlayerMoney(playerid) < DEFAULT_AD_PRICE*2) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_AD_PRICE);
 	if(PlayerExtra[playerid][peAdCooldown]+60 > gettime() && PlayerInfo[playerid][pDonator] <= 0) return SendWarning(playerid, "/cad galite naudoti kas minutæ.");
 	if((businessid = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
 	{
@@ -41255,7 +39580,7 @@ CMD:cad(playerid, params[])
 			{
 				FactionInfo[factionid][fBudget] += DEFAULT_AD_PRICE*2;
 			}
-			sd_GivePlayerMoney(playerid, -DEFAULT_AD_PRICE*2);
+			GivePlayerMoney(playerid, -DEFAULT_AD_PRICE*2);
 		}
 		else return InfoBox(playerid, IB_NO_BUSINESS_KEYS);
 	}
@@ -41412,7 +39737,7 @@ stock PayForFuel(playerid, businessid)
 	if(PlayerInfo[playerid][pBankCard] <= 0)
 	{
 		SendFormat(playerid, 0xBABABAFF, "Kadangi banko kortelës neturite, apmokate grynais.");
-		sd_GivePlayerMoney(playerid, -PlayerExtra[playerid][peFilling]);
+		GivePlayerMoney(playerid, -PlayerExtra[playerid][peFilling]);
 		PlayerExtra[playerid][peFilling] =
 		PlayerExtra[playerid][peFillingAt] = 0;
 	}
@@ -41516,7 +39841,7 @@ CMD:v(playerid, params[])
 		log_init(true);
 		log_set_table("logs_vehicles");
 		log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`");
-		log_set_values("'%d','%e','%d','%e','Pasalino visus dubkey'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]));
+		log_set_values("'%d','%e','%d','%e','Pasalino visus dubkey'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)));
 		log_push();
 		return 1;
 	}
@@ -41545,7 +39870,7 @@ CMD:v(playerid, params[])
 				log_init(true);
 				log_set_table("logs_vehicles");
 				log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`ExtraId`");
-				log_set_values("'%d','%e','%d','%e','Ateme dubkey','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]), PlayerInfo[receiverid][pId]);
+				log_set_values("'%d','%e','%d','%e','Ateme dubkey','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), PlayerInfo[receiverid][pId]);
 				log_push();
 			}
 			cache_delete(result);
@@ -41566,7 +39891,7 @@ CMD:v(playerid, params[])
 		rp_me(playerid, _, "parodo tr. priemonës dokumentus %s.", GetPlayerNameEx(receiverid, true));
 		SendFormat(receiverid, 0xEBBEF0FF, " _________________________________________________");
 		SendFormat(receiverid, 0xEBBEF0FF, "|");
-		SendFormat(receiverid, 0xEBBEF0FF, "| Modelis: %s, savininkas: %s", GetModelName(VehicleInfo[vehicleid][vModel]), GetNameBySql(VehicleInfo[vehicleid][vOwner]));
+		SendFormat(receiverid, 0xEBBEF0FF, "| Modelis: %s, savininkas: %s", GetModelName(GetVehicleModel(vehicleid)), GetNameBySql(VehicleInfo[vehicleid][vOwner]));
 		SendFormat(receiverid, 0xEBBEF0FF, "| Numeriai: %s, bauda: $%d", VehicleInfo[vehicleid][vNumbers], VehicleInfo[vehicleid][vTicket]);
 		SendFormat(receiverid, 0xEBBEF0FF, "|_________________________________________________");
 	}
@@ -41581,10 +39906,10 @@ CMD:v(playerid, params[])
 				if(IsValidVehicle(Offer[playerid][2]))
 				{
 					if(!IsPlayerInRangeOfVehicle(playerid, 5.0, Offer[playerid][2])) return InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
-					if(sd_GetPlayerMoney(playerid) < Offer[playerid][3]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, Offer[playerid][3]);
+					if(GetPlayerMoney(playerid) < Offer[playerid][3]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, Offer[playerid][3]);
 					new string[126];
-					sd_GivePlayerMoney(owner, Offer[playerid][3]);
-					sd_GivePlayerMoney(playerid, -Offer[playerid][3]);
+					GivePlayerMoney(owner, Offer[playerid][3]);
+					GivePlayerMoney(playerid, -Offer[playerid][3]);
 					mysql_format(chandler, string, sizeof string, "UPDATE `vehicles_data` SET Owner = '%d' WHERE id = '%d'", PlayerInfo[playerid][pId], VehicleInfo[Offer[playerid][2]][vId]);
 					mysql_fquery(chandler, string, "VehicleSavedEx");
 					VehicleInfo[Offer[playerid][2]][vOwner] = PlayerInfo[playerid][pId];
@@ -41595,7 +39920,7 @@ CMD:v(playerid, params[])
 					log_init(true);
 					log_set_table("logs_vehicles");
 					log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`ExtraId`,`Amount`");
-					log_set_values("'%d','%e','%d','%e','Nupirko zaidejo tr. priemone','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[Offer[playerid][2]][vId], GetModelName(VehicleInfo[Offer[playerid][2]][vModel]), PlayerInfo[owner][pId], Offer[playerid][3]);
+					log_set_values("'%d','%e','%d','%e','Nupirko zaidejo tr. priemone','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[Offer[playerid][2]][vId], GetModelName(GetVehicleModel(Offer[playerid][2])), PlayerInfo[owner][pId], Offer[playerid][3]);
 					log_push();
 
 					ParkVehicle(Offer[playerid][2]);
@@ -41658,7 +39983,7 @@ CMD:v(playerid, params[])
 				log_init(true);
 				log_set_table("logs_vehicles");
 				log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`ExtraId`");
-				log_set_values("'%d','%e','%d','%e','Dave dubkey','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]), PlayerInfo[receiverid][pId]);
+				log_set_values("'%d','%e','%d','%e','Dave dubkey','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), PlayerInfo[receiverid][pId]);
 				log_push();
 			}
 			cache_delete(result);
@@ -41667,7 +39992,8 @@ CMD:v(playerid, params[])
 	}
 	else if(!strcmp(input, "engine", true)) // /engine /v engine
 	{
-		if(IsPlayerInAnyVehicle(playerid) && VehicleHaveEngine(VehicleInfo[GetPlayerVehicleID(playerid)][vModel]))
+		new vehicleid = GetPlayerVehicleID(playerid);
+		if(IsPlayerInAnyVehicle(playerid) && VehicleHaveEngine(GetVehicleModel(vehicleid)))
 		{
 			EngineTurning(playerid);
 		}
@@ -41675,7 +40001,7 @@ CMD:v(playerid, params[])
 	}
 	else if(!strcmp(input, "register", true)) // /v register
 	{
-		if(sd_GetPlayerMoney(playerid) < VEHICLE_REGISTER_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, VEHICLE_REGISTER_PRICE);
+		if(GetPlayerMoney(playerid) < VEHICLE_REGISTER_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, VEHICLE_REGISTER_PRICE);
 		if(!IsPlayerInAnyVehicle(playerid)) return InfoBox(playerid, IB_NOT_IN_VEHICLE);
 		new vehicleid = GetPlayerVehicleID(playerid);
 		if(!HaveVehicleKey(playerid, vehicleid, .check_only_owner = true, .ignore_admin_perm = true)) return SendWarning(playerid, "Nesate savo tr. priemonëje.");
@@ -41686,10 +40012,10 @@ CMD:v(playerid, params[])
 		log_init(true);
 		log_set_table("logs_vehicles");
 		log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Amount`,`ExtraString`");
-		log_set_values("'%d','%e','%d','%e','Priregistravo tr. priemone','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]), VEHICLE_REGISTER_PRICE, VehicleInfo[vehicleid][vNumbers]);
+		log_set_values("'%d','%e','%d','%e','Priregistravo tr. priemone','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), VEHICLE_REGISTER_PRICE, VehicleInfo[vehicleid][vNumbers]);
 		log_push();
 		SendFormat(playerid, 0xBABABAFF, "Tr. priemonë sëkmingai priregistruota, numeriai atsiras ið naujo priparkavus.");
-		sd_GivePlayerMoney(playerid, -VEHICLE_REGISTER_PRICE);
+		GivePlayerMoney(playerid, -VEHICLE_REGISTER_PRICE);
 		return 1;
 	}
 	else if(strfind(input, "buylock", true) == 0) // /v buylock
@@ -41729,15 +40055,15 @@ CMD:v(playerid, params[])
 			if(!HaveVehicleKey(playerid, vehicleid, .check_only_owner = true, .canbejob = false, .ignore_admin_perm = true) || vehicleid == INVALID_VEHICLE_ID) return SendWarning(playerid, "nesate savo tr. priemonëje.");
 			if(level == VehicleInfo[vehicleid][vLock]) return SendError(playerid, "Jûs jau turite %d-à uþrakto lygá.", level);
 			
-			if(sd_GetPlayerMoney(playerid) < money) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, money);
+			if(GetPlayerMoney(playerid) < money) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, money);
 			VehicleInfo[vehicleid][vLock] = level;
-			sd_GivePlayerMoney(playerid, -money);
+			GivePlayerMoney(playerid, -money);
 			SaveVehicleIntEx(vehicleid, "Lock", level);
 			SendFormat(playerid, 0xBABABAFF, "Sëkmingai ádiegëte {1162E5}%d{BABABA} lygio uþrakto sistemà.", level);
 			log_init(true);
 			log_set_table("logs_vehicles");
 			log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Amount`,`ExtraId`");
-			log_set_values("'%d','%e','%d','%e','Nupirko tr. priemones uzrakta','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]), level*150, VehicleInfo[vehicleid][vLock]);
+			log_set_values("'%d','%e','%d','%e','Nupirko tr. priemones uzrakta','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), level*150, VehicleInfo[vehicleid][vLock]);
 			log_push();
 		}
 		return 1;
@@ -41789,15 +40115,15 @@ CMD:v(playerid, params[])
 			if(VehicleInfo[vehicleid][vInsurance] < MAX_INSURANCE_LEVEL)
 			{
 				new price = floatround(VehicleInfo[vehicleid][vPrice]*0.10);
-				if(sd_GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
+				if(GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
 				VehicleInfo[vehicleid][vInsurance]++;
 				SendFormat(playerid, 0xD9D9D9FF, "Tr. priemonës draudimas pratæstas. Jis kainavo {5FCE48}$%d", price);
 				SaveVehicleIntEx(vehicleid, "Insurance", VehicleInfo[vehicleid][vInsurance]);
-				sd_GivePlayerMoney(playerid, -price);
+				GivePlayerMoney(playerid, -price);
 				log_init(true);
 				log_set_table("logs_vehicles");
 				log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Amount`,`ExtraId`");
-				log_set_values("'%d','%e','%d','%e','Nupirko draudima tr. priemonei','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]), price, VehicleInfo[vehicleid][vInsurance]);
+				log_set_values("'%d','%e','%d','%e','Nupirko draudima tr. priemonei','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), price, VehicleInfo[vehicleid][vInsurance]);
 				log_push();
 				return 1;
 			}
@@ -41818,7 +40144,7 @@ CMD:v(playerid, params[])
 		new vehicleid = INVALID_VEHICLE_ID;
 		if((vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID && IsPlayerInAnyVehicle(playerid) && HaveVehicleKey(playerid, vehicleid, .canbejob = false, .ignore_admin_perm = true))
 		{
-			if(sd_GetPlayerMoney(playerid) < VEHICLE_BUY_PARK_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, VEHICLE_BUY_PARK_PRICE);
+			if(GetPlayerMoney(playerid) < VEHICLE_BUY_PARK_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, VEHICLE_BUY_PARK_PRICE);
 			new
 				Float:x,
 				Float:y,
@@ -41837,7 +40163,7 @@ CMD:v(playerid, params[])
 			log_init(true);
 			log_set_table("logs_vehicles");
 			log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`");
-			log_set_values("'%d','%e','%d','%e','Nupirko parkavimo vieta'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]));
+			log_set_values("'%d','%e','%d','%e','Nupirko parkavimo vieta'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)));
 			log_push();
 
 			SaveVehicleFloatEx(vehicleid, "X", x);
@@ -41845,7 +40171,7 @@ CMD:v(playerid, params[])
 			SaveVehicleFloatEx(vehicleid, "Z", z);
 			SaveVehicleFloatEx(vehicleid, "A", a);
 
-			sd_GivePlayerMoney(playerid, -VEHICLE_BUY_PARK_PRICE);
+			GivePlayerMoney(playerid, -VEHICLE_BUY_PARK_PRICE);
 			SendFormat(playerid, 0xD9D9D9FF, "Tr. priemonës parkavimo vieta nupirkta.");
 
 			format(string, sizeof string, "%0.1f, %0.1f, %0.1f, %0.1f", x, y, z, a);
@@ -41877,7 +40203,7 @@ CMD:v(playerid, params[])
 			log_init(true);
 			log_set_table("logs_vehicles");
 			log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`");
-			log_set_values("'%d','%e','%d','%e','Priparkavo tr. priemone'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(VehicleInfo[vehicleid][vModel]));
+			log_set_values("'%d','%e','%d','%e','Priparkavo tr. priemone'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)));
 			log_push();
 
 			if(VehicleInfo[vehicleid][vSpawnedBy] == PlayerInfo[playerid][pId])
@@ -42200,16 +40526,16 @@ public TruckerOrdersLoad(playerid)
 forward DubkeyAdded(playerid, receiverid, vehicleid);
 public DubkeyAdded(playerid, receiverid, vehicleid)
 {
-	SendFormat(playerid, 0xE6E6E6FF, "Davëte þaidëjui {FF8400}%s{E6E6E6} raktus nuo {FF8400}\"%s\"{E6E6E6} tr. priemonës.", GetPlayerNameEx(receiverid), GetModelName(VehicleInfo[vehicleid][vModel]));
-	SendFormat(receiverid, 0xE6E6E6FF, "Gavote tr. priemonës {FF8400}\"%s\" {E6E6E6}raktus ið {E6E6E6}%s{E6E6E6}.", GetModelName(VehicleInfo[vehicleid][vModel]), GetPlayerNameEx(playerid));
+	SendFormat(playerid, 0xE6E6E6FF, "Davëte þaidëjui {FF8400}%s{E6E6E6} raktus nuo {FF8400}\"%s\"{E6E6E6} tr. priemonës.", GetPlayerNameEx(receiverid), GetModelName(GetVehicleModel(vehicleid)));
+	SendFormat(receiverid, 0xE6E6E6FF, "Gavote tr. priemonës {FF8400}\"%s\" {E6E6E6}raktus ið {E6E6E6}%s{E6E6E6}.", GetModelName(GetVehicleModel(vehicleid)), GetPlayerNameEx(playerid));
 	return 1;
 }
 
 forward DubkeyRemoved(playerid, receiverid, vehicleid);
 public DubkeyRemoved(playerid, receiverid, vehicleid)
 {
-	SendFormat(playerid, 0xE6E6E6FF, "Atëmëte þaidëjo {FF8400}%s{E6E6E6} raktus nuo {FF8400}\"%s\"{E6E6E6} tr. priemonës.", GetPlayerNameEx(receiverid), GetModelName(VehicleInfo[vehicleid][vModel]));
-	SendFormat(receiverid, 0xE6E6E6FF, "{E6E6E6}%s{E6E6E6} atëmë ið jûsø raktus nuo {FF8400}\"%s\"{E6E6E6} tr. priemonës.", GetPlayerNameEx(playerid), GetModelName(VehicleInfo[vehicleid][vModel]));
+	SendFormat(playerid, 0xE6E6E6FF, "Atëmëte þaidëjo {FF8400}%s{E6E6E6} raktus nuo {FF8400}\"%s\"{E6E6E6} tr. priemonës.", GetPlayerNameEx(receiverid), GetModelName(GetVehicleModel(vehicleid)));
+	SendFormat(receiverid, 0xE6E6E6FF, "{E6E6E6}%s{E6E6E6} atëmë ið jûsø raktus nuo {FF8400}\"%s\"{E6E6E6} tr. priemonës.", GetPlayerNameEx(playerid), GetModelName(GetVehicleModel(vehicleid)));
 	return 1;
 }
 

@@ -1,5 +1,12 @@
 stock SendChatMessage(playerid, color, const text[]) return SendClientMessage(playerid, color, text);
 stock SendChatMessageToAll(color, const text[]) return SendClientMessageToAll(color, text);
+stock CancelVehicleEnter(playerid)
+{      
+    new Float:_c_Ex,Float:_c_Ey,Float:_c_Ez; 
+    GetPlayerPos(playerid, _c_Ex, _c_Ey, _c_Ez); 
+    SetPlayerPos(playerid, _c_Ex, _c_Ey, _c_Ez + 0.085);
+    return 1;
+}
 
 stock sd_DestroyDynamicObject(STREAMER_TAG_OBJECT objectid, called[] = "default", extra[] = "")
 {

@@ -86,7 +86,7 @@ CMD:opengift(playerid, params[])
 			{
 				if(ChristmasGifts[i][giftPrizeType] == GIFT_TYPE_MONEY)
 				{
-					sd_GivePlayerMoney(playerid, ChristmasGifts[i][giftPrizeValue]);
+					GivePlayerMoney(playerid, ChristmasGifts[i][giftPrizeValue]);
 				}
 				else if(ChristmasGifts[i][giftPrizeType] == GIFT_TYPE_DONATOR)
 				{

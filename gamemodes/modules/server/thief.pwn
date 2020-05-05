@@ -259,7 +259,7 @@ CMD:sellcar(playerid, params[])
 							SendFormat(playerid, 0xc25c43ff, "[SMS]: Ðitos labai reikëjo, sumoku papildomai.", money);
 							money = floatround(money * 1.15);
 						}
-						sd_GivePlayerMoney(playerid, money);
+						GivePlayerMoney(playerid, money);
 
 						Destroy_Stolen_Vehicle(vehicleid);
 						thief_Spot[spotCarsNeed][car] -- ;
@@ -304,7 +304,8 @@ stock Destroy_Stolen_Vehicle(vehicleid)
 		}
 		else
 		{
-			format(string, sizeof string, "Jûsø tr. priemonë %s (numeriai: %s) buvo sunaikinta negráþtamai.", GetModelName(VehicleInfo[vehicleid][vModel]), VehicleInfo[vehicleid][vNumbers]);
+			format(string, sizeof string, "Jûsø tr. priemonë %s (numeriai: %s) buvo sunaikinta negráþtamai.", 
+				GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vNumbers]);
 			AddPlayerLoginNote(VehicleInfo[vehicleid][vOwner], -1, string);
 		}
 	}
@@ -314,7 +315,7 @@ stock Destroy_Stolen_Vehicle(vehicleid)
 		SaveVehicleIntEx(vehicleid, "SpawnedId", 0);
 	}
 	NullVehicle(vehicleid);
-	sd_DestroyVehicle(vehicleid);
+	DestroyVehicle(vehicleid);
 	return 1;
 }
 
@@ -692,7 +693,7 @@ stock Thief_Start(playerid, vehicleid)
 		GetPlayerPos(playerid, tlc_pd[0], tlc_pd[1], tlc_pd[2]);
 
 		GetCoords2DZone(string, 28, tlc_pd[0], tlc_pd[1]);
-		format(string, sizeof string, "Gautas iðkvietimas apie automobilio %s[%s] vagystæ! Vieta: %s ((/tlc)):", GetModelName(VehicleInfo[vehicleid][vModel]), VehicleInfo[vehicleid][vNumbers], string);
+		format(string, sizeof string, "Gautas iðkvietimas apie automobilio %s[%s] vagystæ! Vieta: %s ((/tlc)):", GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vNumbers], string);
 
 		new _f;
 		foreach(new officer : Player)
@@ -708,7 +709,7 @@ stock Thief_Start(playerid, vehicleid)
 			ownerid;
 		if((ownerid = FindPlayerBySql(VehicleInfo[vehicleid][vOwner])) != INVALID_PLAYER_ID)
 		{
-			SendFormat(ownerid, -1, "Jûsø transporto priemonë %s yra vogiama!", GetModelName(VehicleInfo[vehicleid][vModel]));
+			SendFormat(ownerid, -1, "Jûsø transporto priemonë %s yra vogiama!", GetModelName(GetVehicleModel(vehicleid)));
 		}
 	}
 

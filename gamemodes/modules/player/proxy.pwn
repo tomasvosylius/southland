@@ -11,7 +11,7 @@ static
 
 hook OnGameModeInit()
 {
-    API_client = RequestsClient("https://blackbox.ipinfo.app/lookup/");
+    API_client = RequestsClient("http://blackbox.ipinfo.app/lookup/");
 }
 
 hook OnPlayerConnect(playerid)

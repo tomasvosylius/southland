@@ -1665,53 +1665,55 @@ stock encode_tires(rear_right_tire, front_right_tire, rear_left_tire, front_left
 	return rear_right_tire | (front_right_tire << 1) | (rear_left_tire << 2) | (front_left_tire << 3);
 }
 
-stock sd_LinkVehicleToInterior(vehicleid, interiorid)
+stock VHS_LinkVehicleToInterior(vehicleid, interiorid)
 {
 	VehicleInfo[vehicleid][vInt] = interiorid;
 	return LinkVehicleToInterior(vehicleid, interiorid);
 }
+#if defined _ALS_LinkVehicleToInterior
+	#undef LinkVehicleToInterior
+#else 
+	#define _ALS_LinkVehicleToInterior
+#endif 
+#define LinkVehicleToInterior VHS_LinkVehicleToInterior
 
-stock sd_SetVehicleToRespawn(vehicleid)
+stock VHS_SetVehicleToRespawn(vehicleid)
 {
-	AcVehicleData[vehicleid][VehicleHealth] = 1000.0;
 	new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
 	for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
 	return SetVehicleToRespawn(vehicleid);
 }
+#if defined _ALS_SetVehicleToRespawn
+	#undef SetVehicleToRespawn
+#else 
+	#define _ALS_SetVehicleToRespawn
+#endif 
+#define SetVehicleToRespawn VHS_SetVehicleToRespawn
 
-stock sd_CreateVehicle(model, Float:x, Float:y, Float:z, Float:a, color_1, color_2, respawn_time, add_siren = 0)
+stock VHS_CreateVehicle(model, Float:x, Float:y, Float:z, Float:a, color_1, color_2, respawn_time, add_siren = 0)
 {
 	new 
 		vehicleid = CreateVehicle(model, x, y, z, a, color_1, color_2, respawn_time, add_siren);
-	new 
-		r_color_1, 
-		r_color_2;
+
 	if(vehicleid != INVALID_VEHICLE_ID)
 	{
-		if(color_1 < 0) r_color_1 = random(255);
-		else r_color_1 = color_1; 
-		if(color_2 < 0) r_color_2 = random(255);
-		else r_color_2 = color_2;
-		ChangeVehicleColor(vehicleid, r_color_1, r_color_2);
-		AcVehicleData[vehicleid][VehicleHealth] = 1000.0;
-
 		new __reset_VehicleInfo[E_VEHICLE_DATA],
 			__reset_VehicleInventory[E_INVENTORY_DATA];
+
 		VehicleInfo[vehicleid] = __reset_VehicleInfo;
+
 		for(new slot = 0; slot < MAX_INVENTORY_SLOTS; slot++) VehicleInventory[vehicleid][slot] = __reset_VehicleInventory;
-		if(Iter_Contains(Vehicle, vehicleid))
-		{
-			Iter_Remove(Vehicle, vehicleid);
-		}
-		VehicleInfo[vehicleid][vModel] = model;
+		
 		VehicleInfo[vehicleid][vRespawnTime] = respawn_time;
 		VehicleInfo[vehicleid][vAddSiren] = add_siren;
-		VehicleInfo[vehicleid][vColor1] = r_color_1;
-		VehicleInfo[vehicleid][vColor2] = r_color_2;
+		
 		VehicleInfo[vehicleid][vUnitLabel] = INVALID_3DTEXT_ID;
 		RentedBy[vehicleid] = INVALID_PLAYER_ID;
-		for(new i = 0; i < 4; i++) VehicleInfo[vehicleid][vObjects][i] = INVALID_OBJECT_ID;
-		Iter_Add(Vehicle, vehicleid);
+		
+		for(new i = 0; i < 4; i++)
+		{
+			VehicleInfo[vehicleid][vObjects][i] = INVALID_OBJECT_ID;
+		}
 	}
 	#if SERVER_DEBUG_LEVEL >= 2 
 		printf("[create] CreateVehicle(%d) called, ID: %d", model, vehicleid);
@@ -1719,14 +1721,14 @@ stock sd_CreateVehicle(model, Float:x, Float:y, Float:z, Float:a, color_1, color
 	return vehicleid;
 }
 
-stock sd_ChangeVehicleColor(vehicleid, color1, color2)
-{
-	VehicleInfo[vehicleid][vColor1] = color1;
-	VehicleInfo[vehicleid][vColor2] = color2;
-	return ChangeVehicleColor(vehicleid, color1, color2);
-}
+#if defined _ALS_CreateVehicle 
+	#undef CreateVehicle
+#else
+	#define _ALS_CreateVehicle
+#endif
+#define CreateVehicle VHS_CreateVehicle
 
-stock sd_DestroyVehicle(vehicleid)
+stock VHS_DestroyVehicle(vehicleid)
 {
 	#if SERVER_DEBUG_LEVEL >= 2 
 		printf("[destroy] DestroyVehicle(%d, %d) called", vehicleid, GetVehicleModel(vehicleid));
@@ -1739,21 +1741,31 @@ stock sd_DestroyVehicle(vehicleid)
 	}
 	
 	VehicleInfo[vehicleid] = __reset_VehicleInfo;
+	
+	VehicleInfo[vehicleid][vUnitLabel] = INVALID_3DTEXT_ID;
+	format(VehicleInfo[vehicleid][vUnitText], 1, "");
 
 	for(new i = 0; i < 4; i++)
 	{
 		VehicleInfo[vehicleid][vObjects][i] = INVALID_OBJECT_ID;
 	}
-	VehicleInfo[vehicleid][vUnitLabel] = INVALID_3DTEXT_ID;
-	format(VehicleInfo[vehicleid][vUnitText], 1, "");
-	DestroyVehicle(vehicleid);
-	return Iter_Remove(Vehicle, vehicleid);
+	
+
+	return DestroyVehicle(vehicleid);
 }
+
+#if defined _ALS_CreateVehicle 
+	#undef CreateVehicle
+#else
+	#define _ALS_CreateVehicle
+#endif
+#define CreateVehicle VHS_CreateVehicle
+
 
 stock GetModelName(model)
 {
 	new string[64];
 	if(400 <= model <= 612) format(string, sizeof string, "%s", aVehicleNames[model-400]);
-	else format(string, sizeof string, "model%d", model);
+	else format(string, sizeof string, "Model:%d", model);
 	return string;
 }

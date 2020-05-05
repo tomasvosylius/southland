@@ -1,10 +1,14 @@
+#include <YSI\y_hooks>
 /*
  *
- * SAN ANDREAS MULTIPLAYER WEAPONS.PWN BY TOMAS TORKQ VOSYLIUS
+ * SAN ANDREAS MULTIPLAYER WEAPONS.PWN BY TOMAS f0cus VOSYLIUS
  * ALL RIGHTS RESERVED
- * 2016
+ * 2016-2020
  *
  */
+
+#define WEAPON_GIVE_TYPE_NO_INVENTORY		0
+#define WEAPON_GIVE_TYPE_NORMAL				1
 
 new WeaponObjects[] = {
 	0,
@@ -155,3 +159,99 @@ new Float:WeaponDamages[] = { // Zala
 	0.0, // Infrar. akiniai
 	0.0 // Paraðiuta
 };	
+
+
+hook OnPlayerConnect(playerid)
+{
+	ResetPlayerWeapons(playerid);
+	return 1;
+}
+
+hook OnPlayerDeath(playerid, reason, killerid)
+{
+	ResetPlayerWeapons(playerid);
+	return 1;
+}
+
+static 
+	weapon_GiveType[MAX_PLAYERS][13],
+	weapon_UniqueId[MAX_PLAYERS][13];
+
+stock GetPlayerWeaponExtraData(playerid, slot, &givetype, &uniqueid)
+{
+	if(0 <= slot < sizeof weapon_GiveType[])
+	{
+		givetype = weapon_GiveType[playerid][slot];
+		uniqueid = weapon_UniqueId[playerid][slot];
+		return 1;
+	}
+	return 0;
+}
+
+stock ret_GetSlotWeaponUniqueId(playerid, slot)
+{
+	return weapon_UniqueId[playerid][slot];
+}
+stock ret_GetSlotWeaponGiveType(playerid, slot)
+{
+	return weapon_GiveType[playerid][slot];
+}
+
+
+stock WPS_ResetPlayerWeapons(playerid)
+{
+	for(new slot = 0; slot < sizeof weapon_GiveType[]; slot++)
+	{
+		weapon_GiveType[playerid][slot] = 
+		weapon_UniqueId[playerid][slot] = 0;	
+	}
+	return ResetPlayerWeapons(playerid);
+}
+#if defined _ALS_ResetPlayerWeapons
+	#undef ResetPlayerWeapons
+#else 
+	#define _ALS_ResetPlayerWeapons
+#endif 
+#define ResetPlayerWeapons WPS_ResetPlayerWeapons
+
+stock WPS_GivePlayerWeapon(playerid, weaponid, ammo, givetype = 0, uniqueid = 0)
+{
+	new slot = FAC_GetWeaponSlot(weaponid);
+	if(0 <= slot < sizeof weapon_GiveType[])
+	{
+		weapon_GiveType[playerid][slot] = givetype;
+		weapon_UniqueId[playerid][slot] = uniqueid;
+	}
+	return GivePlayerWeapon(playerid, weaponid, ammo);
+}
+
+#if defined _ALS_GivePlayerWeapon
+	#undef GivePlayerWeapon
+#else 
+	#define _ALS_GivePlayerWeapon
+#endif 
+#define GivePlayerWeapon WPS_GivePlayerWeapon
+
+stock CreateUniqueWeaponId(playerid, weaponid, ammo, givetype)
+{
+	new 
+		string[126],
+		Cache:result,
+		id;
+
+	mysql_format(chandler, string, sizeof string, "INSERT INTO `weapons_data` (`WeaponModel`,`GiveType`,`GiveAmmo`) VALUES ('%d','%d','%d')", weaponid, givetype, ammo);
+	result = mysql_query(chandler, string, true);
+	if(mysql_errno() != 0)
+	{
+		format(string, sizeof string, "%d", mysql_errno());
+		SendCriticalError(playerid, "Ginklas jums nebuvo suteiktas dël MySQL klaidos.", string);
+		cache_delete(result);
+		id = -1;
+	}
+	else
+	{
+		id = cache_insert_id();
+		cache_delete(result);
+	}
+	return id;
+}

@@ -1396,7 +1396,7 @@ stock LoadBar_Create_Player(playerid)
 
 	LoadBar_Loaded[playerid] = CreatePlayerTextDraw(playerid, 191.476211, 378.999969, "LD_SPAC:white");
 	PlayerTextDrawLetterSize(playerid, LoadBar_Loaded[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], 97.000000, 3.0);
+	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], 0.000000, 3.0);
 	PlayerTextDrawAlignment(playerid, LoadBar_Loaded[playerid], 1);
 	PlayerTextDrawColor(playerid, LoadBar_Loaded[playerid], 0xEEBC26ff);
 	PlayerTextDrawSetShadow(playerid, LoadBar_Loaded[playerid], 0);

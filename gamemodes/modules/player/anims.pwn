@@ -659,18 +659,6 @@ CMD:lean(playerid, params[])
 	}
 	return 1;
 }
-
-CMD:charity(playerid, params[])
-{
-	new amount;
-	if(sscanf(params,"d",amount) || amount < 0) return SendUsage(playerid, "/charity [kiekis]");
-	if(sd_GetPlayerMoney(playerid) < amount) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
-
-	sd_GivePlayerMoney(playerid, -amount);
-	SendFormat(playerid, 0xb0df67ff, "Paaukojote $%d", amount);
-	return 1;
-}
-
 // chat
 flags:chat(CMD_TYPE_ANIMATION);
 CMD:chat(playerid, params[])

@@ -41,6 +41,9 @@ new stock airbreakIndexes[] =
     1129, 1208, 1156
 };
 
+static  
+    airbrk_count[MAX_PLAYERS];
+
 stock Float:GetVehicleSpeed_MPH(playerid)
 {
     if (!IsPlayerInAnyVehicle(playerid)) return 0.0;
@@ -56,7 +59,6 @@ stock Float:GetVehicleSpeed_MPH(playerid)
 forward AirbreakCheck();
 public AirbreakCheck()
 {
-    
     new Float:x, Float:y, Float:z, index, Float:dist[4];
     foreach(new i : Player)
     {
@@ -119,15 +121,23 @@ public AirbreakCheck()
     return 1;
 }
 
-public OnEnterExitModShop(playerid, enterexit)
+hook OnPlayerConnect(playerid)
+{
+    airbrk_count[playerid] = 0;
+    return 1;
+}
+
+hook OnEnterExitModShop(playerid, enterexit)
 {
     if (enterexit)
     {
         AIRBREAK_DATA[playerid][CheckDelay] = 2;
     }
     else AIRBREAK_DATA[playerid][CheckDelay] = 0;
-    return CallLocalFunction("ab_OnEnterExitModShop", "dd", playerid, enterexit);
+
+    return 1;
 }
+
 #if defined _ALS_OnEnterExitModShop
     #undef OnEnterExitModShop
 #else
@@ -171,15 +181,25 @@ stock ab_PutPlayerInVehicle(playerid, vehicleid, seatid)
     return PutPlayerInVehicle(playerid, vehicleid, seatid);
 }
 
-#define SetPlayerPos ab_SetPlayerPos
-#define SetVehiclePos ab_SetVehiclePos
-//#define PutPlayerInVehicle ab_PutPlayerInVehicle
-
 #if defined _ALS_PutPlayerInVehicle
     #undef PutPlayerInVehicle
 #else
     #define _ALS_PutPlayerInVehicle
 #endif
 #define PutPlayerInVehicle ab_PutPlayerInVehicle   
+
+#if defined _ALS_SetPlayerPos
+    #undef SetPlayerPos
+#else
+    #define _ALS_SetPlayerPos
+#endif
+#define SetPlayerPos ab_SetPlayerPos   
+
+#if defined _ALS_SetVehiclePos
+    #undef SetVehiclePos
+#else
+    #define _ALS_SetVehiclePos
+#endif
+#define SetVehiclePos ab_SetVehiclePos   
 
 forward OnPlayerAirbreak(playerid);
