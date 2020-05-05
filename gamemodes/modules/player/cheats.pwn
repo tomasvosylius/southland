@@ -80,12 +80,12 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
 
 
     if(ban) {
-        SendFormat(playerid, 0xff0000ff, "(BAN) Cheat: %s", reason);
-        // BanPlayer(playerid, "Sistema", reason);
+        // SendFormat(playerid, 0xff0000ff, "(BAN) Cheat: %s", reason);
+        BanPlayer(playerid, "Sistema", reason);
     }
     else {
-        SendFormat(playerid, -1, "(KICK) Cheat: %s", reason);
-        // KickPlayer(playerid, "Sistema", reason);
+        // SendFormat(playerid, -1, "(KICK) Cheat: %s", reason);
+        KickPlayer(playerid, "Sistema", reason);
     }
     return 1;
 }
