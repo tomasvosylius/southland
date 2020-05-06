@@ -252,12 +252,6 @@ new PlayerText:TipBox_Info[MAX_PLAYERS];
 	
 new PlayerText:Furniture_Data[MAX_PLAYERS];
 
-new PlayerText:LoadBar_Base[MAX_PLAYERS],
-	PlayerText:LoadBar_LoadFull[MAX_PLAYERS],
-	PlayerText:LoadBar_Loaded[MAX_PLAYERS],
-	PlayerText:LoadBar_Text[MAX_PLAYERS];
-
-
 new PlayerText:JobGuiTD_TopText[MAX_PLAYERS],
 	PlayerText:JobGuiTD_BotText[MAX_PLAYERS];
 
@@ -1367,56 +1361,6 @@ stock TipBox_Create_Player(playerid)
 }
 
 
-
-stock LoadBar_Create_Player(playerid)
-{
-	LoadBar_Base[playerid] = CreatePlayerTextDraw(playerid, 189.952392, 377.293304, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, LoadBar_Base[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_Base[playerid], 268.000000, 6.000000);
-	PlayerTextDrawAlignment(playerid, LoadBar_Base[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_Base[playerid], 168430335);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Base[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, LoadBar_Base[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, LoadBar_Base[playerid], 255);
-	PlayerTextDrawFont(playerid, LoadBar_Base[playerid], 4);
-	PlayerTextDrawSetProportional(playerid, LoadBar_Base[playerid], 0);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Base[playerid], 0);
-
-	LoadBar_LoadFull[playerid] = CreatePlayerTextDraw(playerid, 191.476211, 378.999969, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, LoadBar_LoadFull[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_LoadFull[playerid], 265.000000, 3.0);
-	PlayerTextDrawAlignment(playerid, LoadBar_LoadFull[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_LoadFull[playerid], 0x8E721Cff);
-	PlayerTextDrawSetShadow(playerid, LoadBar_LoadFull[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, LoadBar_LoadFull[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, LoadBar_LoadFull[playerid], 255);
-	PlayerTextDrawFont(playerid, LoadBar_LoadFull[playerid], 4);
-	PlayerTextDrawSetProportional(playerid, LoadBar_LoadFull[playerid], 0);
-	PlayerTextDrawSetShadow(playerid, LoadBar_LoadFull[playerid], 0);
-
-	LoadBar_Loaded[playerid] = CreatePlayerTextDraw(playerid, 191.476211, 378.999969, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, LoadBar_Loaded[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], 0.000000, 3.0);
-	PlayerTextDrawAlignment(playerid, LoadBar_Loaded[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_Loaded[playerid], 0xEEBC26ff);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Loaded[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, LoadBar_Loaded[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, LoadBar_Loaded[playerid], 255);
-	PlayerTextDrawFont(playerid, LoadBar_Loaded[playerid], 4);
-	PlayerTextDrawSetProportional(playerid, LoadBar_Loaded[playerid], 0);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Loaded[playerid], 0);
-
-	LoadBar_Text[playerid] = CreatePlayerTextDraw(playerid, 190.190536, 366.639923, "VARIKLIS_UZVEDAMAS");
-	PlayerTextDrawLetterSize(playerid, LoadBar_Text[playerid], 0.183238, 1.096533);
-	PlayerTextDrawAlignment(playerid, LoadBar_Text[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_Text[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Text[playerid], 1);
-	PlayerTextDrawSetOutline(playerid, LoadBar_Text[playerid], 1);
-	PlayerTextDrawBackgroundColor(playerid, LoadBar_Text[playerid], 5887);
-	PlayerTextDrawFont(playerid, LoadBar_Text[playerid], 2);
-	PlayerTextDrawSetProportional(playerid, LoadBar_Text[playerid], 1);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Text[playerid], 1);
-}
 
 stock JailTimeTD_Create_Global()
 {

@@ -844,7 +844,6 @@ native gpci(playerid, serial[], len);
 #define ENGINE_UPGRADE					0
 #define BRAKES_UPGRADE					1
 
-#define LOAD_BAR_ENGINE 				1
 
 #define IB_NOT_ENOUGH_MONEY				"NETURITE","PAKANKAMAI PINIGU ($%d)"
 #define IB_NO_JOB 						"NETURITE","DARBO"
@@ -1591,13 +1590,6 @@ enum E_SALON_DATA
 };
 new SalonData[MAX_SALONS][E_SALON_DATA];
 
-enum E_LOAD_BAR_DATA
-{
-	barTimer,
-	barValue,
-	barType
-};
-new LoadBarInfo[MAX_PLAYERS][E_LOAD_BAR_DATA];
 
 enum E_PICKUP_DATA
 {
@@ -1766,7 +1758,6 @@ new
 	bool:SeenATMCommand[MAX_PLAYERS char],
 	bool:SeenFillCommand[MAX_PLAYERS char],
 	bool:SeenPayPhoneCommand[MAX_PLAYERS char],
-	TurningEngine[MAX_PLAYERS],
 	Checkpoint[MAX_PLAYERS],
 	CheckpointData[MAX_PLAYERS],
 	MySQL:chandler,
@@ -2250,6 +2241,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player\ui/textdraw.pwn"
 #include "modules\player\ui/speedo.pwn"
 #include "modules\player\ui/leftbox.pwn"
+#include "modules\player\ui/loadbar.pwn"
 
 /** Server modules */
 #include "modules\bots/npc.pwn"
@@ -3621,7 +3613,6 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 
 	PlayerExtra[playerid][peAcceptedBk] = INVALID_PLAYER_ID;
 
-	NullLoadBar(playerid);
 	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK) SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 	
 	KillTimer(PlayerInfo[playerid][pJobTimer]);
@@ -6229,7 +6220,7 @@ public OnPlayerCommandReceived(playerid, cmd[], params[], flags)
 
 public OnPlayerCommandPerformed(playerid, cmd[], params[], result, flags)
 {
-	printf("OnPlayerCommandPerformed(%s, %s, %s, %d, %d)", playerid, cmd, params, result, flags);
+	// printf("OnPlayerCommandPerformed(%s, %s, %s, %d, %d)", ret_GetPlayerName(playerid), cmd, params, result, flags);
 
 	if(result == -1) { return SendError(playerid, "Tokios komandos nëra. Naudokite /help arba /ask"); }
 	else
@@ -6286,7 +6277,6 @@ public OnPlayerConnect(playerid)
 		DMV_Create_Player(playerid);
 		FurnitureTd_Create_Player(playerid);
 		TipBox_Create_Player(playerid);
-		LoadBar_Create_Player(playerid);
 		JailTimeTD_Create_Player(playerid);
 		MechTune_Create_Player(playerid);
 		VLTextdraw_Create_Player(playerid);
@@ -26050,11 +26040,12 @@ stock DisconnectPlayer(playerid)
 	*/
 	if(PlayerInfo[playerid][pJobDuty] > 0)
 	{
-		if(PlayerInfo[playerid][pJob] == JOB_TRUCKER && PlayerInfo[playerid][pJobDestination] > 0 && PlayerInfo[playerid][pJobCurrentType] == 1) OnTruckerCancelWares(playerid, PlayerInfo[playerid][pJobDestination]);
-	}
-	if(LoadBarInfo[playerid][barType] != 0)
-	{
-		KillTimer(LoadBarInfo[playerid][barTimer]);
+		if(	PlayerInfo[playerid][pJob] == JOB_TRUCKER && 
+			PlayerInfo[playerid][pJobDestination] > 0 &&
+			PlayerInfo[playerid][pJobCurrentType] == 1) 
+		{
+			OnTruckerCancelWares(playerid, PlayerInfo[playerid][pJobDestination]);
+		}
 	}
 	ResetPlayerJobTask(playerid);
 	DestroyFurniturePreview(playerid, false);
@@ -26103,7 +26094,8 @@ stock VehicleSpeedboost(vehicleid, Float:BoostSpeed)
 
 stock EngineTurning(playerid)
 {
-	if(TurningEngine[playerid] != 0) return 0;
+	if(UI_LoadBar_IsActive(playerid)) return 0;
+
 	new vehicleid;
 	if((vehicleid = GetPlayerVehicleID(playerid)) && IsPlayerInAnyVehicle(playerid) && GetPlayerVehicleSeat(playerid) == 0)
 	{
@@ -26123,10 +26115,10 @@ stock EngineTurning(playerid)
 				new turn_time = 1200 +
 								floatround((VehicleInfo[vehicleid][vBatteryStatus] > 90.0 ? 0.0 : (100-VehicleInfo[vehicleid][vBatteryStatus])*28)) +
 								floatround((VehicleInfo[vehicleid][vEngineStatus] > 50.0 ? 0.0 : (100-VehicleInfo[vehicleid][vEngineStatus])*20));
-				if(StartLoadBar(playerid, LOAD_BAR_ENGINE, turn_time))
+				
+				if(UI_LoadBar_Start(playerid, "TurnEngine", turn_time))
 				{
 					rp_ame(playerid, "bando uþvesti tr. priemonës variklá.");
-					TurningEngine[playerid] = 1;
 				}
 			}
 		}
@@ -26182,73 +26174,6 @@ public UpdateSpamBar(playerid, type)
 	return 1;
 }
 
-stock StartLoadBar(playerid, type, time)
-{
-	if(LoadBarInfo[playerid][barValue] != 0) return 0;
-	LoadBarInfo[playerid][barType] = type;
-	LoadBarInfo[playerid][barValue] = 0;
-	PlayerTextDrawShow(playerid, LoadBar_Base[playerid]);
-	PlayerTextDrawShow(playerid, LoadBar_LoadFull[playerid]);
-	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], 0.0, 3.0);
-	PlayerTextDrawShow(playerid, LoadBar_Loaded[playerid]);
-	PlayerTextDrawShow(playerid, LoadBar_Text[playerid]);
-	return LoadBarInfo[playerid][barTimer] = SetTimerEx("UpdateLoadBar", time/10, true, "d", playerid);
-}
-
-forward UpdateLoadBar(playerid);
-public UpdateLoadBar(playerid)
-{
-	LoadBarInfo[playerid][barValue] += 10;
-	PlayerTextDrawHide(playerid, LoadBar_Loaded[playerid]);
-	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], LoadBarInfo[playerid][barValue]*2.65, 3.0);
-	PlayerTextDrawShow(playerid, LoadBar_Loaded[playerid]);
-	if(LoadBarInfo[playerid][barValue] >= 100)
-	{
-		PlayerTextDrawHide(playerid, LoadBar_Base[playerid]);
-		PlayerTextDrawHide(playerid, LoadBar_LoadFull[playerid]);
-		PlayerTextDrawHide(playerid, LoadBar_Loaded[playerid]);
-		PlayerTextDrawHide(playerid, LoadBar_Text[playerid]);
-		OnLoadBarEnd(playerid, LoadBarInfo[playerid][barType]);
-		NullLoadBar(playerid);
-	}
-	return 1;
-}
-
-forward OnLoadBarEnd(playerid, type);
-public OnLoadBarEnd(playerid, type)
-{
-	switch(type)
-	{
-		case LOAD_BAR_ENGINE:
-		{
-			TurningEngine[playerid] = 0;
-			if(OldVehicle[playerid] != GetPlayerVehicleID(playerid)) return 0;
-			if(VehicleInfo[OldVehicle[playerid]][vFuel] <= 0.0 || VehicleInfo[OldVehicle[playerid]][vEngineStatus] <= 0.0 || VehicleInfo[OldVehicle[playerid]][vBatteryStatus] <= 0.0)
-			{
-				return GameTextForPlayer(playerid, "UZVEDIMAS ~r~NEPAVYKO", 3000, 5);
-			}
-			new
-				chance = 100-floatround(((100-VehicleInfo[OldVehicle[playerid]][vEngineStatus])*0.2))-floatround(((100-VehicleInfo[OldVehicle[playerid]][vBatteryStatus])*0.2));
-			if(chance >= random(100))
-			{
-				ChangeVehicleEngineStatus(playerid, OldVehicle[playerid]);
-			}
-			else
-			{
-				GameTextForPlayer(playerid, "UZVEDIMAS ~r~NEPAVYKO", 3000, 5);
-			}
-		}
-	}
-	return 1;
-}
-
-stock NullLoadBar(playerid)
-{
-	KillTimer(LoadBarInfo[playerid][barTimer]);
-	LoadBarInfo[playerid][barTimer] = -1;
-	for(new i = 0; E_LOAD_BAR_DATA:i < E_LOAD_BAR_DATA; i++) LoadBarInfo[playerid][E_LOAD_BAR_DATA:i] = 0;
-	return 1;
-}
 
 stock ParkVehicle(vehicleid, Float:health = -1.0, bool:use_sync = true)
 {
@@ -29145,7 +29070,6 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 	SeenFillCommand{playerid} = 
 	SeenPayPhoneCommand{playerid} = false;
 
-	TurningEngine[playerid] = 
 	Checkpoint[playerid] = 
 	CheckpointData[playerid] = 0;
 
@@ -39936,6 +39860,31 @@ CMD:maxspeed(playerid, params[])
 	return 1;
 }
 CMD:engine(playerid, params[]) return pc_cmd_v(playerid, "engine");
+
+hook OnLoadBarEnd(playerid, type[])
+{
+	if(isequal(type, "TurnEngine", true))
+    {
+
+        if(OldVehicle[playerid] != GetPlayerVehicleID(playerid)) return 0;
+        if(VehicleInfo[OldVehicle[playerid]][vFuel] <= 0.0 || VehicleInfo[OldVehicle[playerid]][vEngineStatus] <= 0.0 || VehicleInfo[OldVehicle[playerid]][vBatteryStatus] <= 0.0)
+        {
+            return GameTextForPlayer(playerid, "UZVEDIMAS ~r~NEPAVYKO", 3000, 5);
+        }
+        new
+            chance = 100-floatround(((100-VehicleInfo[OldVehicle[playerid]][vEngineStatus])*0.2))-floatround(((100-VehicleInfo[OldVehicle[playerid]][vBatteryStatus])*0.2));
+        if(chance >= random(100))
+        {
+            ChangeVehicleEngineStatus(playerid, OldVehicle[playerid]);
+        }
+        else
+        {
+            GameTextForPlayer(playerid, "UZVEDIMAS ~r~NEPAVYKO", 3000, 5);
+        }
+    }
+	return 1;
+}
+
 CMD:v(playerid, params[])
 {
 	new input[56];
