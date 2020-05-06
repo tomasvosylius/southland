@@ -15,7 +15,7 @@
 // Includinam funkciju failus
 #pragma warning disable 239, 217, 214
 #define YSI_NO_HEAP_MALLOC
-#define CGEN_MEMORY 		(30000)
+#define CGEN_MEMORY 		(50000)
 
 #include <a_samp>
 #if defined MAX_PLAYERS
@@ -871,7 +871,7 @@ native gpci(playerid, serial[], len);
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-// #define USING_VIRTUAL_PRIVATE_SERVER
+#define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -939,9 +939,6 @@ native gpci(playerid, serial[], len);
 #define AC_ENABLE_PICKUP_TELEPORT	true
 #define AC_ENABLE_TELEPORTER		false
 #define AC_ENABLE_VW_INT			false
-
-#include "libraries/dialog.pwn"
-#include "libraries/anticheat.pwn"
 
 // ==============================================================================
 // Projekto pavadinimas ir pns
@@ -2172,9 +2169,6 @@ new Jobs[][E_JOB_DATA] = {
 	{JOB_TRUCKER, 	"Kroviniø iðveþiotojai", 	2432.76, -2097.25, 13.55, 		300, 	1100, 	15, 	2}
 };
 
-#include "core/furniture_list.pwn"
-#include "core/clothes_list.pwn"
-
 enum E_NEW_CHAR_QUESTIONS
 {
 	ncq_Lt[128],
@@ -2188,16 +2182,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 };
 
 
-#include "core/weapons.pwn"
-#include "core/logs.pwn"
-#include "core/vehicle.pwn"
-#include "core/player.pwn"
-#include "core/inventory.pwn"
-#include "core/effects.pwn"
-#include "core/police.pwn"
-#include "core/cctv.pwn"
-#include "core/mdc.pwn"
-#include "core/audio.pwn"
 
 // objects
 //#include "core\map\newbie.pwn"
@@ -2244,25 +2228,49 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\deja_vu.pwn"
 // #include "core\map\idlewood_park.pwn"
 
+/** Lists etc. */
+#include "other/furniture_list.pwn"
+#include "other/clothes_list.pwn"
+#include "other/body_parts.pwn"
+
+/** Libraries */
+#include "libraries/dialog.pwn"
+#include "libraries/anticheat.pwn"
+
+/** Managers */
+#include "modules\managers/ipspam.pwn"
+#include "modules\managers/weapons.pwn"
+#include "modules\managers/logs.pwn"
+#include "modules\managers/vehicle.pwn"
+#include "modules\managers/time_weather.pwn"
+#include "modules\managers/effects.pwn"
+#include "modules\managers/audio.pwn"
+
 /** Player UI modules */
 #include "modules\player\ui/textdraw.pwn"
 #include "modules\player\ui/speedo.pwn"
 #include "modules\player\ui/leftbox.pwn"
 
 /** Server modules */
-#include "modules\managers/time_weather.pwn"
 #include "modules\bots/npc.pwn"
+#include "modules\server/inventory.pwn"
 #include "modules\server/graffiti.pwn"
-#include "modules\server/thief.pwn"
 #include "modules\server/boombox.pwn"
-#include "modules\server/taxi.pwn"
-#include "modules\server/trace.pwn"
 #include "modules\server/paynspray.pwn"
 //#include "modules\server/gifts.pwn"
 
+// Jobs
+#include "modules\server\jobs/thief.pwn"
+#include "modules\server\jobs/taxi.pwn"
+
+// Factions
+#include "modules\server\factions\police/trace.pwn"
+#include "modules\server\factions\police/doors.pwn"
+#include "modules\server\factions\police/cctv.pwn"
+#include "modules\server\factions\police/mdc.pwn"
+
 /** Player modules */
 #include "modules\player/proxy.pwn"
-#include "modules\player/ipspam.pwn"
 #include "modules\player/anims.pwn"
 #include "modules\player/newbie.pwn"
 // #include "modules\player/cheats.pwn"
@@ -3637,128 +3645,6 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 }
 
 
-/*stock SetVehicleLocalXYVelocity(vehicleid, Float:VelocityX, Float:VelocityY)
-{
-	// FUNCTION: Set the local XY velocity of the specified vehicle (velocity relative to its Z rotation angle).
-	new Float:VSpeed[3], Float:VRotZ;
-	GetVehicleVelocity(vehicleid, VSpeed[0], VSpeed[1], VSpeed[2]);
-	GetVehicleZAngle(vehicleid, VRotZ);
-	// Optimized, thanks to Nero_3D.
-	SetVehicleVelocity(vehicleid, floatcos(VRotZ, degrees) * VelocityX - floatsin(VRotZ, degrees) * VelocityY, floatsin(VRotZ, degrees) * VelocityX + floatcos(VRotZ, degrees) * VelocityY, VSpeed[2]);
-	return 1;
-}
-
-stock GetVehicleLocalXYVelocity(vehicleid, &Float:VelocityX, &Float:VelocityY)
-{
-	// FUNCTION: Get the local XY velocity of the specified vehicle (velocity relative to its Z rotation angle).
-	new Float:VSpeed[3], Float:VRotZ;
-	GetVehicleVelocity(vehicleid, VSpeed[0], VSpeed[1], VSpeed[2]);
-	GetVehicleZAngle(vehicleid, VRotZ);
-	// Optimized, thanks to Nero_3D.
-	VelocityX = floatsin(VRotZ, degrees) * VSpeed[1] + floatcos(VRotZ, degrees) * VSpeed[0];
-	VelocityY = floatcos(VRotZ, degrees) * VSpeed[1] - floatsin(VRotZ, degrees) * VSpeed[0];
-	return 1;
-}
-
-
-
- geros idejos
-
-stock CensorEmailAddress(const addr[], addr_len, addr_censored[], replace_char = '*', visible_chars = 1)
-{
-	new at_idx, idx = 0;
- 	// Get the last @ symbol position
-	while(idx < addr_len)
-	{
-	    if(addr[idx] == '@')
-	    {
-	        at_idx = idx;
-	    }
-	    else if(addr[idx] == '\0')
-		{
-			break; // It's end of string, go out
-		}
-	    idx++;
-	}
-	if(at_idx > 0 && visible_chars >= 0) // @ symbol is found or not the first character and make sure visible_chars is not negative
-	{
-	    while(idx >= at_idx) // Copy the characters after @ symbol
-	    {
-	        addr_censored[idx] = addr[idx];
-	        idx--;
-	    }
-		idx = at_idx-1;
-		while(idx >= visible_chars) // Only censor until visible characters from start
-		{
-			addr_censored[idx] = replace_char;
-			idx--;
-		}
-		while(idx >= 0) // Now copy the visible first characters
-		{
-		    addr_censored[idx] = addr[idx];
-		    idx--;
-		}
-		return 1;
-	}
-	return 0;
-}
-
-
-stock GetNearestVehicle(vehicleid, Float:range)
-{
-	new Float:pos[3],
-		last_vehicle = INVALID_PLAYER_ID,
-		Float:last_distance = range;
-	foreach(Player, i)
-	{
-		if(i == vehicleid) continue;
-		GetVehiclePos(i, pos[0], pos[1], pos[2]);
-		if(GetVehicleDistanceFromPoint(vehicleid, pos[0], pos[1], pos[2]) < last_distance) {
-			last_distance = GetVehicleDistanceFromPoint(vehicleid, pos[0], pos[1], pos[2]);
-			last_vehicle = i;
-		}
-	}
-	return last_vehicle;
-}
-
-
-enum E_VEHICLE_STATS_INFO
-{
-	vsName[38],
-	vsMaxSpeed,
-	vsTurboMaxSpeed,
-	vsTrunk,
-	vsGlovebox,
-	vsTank,
-}
-// STOCK SPEED 45 PAKLAIDA PAGAL GETVEHICLESPEED
-
-
-
-public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
-{
-	if(hittype == BULLET_HIT_TYPE_PLAYER)
-	{
-		new Float:vX, Float:vY, Float:vZ;
-		GetPlayerLastShotVectors(playerid, vX, vY, vZ, fX, fY, fZ);
-
-		vX = fX - vX,
-		vY = fY - vY,
-		vZ = fZ - vZ;
-
-		new Float:divide = 5.0 * VectorSize(vX, vY, vZ);
-		vX /= divide,
-		vY /= divide,
-		vZ /= divide;
-
-		if(CA_RayCastLineAngle(fX, fY, fZ, fX + vX, fY + vY, fZ + vZ, vX, vY, vZ, fX, fY, fZ))
-		{
-			SetTimerEx("DestoyBlood", 12000, false, "d", CreateDynamicObject(19836, vX, vY, vZ, fX, fY, fZ, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), -1, 50));
-		}
-	}
-	return 1;
-}*/
-
 public OnVehicleSpawn(vehicleid)
 {
 	new model = GetVehicleModel(vehicleid);
@@ -3769,7 +3655,7 @@ public OnVehicleSpawn(vehicleid)
 
 	if(VehicleInfo[vehicleid][vOwner] <= 0)
 	{
-		new col1,col2;
+		new col1, col2;
 		GetVehicleColor(vehicleid, col1, col2);
 		ChangeVehicleColor(vehicleid, col1, col2);
 	}
@@ -3778,13 +3664,26 @@ public OnVehicleSpawn(vehicleid)
 		PutFactionWeaponsInVehicle(vehicleid);
 		VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[model-400];
 
-		if(IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel])) DestroyDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]);
+		IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]) && DestroyDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]);
 		VehicleInfo[vehicleid][vUnitLabel] = INVALID_3DTEXT_ID;
 		if(strlen(VehicleInfo[vehicleid][vUnitText]))
 		{
-			new Float:x, Float:z, Float:y;
+			new Float:x,
+				Float:z,
+				Float:y;
 			GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, x, y, z);
-			VehicleInfo[vehicleid][vUnitLabel] = CreateDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitText], 0xFFFFFFFF, 0.425*x, (-0.45*y), (-0.1*z), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
+
+			VehicleInfo[vehicleid][vUnitLabel] = CreateDynamic3DTextLabel(
+				VehicleInfo[vehicleid][vUnitText],
+				0xFFFFFFFF,
+				0.425*x,
+				-0.45*y,
+				-0.1*z,
+				15.0,
+				INVALID_PLAYER_ID,
+				vehicleid, 
+				1
+			);
 		}
 	}
 	RentedBy[vehicleid] = INVALID_PLAYER_ID;
@@ -16323,24 +16222,24 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new factionid, vehicleid = tmpIter[playerid], numbers[17];
 				if(sscanf(inputtext,"d",factionid)) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 4, "");
 				
-				VehicleInfo[vehicleid][vRequiredLevel] = 0;
-				VehicleInfo[vehicleid][vJob] = 0;
-				VehicleInfo[vehicleid][vOwner] = 0;
+				// Reset faction
+				VehicleInfo[vehicleid][vRequiredLevel] = VehicleInfo[vehicleid][vJob] = VehicleInfo[vehicleid][vOwner] = 0;
 				VehicleInfo[vehicleid][vFaction] = factionid;
 
 				SendFormat(playerid, -1, "%d %d", factionid, vehicleid);
-				format(numbers, sizeof numbers, ""#DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vFaction], VehicleInfo[vehicleid][vId]);
+				format(numbers, sizeof numbers, ""#DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX"%d%d",
+					VehicleInfo[vehicleid][vFaction], VehicleInfo[vehicleid][vId]);
+
 				format(VehicleInfo[vehicleid][vNumbers], 10, numbers);
 				SetVehicleNumberPlate(vehicleid, numbers);
 				SaveServerVehicleIntEx(vehicleid, "FactionId", factionid);
 			
 				MsgSuccess(playerid, "TRANSPORTAS", "Tr. priemonë priskirta frakcijai, kurios MySQL numeris: %d.", factionid);
-
-				new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
-				for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
 				
-				SetVehicleToRespawn(vehicleid); // <- Crash?
-				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
+				Vehicle_ResetTrunkWeapons(playerid);
+
+				SetVehicleToRespawn(vehicleid);
+				// OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 
 				log_init(true);
 				log_set_table("logs_admins");
@@ -19070,8 +18969,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						model = GetVehicleModel(vehicleid);
 						format(string, sizeof string, VehicleInfo[vehicleid][vUnitText]);
 						DestroyVehicle(vehicleid);
-						new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
-						for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
+						
+						Vehicle_ResetTrunkWeapons(vehicleid);
 
 						new newvehicleid = AddServerVehicle(model, factionid, -1, playerid, x, y, z, a, color1, color2, price, addsiren, respawntime, .added_by_admin = !!addtype, .add_to_mysql = false);
 						VehicleInfo[newvehicleid][vId] = id;
@@ -24797,10 +24696,10 @@ stock HidePlayerVehicleShop(playerid)
 stock ShowVehicleShop(playerid, bool:show_body, ...)
 {
 	new
-		string[150],
-		argvalue,
-		idx;
+		string[150];
+
 	tmpSelected[playerid] = -1;
+
 	if(show_body)
 	{
 		TextDrawShowForPlayer(playerid, vShop_Base);
@@ -24814,9 +24713,11 @@ stock ShowVehicleShop(playerid, bool:show_body, ...)
 	}
 	for(new arg = 2; arg <= (numargs() >= 4 ? 4 : numargs()); arg++)
 	{
-		argvalue = getarg(arg);
-		idx = arg-2;
-		if(argvalue == 0)
+		new 
+			model  = getarg(arg),
+			idx = arg - 2;
+
+		if(model == 0)
 		{
 			PlayerTextDrawHide(playerid, vShop_ModelBase[playerid][idx]);
 			PlayerTextDrawHide(playerid, vShop_CarName[playerid][idx]);
@@ -24826,35 +24727,33 @@ stock ShowVehicleShop(playerid, bool:show_body, ...)
 		}
 		else
 		{
-			format(string, sizeof string, "KATEGORIJA: %s~n~", GetModelCategory(argvalue));
-			if(!IsModelPedal(argvalue))
+			format(string, sizeof string, "KATEGORIJA: %s~n~", GetModelCategory(model));
+			if(!IsModelPedal(model))
 			{
 				format(string, sizeof string, "%sVARIKLIO LITRAZAS: %0.1f~n~KURO TIPAS: %s~n~", 
 					string, 
-					VehicleEngineUsage[argvalue-400],
-					(GetVehicleModelInfoAsInt(argvalue, "TransmissionData_nEngineType") == 'P' ? ("BENZINAS") : (GetVehicleModelInfoAsInt(argvalue, "TransmissionData_nEngineType") == 'D' ? ("DYZELIS") : ("ELEKTRA"))));
+					VehicleEngineUsage[model-400],
+					GetVehicleModelEngineType(model));
+
 			}
-			if(!IsModelPedal(argvalue) && !IsModelBoat(argvalue))
+			if(!IsModelPedal(model) && !IsModelBoat(model))
 			{
 				format(string, sizeof string, "%sVAROMIEJI: %s~n~", 
 					string, 
-					(GetVehicleModelInfoAsInt(argvalue, "TransmissionData_nDriveType") == 'F' ? ("PRIEKINIAI") : (GetVehicleModelInfoAsInt(argvalue, "TransmissionData_nDriveType") == 'R' ? ("GALINIAI") : ("VISI"))));
+					GetVehicleModelDriveType(model));
 			}
 
-			/*format(string, sizeof string, "KATEGORIJA: %s~n~GAMYBOS METAI: 2016~n~~n~VARIKLIO LITRAZAS: %0.1fL~n~KURO TIPAS: %s~n~~n~VAROMIEJI: %s~n~INFORMACIJA: NERA",
-				GetModelCategory(argvalue),
-				VehicleEngineUsage[argvalue-400],
-				(GetVehicleModelInfoAsInt(argvalue, "TransmissionData_nEngineType") == 'P' ? ("BENZINAS") : (GetVehicleModelInfoAsInt(argvalue, "TransmissionData_nEngineType") == 'D' ? ("DYZELIS") : ("ELEKTRA"))),
-				(GetVehicleModelInfoAsInt(argvalue, "TransmissionData_nDriveType") == 'F' ? ("PRIEKINIAI") : (GetVehicleModelInfoAsInt(argvalue, "TransmissionData_nDriveType") == 'R' ? ("GALINIAI") : ("VISI"))));*/
-
 			PlayerTextDrawSetString(playerid, vShop_CarStats[playerid][idx], string);
-			PlayerTextDrawSetPreviewModel(playerid, vShop_Model[playerid][idx], argvalue);
-			format(string, sizeof string, GetModelName(argvalue));
+			PlayerTextDrawSetPreviewModel(playerid, vShop_Model[playerid][idx], model);
+			format(string, sizeof string, GetModelName(model));
 			PlayerTextDrawSetString(playerid, vShop_CarName[playerid][idx], string);
 			PlayerTextDrawShow(playerid, vShop_ModelBase[playerid][idx]);
 			PlayerTextDrawShow(playerid, vShop_CarName[playerid][idx]);
 			PlayerTextDrawShow(playerid, vShop_CarStats[playerid][idx]);
-			format(string, sizeof string, "$%d", SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-idx)]][sellvehiclePrice]);
+			format(string, sizeof string, "$%d", 
+				SellVehicleData[
+					tmpArray[playerid][ tmpPage_Object[playerid]*3 - (3-idx) ] ][sellvehiclePrice]
+			);
 			PlayerTextDrawSetString(playerid, vShop_CarPrice[playerid][idx], string);
 			PlayerTextDrawShow(playerid, vShop_CarPrice[playerid][idx]);
 			PlayerTextDrawShow(playerid, vShop_Model[playerid][idx]);
@@ -24864,50 +24763,79 @@ stock ShowVehicleShop(playerid, bool:show_body, ...)
 	GetESCType(playerid) = ESC_TYPE_VSHOP;
 }
 
+stock GetVehicleModelDriveType(model)
+{
+	new 	
+		string[24],
+		driveType = GetVehicleModelInfoAsInt(model, "TransmissionData_nDriveType");
+
+	if(driveType == 'F') {
+		format(string, sizeof string, "PRIEKINIAI");
+	} else if(driveType == 'R') {
+		format(string, sizeof string, "GALINIAI");
+	} else {
+		format(string, sizeof string, "VISI");
+	}
+	return string;
+}
+stock GetVehicleModelEngineType(model)
+{
+	new 	
+		string[24],
+		engineType = GetVehicleModelInfoAsInt(model, "TransmissionData_nEngineType");
+	
+	if(engineType == 'D') {
+		format(string, sizeof string, "Dyzelis");
+	} else if(engineType == 'E') {
+		format(string, sizeof string, "Elektra");
+	} else {
+		format(string, sizeof string, "Benzinas");
+	}
+	return string;
+}
+
 stock ShowVehicleList(playerid, ...)
 {
 	new
 		string[222],
-		argvalue,
-		idx;
+		sql_id,
+		td_idx;
 	TextDrawShowForPlayer(playerid, VL_Base);
 	for(new arg = 1; arg <= (numargs() >= 4 ? 4 : numargs()); arg++)
 	{
-		argvalue = getarg(arg);
-		idx = arg-1;
-		if(argvalue <= 0)
+		sql_id = getarg(arg);
+		td_idx = arg-1;
+		if(sql_id <= 0)
 		{
-			PlayerTextDrawHide(playerid, VL_SpawnText[playerid][idx]);
-			PlayerTextDrawHide(playerid, VL_SpawnBox[playerid][idx]);
-			PlayerTextDrawHide(playerid, VL_FindText[playerid][idx]);
-			PlayerTextDrawHide(playerid, VL_FindBox[playerid][idx]);
-			PlayerTextDrawHide(playerid, VL_ModelBase[playerid][idx]);
-			PlayerTextDrawHide(playerid, VL_ModelName[playerid][idx]);
-			PlayerTextDrawHide(playerid, VL_RowText[playerid][idx]);
-			TextDrawHideForPlayer(playerid, VL_RowBase[idx]);
+			PlayerTextDrawHide(playerid, VL_SpawnText[playerid][td_idx]);
+			PlayerTextDrawHide(playerid, VL_SpawnBox[playerid][td_idx]);
+			PlayerTextDrawHide(playerid, VL_FindText[playerid][td_idx]);
+			PlayerTextDrawHide(playerid, VL_FindBox[playerid][td_idx]);
+			PlayerTextDrawHide(playerid, VL_ModelBase[playerid][td_idx]);
+			PlayerTextDrawHide(playerid, VL_ModelName[playerid][td_idx]);
+			PlayerTextDrawHide(playerid, VL_RowText[playerid][td_idx]);
+			TextDrawHideForPlayer(playerid, VL_RowBase[td_idx]);
 		}
 		else
 		{
-			mysql_format(chandler, string, sizeof string, "SELECT * FROM `vehicles_data` WHERE id = '%d'", argvalue);
+			mysql_format(chandler, string, sizeof string, "SELECT * FROM `vehicles_data` WHERE id = '%d'", sql_id);
 			new Cache:all_data = mysql_query(chandler, string, true),
 				model, numbers[24];
 			cache_set_active(all_data);
 			if(cache_num_rows())
 			{
-				TextDrawShowForPlayer(playerid, VL_RowBase[idx]);
+				TextDrawShowForPlayer(playerid, VL_RowBase[td_idx]);
 
 				cache_get_value_name_int(0, "Model", model);
-				PlayerTextDrawSetString(playerid, VL_ModelName[playerid][idx], GetModelName(model));
+				PlayerTextDrawSetString(playerid, VL_ModelName[playerid][td_idx], GetModelName(model));
 
 				new Float:km,
 					lock,
 					insurance,
 					c1, c2,
 					spawned,
-					dealer,
-					vehiclesql;
+					dealer;
 
-				cache_get_value_name_int(0, "id", vehiclesql);
 				cache_get_value_name_float(0, "KM", km),
 				cache_get_value_name_int(0, "Insurance", insurance),
 				cache_get_value_name_int(0, "Lock", lock),
@@ -24917,9 +24845,17 @@ stock ShowVehicleList(playerid, ...)
 				cache_get_value_name_int(0, "Dealer", dealer);
 
 				cache_get_value_name(0, "Numbers", numbers, 31);
-				format(string, sizeof string, "ID:%d~n~NUMERIAI: %s ~n~RIDA: %0.1fKM~n~DRAUDIMAS: %d~n~UZRAKTO LYGIS: %d", vehiclesql, numbers, km, insurance, lock);
+				format(string, sizeof string, "\
+					ID: %d %s~n~NUMERIAI: %s ~n~RIDA: %0.1fKM~n~DRAUDIMAS: %d~n~UZRAKTO LYGIS: %d", 
+					sql_id,
+					spawned > 0 ? (va_return("(SRV ID: %d)", spawned)) : (""),
+					numbers,
+					km,
+					insurance,
+					lock
+				);
 				//														   CALCULATION OF CURRENT INDEX
-				new working_with = (tmpPage_Object[playerid] == 1 ? idx : (tmpPage_Object[playerid]*4-(4-idx)));
+				new working_with = (tmpPage_Object[playerid] == 1 ? td_idx : (tmpPage_Object[playerid]*4-(4-td_idx)));
 				if(dealer > 0)
 				{
 					strcat(string, "~n~TIEKEJO TR. PRIEMONE");
@@ -24928,45 +24864,45 @@ stock ShowVehicleList(playerid, ...)
 				{
 					strcat(string, "~n~DUBKEY TR. PRIEMONE");
 				}
-				PlayerTextDrawSetString(playerid, VL_RowText[playerid][idx], string);
-				PlayerTextDrawSetPreviewModel(playerid, VL_ModelBase[playerid][idx], model);
-				PlayerTextDrawSetPreviewVehCol(playerid, VL_ModelBase[playerid][idx], c1, c2);
+				PlayerTextDrawSetString(playerid, VL_RowText[playerid][td_idx], string);
+				PlayerTextDrawSetPreviewModel(playerid, VL_ModelBase[playerid][td_idx], model);
+				PlayerTextDrawSetPreviewVehCol(playerid, VL_ModelBase[playerid][td_idx], c1, c2);
 
 				// Padarome kad negaletu arba galetu FINDINT
-				PlayerTextDrawHide(playerid, VL_FindBox[playerid][idx]);
+				PlayerTextDrawHide(playerid, VL_FindBox[playerid][td_idx]);
 				if(lock >= DEFAULT_LOCK_NEEDED_TO_FIND && spawned > 0)
 				{
-					PlayerTextDrawSetSelectable(playerid, VL_FindBox[playerid][idx], 1);
-					PlayerTextDrawColor(playerid, VL_FindBox[playerid][idx], VL_SUCCESS_COLOR);
+					PlayerTextDrawSetSelectable(playerid, VL_FindBox[playerid][td_idx], 1);
+					PlayerTextDrawColor(playerid, VL_FindBox[playerid][td_idx], VL_SUCCESS_COLOR);
 				}
 				else
 				{
-					PlayerTextDrawSetSelectable(playerid, VL_FindBox[playerid][idx], 0);
-					PlayerTextDrawColor(playerid, VL_FindBox[playerid][idx], VL_DENIED_COLOR);
+					PlayerTextDrawSetSelectable(playerid, VL_FindBox[playerid][td_idx], 0);
+					PlayerTextDrawColor(playerid, VL_FindBox[playerid][td_idx], VL_DENIED_COLOR);
 				}
 				// Gali arba negali spawnint
-				PlayerTextDrawHide(playerid, VL_SpawnBox[playerid][idx]);
+				PlayerTextDrawHide(playerid, VL_SpawnBox[playerid][td_idx]);
 				if(spawned <= 0)
 				{
-					PlayerTextDrawSetSelectable(playerid, VL_SpawnBox[playerid][idx], 1);
-					PlayerTextDrawColor(playerid, VL_SpawnBox[playerid][idx], VL_SUCCESS_COLOR);
-					PlayerTextDrawSetString(playerid, VL_SpawnText[playerid][idx], "ISSPAWNINTI");
+					PlayerTextDrawSetSelectable(playerid, VL_SpawnBox[playerid][td_idx], 1);
+					PlayerTextDrawColor(playerid, VL_SpawnBox[playerid][td_idx], VL_SUCCESS_COLOR);
+					PlayerTextDrawSetString(playerid, VL_SpawnText[playerid][td_idx], "ISSPAWNINTI");
 				}
 				else
 				{
-					PlayerTextDrawSetSelectable(playerid, VL_SpawnBox[playerid][idx], 0);
-					PlayerTextDrawColor(playerid, VL_SpawnBox[playerid][idx], VL_DENIED_COLOR);
-					PlayerTextDrawSetString(playerid, VL_SpawnText[playerid][idx], "ISSPAWNINTA");
+					PlayerTextDrawSetSelectable(playerid, VL_SpawnBox[playerid][td_idx], 0);
+					PlayerTextDrawColor(playerid, VL_SpawnBox[playerid][td_idx], VL_DENIED_COLOR);
+					PlayerTextDrawSetString(playerid, VL_SpawnText[playerid][td_idx], "ISSPAWNINTA");
 				}
 
 				cache_delete(all_data);
-				PlayerTextDrawShow(playerid, VL_SpawnText[playerid][idx]);
-				PlayerTextDrawShow(playerid, VL_SpawnBox[playerid][idx]);
-				PlayerTextDrawShow(playerid, VL_FindText[playerid][idx]);
-				PlayerTextDrawShow(playerid, VL_FindBox[playerid][idx]);
-				PlayerTextDrawShow(playerid, VL_ModelBase[playerid][idx]);
-				PlayerTextDrawShow(playerid, VL_ModelName[playerid][idx]);
-				PlayerTextDrawShow(playerid, VL_RowText[playerid][idx]);
+				PlayerTextDrawShow(playerid, VL_SpawnText[playerid][td_idx]);
+				PlayerTextDrawShow(playerid, VL_SpawnBox[playerid][td_idx]);
+				PlayerTextDrawShow(playerid, VL_FindText[playerid][td_idx]);
+				PlayerTextDrawShow(playerid, VL_FindBox[playerid][td_idx]);
+				PlayerTextDrawShow(playerid, VL_ModelBase[playerid][td_idx]);
+				PlayerTextDrawShow(playerid, VL_ModelName[playerid][td_idx]);
+				PlayerTextDrawShow(playerid, VL_RowText[playerid][td_idx]);
 			}
 			else
 			{
@@ -26146,6 +26082,12 @@ stock GetVehicleLocalXYVelocity(vehicleid, &Float:VelocityX, &Float:VelocityY)
 	VelocityX = floatsin(VRotZ, degrees) * VSpeed[1] + floatcos(VRotZ, degrees) * VSpeed[0];
 	VelocityY = floatcos(VRotZ, degrees) * VSpeed[1] - floatsin(VRotZ, degrees) * VSpeed[0];
 	return 1;
+}
+
+stock Vehicle_ResetTrunkWeapons(vehicleid)
+{
+	new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
+	for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
 }
 
 stock VehicleSpeedboost(vehicleid, Float:BoostSpeed)
