@@ -1865,6 +1865,7 @@ INSERT INTO `options` (`id`, `Key`, `Value`, `Type`) VALUES
 (105, 'BusinessPayLevel13', '4000', 1),
 (106, 'BusinessPayLevel14', '5500', 1),
 (107, 'BusinessPayLevel15', '13500', 1);
+(108, 'DAYS_REROLL_GUNS', '0', 1);
 
 -- --------------------------------------------------------
 

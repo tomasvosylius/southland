@@ -1,6 +1,4 @@
-#include <a_samp>
 #include <YSI\y_hooks>
-#include <streamer>
 
 enum PayNSprayData {
 	Float:pns_x,

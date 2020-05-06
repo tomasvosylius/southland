@@ -19,17 +19,17 @@
 #if defined MAX_PLAYERS
 	#undef MAX_PLAYERS
 #endif
-#define MAX_PLAYERS 250
+#define MAX_PLAYERS 150
 
 
 native IsValidVehicle(vehicleid);
 
 //#include <audio>
 #include <FileManager>
+#include <streamer>
 #include <crashdetect>
 #include <YSI\y_iterate>
 #include <YSI\y_va>
-#include <YSI\y_hooks>
 #include <YSI\y_inline>
 #include <YSI\y_timers>
 #include <YSI\y_stringhash>
@@ -43,7 +43,6 @@ native IsValidVehicle(vehicleid);
 #include <geolocation>
 #include <strlib>
 #include <zones>
-#include <streamer>
 #include <callbacks>
 #include <arrow>
 #include <evi>
@@ -875,7 +874,7 @@ native gpci(playerid, serial[], len);
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-#define USING_VIRTUAL_PRIVATE_SERVER
+// #define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -2269,6 +2268,9 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player\ui/speedo.pwn"
 #include "modules\player\ui/leftbox.pwn"
 #include "modules\player/afk.pwn"
+#include "modules\player/faction_credits.pwn"
+
+#include <YSI\y_hooks>
 
 // stock FAC_GetWeaponSlot(playerid) return 1;
 // stock RemovePlayerWeaponInSlot(playerid, slot) return 1;
@@ -3228,7 +3230,12 @@ task T_MinuteTimer[60000]()
 		if(hour > serverHour || (hour == 0 && serverHour == 23))
 		{
 			call OnFullPayday();
-			if(hour == 0 && serverHour == 23) call OnNewDay();
+			
+			if(hour == 0 && serverHour == 23)
+			{
+				call OnNewDay();
+			}
+
 			foreach(new businessid : Business)
 			{
 				if(BusinessInfo[businessid][bOwner] > 0)
@@ -5753,6 +5760,8 @@ public OnPlayerSpawn(playerid)
 
 			mysql_format(chandler, string, sizeof string, "SELECT `Packed` FROM `players_weapons` WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
 			mysql_tquery(chandler, string, "PlayerWeaponsLoad", "d", playerid);
+
+			call OnPlayerRequestDataLoad(playerid);
 
 			#if defined ENABLE_GPS
 				//SendFormat(playerid, 0xFF7300FF, "* {FFAD69}Dël maþesnës apkrovos administratoriams, serverio startavimo metu naudokitës komanda /gps");
@@ -8543,12 +8552,20 @@ public OptionsLoad()
 			case GLOBAL_VARTYPE_FLOAT: SetGVarFloat(varname, floatstr(value), SERVER_VARS_ID);
 		}
 	}
+
+	call OnServerOptionsLoad();
+	return 1;
+}
+
+hook OnServerOptionsLoad()
+{
 	PreparePoliceWaresUsage();
 	LoadJobs();
 	LoadDroppedItems();
 	LoadHouses(false);
 	LoadDealerHouses(false);
 	LoadBusiness(false);
+
 	BankPickup = sd_CreateDynamicPickup(PICKUP_TYPE_BANK, 0, 1274, 2, GetGVarFloat("BankX", SERVER_VARS_ID), GetGVarFloat("BankY", SERVER_VARS_ID), GetGVarFloat("BankZ", SERVER_VARS_ID), GetGVarInt("BankVW", SERVER_VARS_ID), GetGVarInt("BankInt", SERVER_VARS_ID));
 	BankLabel = CreateDynamic3DTextLabel("Norëdami naudotis banku, raðykite /bank", 0x66C729FF, GetGVarFloat("BankX", SERVER_VARS_ID), GetGVarFloat("BankY", SERVER_VARS_ID), GetGVarFloat("BankZ", SERVER_VARS_ID), 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, GetGVarInt("BankVW", SERVER_VARS_ID), GetGVarInt("BankInt", SERVER_VARS_ID));
 	return 1;
@@ -29025,6 +29042,8 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 		saved_numberchanges = PlayerInfo[playerid][pNumberChanges],
 		saved_platechanges = PlayerInfo[playerid][pPlateChanges];
 
+	call OnPlayerResetVariables(playerid, saved_player_id);
+
 	if(broadcast_Status != 0)
 	{
 		if(broadcast_Owner == playerid)
@@ -29334,9 +29353,11 @@ stock sd_Prepare()
 	SetNameTagDrawDistance(12.0);
  	ShowNameTags(true);
 	ManualVehicleEngineAndLights();
-	Streamer_VisibleItems(STREAMER_TYPE_OBJECT, 999);
-	Streamer_SetChunkSize(STREAMER_TYPE_OBJECT, 200);
-	Streamer_SetChunkSize(STREAMER_TYPE_3D_TEXT_LABEL, 200);
+	
+	// Streamer_VisibleItems(STREAMER_TYPE_OBJECT, 999);
+	// Streamer_SetChunkSize(STREAMER_TYPE_OBJECT, 200);
+	// Streamer_SetChunkSize(STREAMER_TYPE_3D_TEXT_LABEL, 200);
+
 	Streamer_ToggleErrorCallback(1);
 	for(new pickup = 1; pickup < MAX_PICKUPS; pickup++)
 	{
@@ -29352,7 +29373,7 @@ stock sd_Prepare()
 	return 1;
 }
 
-public Streamer_OnPluginError(const error[])
+public Streamer_OnPluginError(error[])
 {
 	#if SERVER_DEBUG_LEVEL >= 1
 		printf("[error] Streamer_OnPluginError(%s)", error);
@@ -40242,8 +40263,10 @@ CMD:v(playerid, params[])
 				new engine, lights, alarm, doors, bonnet, boot, objective;
 				VehicleInfo[vehicleid][vLocked] = !VehicleInfo[vehicleid][vLocked];
 				SaveVehicleIntEx(vehicleid, "Locked", VehicleInfo[vehicleid][vLocked]);
+				
 				GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
 				SetVehicleParamsEx(vehicleid, engine, lights, alarm, VehicleInfo[vehicleid][vLocked], bonnet, boot, objective);
+
 				if(VehicleInfo[vehicleid][vLocked] == 0) InfoBox(playerid, "~g~ATRAKINOTE", "TR. PRIEMONE");
 				else InfoBox(playerid, "UZRAKINOTE", "TR. PRIEMONE");
 			}
