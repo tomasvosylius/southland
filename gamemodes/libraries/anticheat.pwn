@@ -1015,7 +1015,7 @@ stock FAC_SetPlayerSpecialAction(playerid, action)
 	public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_x, Float:new_y, Float:new_z, Float:vel_x, Float:vel_y, Float:vel_z)
 #endif
 {
-	printf("%s -> UNNOCUPPIED: %d, %d, [POS:%0.1f, %0.1f, %0.1f, VEL:%0.1f, %0.1f, %0.1f]", GetPlayerNameEx(playerid), vehicleid, passenger_seat, new_x, new_y, new_z, vel_x, vel_y, vel_z);	
+	// printf("%s -> UNNOCUPPIED: %d, %d, [POS:%0.1f, %0.1f, %0.1f, VEL:%0.1f, %0.1f, %0.1f]", GetPlayerNameEx(playerid), vehicleid, passenger_seat, new_x, new_y, new_z, vel_x, vel_y, vel_z);	
 
 	#if AC_ENABLE_TROLLBOSS
 		if(	(!vel_x && !vel_y && vel_z == 400.000000) ||
@@ -1080,7 +1080,7 @@ stock FAC_SetPlayerSpecialAction(playerid, action)
 {
 	new unused, doors;
 	GetVehicleParamsEx(vehicleid, unused, unused, unused, doors, unused, unused, unused);
-	printf("%s -> ENTER_VEHICLE(%d, %d, doors: %d)", GetPlayerNameEx(playerid), vehicleid, ispassenger, doors);
+	// printf("%s -> ENTER_VEHICLE(%d, %d, doors: %d)", GetPlayerNameEx(playerid), vehicleid, ispassenger, doors);
 
 	if(doors == 1)
 	{
@@ -1226,7 +1226,7 @@ public t_ac__Health()
 		current_vehicle != ac__CurrentVehicle[playerid])
 	{
 		// pasikeite masina
-		printf("%s -> CHANGE_VEHICLE: %d, %d", GetPlayerNameEx(playerid), current_vehicle, ac__CurrentVehicle[playerid]);
+		// printf("%s -> CHANGE_VEHICLE: %d, %d", GetPlayerNameEx(playerid), current_vehicle, ac__CurrentVehicle[playerid]);
 
 		#if AC_ENABLE_CAR_CHANGER
 			if(FAC_GetTickDiff(tick, ac__VehicleChangeTime[playerid]) <= 400)
@@ -1644,7 +1644,7 @@ public t_ac__Health()
 	public OnPlayerStateChange(playerid, newstate, oldstate)
 #endif
 {
-	printf("%s -> STATE_CHANGE: %d, %d (%d)", GetPlayerNameEx(playerid), newstate, oldstate, GetPlayerVehicleID(playerid));
+	// printf("%s -> STATE_CHANGE: %d, %d (%d)", GetPlayerNameEx(playerid), newstate, oldstate, GetPlayerVehicleID(playerid));
 
 	if(IsPlayerNPC(playerid)) return 1;
 
@@ -1847,9 +1847,9 @@ stock FAC_SetPlayerHealth(playerid, Float:health)
 	if(health >= 0.0)
 	{
 		ac__PlayerHealth[playerid] = health;
-		return SetPlayerHealth(playerid, health);
 	}
-	return false;
+	else ac__PlayerHealth[playerid] = 0.0000000;
+	return SetPlayerHealth(playerid, health);
 }
 
 stock FAC_SetPlayerArmour(playerid, Float:armour)
@@ -1861,9 +1861,9 @@ stock FAC_SetPlayerArmour(playerid, Float:armour)
 	if(armour >= 0.0)
 	{
 		ac__PlayerArmour[playerid] = armour;
-		return SetPlayerArmour(playerid, armour);
 	}
-	return false;
+	else ac__PlayerArmour[playerid] = 0.0;
+	return SetPlayerArmour(playerid, armour);
 }
 
 stock FAC_GetPlayerHealth(playerid, &Float:health)

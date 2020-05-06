@@ -7,8 +7,8 @@
  *
  */
 
-#define WEAPON_GIVE_TYPE_NO_INVENTORY		0
-#define WEAPON_GIVE_TYPE_NORMAL				1
+#define WEAPON_GIVE_TYPE_NORMAL				0
+#define WEAPON_GIVE_TYPE_NO_INVENTORY		1
 
 new WeaponObjects[] = {
 	0,

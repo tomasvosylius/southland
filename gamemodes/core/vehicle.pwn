@@ -1679,8 +1679,13 @@ stock VHS_LinkVehicleToInterior(vehicleid, interiorid)
 
 stock VHS_SetVehicleToRespawn(vehicleid)
 {
-	new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
-	for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
+	if(vehicleid != INVALID_VEHICLE_ID)
+	{
+		new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
+		for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) { 
+			VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
+		}
+	}
 	return SetVehicleToRespawn(vehicleid);
 }
 #if defined _ALS_SetVehicleToRespawn

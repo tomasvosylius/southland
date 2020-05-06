@@ -406,7 +406,7 @@ stock GetInventoryItemName(itemid, bool:lower_case = false)
 		case ITEM_WOOL: name = "Vata";
 		case ITEM_SYRINGE: name = "Ðvirkðtas";
 		case ITEM_DICE: name = "Kauliukai";
-		case ITEM_SPRUNK: name = "Sprunk";
+		case ITEM_SPRUNK: name = "\"Sprunk\"";
 		case ITEM_WINE: name = "Vynas";
 		case ITEM_BEER: name = "Alus";
 		case ITEM_MASK: name = "Veido kaukë";
@@ -414,13 +414,13 @@ stock GetInventoryItemName(itemid, bool:lower_case = false)
 		case ITEM_HOUSE_AUDIO: name = "Audio aparatûra";
 		case ITEM_ROD: name = "Meðkerë";
 		case ITEM_BAIT: name = "Masalas";
-		case ITEM_XANAX: name = "Xanax";
+		case ITEM_XANAX: name = "\"Xanax\"";
 		case ITEM_FUEL: name = "Degalø bakelis";
 		case ITEM_TOOLBOX: name = "Árankiø dëþutë";
 		default: name[0] = EOS;
 	}
 
-	(lower_case) && (name[0] = tolower(name[0]));
+	(lower_case && itemid > 46 && name[0] != '\"') && (name[0] = tolower(name[0]));
 
 	return name;
 }

@@ -48,7 +48,8 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
             format(reason, sizeof reason, "Gyvybiø cheat");
         }
         case CHEAT_ARMOUR: {
-            format(reason, sizeof reason, "Ðarvø cheat");
+            // format(reason, sizeof reason, "Ðarvø cheat");
+            return 1;
         }
         case CHEAT_PICKUP_TP: {
             format(reason, sizeof reason, "Pickup teleport");

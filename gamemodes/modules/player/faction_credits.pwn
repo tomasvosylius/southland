@@ -40,7 +40,16 @@ static dealer_Places[][E_DEALER_PLACES] = {
         {1430.1309,217.3752,19.5618,351.0}, {1429.5525,214.2907,19.6808, 167.5178} // MG
     },
     {
-         {41.2671,-285.8699,1.9725,348.0}, {40.6633,-288.9288,2.1139,167.0} // BB
+        {41.2671,-285.8699,1.9725,348.0}, {40.6633,-288.9288,2.1139,167.0} // BB
+    },
+    {
+        {1321.5529,205.1030,19.5547,114.5618}, {1324.5160,206.2788,19.6767,293.9687}
+    },
+    {
+        {2318.2878,-61.1998,26.4844,189.0906}, {2317.8521,-58.0806,26.6074,6.0171}
+    },
+    {
+        {-81.4395,-1548.2616,2.6107,171.3518}, {-81.0286,-1545.1213,2.7351,354.2431}
     }
 };
 static
@@ -84,14 +93,8 @@ hook OnFullPayday()
 
 static _GunDealer_RerollPlace()
 {
-    if(IsValidActor(dealer_Actor))
-    {
-        DestroyVehicle(dealer_Actor);
-    }
-    if(IsValidVehicle(dealer_Vehicle))
-    {
-        DestroyVehicle(dealer_Vehicle);
-    }
+    IsValidActor(dealer_Actor) && DestroyActor(dealer_Actor);
+    IsValidVehicle(dealer_Vehicle) && DestroyVehicle(dealer_Vehicle);
 
     new index = NONE;
     while(index == NONE || index == dealer_PlaceIndex)
@@ -376,7 +379,7 @@ CMD:givefactioncredits(playerid, params[])
     SendFormat(playerid, 0x7BD8C1ff, "Suteikëte þaidëjui [%s] %d frakcijos kreditø. Dabar þaidëjas turi: %d",
         GetPlayerNameEx(playerid), amount, player_FactionCredits[receiverid]);
 
-    SendFormat(playerid, 0x7BD8C1ff, "Gavote frakcijos kreditø: %d. Dabar turite: %d",
+    SendFormat(receiverid, 0x7BD8C1ff, "Gavote frakcijos kreditø: %d. Dabar turite: %d",
         amount, player_FactionCredits[receiverid]);
 
 

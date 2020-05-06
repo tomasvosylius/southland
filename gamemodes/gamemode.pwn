@@ -943,8 +943,8 @@ native gpci(playerid, serial[], len);
 #define AC_ENABLE_TELEPORTER		false
 #define AC_ENABLE_VW_INT			false
 
-#include "libraries/anticheat.pwn"
 #include "libraries/dialog.pwn"
+#include "libraries/anticheat.pwn"
 
 // ==============================================================================
 // Projekto pavadinimas ir pns
@@ -2193,7 +2193,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 
 #include "core/weapons.pwn"
 #include "core/logs.pwn"
-#include "core/textdraw.pwn"
 #include "core/vehicle.pwn"
 #include "core/player.pwn"
 #include "core/inventory.pwn"
@@ -2209,28 +2208,28 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 //#include "core\map\central_hotel.pwn"
 // #include "core\map\empty_houses.pwn"
 
-#include "core\map\interiors.pwn"
-#include "core\map\school.pwn"
-#include "core\map\squatters.pwn"
-#include "core\map\china_town.pwn"
-#include "core\map\ganton_basketball.pwn"
-#include "core\map\docks.pwn"
-#include "core\map\willowfield_garage.pwn"
-#include "core\map\idlewood_basket.pwn"
-#include "core\map\misc.pwn"
-#include "core\map\corona247.pwn"
-#include "core\map\idlewood_pizza_corner.pwn"
-#include "core\map\china.pwn"
-#include "core\map\prison.pwn"
-#include "core\map\government.pwn"
-#include "core\map\mechanics.pwn"
-#include "core\map\train_ganton.pwn"
-#include "core\map\train_jefferson.pwn"
-#include "core\map\pier.pwn"
-#include "core\map\interiors.pwn"
-#include "core\map\ls_bus_station.pwn"
-#include "core\map\ls_dump.pwn"
-#include "core\map\ls_logistics.pwn"
+// #include "core\map\interiors.pwn"
+// #include "core\map\school.pwn"
+// #include "core\map\squatters.pwn"
+// #include "core\map\china_town.pwn"
+// #include "core\map\ganton_basketball.pwn"
+// #include "core\map\docks.pwn"
+// #include "core\map\willowfield_garage.pwn"
+// #include "core\map\idlewood_basket.pwn"
+// #include "core\map\misc.pwn"
+// #include "core\map\corona247.pwn"
+// #include "core\map\idlewood_pizza_corner.pwn"
+// #include "core\map\china.pwn"
+// #include "core\map\prison.pwn"
+// #include "core\map\government.pwn"
+// #include "core\map\mechanics.pwn"
+// #include "core\map\train_ganton.pwn"
+// #include "core\map\train_jefferson.pwn"
+// #include "core\map\pier.pwn"
+// #include "core\map\interiors.pwn"
+// #include "core\map\ls_bus_station.pwn"
+// #include "core\map\ls_dump.pwn"
+// #include "core\map\ls_logistics.pwn"
 // #include "core\map\ganghood_details.pwn"
 // #include "core\map\taxi.pwn"
 // #include "core\map\corona_small.pwn"
@@ -2248,7 +2247,12 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\deja_vu.pwn"
 // #include "core\map\idlewood_park.pwn"
 
+/** Player UI modules */
+#include "modules\player\ui/textdraw.pwn"
+#include "modules\player\ui/speedo.pwn"
+#include "modules\player\ui/leftbox.pwn"
 
+/** Server modules */
 #include "modules\managers/time_weather.pwn"
 #include "modules\bots/npc.pwn"
 #include "modules\server/graffiti.pwn"
@@ -2264,10 +2268,8 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player/ipspam.pwn"
 #include "modules\player/anims.pwn"
 #include "modules\player/newbie.pwn"
-#include "modules\player/cheats.pwn"
-#include "modules\player\ui/speedo.pwn"
-#include "modules\player\ui/leftbox.pwn"
-#include "modules\player/afk.pwn"
+// #include "modules\player/cheats.pwn"
+// #include "modules\player/afk.pwn"
 #include "modules\player/faction_credits.pwn"
 
 #include <YSI\y_hooks>
@@ -2420,7 +2422,6 @@ public OnGameModeInit()
 	Iter_Init(PlayerDamages);
 
 	// ==============================================================================
-	CreateGlobalTextdraws();
 	BlockGarages(.text = "X");
 
 	// Timers
@@ -3559,6 +3560,19 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 	#if SERVER_DEBUG_LEVEL >= 2
 		printf("OnPlayerDespawnChar(%s, %d, %d)", GetPlayerNameEx(playerid), reason, changechar);
 	#endif
+
+	if(changechar > 0)
+	{
+		new index = changechar - 1,
+			id = player_CharArray[playerid][index][0];
+
+		if(FindPlayerBySql(id) != INVALID_PLAYER_ID)
+		{
+			CharListTD_ShowMessage(playerid, "~w~Sis veikejas jau yra ~r~zaidime~w~!");
+			return;
+		}
+	}
+
 	new string[126];
 	if(reason != 2)
 	{
@@ -3750,9 +3764,12 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 
 public OnVehicleSpawn(vehicleid)
 {
+	new model = GetVehicleModel(vehicleid);
+
 	#if SERVER_DEBUG_LEVEL >= 2
-		printf("[debug] OnVehicleSpawn(%d)", vehicleid);
+		printf("[debug] OnVehicleSpawn(%d, model: %d)", vehicleid, model);
 	#endif
+
 	if(VehicleInfo[vehicleid][vOwner] <= 0)
 	{
 		new col1,col2;
@@ -3762,7 +3779,7 @@ public OnVehicleSpawn(vehicleid)
 	if(IsVehicleServer(vehicleid))
 	{
 		PutFactionWeaponsInVehicle(vehicleid);
-		VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[GetVehicleModel(vehicleid)-400];
+		VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[model-400];
 
 		if(IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel])) DestroyDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]);
 		VehicleInfo[vehicleid][vUnitLabel] = INVALID_3DTEXT_ID;
@@ -4323,7 +4340,7 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 	{
 		new Float:x, Float:y, Float:z;
 		GetPlayerPos(playerid, x, y, z);
-		SetPlayerPos(playerid, x, y, z+0.5);
+		SetPlayerPos(playerid, x, y, z+0.085);
 		// ac__EnteringVehicle[playerid] = INVALID_VEHICLE_ID;
 	}
 	if(!ispassenger)
@@ -16309,20 +16326,24 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new factionid, vehicleid = tmpIter[playerid], numbers[17];
 				if(sscanf(inputtext,"d",factionid)) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 4, "");
+				
 				VehicleInfo[vehicleid][vRequiredLevel] = 0;
 				VehicleInfo[vehicleid][vJob] = 0;
 				VehicleInfo[vehicleid][vOwner] = 0;
 				VehicleInfo[vehicleid][vFaction] = factionid;
+
 				SendFormat(playerid, -1, "%d %d", factionid, vehicleid);
 				format(numbers, sizeof numbers, ""#DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vFaction], VehicleInfo[vehicleid][vId]);
 				format(VehicleInfo[vehicleid][vNumbers], 10, numbers);
 				SetVehicleNumberPlate(vehicleid, numbers);
 				SaveServerVehicleIntEx(vehicleid, "FactionId", factionid);
+			
 				MsgSuccess(playerid, "TRANSPORTAS", "Tr. priemonë priskirta frakcijai, kurios MySQL numeris: %d.", factionid);
+
 				new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
 				for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
 				
-				SetVehicleToRespawn(vehicleid);
+				SetVehicleToRespawn(vehicleid); // <- Crash?
 				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 
 				log_init(true);
@@ -29040,7 +29061,8 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 		saved_donatortime = PlayerInfo[playerid][pDonatorTime],
 		saved_namechanges = PlayerInfo[playerid][pNameChanges],
 		saved_numberchanges = PlayerInfo[playerid][pNumberChanges],
-		saved_platechanges = PlayerInfo[playerid][pPlateChanges];
+		saved_platechanges = PlayerInfo[playerid][pPlateChanges],
+		saved_tutorialdone = PlayerInfo[playerid][pTutorialDone];
 
 	call OnPlayerResetVariables(playerid, saved_player_id);
 
@@ -29098,7 +29120,8 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 		PlayerInfo[playerid][pDonator] = 
 		PlayerInfo[playerid][pNameChanges] =
 		PlayerInfo[playerid][pPlateChanges] = 
-		PlayerInfo[playerid][pNumberChanges] = 0;
+		PlayerInfo[playerid][pNumberChanges] =
+		PlayerInfo[playerid][pTutorialDone] = 0;
 		for(new i = 0; i < MAX_PLAYER_GROUPS; i++) {
 			PlayerGroups[playerid][i] = 0; 
 		}
@@ -29175,6 +29198,7 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 		PlayerInfo[playerid][pDonatorTime] = saved_donatortime;
 		PlayerInfo[playerid][pNumberChanges] = saved_numberchanges;
 		PlayerInfo[playerid][pPlateChanges] = saved_platechanges;
+		PlayerInfo[playerid][pTutorialDone] = saved_tutorialdone;
 		PreparePlayerData(playerid);
 	}
 
@@ -37259,7 +37283,7 @@ stock ResetServerSidedWeapons(playerid)
 
 	for(new i = 0; i < 13; i++)
 	{
-		if(data[i][0] > 0 && data[i][1] > 0 && data[i][2] == WEAPON_GIVE_TYPE_NORMAL) // GiveType
+		if(data[i][0] > 0 && data[i][1] > 0 && data[i][2] != WEAPON_GIVE_TYPE_NO_INVENTORY) // GiveType
 		{	
 			GivePlayerWeapon(playerid, data[i][0], data[i][1], WEAPON_GIVE_TYPE_NORMAL, data[i][3]);
 		}

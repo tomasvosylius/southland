@@ -288,7 +288,7 @@ stock CreateESCTextdraw()
 	TD_ESC = TextDrawCreate(0.0, 0.0, " ");	
 }
 
-stock CreateGlobalTextdraws()
+hook OnGameModeInit()
 {
 	CreateESCTextdraw();
 	DrugsEffect_Create_Global();
