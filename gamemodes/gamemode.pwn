@@ -165,7 +165,7 @@ native gpci(playerid, serial[], len);
 #define DEFAULT_STUDIO_NUMBER 			5555
 #define DEFAULT_TAXI_NUMBER 			4114
 #define DEFAULT_TAXI_LICENCE_PRICE		3000
-
+#define DEFAULT_PLAYER_COLOR			0x99999911
 #define DEFAULT_CAR_RENT_PRICE			8
 
 #define WARNS_TO_BAN 					3
@@ -5734,7 +5734,7 @@ public OnPlayerSpawn(playerid)
 			#endif
 		}
 
-		SetPlayerColor(playerid, 0x99999911);
+		SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
 		SetPlayerArmour(playerid, 0.0);
 
 		SetPlayerSkillLevel(playerid, 0, 1);
@@ -8629,7 +8629,8 @@ public LoginTime(playerid)
 	#if SERVER_DEBUG_LEVEL >= 3
 		printf("[debug] LoginTime(%s)", GetPlayerNameEx(playerid));
 	#endif
-	if(PlayerInfo[playerid][pConnection] != CONNECTION_STATE_LOGGED)
+	if(	PlayerInfo[playerid][pConnection] != CONNECTION_STATE_LOGGED && 
+		!(isequal(GetPlayerIpEx(playerid), "255.255.255.255", true) || isequal(GetPlayerIpEx(playerid), "127.0.0.1", true)) )
 	{
 		Kick(playerid);
 	}
@@ -32708,7 +32709,7 @@ CMD:aduty(playerid, params[])
 		//PlayerExtra[playerid][peDutyObject] = INVALID_OBJECT_ID;
 		SendFormat(playerid, 0xD6EB77FF, "Baigëte administratoriaus darbà.");
 		if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK) SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-		SetPlayerColor(playerid, 0x99999911);
+		SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
 	}
 	return 1;
 }
@@ -33271,7 +33272,7 @@ CMD:unsetgroup(playerid, params[])
 		//PlayerExtra[playerid][peDutyObject] = INVALID_OBJECT_ID;
 		PlayerExtra[receiverid][peDutyLabel] = INVALID_3DTEXT_ID;
 		if(GetPlayerSpecialAction(receiverid) == SPECIAL_ACTION_USEJETPACK) SetPlayerSpecialAction(receiverid, SPECIAL_ACTION_NONE);
-		SetPlayerColor(receiverid, 0x99999911);
+		SetPlayerColor(receiverid, DEFAULT_PLAYER_COLOR);
 	}
 	!found && SendWarning(playerid, "Þaidëjas nëra nurodytoje grupëje.");
 	return 1;
@@ -38969,7 +38970,7 @@ CMD:duty(playerid, params[])
 			else if(faction != 0)
 			{
 				new factionid = GetFactionArrayIndexById(faction);
-				if(PlayerInfo[playerid][pAdminDuty] <= 0) SetPlayerColor(playerid, 0x99999911);
+				if(PlayerInfo[playerid][pAdminDuty] <= 0) SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
 				if(factionid != -1)
 				{
 					switch(FactionInfo[factionid][fType])

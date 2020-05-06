@@ -28,7 +28,7 @@ hook OnPlayerConnect(playerid)
         return 1;
     }
 
-    if(isequal(ip, "127.0.0.1", true))
+    if(isequal(ip, "127.0.0.1", true) || isequal(ip, "255.255.255.255", true))
     {
         return 1;
     }
