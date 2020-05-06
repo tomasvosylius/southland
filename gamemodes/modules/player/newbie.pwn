@@ -119,6 +119,7 @@ stock Tutorial_Step(playerid, step)
         return 0;
     }
     
+    PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.15);
     UI_LeftBox_Show(playerid, GuidePoints[step][guideText], .width = 180.0, .time = 0.0);
 
     InterpolateCameraPos(playerid, 	

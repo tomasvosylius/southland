@@ -919,6 +919,31 @@ native gpci(playerid, serial[], len);
 #include "libraries/samp.pwn"
 #include "libraries/macros.pwn"
 #include "libraries/als.pwn"
+
+#define AC_ENABLE_WEAPONS			true
+#define AC_ENABLE_MONEY				true
+#define AC_ENABLE_AIRBREAK			true
+#define AC_ENABLE_HEALTH			true
+#define AC_ENABLE_SPEED				true
+#define AC_ENABLE_INV				true
+#define AC_ENABLE_JETPACK			false
+#define AC_ENABLE_DIALOGS			false
+#define AC_ENABLE_FLOOD				false
+#define AC_ENABLE_NPC				false
+#define AC_ENABLE_FAKEKILL			true
+#define AC_ENABLE_RAPIDFIRE			true
+#define AC_ENABLE_WARP_INTO_CAR		true
+#define AC_ENABLE_AIMBOT			true
+#define AC_ENABLE_TROLLBOSS			true
+#define AC_ENABLE_ANTIMOD			true
+#define AC_ENABLE_PARACHUTE_DAMAGE	true
+#define AC_ENABLE_GOGGLES_FIX		true
+#define AC_ENABLE_SEAT_CHANGER		true
+#define AC_ENABLE_CAR_CHANGER		true
+#define AC_ENABLE_PICKUP_TELEPORT	true
+#define AC_ENABLE_TELEPORTER		false
+#define AC_ENABLE_VW_INT			false
+
 #include "libraries/anticheat.pwn"
 #include "libraries/dialog.pwn"
 
@@ -6383,6 +6408,7 @@ public LoginHalt(playerid)
 	 */
 	if(	!isequal(country, "Lithuania") && 
 		!isequal(GetPlayerIpEx(playerid), "127.0.0.1") &&
+		!isequal(GetPlayerIpEx(playerid), "255.255.255.255") &&
 		!isequal(GetPlayerIpEx(playerid), "Unknown"))
 	{
 		// IP ne master, ne unknown ir ne LT
@@ -27031,7 +27057,7 @@ stock House_CreatePickup(house)
 		house,
 		HouseInfo[house][hOwner] > 0 ? (1272) : (1273), // DEFAULT_HOUSE_PICKUP
 		1,
-		HouseInfo[house][hEnterX], HouseInfo[house][hEnterY], HouseInfo[house][hEnterZ] - 0.75,
+		HouseInfo[house][hEnterX], HouseInfo[house][hEnterY], HouseInfo[house][hEnterZ],
 		HouseInfo[house][hOutVW], HouseInfo[house][hExterior]
 	);
 	return 1;

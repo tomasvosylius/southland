@@ -236,10 +236,10 @@ Enables/disables
 	#define AC_ENABLE_INV 						true
 #endif
 #if !defined AC_ENABLE_JETPACK
-	#define AC_ENABLE_JETPACK 					false
+	#define AC_ENABLE_JETPACK 					true
 #endif
 #if !defined AC_ENABLE_DIALOGS
-	#define AC_ENABLE_DIALOGS 					false
+	#define AC_ENABLE_DIALOGS 					true
 #endif
 #if !defined AC_ENABLE_FLOOD
 	#define AC_ENABLE_FLOOD 					true
@@ -281,10 +281,10 @@ Enables/disables
 	#define AC_ENABLE_PICKUP_TELEPORT			true
 #endif 
 #if !defined AC_ENABLE_TELEPORTER
-	#define AC_ENABLE_TELEPORTER				false
+	#define AC_ENABLE_TELEPORTER				true
 #endif 
 #if !defined AC_ENABLE_VW_INT
-	#define AC_ENABLE_VW_INT					false
+	#define AC_ENABLE_VW_INT					true
 #endif 
 /* 
 ****************************
@@ -611,9 +611,8 @@ static _FAC_CheatDetected(playerid, code, extra_id_1 = 0, extra_id_2 = 0)
 	public OnPlayerConnect(playerid)
 #endif
 {
-	new now = gettime();
-
 	#if AC_ENABLE_FLOOD
+		new now = gettime();
 		static 
 			joinIndex,
 			joinArray[19];
@@ -2976,4 +2975,4 @@ stock FAC_GetTickDiff(newtick, oldtick)
 #undef AC_FULL_VERSION
 
 #pragma unused 	BustAim_g_WeaponRange, FAC_aimInt_DCTTL, FAC_aimInt_GXYIFOP, FAC_aimInt_IsCameraAimingAt,\
-				_FAC_IsPlayerStatePlaying, _FAC_IsPlayerStateVehicle, ac__Aim_LastWeapon
+				_FAC_IsPlayerStatePlaying, _FAC_IsPlayerStateVehicle, ac__Aim_LastWeapon, ac__Joins
