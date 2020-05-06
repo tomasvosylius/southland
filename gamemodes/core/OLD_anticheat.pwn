@@ -9,7 +9,7 @@
 /* 
 	Defines
 */
-#include <YSI\y_hooks>
+#include <YSI_Coding\y_hooks>
 
 #define HACK_NEW_WEAPON	1001
 #define HACK_NEW_AMMO	1002

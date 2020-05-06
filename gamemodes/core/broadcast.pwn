@@ -1,4 +1,5 @@
-#include <YSI\y_hooks>
+#include <YSI_Coding\y_hooks>
+
 #define SendToBroadcasters(%0,%1);		foreach(new __internalPlayerid : Player) {\
 											if(player_Broadcast[__internalPlayerid]) {\
 												SendFormat(__internalPlayerid,%0,%1);\

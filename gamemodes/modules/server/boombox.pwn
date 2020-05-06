@@ -1,4 +1,4 @@
-#include <YSI\y_hooks>
+#include <YSI_Coding\y_hooks>
 
 #define ALS_DO_PlayerBoomboxUse<%0> %0<PlayerBoomboxUse,i>(end:playerid)
 

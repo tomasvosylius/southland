@@ -1,4 +1,4 @@
-#include <YSI\y_hooks>
+#include <YSI_Coding\y_hooks>
 
 #define POLICE_NEEDED_TO_THIEF 			2
 #define DEFAULT_BREAKIN_DOORS_DAMAGE 	5

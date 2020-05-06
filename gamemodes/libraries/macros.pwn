@@ -116,3 +116,5 @@
 #define GetDynamicObjectModel(%0) 			Streamer_GetIntData(STREAMER_TYPE_OBJECT,%0,E_STREAMER_MODEL_ID)
 
 #define IsVehicleInRangeOfPoint(%0,%1,%2,%3,%4) ((%1 >= GetVehicleDistanceFromPoint(%0,%2,%3,%4) ? true : false))
+
+#define mysql_tquery_inline 	MySQL_TQueryInline

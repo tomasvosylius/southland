@@ -1,4 +1,4 @@
-#include <YSI\y_hooks>
+#include <YSI_Coding\y_hooks>
 /*
  *
  * SAN ANDREAS MULTIPLAYER WEAPONS.PWN BY TOMAS f0cus VOSYLIUS

@@ -14,6 +14,8 @@
 // ==============================================================================#
 // Includinam funkciju failus
 #pragma warning disable 239, 217, 214
+#define YSI_NO_HEAP_MALLOC
+#define CGEN_MEMORY 		(30000)
 
 #include <a_samp>
 #if defined MAX_PLAYERS
@@ -21,22 +23,18 @@
 #endif
 #define MAX_PLAYERS 150
 
+#include <a_mysql>
 
-native IsValidVehicle(vehicleid);
-
-//#include <audio>
 #include <FileManager>
 #include <streamer>
 #include <crashdetect>
-#include <YSI\y_iterate>
-#include <YSI\y_va>
-#include <YSI\y_inline>
-#include <YSI\y_timers>
-#include <YSI\y_stringhash>
+#include <YSI_Data\y_iterate>
+#include <YSI_Coding\y_va>
+#include <YSI_Coding\y_inline>
+#include <YSI_Coding\y_timers>
+#include <YSI_Coding\y_stringhash>
 //#include <YSI\y_dialog>
 #include <easyDialog>
-#include <a_mysql>
-#include <a_mysql_inline>
 #include <sscanf2>
 #include <pawn.CMD>
 #include <md5>
@@ -49,7 +47,6 @@ native IsValidVehicle(vehicleid);
 #include <gvar>
 #include <colandreas>
 #include <timestamp>
-#include <timerfix>
 #include <streamer_td>
 #include <mSelection>
 #include <screen>
@@ -2272,7 +2269,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "modules\player/afk.pwn"
 #include "modules\player/faction_credits.pwn"
 
-#include <YSI\y_hooks>
+#include <YSI_Coding\y_hooks>
 
 // stock FAC_GetWeaponSlot(playerid) return 1;
 // stock RemovePlayerWeaponInSlot(playerid, slot) return 1;
@@ -6860,10 +6857,9 @@ Dialog:InputDiscordCode(playerid, response, listitem, inputtext[])
 				Register_ShowDiscordInput(playerid);
 			}
 		}
-		mysql_format(chandler, string, sizeof string, "\
+		mysql_tquery_inline(chandler, using inline checkCode, "\
 			SELECT NULL FROM `users_data` WHERE id = '%d' AND DiscordCode='%e' AND DiscordVerified!='2'",
 			PlayerInfo[playerid][pUserId], inputtext);
-		mysql_tquery_inline(chandler, string, using inline checkCode, "");
 	}
 	else Kick(playerid);
 	return 1;
@@ -33291,9 +33287,6 @@ CMD:unsetgroupsoff(playerid, params[])
 		SendWarning(playerid, "Þaidëjas %s prisijungæs. Naudok /unsetgroup", GetPlayerNameEx(J@));
 		return 1;
 	}
-
-	new string[256];
-	mysql_format(chandler, string, sizeof string, "SELECT UserId FROM `players_data` WHERE Name = '%e'", name);
 	
 	inline findPlayerByName()
 	{
@@ -33304,17 +33297,15 @@ CMD:unsetgroupsoff(playerid, params[])
 			
 			SendFormat(playerid, 0x7be677ff, "Vartotojui %s paðalintos visos grupës.", GetUserNameById(userid));
 
-			mysql_format(chandler, string, sizeof string, "\
+			inline removeGroups() return 1;
+			mysql_tquery_inline(chandler, using inline removeGroups, "\
 				UPDATE `users_data` SET Group1='0',Group2='0',Group3='0' WHERE id = '%d'", userid);
-			mysql_fquery(chandler, string, "UserRemovedFromGroups");
 		}
 		else SendError(playerid, "Tokio veikëjo nëra.");
 	}
-	mysql_tquery_inline(chandler, string, using inline findPlayerByName, "");
+	mysql_tquery_inline(chandler, using inline findPlayerByName, "SELECT UserId FROM `players_data` WHERE Name = '%e'", name);
 	return 1;
 }
-thread(UserRemovedFromGroups);
-
 
 flags:unsetgroup(CMD_TYPE_ADMIN);
 CMD:unsetgroup(playerid, params[])

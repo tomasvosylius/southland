@@ -424,10 +424,8 @@ hook OnPlayerRequestDataLoad(playerid)
             cache_get_value_name_int(0, "FactionCredits", player_FactionCredits[playerid]);
         }
     }
-    new string[126];
-    mysql_format(chandler, string, sizeof string, "\
+    mysql_tquery_inline(chandler, using inline loadFactionCredits, "\
         SELECT `FactionCredits` FROM `players_data` WHERE id = '%d'", PlayerInfo[playerid][pId]);
-    mysql_tquery_inline(chandler, string, using inline loadFactionCredits, "");
     return 1;
 }
 
