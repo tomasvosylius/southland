@@ -3501,9 +3501,6 @@ stock PhoneTD_Create_Player(playerid)
 	return 1;
 }
 
-
-
-
 stock SpamBarTD_Show(playerid)
 {
 	TextDrawShowForPlayer(playerid, SpamBarTD_Base);

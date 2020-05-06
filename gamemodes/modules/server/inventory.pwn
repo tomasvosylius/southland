@@ -634,14 +634,13 @@ stock GenerateRandomPhoneNumber(playerid = INVALID_PLAYER_ID)
 	{
 		if(cache_num_rows())
 		{
-			new number,
-				string[86];
+			new number;
 			cache_get_value_name_int(0, "Number", number);
 
 			PlayerInfo[playerid][pPhoneNumber] = number;
 
-			mysql_format(chandler, string, sizeof string, "DELETE FROM `unused_phone_numbers` WHERE Number = '%d'", number);
-			mysql_fquery(chandler, string, "NumberGotUsed");
+			inline numberGotUsed() return 1;
+			mysql_tquery_inline(chandler, using inline numberGotUsed, "DELETE FROM `unused_phone_numbers` WHERE Number = '%d'", number);
 
 			printf("Selected random number: %d for %s", number, GetPlayerNameEx(playerid));
 		}
@@ -650,5 +649,3 @@ stock GenerateRandomPhoneNumber(playerid = INVALID_PLAYER_ID)
 	mysql_tquery_inline(chandler, using inline selectRandomNumber, "SELECT Number FROM `unused_phone_numbers` ORDER BY RAND() LIMIT 1");
 	return 1;
 }
-
-thread(NumberGotUsed);

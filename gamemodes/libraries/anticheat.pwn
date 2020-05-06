@@ -2005,14 +2005,13 @@ stock FAC_DestroyVehicle(vehicleid)
 	}
 	return false;
 }
-#if !defined GetVehicleColor
-	stock GetVehicleColor(vehicleid, &color1, &color2)
-	{
-		color1 = vehicle_Colors[vehicleid][0];
-		color2 = vehicle_Colors[vehicleid][1];
-		return 1;
-	}
-#endif
+
+stock GetVehicleColor(vehicleid, &color1, &color2)
+{
+	color1 = vehicle_Colors[vehicleid][0];
+	color2 = vehicle_Colors[vehicleid][1];
+}
+
 stock FAC_ChangeVehicleColor(vehicleid, color1, color2)
 {
 	vehicle_Colors[vehicleid][0] = color1;
