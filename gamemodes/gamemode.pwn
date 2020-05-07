@@ -6602,6 +6602,7 @@ stock ShowPlayerLeaveConfirm(playerid)
 stock ShowPlayerCharCreateHelp(playerid)
 {
 	player_charList_GUIShown[playerid] = true;
+	dialog_Clear();
 	dialog_AddLine("Roleplay - realybës atkartojimas þaidime.");
 	dialog_AddLine("Þaidþiant roleplay tipo serveryje jûsø tikslas yra savo veiksmus iðreikðti kuo realistiðkiau.");
 
@@ -7572,6 +7573,9 @@ stock DonatorMenu_SelectCharForName(playerid)
 			rows = cache_num_rows();
 
 		if(!rows) return SendWarning(playerid, "Atsirado klaida ieðkant jûsø veikëjo.");
+
+		dialog_Clear();
+
 		for(new i = 0; i < rows; i++)
 		{
 			cache_get_value_name(i, "Name", name);
@@ -8243,6 +8247,7 @@ public CheckRegisterIp(playerid)
 
 stock User_Register_Show(playerid)
 {
+	dialog_Clear();
 	dialog_AddLine("{adcf70}Sveikas atvykæs á Southland roleplay!");
 	dialog_AddLine("{f9f9f9}Tai yra roleplay tipo serveris, kuriame atkartojama realybë.");
 	dialog_AddLine("Jei tokiame serveryje lankotës pirmà kartà, perskaitykite informacijà {a9d659}www.southland.lt");
@@ -8291,6 +8296,7 @@ stock Register_CreateQuestion(playerid)
 
 stock Register_CreateAnswer(playerid, question[])
 {
+	dialog_Clear();
 	dialog_AddLine("{f9f9f9}Praðome paraðyti atsakymà á savo sukurtà klausimà:");
 	dialog_AddLine(question);
 	dialog_AddLine("Praðome sugalvoti ásimenamà atsakymà, kadangi administracija jo matyti taip pat negalës.");
@@ -32223,6 +32229,7 @@ stock Admin_NewChars_ShowDetails(playerid, offset)
 				PlayerInfo[playerid][pUserId], player_NewCharDetails[playerid]
 			);
 
+			dialog_Clear();
 			dialog_AddLine("Veikëjo vardas: %s", name);
 			dialog_AddLine("Data: %s", date);
 			dialog_AddLine("Vartotojas: %s", GetUserNameById(player_NewCharUserId[playerid]));
@@ -35368,6 +35375,7 @@ public SanNewsSmsData(playerid)
 		cache_get_value_name_int(0, "PlayerNumber", number);
 		cache_get_value_name(0, "Text", text);
 	
+		dialog_Clear();
 		dialog_AddLine("%d paraðë þinutæ:", number);
 		dialog_AddLine(text);
 
