@@ -6,72 +6,70 @@ static
 
 static 
     player_BarType[MAX_PLAYERS][32],
-    Timer:player_BarTimer[MAX_PLAYERS] = {Timer:NONE,...},
     player_BarValue[MAX_PLAYERS],
     bool:player_BarShowed[MAX_PLAYERS] = {false,...};
     
 stock UI_LoadBar_IsActive(playerid) return (strlen(player_BarType[playerid]) > 0);
 
-stock UI_LoadBar_Start(playerid, type[], time)
+stock UI_LoadBar_Start(playerid, type[], text[], time)
 {
 	if(UI_LoadBar_IsActive(playerid)) return 0;
 
-	format(player_BarType[playerid], 32, type);
-    player_BarValue[playerid] = 0;
-
+    if(!strlen(type))   format(player_BarType[playerid], 5, "None");
+	else                format(player_BarType[playerid], 32, type);
 
     if(!player_BarShowed[playerid])
     {
-        _UI_LoadBar_Create(playerid);
+        printf("Create called");
+        _UI_LoadBar_Create(playerid, text);
 
         PlayerTextDrawTextSize(playerid, TD_Core[playerid][idx_Core_Value], 0.0, 3.0);
         for(new td = 0; td < sizeof TD_Core[]; td++)
         {
+            printf("Show %d called", td);
             PlayerTextDrawShow(playerid, TD_Core[playerid][td]);
         }
     }
 
+    player_BarValue[playerid] = 0;
     player_BarShowed[playerid] = true;
-    player_BarTimer[playerid] = repeat PT_LoadBarUpdate[time / 10](playerid);
+    defer PT_LoadBarUpdate(playerid, 0, time / 100);
     return 1;
 }
 
 static _UI_LoadBar_Stop(playerid)
 {
-    if(player_BarTimer[playerid] != Timer:NONE)
-    {
-        stop player_BarTimer[playerid];
-    }
-    player_BarTimer[playerid] = Timer:NONE;
-
     if(player_BarShowed[playerid])
     {
         for(new td = 0; td < sizeof TD_Core[]; td++)
         {
             PlayerTextDrawDestroy(playerid, TD_Core[playerid][td]);
         }
-        player_BarShowed[playerid] = false;
     }
+    player_BarShowed[playerid] = false;
 
     format(player_BarType[playerid], 1, "");
 }
 
-timer PT_LoadBarUpdate[100](playerid)
+timer PT_LoadBarUpdate[100](playerid, value, finishValue)
 {
-    new value = (player_BarValue[playerid] += 10);
+    if(!UI_LoadBar_IsActive(playerid)) return;
 
-    PlayerTextDrawTextSize(playerid, TD_Core[playerid][idx_Core_Value], value * 2.65, 3.0);
+    value += 1;
 
-    if(value >= 100)
+    PlayerTextDrawTextSize(playerid, TD_Core[playerid][idx_Core_Value], (26.50 / finishValue * value) * 2.65, 3.0);
+    PlayerTextDrawShow(playerid, TD_Core[playerid][idx_Core_Value]);
+
+    if(value >= finishValue)
     {
         call OnLoadBarEnd(playerid, player_BarType[playerid]);
 
         _UI_LoadBar_Stop(playerid);
     }
-    return 1;
+    else defer PT_LoadBarUpdate(playerid, value, finishValue);
 }
 
-static _UI_LoadBar_Create(playerid)
+static _UI_LoadBar_Create(playerid, text[])
 {
     new td = 0;
     TD_Core[playerid][td] = CreatePlayerTextDraw(playerid, 189.952392, 377.293304, "LD_SPAC:white");
@@ -114,7 +112,7 @@ static _UI_LoadBar_Create(playerid)
     (idx_Core_Value == NONE) && (idx_Core_Value = td);
     td++;
 
-	TD_Core[playerid][td] = CreatePlayerTextDraw(playerid, 190.190536, 366.639923, "VARIKLIS_UZVEDAMAS");
+	TD_Core[playerid][td] = CreatePlayerTextDraw(playerid, 190.190536, 366.639923, text);
 	PlayerTextDrawLetterSize(playerid, TD_Core[playerid][td], 0.183238, 1.096533);
 	PlayerTextDrawAlignment(playerid, TD_Core[playerid][td], 1);
 	PlayerTextDrawColor(playerid, TD_Core[playerid][td], -1);
@@ -128,7 +126,11 @@ static _UI_LoadBar_Create(playerid)
     td++;
 }
 
-
+hook OnPlayerConnect(playerid)
+{
+    player_BarShowed[playerid] = false;
+    return 1;
+}
 
 hook OnPlayerDespawnChar(playerid, reason, changechar)
 {

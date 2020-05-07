@@ -168,6 +168,9 @@ new Text:MDC_HeaderBackground,
 	Text:MDC_Prison_Alarm,
 	Text:MDC_Record_Back;
 
+static 
+	bool:player_UI_Created[MAX_PLAYERS];
+
 /*
  * Hooks
  */
@@ -175,6 +178,12 @@ new Text:MDC_HeaderBackground,
 hook OnPlayerDisconnect(playerid)
 {
 	reset(MDC, MDC__Player_Data[playerid], E_MDC_PLAYER_DATA);
+	return 1;
+}
+
+hook OnGameModeInit()
+{
+	MDC_CreateTextdraws();
 	return 1;
 }
 
@@ -194,11 +203,6 @@ stock MDC_Prepare()
 	return 1;
 }
 
-stock MDC_Init()
-{
-	MDC_CreateTextdraws();
-	return 1;
-}
 
 stock MDC_AddMenuButton(text[], action_id, header[] = "", td_type = MDC_TEXTDRAW_TYPE_PLAYER, bool:selectable = true)
 {
@@ -596,11 +600,16 @@ stock MDC_CreateTextdraws()
 	return 1;
 }
 
-stock MDC_CreatePlayerTextdraws(playerid)
+
+
+static _MDC_CreatePlayerTextdraws(playerid)
 {
+	if(player_UI_Created[playerid]) return 1;
+
 	for(new td = 0, limit = MDC__Textdraw_Data[mdcButtonsCount]; td < limit; td++)
 	{
-		if(MDC__Buttons_Data[td][mdcButtonType] == MDC_BUTTON_TYPE_MENU && MDC__Buttons_Data[td][mdcButtonTextdrawType] == MDC_TEXTDRAW_TYPE_PLAYER)
+		if(	MDC__Buttons_Data[td][mdcButtonType] == MDC_BUTTON_TYPE_MENU && 
+			MDC__Buttons_Data[td][mdcButtonTextdrawType] == MDC_TEXTDRAW_TYPE_PLAYER)
 		{
 			MDC_ButtonBox[playerid][td] = CreatePlayerTextDraw(playerid, MDC__Buttons_Data[td][mdcButtonBoxX], MDC__Buttons_Data[td][mdcButtonBoxY], "LD_SPAC:white");
 			PlayerTextDrawLetterSize(playerid, MDC_ButtonBox[playerid][td], 0.000000, 0.000000);
@@ -1112,11 +1121,57 @@ stock MDC_CreatePlayerTextdraws(playerid)
 	PlayerTextDrawSetShadow(playerid, MDC_Weapon_Model[playerid], 0);
 	PlayerTextDrawSetPreviewModel(playerid, MDC_Weapon_Model[playerid], 351);
 	PlayerTextDrawSetPreviewRot(playerid, MDC_Weapon_Model[playerid], 360.000000, 0.000000, 128.000000, 2.443384);
+
+	player_UI_Created[playerid] = true;
+	return 1;
+}
+
+static _MDC_DestroyPlayerTextdraws(playerid)
+{
+	PlayerTextDrawDestroy(playerid, MDC_HeaderText[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_HeaderName[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Main_Skin[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Main_Stats[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Main_Name[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Main_HideSkin[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Lookup_SearchText[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Player_Skin[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Lookup_StatsKey[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Lookup_StatsValue[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Lookup_Action1[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Lookup_Action2[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Lookup_Action3[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Player_HideSkin[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Vehicle_Model[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_WantedAddEdit_Looks[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_WantedAddEdit_Name[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_WantedAddEdit_Reason[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_WantedAddEdit_Seen[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Wanted_Next[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Wanted_Back[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_WantedAddEdit_Action1[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_WantedAddEdit_Action2[playerid]);
+	PlayerTextDrawDestroy(playerid, MDC_Weapon_Model[playerid]);
+
+	for(new td = 0; td < sizeof MDC_ButtonBox[]; td++) PlayerTextDrawDestroy(playerid, MDC_ButtonBox[playerid][td]);
+	for(new td = 0; td < sizeof MDC_ButtonText[]; td++) PlayerTextDrawDestroy(playerid, MDC_ButtonText[playerid][td]);
+	for(new td = 0; td < sizeof MDC_Lookup_StatsRow[]; td++) PlayerTextDrawDestroy(playerid, MDC_Lookup_StatsRow[playerid][td]);
+	for(new td = 0; td < sizeof MDC_Wanted_Name[]; td++) PlayerTextDrawDestroy(playerid, MDC_Wanted_Name[playerid][td]);
+	for(new td = 0; td < sizeof MDC_Wanted_Reason[]; td++) PlayerTextDrawDestroy(playerid, MDC_Wanted_Reason[playerid][td]);
+	for(new td = 0; td < sizeof MDC_Wanted_Looks[]; td++) PlayerTextDrawDestroy(playerid, MDC_Wanted_Looks[playerid][td]);
+	for(new td = 0; td < sizeof MDC_Wanted_Seen[]; td++) PlayerTextDrawDestroy(playerid, MDC_Wanted_Seen[playerid][td]);
+	for(new td = 0; td < sizeof MDC_Prison_CellStatus[]; td++) PlayerTextDrawDestroy(playerid, MDC_Prison_CellStatus[playerid][td]);
+	for(new td = 0; td < sizeof MDC_Record_Name[]; td++) PlayerTextDrawDestroy(playerid, MDC_Record_Name[playerid][td]);
+	for(new td = 0; td < sizeof MDC_Record_Date[]; td++) PlayerTextDrawDestroy(playerid, MDC_Record_Date[playerid][td]);
+
+	player_UI_Created[playerid] = false;
 	return 1;
 }
 
 stock MDC_ShowForPlayer(playerid, active_page = 0)
 {
+	_MDC_CreatePlayerTextdraws(playerid);
+
 	TextDrawShowForPlayer(playerid, MDC_BackgroundMain);
 	TextDrawShowForPlayer(playerid, MDC_HeaderBackground);
 	TextDrawShowForPlayer(playerid, MDC_Exit);
@@ -1128,6 +1183,7 @@ stock MDC_ShowForPlayer(playerid, active_page = 0)
 	MDC_SetHeader(playerid, MDC_GetHeaderName(playerid, active_page, .add_root = true), .show = true);
 	MDC_SetName(playerid, GetPlayerNameEx(playerid, .roleplay = true, .ignoremask = true), .show = true);
 	MDC_ShowPage(playerid, active_page);
+	
 	for(new td = 0, limit = MDC__Textdraw_Data[mdcButtonsCount]; td < limit; td++)
 	{
 		PlayerTextDrawShow(playerid, MDC_ButtonBox[playerid][td]);
@@ -1144,17 +1200,14 @@ stock MDC_HideForPlayer(playerid)
 	TextDrawHideForPlayer(playerid, MDC_Exit);
 	TextDrawHideForPlayer(playerid, MDC_ExitX);
 	TextDrawHideForPlayer(playerid, MDC_MenuSeparate);
-	PlayerTextDrawHide(playerid, MDC_HeaderText[playerid]);
-	PlayerTextDrawHide(playerid, MDC_HeaderName[playerid]);
+	
 	MDC_SetUnactiveMenuButton(playerid, MDC__Player_Data[playerid][pMdcActivePage], .reshow = false, .update_variables = false);
 	MDC_HidePage(playerid, MDC__Player_Data[playerid][pMdcActivePage], .update_variables = true);
-	for(new td = 0, limit = MDC__Textdraw_Data[mdcButtonsCount]; td < limit; td++)
-	{
-		PlayerTextDrawHide(playerid, MDC_ButtonBox[playerid][td]);
-		PlayerTextDrawHide(playerid, MDC_ButtonText[playerid][td]);
-	}
+	
 	GetESCType(playerid) = ESC_TYPE_NONE;
 	MDC__Player_Data[playerid][pMdcLookupId] = 0;
+
+	_MDC_DestroyPlayerTextdraws(playerid);
 	return 1;
 }
 
@@ -2609,5 +2662,11 @@ mdc_called OnCCTVSelect(playerid, cctv)
 		CancelSelectTextDraw(playerid);
 		SendFormat(playerid, 0x7BC19EFF, "Norëdami baigti stebëti vaizdà per kamerà, raðykite /stopcctv");
 	}
+	return 1;
+}
+
+hook OnPlayerConnect(playerid)
+{
+	player_UI_Created[playerid] = false;
 	return 1;
 }

@@ -75,7 +75,7 @@ Optional plugins:
 static stock
 	YSI_g_sPlayerDialog[MAX_PLAYERS] = {-1, ...},
 	bool:YSI_g_sPlayerMaster[MAX_PLAYERS] = {false, ...},
-	Func:YSI_g_sPlayerCallback[MAX_PLAYERS]<iiiis>;
+	Func:YSI_g_sPlayerCallback[MAX_PLAYERS]<ii>;
 
 stock Dialog_Get(playerid)
 {
@@ -90,12 +90,12 @@ remotefunc void:Dialog_Set(playerid, dialogid)
 	if (YSI_g_sPlayerMaster[playerid])
 	{
 		Indirect_Release(YSI_g_sPlayerCallback[playerid]),
-		YSI_g_sPlayerCallback[playerid] = Func:0<iiiis>,
+		YSI_g_sPlayerCallback[playerid] = Func:0<ii>,
 		YSI_g_sPlayerMaster[playerid] = false;
 	}
 }
 
-stock Dialog_ShowCallback(playerid, Func:callback<iiiis>, style, const string:title[], const string:caption[], const string:button1[], const string:button2[] = "")
+stock Dialog_ShowCallback(playerid, Func:callback<ii>, style, const string:title[], const string:caption[], const string:button1[], const string:button2[] = "")
 {
 	new
 		ret = Dialog_Show(playerid, style, title, caption, button1, button2);
@@ -110,7 +110,7 @@ stock Dialog_ShowCallbackData(playerid, callback[E_CALLBACK_DATA], style, const 
 	new
 		ret = Dialog_Show(playerid, style, title, caption, button1, button2);
 	Indirect_Claim(callback[0]);
-	YSI_g_sPlayerCallback[playerid] = F@_@iiiis:callback[0];
+	YSI_g_sPlayerCallback[playerid] = F@_@ii:callback[0];
 	return ret;
 }
 
@@ -154,14 +154,14 @@ HOOK__ OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if (YSI_g_sPlayerMaster[playerid])
 		{
 			new
-				Func:callback<iiiis> = YSI_g_sPlayerCallback[playerid];
-			YSI_g_sPlayerCallback[playerid] = Func:0<iiiis>;
+				Func:callback<ii> = YSI_g_sPlayerCallback[playerid];
+			YSI_g_sPlayerCallback[playerid] = Func:0<ii>;
 			// Totally blank the stored dialog information, after making a local
 			// copy of it for the sake of calling the callback.  This is so that
 			// we don't free the memory for the callback prematurely.
 			broadcastfunc Dialog_Set(playerid, -1);
 			// Call the callback.
-			@.callback(playerid, YSI_DIALOG_ID, response, listitem, isnull(inputtext) ? ("\1") : inputtext);
+			@.callback(response, listitem);
 			// Free the data.
 			Indirect_Release(callback);
 			return Y_HOOKS_BREAK_RETURN_1;

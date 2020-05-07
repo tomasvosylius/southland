@@ -151,6 +151,9 @@ public _@_y_cgen_@_0()
 		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
 	#endif
 	#if CGEN_MEMORY >= 100000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 110000
 		#error Too much codespace requested, please edit YSI_Coding\y_cgen\y_cgen
 	#endif
 }

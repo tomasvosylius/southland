@@ -15,7 +15,7 @@
 // Includinam funkciju failus
 #pragma warning disable 239, 217, 214
 #define YSI_NO_HEAP_MALLOC
-#define CGEN_MEMORY 		(50000)
+#define CGEN_MEMORY 		(100000)
 
 #include <a_samp>
 #if defined MAX_PLAYERS
@@ -47,7 +47,6 @@
 #include <gvar>
 #include <colandreas>
 #include <timestamp>
-#include <streamer_td>
 #include <mSelection>
 #include <screen>
 #include <requests>
@@ -165,7 +164,6 @@ native gpci(playerid, serial[], len);
 #define DEFAULT_CAR_RENT_PRICE			8
 
 #define WARNS_TO_BAN 					3
-// #define TIP_EVERY_MINUTE				2 // kas kiek minuciu tip rodomas visiems random
 #define TIME_TO_DELETE_DROPS			18000 // 5val.  	60sec= 1mmin // kas kiek UNIX sec issitrins visi objektai
 #define MINUTES_TO_PLAY_FOR_PAYDAY 				15 // kiek minuciu reik prazaist, kad gautum payday
 #define ADMIN_PERMISSIONS_PER_PAGE		18 // kiek permisionu per page rodyt ( << >> )
@@ -1598,11 +1596,6 @@ enum E_PICKUP_DATA
 };
 new PickupData[MAX_PICKUPS][E_PICKUP_DATA];
 
-enum E_TIP_DATA
-{
-	tipText[156]
-};
-
 enum E_JOB_DATA
 {
 	jobId,
@@ -1924,17 +1917,6 @@ new DrugLevelReset[MAX_DRUG_TYPES] = {
 	5, // MDMA
 	0, // Krekas
 	0 // Methas
-};*/
-
-/*new Tips[][E_TIP_DATA] = {
-	{"Ar zinote, kad galite naudoti~n~komandas /enter ir /exit,~n~noredami ieiti arba iseiti is ~n~pastato?"},
-	{"Noredami rasti daugiau siste-~n~mos komandu, rasykite /help~n~ir sistemos pavadinima salia"},
-	{"Pilnus sistemu aprasymus,~n~oficialius projekto gidus ir~n~kita informacija galite~n~rasti forume www."#PROJECT_NAME"."#PROJECT_DOMAIN""},
-	{"Pries pirkdami draudima~n~transporto priemonei,~n~paziurekite informacija forume ~n~www."#PROJECT_NAME"."#PROJECT_DOMAIN""},
-	{"Noredami valdyti matomus~n~langus ekrane, naudokite~n~komanda /screen"},
-	{"Telefono valdyma galite~n~matyti naudodami /phone arba~n~paspaude mygtuka N"},
-	{"Noredami naudotis bankomatu~n~naudokite komanda /atm salia~n~bankomato"},
-	{"Paimti ismesta daikta nuo~n~zemes naudokite C + ALT~n~mygtukus"}
 };*/
 
 
@@ -2386,7 +2368,6 @@ public OnGameModeInit()
 	CA_Init();
 	sd_Prepare();
 	MDC_Prepare();
-	MDC_Init();
 	//MapAndreas_Init(MAP_ANDREAS_MODE_FULL);
 	ZonesPrepare();
 	SetGameModeText("S-RP "#CODE_VERSION"");
@@ -6276,7 +6257,6 @@ public OnPlayerConnect(playerid)
 		}
 		DMV_Create_Player(playerid);
 		FurnitureTd_Create_Player(playerid);
-		TipBox_Create_Player(playerid);
 		JailTimeTD_Create_Player(playerid);
 		MechTune_Create_Player(playerid);
 		VLTextdraw_Create_Player(playerid);
@@ -6287,7 +6267,6 @@ public OnPlayerConnect(playerid)
 		JobGuiTD_Create_Player(playerid);
 		InfoBar_Create_Player(playerid);
 		DeathScreen_Create_Player(playerid);
-		MDC_CreatePlayerTextdraws(playerid);
 		PayPhoneTD_Create_Player(playerid);
 		CharListTD_Create_Player(playerid);
 		CharCreateTD_Create_Player(playerid);
@@ -13534,7 +13513,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 1:
 					{
 						// esami iejimai
-						new string[4000],
+						new string[2024],
 							line[56],
 							real_itter;
 						foreach(new id : EnterExit)
@@ -13542,7 +13521,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							if(EntersExits[id][eeId] != 0)
 							{
 								tmpArray[playerid][real_itter] = id;
-								format(line, sizeof line, "%d. %.16s%s (MySQL ID: %d)\n", real_itter+1, EntersExits[id][eeName], strlen(EntersExits[id][eeName]) > 14 ? ("...") : (" "), EntersExits[id][eeId]);
+								format(line, sizeof line, "%d. %.12s(ID:%d)\n", real_itter+1, EntersExits[id][eeName], strlen(EntersExits[id][eeName]) > 14 ? ("...") : (" "), EntersExits[id][eeId]);
 								strcat(string, line);
 								real_itter++;
 							}
@@ -14165,7 +14144,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 1:
 					{
 						// perziureti visus garazus visi garazai
-						new string[4000] = "{BABABA}Nr.\t{BABABA}MySQL ID (numeris)\t{BABABA}Savininkas\n{FFFFFF}",
+						new string[2048] = "Nr.\tMySQL ID (numeris)\tSavininkas\n",
 							real_itter,
 							name[24],
 							line[86];
@@ -14176,7 +14155,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								if(GarageInfo[garage][gOwner] == 0) format(name, 10, "joks");
 								else format(name, sizeof name, GetNameBySql(GarageInfo[garage][gOwner]));
 								real_itter++;
-								format(line, sizeof line, "%d.\t%d\t%s\n", real_itter, GarageInfo[garage][gId], name);
+								format(line, sizeof line, "%d.\t%d\t%.19s%s\n", real_itter, GarageInfo[garage][gId], name);
 								strcat(string, line);
 							}
 						}
@@ -16708,7 +16687,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 13:
 					{
 						// interjeru meniu
-						mysql_tquery(chandler, "SELECT * FROM `interiors` LIMIT 101 OFFSET 0", "InteriorsMenuLoad", "dd", playerid, 0);
+						mysql_tquery(chandler, "SELECT * FROM `interiors` LIMIT 50 OFFSET 0", "InteriorsMenuLoad", "dd", playerid, 0);
 					}
 					case 14:
 					{
@@ -16838,7 +16817,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// perziureti visas
 						if(HaveAdminPermission(playerid, "EditParkings"))
 						{
-							new string[4020] = "{BABABA}Nr.\t{BABABA}Pavadinimas (MySQL ID)\t{BABABA}Vieta\n",
+							new string[4020] = "Nr.\tPavadinimas (MySQL ID)\tVieta\n",
 								line[64],
 								i,
 								zone[28];
@@ -16848,7 +16827,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								{
 									i++;
 									GetCoords2DZone(zone, 28, ParkingInfo[parking][parkingEnterX], ParkingInfo[parking][parkingEnterY]);
-									format(line, sizeof line, "%d.\t%s (%d)\t%s\n", i, ParkingInfo[parking][parkingName], ParkingInfo[parking][parkingId], zone);
+									format(line, sizeof line, "%d.\t%.14s (%d)\t%s\n", i, ParkingInfo[parking][parkingName], ParkingInfo[parking][parkingId], zone);
 									strcat(string, line);
 								}
 							}
@@ -24629,33 +24608,7 @@ stock IsItemDrug(itemid)
 	if(InArray(itemid, ITEM_MARIJUANA, ITEM_MDMA, ITEM_CRACK, ITEM_HEROINE, ITEM_METHAMPHETAMINE, ITEM_COCAINE, ITEM_XANAX)) return true;
 	return false;
 }
-/*
-stock HidePlayerTip(playerid)
-{
-	TextDrawHideForPlayer(playerid, TipBox_Base);
-	TextDrawHideForPlayer(playerid, TipBox_NameBase);
-	TextDrawHideForPlayer(playerid, TipBox_Name);
-	PlayerTextDrawHide(playerid, TipBox_Info[playerid]);
-	TextDrawHideForPlayer(playerid, TipBox_LowText);
-	return 1;
-}
-stock ShowPlayerTip(playerid, seconds, text[], bool:forceshow = false)
-{
-	#pragma unused text
-	if(PlayerInfo[playerid][pConnection] != CONNECTION_STATE_LOGGED) return 1;
-	if(TextdrawDisabled_Tips{playerid} && !forceshow) return 1;
-	if(PlayerTip[playerid] == 0)
-	{
-		// TextDrawShowForPlayer(playerid, TipBox_Base);
-		// TextDrawShowForPlayer(playerid, TipBox_NameBase);
-		// TextDrawShowForPlayer(playerid, TipBox_Name);
-		// PlayerTextDrawShow(playerid, TipBox_Info[playerid]);
-		// PlayerTextDrawSetString(playerid, TipBox_Info[playerid], text);
-		// TextDrawShowForPlayer(playerid, TipBox_LowText);
-		PlayerTip[playerid] = seconds;
-	}
-	return 1;
-}*/
+
 
 stock HidePlayerVehicleShop(playerid)
 {
@@ -25518,7 +25471,6 @@ stock PayDay(playerid)
 
 stock PlayerEnteredBuilding(playerid)
 {
-	// ShowPlayerTip(playerid, 5, Tips[random(sizeof Tips)][tipText]);
 	return FreezePlayer(playerid, 3);
 }
 
@@ -26116,7 +26068,7 @@ stock EngineTurning(playerid)
 								floatround((VehicleInfo[vehicleid][vBatteryStatus] > 90.0 ? 0.0 : (100-VehicleInfo[vehicleid][vBatteryStatus])*28)) +
 								floatround((VehicleInfo[vehicleid][vEngineStatus] > 50.0 ? 0.0 : (100-VehicleInfo[vehicleid][vEngineStatus])*20));
 				
-				if(UI_LoadBar_Start(playerid, "TurnEngine", turn_time))
+				if(UI_LoadBar_Start(playerid, "TurnEngine", "Variklio uzvedimas", turn_time))
 				{
 					rp_ame(playerid, "bando uþvesti tr. priemonës variklá.");
 				}
@@ -28064,10 +28016,6 @@ public PlOptionsLoad(playerid)
 			{
 				TextdrawDisabled_InfoBar{playerid} = !!value;
 			}
-			if(isequal(option, "TextdrawDisabled_Tips"))
-			{
-				TextdrawDisabled_Tips{playerid} = !!value;
-			}
 		}
 	}
 	return 1;
@@ -29016,8 +28964,7 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 
 	TextdrawDisabled_JailTimer{playerid} =
 	TextdrawDisabled_Speedo{playerid} =
-	TextdrawDisabled_InfoBar{playerid} =
-	TextdrawDisabled_Tips{playerid} = false;
+	TextdrawDisabled_InfoBar{playerid} = false;
 
 	OldVehicle[playerid] = INVALID_VEHICLE_ID;
 	tmpSelected[playerid] = -1;
@@ -30901,8 +30848,10 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 }
 
 // public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
-forward OnPlayerClickPTextDraw(playerid, PlayerText:playertextid);
-public OnPlayerClickPTextDraw(playerid, PlayerText:playertextid)
+// forward OnPlayerClickPTextDraw(playerid, PlayerText:playertextid);
+// public OnPlayerClickPTextDraw(playerid, PlayerText:playertextid)
+
+hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 {
 
 	#if SERVER_DEBUG_LEVEL >= 2
@@ -32241,6 +32190,11 @@ CMD:ucp(playerid, params[])
 	if(GetESCType(playerid) == ESC_TYPE_CHARSELECT)
 	{
 		SelectTextDraw(playerid, CHARSELECT_COLOR);
+		return 1;
+	}
+	else if(GetESCType(playerid) != ESC_TYPE_NONE)
+	{
+		SendWarning(playerid, "Uþdarykite kitus langus!");
 		return 1;
 	}
 	CharListTD_ShowSelect(playerid, 0, true, 0);
@@ -34962,12 +34916,16 @@ CMD:mdc(playerid, params[])
 		new v_factionid = GetFactionArrayIndexById(VehicleInfo[GetPlayerVehicleID(playerid)][vFaction]);
 		if(FactionInfo[v_factionid][fType] == FACTION_TYPE_POLICE) allowed = true;
 	}
-	else if(IsPlayerInPD(playerid) || IsPlayerInRangeOfPoint(playerid, 100.0, 410.36, 1445.06, 1844.09) || IsPlayerInRangeOfPoint(playerid, 100.0, 359.22, 1426.68, 1519.27)) allowed = true;
+	else if(
+		IsPlayerInPD(playerid) || 
+		IsPlayerInRangeOfPoint(playerid, 100.0, 410.36, 1445.06, 1844.09) ||
+		IsPlayerInRangeOfPoint(playerid, 100.0, 359.22, 1426.68, 1519.27)) allowed = true;
 	if(allowed)
 	{
 		MDC_ShowForPlayer(playerid, MDC_MAIN);
 		SelectTextDraw(playerid, 0xFFFFFF99);
 	}
+	else SendWarning(playerid, "Turite sedëti automobilyje arba bûti departamente.");
 	return 1;
 }
 
@@ -38178,8 +38136,7 @@ CMD:screen(playerid, params[])
 		!TextdrawDisabled_Speedo{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
 		!TextdrawDisabled_JailTimer{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
 		!TextdrawDisabled_InfoBar{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
-	
-	// \n{FFFFFF}Patarimai\t%s	!TextdrawDisabled_Tips{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
+
 	ShowPlayerDialog(playerid, DIALOG_PLAYER_OPTIONS, DIALOG_STYLE_TABLIST_HEADERS, "Textdraw valdymas", string, "Keisti", "Atðaukti");
 	return 1;
 }
@@ -39859,20 +39816,24 @@ CMD:maxspeed(playerid, params[])
 	}
 	return 1;
 }
-CMD:engine(playerid, params[]) return pc_cmd_v(playerid, "engine");
+CMD:engine(playerid, params[])
+{
+	return pc_cmd_v(playerid, "engine");
+}
 
 hook OnLoadBarEnd(playerid, type[])
 {
 	if(isequal(type, "TurnEngine", true))
     {
-
         if(OldVehicle[playerid] != GetPlayerVehicleID(playerid)) return 0;
-        if(VehicleInfo[OldVehicle[playerid]][vFuel] <= 0.0 || VehicleInfo[OldVehicle[playerid]][vEngineStatus] <= 0.0 || VehicleInfo[OldVehicle[playerid]][vBatteryStatus] <= 0.0)
+        if(	VehicleInfo[OldVehicle[playerid]][vFuel] <= 0.0 || 
+			VehicleInfo[OldVehicle[playerid]][vEngineStatus] <= 0.0 || 
+			VehicleInfo[OldVehicle[playerid]][vBatteryStatus] <= 0.0)
         {
             return GameTextForPlayer(playerid, "UZVEDIMAS ~r~NEPAVYKO", 3000, 5);
         }
         new
-            chance = 100-floatround(((100-VehicleInfo[OldVehicle[playerid]][vEngineStatus])*0.2))-floatround(((100-VehicleInfo[OldVehicle[playerid]][vBatteryStatus])*0.2));
+            chance = 100 - floatround(((100-VehicleInfo[OldVehicle[playerid]][vEngineStatus])*0.2))-floatround(((100-VehicleInfo[OldVehicle[playerid]][vBatteryStatus])*0.2));
         if(chance >= random(100))
         {
             ChangeVehicleEngineStatus(playerid, OldVehicle[playerid]);
@@ -40447,26 +40408,26 @@ public InteriorsMenuLoad(playerid, page)
 {
 	new 
 		offset = 100 * page,
-		string[5000] = "{BABABA}Nr.\t{BABABA}Pavadinimas\n",
+		string[2024] = "Nr.\tPavadinimas\n",
 		line[126],
 		rows = cache_num_rows(),
-		real_rows = rows >= 101 ? 100 : rows;
+		real_rows = rows >= 51 ? 50 : rows;
 
 
 	player_InteriorPage[playerid] = page;
 	for(new i = 0; i < real_rows; i++)
 	{
 		cache_get_value_name(i, "Name", line, 24);
-		format(line, sizeof line, "%d.\t%.24s\n", offset + i + 1, line);
+		format(line, sizeof line, "%d.\t%.14s\n", offset + i + 1, line);
 		strcat(string, line);
 	}
 
 	tmpTexture_MarkStart_CP[playerid] = rows;
 
 	if(page > 0) strcat(string, "{BABABA}<<< ATGAL\n");
-	if(rows >= 101) strcat(string, "{BABABA}>>> KITAS\n");
+	if(rows >= 51) strcat(string, "{BABABA}>>> KITAS\n");
 
-	strcat(string, "{8FD22B}PRIDËTI");
+	strcat(string, "PRIDËTI");
 	Dialog_Show(playerid, Dialog_Am_Interiors, DIALOG_STYLE_TABLIST_HEADERS, "Interjerø meniu", string, "Tæsti", "Atðaukti");
 	return 1;
 }
@@ -40479,14 +40440,14 @@ Dialog:Dialog_Am_Interiors(playerid, response, listitem, inputtext[])
 		{
 			new 
 				string[126];
-			mysql_format(chandler, string, sizeof string, "SELECT * FROM `interiors` LIMIT 101 OFFSET %d", (player_InteriorPage[playerid]-1) * 100);
+			mysql_format(chandler, string, sizeof string, "SELECT * FROM `interiors` LIMIT 50 OFFSET %d", (player_InteriorPage[playerid]-1) * 100);
 			mysql_tquery(chandler, string, "InteriorsMenuLoad", "dd", playerid, player_InteriorPage[playerid] - 1);
 		}
 		else if(strfind(inputtext, ">>> KITAS") != -1)
 		{
 			new 
 				string[126];
-			mysql_format(chandler, string, sizeof string, "SELECT * FROM `interiors` LIMIT 101 OFFSET %d", (player_InteriorPage[playerid]+1) * 100);
+			mysql_format(chandler, string, sizeof string, "SELECT * FROM `interiors` LIMIT 50 OFFSET %d", (player_InteriorPage[playerid]+1) * 100);
 			mysql_tquery(chandler, string, "InteriorsMenuLoad", "dd", playerid, player_InteriorPage[playerid] + 1);
 		}
 		else if(strfind(inputtext, "PRIDËTI") != -1)
