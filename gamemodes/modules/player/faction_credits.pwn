@@ -94,6 +94,7 @@ static _BlackMarket_CheckDays(add = -1)
 
 hook OnGameModeInit()
 {
+    _GunDealer_RerollWeapons();
     _GunDealer_RerollPlace();
     return 1;
 }
