@@ -298,14 +298,10 @@ native gpci(playerid, serial[], len);
 #define DIALOG_CLOTHE_CHANGE_BONE 		63
 #define DIALOG_CLOTHES_LIST_EDIT		64
 #define DIALOG_AM_MAIN					65
-#define DIALOG_AM_ATMS_MAIN				79
-#define DIALOG_AM_ATM_WITHDRAW_LIMIT	80
 #define DIALOG_AM_SPAWN_MAIN			81
 #define DIALOG_ATM_WITHDRAW 			82
 #define DIALOG_ATM_DEPOSIT 				83
 #define DIALOG_ATM_MONEY 				84
-#define DIALOG_AM_ATM_ALL				85
-#define DIALOG_AM_ATM_EDIT				86
 #define DIALOG_AM_GARAGES_MAIN 			87
 #define DIALOG_AM_GARAGES_ALL 			88
 #define DIALOG_AM_GARAGE_EDIT_MAIN 		89
@@ -5220,26 +5216,6 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	{
 		switch(tmpEditing_Component_DMV[playerid])
 		{
-			case EDITING_TYPE_DYNAMIC_ATM:
-			{
-				new atmid = tmpSelected[playerid];
-				if(IsValidDynamicObject(ATMs[atmid][atmObject]))
-				{
-					SetDynamicObjectPos(ATMs[atmid][atmObject], x, y, z);
-					SetDynamicObjectRot(ATMs[atmid][atmObject], rx, ry, rz);
-					ATMs[atmid][atmX] = x;
-					ATMs[atmid][atmY] = y;
-					ATMs[atmid][atmZ] = z;
-					ATMs[atmid][atmRX] = rx;
-					ATMs[atmid][atmRY] = ry;
-					ATMs[atmid][atmRZ] = rz;
-					tmpEditing_Component_DMV[playerid] = 0;
-					new string[186];
-					mysql_format(chandler, string, sizeof string, "UPDATE `atms` SET `X` = '%0.3f', `Y` = '%0.3f', `Z` = '%0.3f', `RX` = '%0.3f', `RY` = '%0.3f', `RZ` = '%0.3f' WHERE `id` = '%d'", x, y, z, rx, ry, rz, ATMs[atmid][atmId]);
-					mysql_fquery(chandler, string, "ATMUpdate");
-					ShowPlayerAdminMenu(playerid);
-				}
-			}
 			case EDITING_TYPE_DYNAMIC_PAYPHONE:
 			{
 				new pp = tmpSelected[playerid];
@@ -12775,201 +12751,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			else OnDialogResponse(playerid, DIALOG_AM_BM_MAIN, 1, 0, "");
 		}
 
-		case DIALOG_AM_ATM_WITHDRAW_LIMIT:
-		{
-			if(response)
-			{
-				new amount,
-					atmid = tmpSelected[playerid],
-					string[126];
-				if(sscanf(inputtext,"d",amount) || amount < 0) return SendError(playerid, "Blogai ávestas skaièius.") , OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 2, "");
-				ATMs[atmid][atmWithdrawLimit] = amount;
-				if(amount == 0)
-				{
-					MsgSuccess(playerid, "BANKOMATAS", "Nuëmimo limitas buvo paðalintas.");
-				}
-				else MsgSuccess(playerid, "BANKOMATAS", "Nuëmimo limitas buvo pakeistas á $%d.", ATMs[atmid][atmWithdrawLimit]);
-				mysql_format(chandler, string, sizeof string, "UPDATE `atms` SET WithdrawLimit = '%d'", amount);
-				mysql_fquery(chandler, string, "ATMUpdate");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite ATM nuemimo limita','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId], amount);
-				log_commit();
-				ShowPlayerAdminMenu(playerid);
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 2, "");
-		}
-		case DIALOG_AM_ATM_ALL:
-		{
-			if(response)
-			{
-				new string[256];
-				tmpSelected[playerid] = tmpArray[playerid][listitem];
-				format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Ar galima áneðti pinigus\t%s\nNuëmimo limitas\t$%d\nTeleportuotis prie bankomato\n{C60000}Iðtrinti", ATMs[tmpSelected[playerid]][atmCanDeposit] == 1 ? ("Taip") : ("Ne"), ATMs[tmpSelected[playerid]][atmWithdrawLimit]);
-				ShowPlayerDialog(playerid, DIALOG_AM_ATM_EDIT, DIALOG_STYLE_TABLIST_HEADERS, "Bankomato redagavimas", string, "Tæsti", "Atðaukti");
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 2, "");
-		}
-		case DIALOG_AM_ATM_EDIT:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						OnDialogResponse(playerid, DIALOG_AM_ATMS_MAIN, 1, 3, "");
-					}
-					case 1:
-					{
-						OnDialogResponse(playerid, DIALOG_AM_ATMS_MAIN, 1, 4, "");
-						// limitas
-					}
-					case 2:
-					{
-						SetPlayerPos(playerid, ATMs[tmpSelected[playerid]][atmX], ATMs[tmpSelected[playerid]][atmY], ATMs[tmpSelected[playerid]][atmZ]);
-					}
-					case 3:
-					{
-						OnDialogResponse(playerid, DIALOG_AM_ATMS_MAIN, 1, 6, "");
-					}
-				}
-			}
-			else
-			{
-				OnDialogResponse(playerid, DIALOG_AM_ATMS_MAIN, 1, 1, "");
-			}
-		}
-		case DIALOG_AM_ATMS_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						if(HaveAdminPermission(playerid, "CreateNewATM"))
-						{
-							// kurti atm
-							new atmid = Iter_Free(ATM),
-								Float:x, Float:y, Float:z,
-								string[256];
-							GetPlayerPos(playerid, x, y, z);
-							mysql_format(chandler, string, sizeof string, "INSERT INTO `atms` (`X`,`Y`,`Z`,`CanDeposit`,`WithdrawLimit`,`Int`,`VW`,`Added`) VALUES ('%f','%f','%f','0','0','%d','%d','%d')", x, y, z, GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid), PlayerInfo[playerid][pId]);
-							new Cache:result = mysql_query(chandler, string, true);
-							if(mysql_errno() == 0)
-							{
-								cache_set_active(result);
-								ATMs[atmid][atmId] = cache_insert_id();
-								ATMs[atmid][atmObject] = CreateDynamicObject(2942, x+1, y+1, z-1, 0.0, 0.0, 0.0, .called = "atm", .extra = "create");
-								ATMs[atmid][atmX] = x;
-								ATMs[atmid][atmY] = y;
-								ATMs[atmid][atmZ] = z;
-								ATMs[atmid][atmCanDeposit] = 0;
-								ATMs[atmid][atmWithdrawLimit] = 0;
-								ATMs[atmid][atmInt] = GetPlayerInterior(playerid);
-								ATMs[atmid][atmVW] = GetPlayerVirtualWorld(playerid);
-								EditDynamicObject(playerid, ATMs[atmid][atmObject]);
-								tmpSelected[playerid] = atmid;
-								tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_ATM;
-								MsgSuccess(playerid, "BANKOMATAI", "Sëkmingai sukûrëte bankomatà, kurio ID: %d.", ATMs[atmid][atmId]);
-								Iter_Add(ATM, atmid);
-								log_init(true);
-								log_set_table("logs_admins");
-								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-								log_set_values("'%d','%e','(AM) Sukure nauja bankomata (ATM)','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId]);
-								log_commit();
-							}
-							else
-							{
-								SendError(playerid, "Siøsta uþklausa nepavyko [%d]", mysql_errno());
-							}
-							if(cache_is_valid(result)) cache_delete(result);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						// visus perziuret
-						new line[86],
-							string[4020],
-							real_itter;
-						foreach(new atm : ATM)
-						{
-							if(ATMs[atm][atmId] != 0)
-							{
-								GetCoords2DZone(line, 28, ATMs[atm][atmX], ATMs[atm][atmY]);
-								format(line, sizeof line, "%d. Bankomatas(%d), %s\n", real_itter+1, ATMs[atm][atmId], line);
-								tmpArray[playerid][real_itter] = atm;
-								real_itter++;
-								strcat(string, line);
-							}
-						}
-						if(real_itter == 0) return ShowPlayerAdminMenu(playerid), SendWarning(playerid, "Nëra bankomatø.");
-						ShowPlayerDialog(playerid, DIALOG_AM_ATM_ALL, DIALOG_STYLE_LIST, "Bankomatai", string, "Tæsti", "Atðaukti");
-					}
-					case 2:
-					{
-						OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 2, "");
-					}
-					case 3:
-					{
-						// ar galima isideti
-						new atmid = tmpSelected[playerid],
-							string[126];
-						ATMs[atmid][atmCanDeposit] = !ATMs[atmid][atmCanDeposit];
-						if(ATMs[atmid][atmCanDeposit] == 1) MsgSuccess(playerid, "BANKOMATAS", "Dabar á bankomatà galima áneðti pinigus.");
-						else MsgSuccess(playerid, "BANKOMATAS", "Dabar á bankomatà negalima áneðti pinigø.");
-						mysql_format(chandler, string, sizeof string, "UPDATE `atms` SET CanDeposit = '%d' WHERE id = '%d'", ATMs[atmid][atmCanDeposit], ATMs[atmid][atmId]);
-						mysql_fquery(chandler, string, "ATMUpdate");
-						OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 2, "");
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-						log_set_values("'%d','%e','(AM) Pakeite ATM inesimo nustatyma','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId], ATMs[atmid][atmCanDeposit]);
-						log_commit();
-					}
-					case 4:
-					{
-						// nuemimo limitas
-						new atmid = tmpSelected[playerid];
-						tmpSelected[playerid] = atmid;
-						ShowPlayerDialog(playerid, DIALOG_AM_ATM_WITHDRAW_LIMIT, DIALOG_STYLE_INPUT, "Bankomato redagavimas", "{FFFFFF}Áveskite nuëmimo limità ðiame bankomate.", "Tæsti", "Atðaukti");
-					}
-					case 5:
-					{
-						// objektas
-						new atmid = tmpSelected[playerid];
-						if(IsValidDynamicObject(ATMs[atmid][atmObject])) EditDynamicObject(playerid, ATMs[atmid][atmObject]);
-						tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_ATM;
-					}
-					case 6:
-					{
-						// istrinti
-						new atmid = tmpSelected[playerid];
-						new __reset_ATM[E_ATM_DATA],
-							string[126];
-						if(IsValidDynamicObject(ATMs[atmid][atmObject])) DestroyDynamicObject(ATMs[atmid][atmObject], "atm", "delete");
-
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-						log_set_values("'%d','%e','(AM) Istryne bankomata (ATM)','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId]);
-						log_commit();
-
-						mysql_format(chandler, string, sizeof string, "DELETE FROM `atms` WHERE id = '%d'", ATMs[atmid][atmId]);
-						mysql_fquery(chandler, string, "ATMDeleted");
-						ATMs[atmid] = __reset_ATM;
-						ATMs[atmid][atmObject] = INVALID_OBJECT_ID;
-						MsgSuccess(playerid, "BANKOMATAS", "Sëkmingai iðtrynëte bankomatà.");
-						Iter_Remove(ATM, atmid);
-						OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 2, "");
-					}
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
+		
 		case DIALOG_AM_GARAGE_EDIT_PRICE:
 		{
 			if(response)
@@ -15851,19 +15633,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 				{
-					case 2:
-					{
-						// bankomatai
-						new atmid = -1;
-						if((atmid = GetClosestATM(playerid, 5.0)) != -1)
-						{
-							new string[356];
-							tmpSelected[playerid] = atmid;
-							format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Kurti naujà\nPerþiûrëti visus\n{EDEDED}[Artimiausio bankomato redagavimas]:\n{FFFFFF}Ar galima áneðti pinigus\t%s\nNuëmimo limitas\t$%d\nObjekto redagavimas\n{C60000}Iðtrinti", ATMs[atmid][atmCanDeposit] ? ("Taip") : ("Ne"), ATMs[atmid][atmWithdrawLimit]);
-							ShowPlayerDialog(playerid, DIALOG_AM_ATMS_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Bankomatai", string, "Tæsti", "Atðaukti");
-						}
-						else ShowPlayerDialog(playerid, DIALOG_AM_ATMS_MAIN, DIALOG_STYLE_LIST, "Bankomatai", "Kurti naujà\nPerþiûrëti visus", "Tæsti", "Atðaukti");
-					}
 					case 3:
 					{
 						// garazai
