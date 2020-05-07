@@ -512,7 +512,7 @@ stock Vehicle_DropItem(playerid, vehicleid, slotid, bool:addDrop)
 		DroppedItems[droppeditemsidx][droppedItemExtraId] = VehicleInventory[vehicleid][slotid][invExtraId];
 		DroppedItems[droppeditemsidx][droppedItemPlayerId] = PlayerInfo[playerid][pId];
 		DroppedItems[droppeditemsidx][droppedItemTime] = gettime();
-		if(GetGVarInt("EnabledDroppedItemsSaving", SERVER_VARS_ID))
+		if(GetGVarInt("EnabledDroppedItemsSaving"))
 		{
 			new string[256];
 			mysql_format(chandler, string, sizeof string, "INSERT INTO `drops_data` (PlayerId,Unix,ItemId,ItemAmount,ItemExtraId,X,Y,Z,Valid,Interior,VW) VALUES ('%d','%d','%d','%d','%d','%f','%f','%f','1','%d','%d')", PlayerInfo[playerid][pId], gettime(), itemid, VehicleInventory[vehicleid][slotid][invAmount], VehicleInventory[vehicleid][slotid][invExtraId], x, y, z, GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
@@ -558,7 +558,7 @@ stock Player_DropItem(playerid, slotid, bool:addDrop)
 		DroppedItems[droppeditemsidx][droppedItemExtraId] = InventoryInfo[playerid][slotid][invExtraId];
 		DroppedItems[droppeditemsidx][droppedItemPlayerId] = PlayerInfo[playerid][pId];
 		DroppedItems[droppeditemsidx][droppedItemTime] = gettime();
-		if(GetGVarInt("EnabledDroppedItemsSaving", SERVER_VARS_ID))
+		if(GetGVarInt("EnabledDroppedItemsSaving"))
 		{
 			new string[256];
 			mysql_format(chandler, string, sizeof string, "INSERT INTO `drops_data` (PlayerId,Unix,ItemId,ItemAmount,ItemExtraId,X,Y,Z,Valid,Interior,VW) VALUES ('%d','%d','%d','%d','%d','%f','%f','%f','1','%d','%d')", PlayerInfo[playerid][pId], gettime(), itemid, InventoryInfo[playerid][slotid][invAmount], InventoryInfo[playerid][slotid][invExtraId], x, y, z, GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));

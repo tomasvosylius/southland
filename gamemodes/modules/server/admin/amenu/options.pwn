@@ -34,28 +34,6 @@ static _Opts_Main(playerid)
 }
 
 /**
-					case 2:
-					{
-						// namo mokesciai
-						new string[256];
-						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiø dydis\t$%d", GetGVarInt("HouseTaxes", SERVER_VARS_ID));
-						ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_TAXES_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Namo nustatymai", string, "Tæsti", "Atðaukti");
-					}
-					case 3:
-					{
-						// ijungimai/isjungimai
-						new string[512];
-						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Furniture multi-select sistema\t%s\nPervedimø sistema\t%s\nPrisijungimo 30s laikmatis\t%s\nIðmestø daiktø saugojimas\t%s\nPolicijos atsargø sistema\t%s\nDarbø 3DTextLabel\t%s\nVerslø 3DTextLabel\t%s\nNamø 3DTextLabel\t%s",
-							GetGVarInt("EnabledFurnitureMultiSelect", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledTransactions", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledLoginTimer", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledDroppedItemsSaving", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledPoliceWeaponUsage", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledJobLabels", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"));
-						ShowPlayerDialog(playerid, DIALOG_AM_ENABLES_DISABLES_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Ájungimai/iðjungimai", string, "Tæsti", "Atðaukti");
-					}
 					case 4:
 					{
 						// spawn nustatymai
@@ -66,8 +44,8 @@ static _Opts_Main(playerid)
 					{
 						// visi kiti mokesciai
 						new string[512];
-						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiai nuo algos\t%dproc.\nProcentas á policijos biudþetà\t%dproc.\n", GetGVarInt("TaxesToCity", SERVER_VARS_ID), GetGVarInt("TaxesToPolice", SERVER_VARS_ID));
-						format(string, sizeof string, "%sPolicijos ginklø atsargø talpa\t%dvnt.\nPolicijos aprangos atsargø talpa\t%dvnt.\nPolicijos spec atsargø talpa\t%dvnt.\nMaks. veikëjø vartotojui\t%d", string, GetGVarInt("PoliceWeaponCapacity", SERVER_VARS_ID), GetGVarInt("PoliceSkinsCapacity", SERVER_VARS_ID), GetGVarInt("PoliceSpecialCapacity", SERVER_VARS_ID), GetGVarInt("MaxCharacters", SERVER_VARS_ID));
+						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiai nuo algos\t%dproc.\nProcentas á policijos biudþetà\t%dproc.\n", GetGVarInt("TaxesToCity"), GetGVarInt("TaxesToPolice"));
+						format(string, sizeof string, "%sPolicijos ginklø atsargø talpa\t%dvnt.\nPolicijos aprangos atsargø talpa\t%dvnt.\nPolicijos spec atsargø talpa\t%dvnt.\nMaks. veikëjø vartotojui\t%d", string, GetGVarInt("PoliceWeaponCapacity"), GetGVarInt("PoliceSkinsCapacity"), GetGVarInt("PoliceSpecialCapacity"), GetGVarInt("MaxCharacters"));
 						ShowPlayerDialog(playerid, DIALOG_AM_OTHER_Opts_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Kiti nustatymai", string, "Tæsti", "Atðaukti");
 					}
 				}
@@ -89,10 +67,11 @@ static _Opts_Vehicles_Main(playerid)
         {
             if(HaveAdminPermission(playerid, "EditVehicleTaxes"))
             {
-                dialog_Row("Mokeðèiø dydis")            return _Opts_Vehicles_InputTax(playerid);
+                dialog_Row("Mokeðèiø dydis") return _Opts_Vehicles_InputTaxes(playerid);
+
                 dialog_Row("Ar papildomai priskaièiuoti pagal tr. priemonës klasæ?")     
                 {
-                    SetGVarIntEx("CountVehicleClass", !GetGVarInt("CountVehicleClass"), SERVER_VARS_ID);
+                    SetGVarIntEx("CountVehicleClass", !GetGVarInt("CountVehicleClass"));
                     
                     SaveServerIntEx("CountVehicleClass", GetGVarInt("CountVehicleClass"));
                     MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
@@ -113,7 +92,7 @@ static _Opts_Vehicles_Main(playerid)
     dialog_Show(playerid, using inline vehicles, DIALOG_STYLE_TABLIST_HEADERS, "Tr. priemoniø nustatymai", "Tæsti", "Atðaukti");
     return 1;
 }
-static _Opts_Vehicles_InputTax(playerid, error[] = "")
+static _Opts_Vehicles_InputTaxes(playerid, error[] = "")
 {
     dialog_Clear();
     dialog_AddLine("Áveskite mokeðèiø dydá:");
@@ -124,15 +103,15 @@ static _Opts_Vehicles_InputTax(playerid, error[] = "")
     dialog_AddLine("\tTAXES/2");
     dialog_AddErrorLine(error);
 
-    inline inputTaxes(response, listitem)
+    inline input(response, listitem)
     {
         if(response)
         {
             new taxes;
             if(sscanf(dialog_Input(),"d",taxes) || !(0 < taxes <= 2000))
-                return _Opts_Vehicles_InputTax(playerid, .error = "Mokeðèiai turi bûti nuo 1$ iki 2000$");
+                return _Opts_Vehicles_InputTaxes(playerid, .error = "Mokeðèiai turi bûti nuo 1$ iki 2000$");
 
-            SetGVarIntEx("VehicleTaxes", taxes, SERVER_VARS_ID);
+            SetGVarIntEx("VehicleTaxes", taxes);
             SaveServerIntEx("VehicleTaxes", GetGVarInt("VehicleTaxes"));
             MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
             
@@ -144,7 +123,7 @@ static _Opts_Vehicles_InputTax(playerid, error[] = "")
         }
         _Opts_Vehicles_Main(playerid);
     }
-    dialog_Show(playerid, using inline inputTaxes, DIALOG_STYLE_INPUT, "Tr. priemoniø mokeðèiai", "Keisti", "Atðaukti");
+    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Tr. priemoniø mokeðèiai", "Keisti", "Atðaukti");
     return 1;
 }
 /**
@@ -183,6 +162,7 @@ static _Opts_Business_InputTaxes(playerid, error[] = "")
 
     dialog_Clear();
     dialog_AddLine("Áveskite mokeðèiø dydá:");
+    dialog_AddErrorLine(error);
 
     inline input(response, listitem)
     {
@@ -192,7 +172,7 @@ static _Opts_Business_InputTaxes(playerid, error[] = "")
             if(sscanf(dialog_Input(),"d",taxes) || !(0 < taxes <= 200))
                 return _Opts_Business_InputTaxes(playerid, .error = "Mokeðèiai turi bûti nuo 1$ iki 200$");
             
-            SetGVarIntEx("BusinessTaxes", taxes, SERVER_VARS_ID);            
+            SetGVarIntEx("BusinessTaxes", taxes);            
             SaveServerIntEx("BusinessTaxes", GetGVarInt("BusinessTaxes"));
             MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
 
@@ -220,6 +200,7 @@ static _Opts_Business_FuelCapacity(playerid, error[] = "")
 
     dialog_Clear();
     dialog_AddLine("Áveskite degalinës talpà:");
+    dialog_AddErrorLine(error);
 
     inline input(response, listitem)
     {
@@ -230,7 +211,7 @@ static _Opts_Business_FuelCapacity(playerid, error[] = "")
                 return _Opts_Business_FuelCapacity(playerid, .error = "Talpa turi bûti nuo 1 iki 9999999");
             
 
-            SetGVarIntEx("BusinessFuelCapacity", capacity, SERVER_VARS_ID);
+            SetGVarIntEx("BusinessFuelCapacity", capacity);
             SaveServerIntEx("BusinessFuelCapacity", GetGVarInt("BusinessFuelCapacity"));
             MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
 
@@ -257,6 +238,7 @@ static _Opts_Business_FuelOrderPrice(playerid, error[] = "")
 
     dialog_Clear();
     dialog_AddLine("Áveskite degalø litro kainà, uþsakant juos savininkui:");
+    dialog_AddErrorLine(error);
 
     inline input(response, listitem)
     {
@@ -266,7 +248,7 @@ static _Opts_Business_FuelOrderPrice(playerid, error[] = "")
             if(sscanf(dialog_Input(),"f",price) || !(0.0 < price <= 9999999.0))
                 return _Opts_Business_FuelOrderPrice(playerid, .error = "Kaina turi bûti nuo 0.1$ iki 9999999.0$");
             
-            SetGVarFloatEx("BusinessOrderFuelPrice", price, SERVER_VARS_ID);    
+            SetGVarFloatEx("BusinessOrderFuelPrice", price);    
             SaveServerFloatEx("BusinessOrderFuelPrice", GetGVarFloat("BusinessOrderFuelPrice"));
             MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
 
@@ -288,6 +270,59 @@ static _Opts_Business_FuelOrderPrice(playerid, error[] = "")
 */
 static _Opts_Houses_Main(playerid)
 {
+    dialog_Clear();
+    dialog_AddLine("{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë");
+    dialog_AddLine("{FFFFFF}Mokeðèiø dydis\t$%d", GetGVarInt("HouseTaxes"));
+
+    inline select(response, listitem)
+    {
+        if(response)
+        {
+            dialog_Row("Mokeðèiø dydis") return _Opts_Houses_InputTaxes(playerid);
+        }
+        _Opts_Main(playerid);
+        return 1;
+    }
+    dialog_Show(playerid, using inline select, DIALOG_STYLE_TABLIST_HEADERS, "Namo nustatymai", "Tæsti", "Atðaukti");
+    return 1;
+}
+
+stock _Opts_Houses_InputTaxes(playerid, error[] = "")
+{
+    if(!HaveAdminPermission(playerid, "EditHouseTaxes"))
+    {
+        InfoBox(playerid, IB_NO_PRIVILEGE);
+        return _Opts_Houses_Main(playerid);
+    }
+
+    dialog_Clear();
+
+    dialog_AddLine("{FFFFFF}Áveskite mokeðèiø dydá:");
+    dialog_AddErrorLine(error);
+
+    inline input(response, listitem)
+    {
+        if(response)
+        {
+            new taxes;
+            if(sscanf(dialog_Input(),"d",taxes) || !(0 < taxes <= 200))
+                return _Opts_Houses_InputTaxes(playerid, .error = "Mokeðèiai turi bûti nuo 1$ iki 200$");
+            
+            SetGVarIntEx("HouseTaxes", taxes);
+            SaveServerIntEx("HouseTaxes", GetGVarInt("HouseTaxes"));
+            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+
+        
+            log_init(true);
+            log_set_table("logs_admins");
+            log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
+            log_set_values("'%d','%e','Nustate namu mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), taxes);
+            log_commit();
+        }
+        _Opts_Houses_Main(playerid);
+        return 1;
+    }
+    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Namo mokeðèiai", "Tæsti", "Atðaukti");
     return 1;
 }
 /**
@@ -296,6 +331,95 @@ static _Opts_Houses_Main(playerid)
 */
 static _Opts_OnOff_Main(playerid)
 {
+    dialog_AddLine("{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë");
+    dialog_AddLine("{FFFFFF}Furniture multi-select sistema\t%s", GetGVarInt("EnabledFurnitureMultiSelect") > 0 ? ("Ájungta") : ("Iðjungta"));
+    dialog_AddLine("Pervedimø sistema\t%s", GetGVarInt("EnabledTransactions") > 0 ? ("Ájungta") : ("Iðjungta"));
+    dialog_AddLine("Saugoti iðmestus daiktus\t%s", GetGVarInt("EnabledDroppedItemsSaving") > 0 ? ("Taip") : ("Ne"));
+    dialog_AddLine("Darbø 3DTextLabel tekstai\t%s", GetGVarInt("EnabledJobLabels") > 0 ? ("Rodomi") : ("Iðjungti"));
+    dialog_AddLine("Verslø 3DTextLabel tekstai\t%s", GetGVarInt("EnabledBusinessLabels") > 0 ? ("Rodomi") : ("Iðjungti"));
+    dialog_AddLine("Namø 3DTextLabel tekstai\t%s", GetGVarInt("EnabledHouseLabels") > 0 ? ("Rodomi") : ("Iðjungti"));
+
+    inline toggle(response, listitem)
+    {
+        if(response)
+        {
+            new perm[56], 
+                setting[56];
+            dialog_Row("Furniture multi-select")
+            {
+                format(perm, 56, "EnableFurnitureMultiSelect");
+                format(setting, 56, "EnabledFurnitureMultiSelect");
+            }
+            dialog_Row("Saugoti iðmestus daiktus")     
+            {
+                format(perm, 56, "EnableDroppedItemsSaving");
+                format(setting, 56, "EnabledDroppedItemsSaving");
+            }
+            dialog_Row("Pervedimø sistema")     
+            {
+                format(perm, 56, "EnableTransactions");
+                format(setting, 56, "EnabledTransactions");
+            }
+            dialog_Row("Darbø 3DTextLabel")     
+            {
+                format(perm, 56, "EnableJobLabels");
+                format(setting, 56, "EnabledJobLabels");
+            }
+            dialog_Row("Verslø 3DTextLabel")    
+            {
+                format(perm, 56, "EnableBusinessLabels");
+                format(setting, 56, "EnabledBusinessLabels");
+            }
+            dialog_Row("Namø 3DTextLabel")      
+            {
+                format(perm, 56, "EnableHouseLabels");
+                format(setting, 56, "EnabledHouseLabels");
+            }
+
+            if(strlen(perm) && strlen(setting))
+            {
+                if(!HaveAdminPermission(playerid, perm))
+                {
+                    InfoBox(playerid, IB_NO_PRIVILEGE);
+                    return _Opts_Other_Main(playerid);
+                }
+
+                new current_set = GetGVarInt(setting);
+                SetGVarInt(setting, current_set > 0 ? 0 : 1);
+                SaveServerIntEx(setting, GetGVarInt(setting));
+                current_set = !current_set;
+
+                MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+
+                switch(YHash(setting, false))
+                {
+                    case _I<EnabledFurnitureMultiSelect>: 
+                    {
+                        foreach(new receiver : Player)
+                        {
+                            FurnitureMultiSelectionEnabled{receiver} = !!current_set;
+                        }
+                    }
+                    case _I<EnableBusinessLabels>: 
+                    {
+                        foreach(new businessid : Business) Business_FixLabels(businessid, current_set);
+                    }
+                    case _I<EnabledHouseLabels>: 
+                    {
+                        foreach(new businessid : Business) House_FixLabels(businessid, current_set);
+                    }
+                    case _I<EnabledJobLabels>: 
+                    {
+                        Jobs_LoadPickups();
+                    }
+                }
+
+                _Opts_OnOff_Main(playerid);
+            }
+        }
+        else _Opts_Main(playerid);
+    }
+    dialog_Show(playerid, using inline toggle, DIALOG_STYLE_TABLIST_HEADERS, "Ájungimai/iðjungimai", "Tæsti", "Atðaukti");
     return 1;
 }
 /**
@@ -304,6 +428,122 @@ static _Opts_OnOff_Main(playerid)
 */
 static _Opts_Places_Main(playerid)
 {
+    MsgInfo(playerid, "SPAWN", "Pasirinkta vieta bus nustatyta á jûsø dabartinæ.");
+    
+    dialog_Clear();
+
+    dialog_AddLine("Kalëjmo pasodinimo vieta");
+    dialog_AddLine("Iðleidimo ið kalëjimo vieta");
+    dialog_AddLine("Areðtinës pasodinimo vieta");
+    dialog_AddLine("Iðleidimo ið areðtinës vieta");
+    dialog_AddLine("OOC kalëjimo vidus");
+    dialog_AddLine("Iðleidimo ið OOC kalëjimo vieta");
+    dialog_AddLine("Banko vidaus vieta");
+    dialog_AddLine("SPAWN po mirties vieta");
+    dialog_AddLine("Kalëjimo vieta (/prison)");
+    dialog_AddLine("Areðtinës vieta (/arrest)");
+    dialog_AddLine("/ad vieta");
+    dialog_AddLine("SPAWN vieta");
+
+    inline select(response, listitem)
+    {
+        if(!response) return _Opts_Main(playerid);
+
+        new 
+            perm[56], set[56];
+
+        dialog_Row("Kalëjmo pasodinimo vieta")
+        {
+            format(perm, 56, "SetJailSpawn");
+            format(set, 56, "JailSpawn");
+        }
+        dialog_Row("Iðleidimo ið kalëjimo vieta")
+        {
+            format(perm, 56, "SetUnjailSpawn");
+            format(set, 56, "Unjail");
+        }
+        dialog_Row("Areðtinës pasodinimo vieta")
+        {
+            format(perm, 56, "SetArrestSpawn");
+            format(set, 56, "ArrestSpawn");
+        }
+        dialog_Row("Iðleidimo ið areðtinës vieta")
+        {
+            format(perm, 56, "SetUnarrestSpawn");
+            format(set, 56, "Unarrest");
+        }
+        dialog_Row("OOC kalëjimo vidus")
+        {
+            format(perm, 56, "SetOOCJailSpawn");
+            format(set, 56, "OOCJailSpawn");
+        }
+        dialog_Row("Iðleidimo ið OOC kalëjimo vieta")
+        {
+            format(perm, 56, "SetOOCUnjailSpawn");
+            format(set, 56, "OOCUnjail");
+        }
+        dialog_Row("Banko vidaus vieta")
+        {
+            format(perm, 56, "SetBankPos");
+            format(set, 56, "Bank");
+        }
+        dialog_Row("SPAWN po mirties vieta")
+        {
+            format(perm, 56, "SetHospitalSpawnPos");
+            format(set, 56, "SpawnHospital");
+        }
+        dialog_Row("Kalëjimo vieta (/prison)")
+        {
+            format(perm, 56, "SetJailSpawn");
+            format(set, 56, "Jail");
+        }
+        dialog_Row("Areðtinës vieta (/arrest)")
+        {
+            format(perm, 56, "SetArrestSpawn");
+            format(set, 56, "Arrest");
+        }
+        dialog_Row("/ad vieta")
+        {
+            format(perm, 56, "SetAdPos");
+            format(set, 56, "Ad");
+        }
+        dialog_Row("SPAWN vieta")
+        {
+            format(perm, 56, "SetHospitalSpawnPos");
+            format(set, 56, "Spawn");
+        }
+
+        if(strlen(perm) && !HaveAdminPermission(playerid, perm))
+        {
+            InfoBox(playerid, IB_NO_PRIVILEGE);
+            return _Opts_Places_Main(playerid);
+        }
+
+        new Float:x, Float:y, Float:z,
+            int = GetPlayerInterior(playerid),
+            vw  = GetPlayerVirtualWorld(playerid);
+
+        GetPlayerPos(playerid, x, y, z);
+        
+        SetGVarFloatEx(va_return("%sX", set), x);
+        SetGVarFloatEx(va_return("%sY", set), y);
+        SetGVarFloatEx(va_return("%sZ", set), z);
+
+        MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
+
+        switch(YHash(set, false))
+        {
+            case _I<Bank>: Bank_CreatePickup();
+            case _I<Ad>: AdPlace_CreateLabel();
+        }
+
+        if(!isequal(set, "Spawn"))
+        {
+            SetGVarIntEx(va_return("%sInt", set), int);
+            SetGVarIntEx(va_return("%sVW", set), vw);
+        }
+    }  
+    dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, "Vietø nustatymai", "Nustatyti", "Atðaukti");
     return 1;
 }
 /**
@@ -313,10 +553,144 @@ static _Opts_Places_Main(playerid)
 static _Opts_Other_Main(playerid)
 {
     dialog_Clear();
-    // dialog_AddLine("Mokeðèiai valstybei");
+    dialog_AddLine("{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë");
+    dialog_AddLine("{FFFFFF}Mokeðèiai nuo algos\t%dproc.", GetGVarInt("TaxesToCity"));
+    dialog_AddLine("Procentas á policijos biudþetà\t%dproc.", GetGVarInt("TaxesToPolice"));
+    dialog_AddLine("Maks. veikëjø vartotojui\t%d", GetGVarInt("MaxCharacters"));
+    // Nekeiciami:
+    dialog_AddLine("{BABABA}[nekeièiama] Policijos ginklø atsargø talpa\t%dvnt.", GetGVarInt("PoliceWeaponCapacity"));
+    dialog_AddLine("[nekeièiama] Policijos aprangos atsargø talpa\t%dvnt.", GetGVarInt("PoliceSkinsCapacity"));
+    dialog_AddLine("[nekeièiama] Policijos spec atsargø talpa\t%dvnt.", GetGVarInt("PoliceSpecialCapacity"));
+    
+    inline select(response, listitem)
+    {
+        if(!response) return _Opts_Main(playerid);
+
+        dialog_Row("Mokeðèiai nuo algos")               return _Opts_Other_PVM(playerid);
+        dialog_Row("Procentas á policijos biudþetà")    return _Opts_Other_PolicePercent(playerid);
+        dialog_Row("Maks. veikëjø vartotojui")          return _Opts_Other_MaxChars(playerid);
+
+        _Opts_Other_Main(playerid);
+    }
+    dialog_Show(playerid, using inline select, DIALOG_STYLE_TABLIST_HEADERS, "Kiti nustatymai", "Tæsti", "Atðaukti");
+    return 1;
+}
+static _Opts_Other_PVM(playerid, error[] = "")
+{
+    if(!HaveAdminPermission(playerid, "EditCityTaxes"))
+    {
+        InfoBox(playerid, IB_NO_PRIVILEGE);
+        return _Opts_Other_Main(playerid);
+    }
+
+    dialog_Clear();
+    dialog_AddLine("{FFFFFF}Ávestas bendras procentas bus nuimamas nuo algos ir atitinkamai");
+    dialog_AddLine("padalintas á savivaldybës ir policijos biudþetà");
+    dialog_AddLine("{BABABA}Áveskite procentà:");
+    dialog_AddErrorLine(error);
+
+    inline input(response, listitem)
+    {
+        if(response)
+        {
+            new percent;
+            if(sscanf(dialog_Input(),"d",percent) || !(0 < percent <= 99))
+                return _Opts_Other_PVM(playerid, .error = "Mokeðèiai turi bûti nuo 1 iki 99proc.");
+            
+
+            SetGVarIntEx("TaxesToCity", percent);
+
+            SaveServerIntEx("TaxesToCity", GetGVarInt("TaxesToCity"));
+            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            log_init(true);
+            log_set_table("logs_admins");
+            log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
+            log_set_values("'%d','%e','Nustate bendra proc. mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), percent);
+            log_commit();
+        }
+        _Opts_Other_Main(playerid);
+        return 1;
+    }
+    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Bendri mokeðèiai", "Tæsti", "Atðaukti");
     return 1;
 }
 
+static _Opts_Other_PolicePercent(playerid, error[] = "")
+{
+    if(!HaveAdminPermission(playerid, "EditCityTaxes"))
+    {
+        InfoBox(playerid, IB_NO_PRIVILEGE);
+        return _Opts_Other_Main(playerid);
+    }
+
+    dialog_Clear();
+    dialog_AddLine("{FFFFFF}Ávestas procentas bus atimamas ið bendro procento nuo algos");
+    dialog_AddLine("ir pervedamas á policijos biudþetà, o likusi suma á savivaldybës biudþetà.");
+    dialog_AddLine("Pvz. jei þaidëjas uþdirba 300$, o bendras mokeðèiø procentas yra 10proc.");
+    dialog_AddLine("nuo þaidëjo ið viso algos nuimami 30$. Tad ðiame lange ávedus 50proc.,");
+    dialog_AddLine("nuo tø 30$ yra nuskaièiuojami 15$ ir pervedami á policijos biudþetà, o");
+    dialog_AddLine("likusi suma atitenka savivaldybei.");
+    dialog_AddLine("{BABABA}Áveskite procentà:");
+    dialog_AddErrorLine(error);
+
+    inline input(response, listitem)
+    {
+        if(response)
+        {
+            new percent;
+            if(sscanf(dialog_Input(),"d",percent) || !(0 < percent <= 99))
+                return _Opts_Other_PolicePercent(playerid, .error = "Procentas turi bûti nuo 1 iki 99proc.");    
+        
+            SetGVarIntEx("TaxesToPolice", percent);
+            SaveServerIntEx("TaxesToPolice", GetGVarInt("TaxesToPolice"));
+            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+
+            log_init(true);
+            log_set_table("logs_admins");
+            log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
+            log_set_values("'%d','%e','Nustate proc. i pd','%d'", LogPlayerId(playerid), LogPlayerName(playerid), percent);
+            log_commit();
+
+        }
+        _Opts_Other_Main(playerid);
+        return 1;
+    }
+
+    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Bendri mokeðèiai", "Tæsti", "Atðaukti");
+    return 1;
+}
+
+static _Opts_Other_MaxChars(playerid, error[] = "")
+{
+    dialog_Clear();
+    dialog_AddLine("{FFFFFF}Áveskite maksimalø veikëjø skaièiø vienam þaidëjui");
+    dialog_AddErrorLine(error);
+
+    inline input(response, listitem)
+    {
+        if(response)
+        {
+            new limit;
+            if(sscanf(dialog_Input(),"d",limit) || !(0 < limit <= 20))
+                return _Opts_Other_MaxChars(playerid, .error = "Limitas turi bûti nuo 1 iki 20.");
+        
+            SetGVarIntEx("MaxCharacters", limit);
+            
+            SaveServerIntEx("MaxCharacters", GetGVarInt("MaxCharacters"));
+            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            log_init(true);
+            log_set_table("logs_admins");
+            log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
+            log_set_values("'%d','%e','Nustate maks. veikeju skaiciu','%d'", LogPlayerId(playerid), LogPlayerName(playerid), limit);
+            log_commit();    
+        }
+        _Opts_Other_Main(playerid);
+        return 1;
+    }
+
+    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Maks. veikëjø skaièius", "Tæsti", "Atðaukti");
+    return 1;
+}
 
 // if(response)
 // {
@@ -367,4 +741,35 @@ static _Opts_Other_Main(playerid)
 //             ShowPlayerDialog(playerid, DIALOG_AM_OTHER_MAX_CHARACTERS, DIALOG_STYLE_INPUT, "Maks. veikëjø skaièius", "{FFFFFF}Áveskite maksimalø veikëjø skaièiø vienam þaidëjui", "Tæsti", "Atðaukti");
 //         }
 //     }
+// }
+
+
+
+// case 2:
+// {
+//     // namo mokesciai
+//     new string[256];
+//     format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiø dydis\t$%d", GetGVarInt("HouseTaxes"));
+//     ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_TAXES_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Namo nustatymai", string, "Tæsti", "Atðaukti");
+// }
+// case 3:
+// {
+//     // ijungimai/isjungimai
+//     new string[512];
+//     format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Furniture multi-select sistema\t%s\nPervedimø sistema\t%s\nPrisijungimo 30s laikmatis\t%s\nIðmestø daiktø saugojimas\t%s\nPolicijos atsargø sistema\t%s\nDarbø 3DTextLabel\t%s\nVerslø 3DTextLabel\t%s\nNamø 3DTextLabel\t%s",
+//         GetGVarInt("EnabledFurnitureMultiSelect") > 0 ? ("Ájungta") : ("Iðjungta"),
+//         GetGVarInt("EnabledTransactions") > 0 ? ("Ájungta") : ("Iðjungta"),
+//         GetGVarInt("EnabledLoginTimer") > 0 ? ("Ájungta") : ("Iðjungta"),
+//         GetGVarInt("EnabledDroppedItemsSaving") > 0 ? ("Ájungta") : ("Iðjungta"),
+//         GetGVarInt("EnabledPoliceWeaponUsage") > 0 ? ("Ájungta") : ("Iðjungta"),
+//         GetGVarInt("EnabledJobLabels") > 0 ? ("Ájungta") : ("Iðjungta"),
+//         GetGVarInt("EnabledBusinessLabels") > 0 ? ("Ájungta") : ("Iðjungta"),
+//         GetGVarInt("EnabledHouseLabels") > 0 ? ("Ájungta") : ("Iðjungta"));
+//     ShowPlayerDialog(playerid, DIALOG_AM_ENABLES_DISABLES_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Ájungimai/iðjungimai", string, "Tæsti", "Atðaukti");
+// }
+// case 4:
+// {
+//     // spawn nustatymai
+//     MsgInfo(playerid, "SPAWN", "Pasirinkta vieta bus nustatyta á jûsø dabartinæ.");
+//     ShowPlayerDialog(playerid, DIALOG_AM_SPAWN_MAIN, DIALOG_STYLE_LIST, "Vietø nustatymai", "Kalëjmo pasodinimo vieta\nIðleidimo ið kalëjimo vieta\nAreðtinës pasodinimo vieta\nIðleidimo ið areðtinës vieta\nOOC kalëjimo vidus\nIðleidimo ið OOC kalëjimo vieta\nBanko vidaus vieta\nSPAWN po mirties vieta\nKalëjimo vieta (/prison)\nAreðtinës vieta (/arrest)\n/ad vieta\nSPAWN vieta", "Nustatyti", "Atðaukti");
 // }

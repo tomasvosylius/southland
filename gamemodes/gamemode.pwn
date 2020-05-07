@@ -149,7 +149,6 @@ native gpci(playerid, serial[], len);
 #define MAX_SAVINGS_COLLECTED			1000000
 
 #define ENABLE_BANK_CARD_CREATION		false
-#define SERVER_VARS_ID 					0 		// nekeisti
 #define GARAGE_VIRTUAL_WORLD 			10000
 #define HOUSE_VIRTUAL_WORLD 			20000
 #define BUSINESS_VIRTUAL_WORLD 			30000
@@ -2207,6 +2206,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "libraries/anticheat.pwn"
 
 /** Managers */
+#include "modules\managers/server_vars.pwn"
 #include "modules\managers/ipspam.pwn"
 #include "modules\managers/weapons.pwn"
 #include "modules\managers/logs.pwn"
@@ -2631,21 +2631,21 @@ ptask PT_JailSecond[1000](playerid)
 				case 1:
 				{
 					// arestine
-					SetPlayerPos(playerid, GetGVarFloat("UnarrestX", SERVER_VARS_ID), GetGVarFloat("UnarrestY", SERVER_VARS_ID), GetGVarFloat("UnarrestZ", SERVER_VARS_ID));
+					SetPlayerPos(playerid, GetGVarFloat("UnarrestX"), GetGVarFloat("UnarrestY"), GetGVarFloat("UnarrestZ"));
 					SetPlayerVirtualWorld(playerid, GetGVarInt("UnarrestVW"));
 					SetPlayerInterior(playerid, GetGVarInt("UnarrestInt"));
 				}
 				case 2:
 				{
 					// kalejimas
-					SetPlayerPos(playerid, GetGVarFloat("UnjailX", SERVER_VARS_ID), GetGVarFloat("UnjailY", SERVER_VARS_ID), GetGVarFloat("UnjailZ", SERVER_VARS_ID));
+					SetPlayerPos(playerid, GetGVarFloat("UnjailX"), GetGVarFloat("UnjailY"), GetGVarFloat("UnjailZ"));
 					SetPlayerVirtualWorld(playerid, GetGVarInt("UnjailVW"));
 					SetPlayerInterior(playerid, GetGVarInt("Unjailnt"));
 				}
 				case 3:
 				{
 					// ooc jail
-					SetPlayerPos(playerid, GetGVarFloat("OOCUnjailX", SERVER_VARS_ID), GetGVarFloat("OOCUnjailY", SERVER_VARS_ID), GetGVarFloat("OOCUnjailZ", SERVER_VARS_ID));
+					SetPlayerPos(playerid, GetGVarFloat("OOCUnjailX"), GetGVarFloat("OOCUnjailY"), GetGVarFloat("OOCUnjailZ"));
 					SetPlayerVirtualWorld(playerid, GetGVarInt("OOCUnjailVW"));
 					SetPlayerInterior(playerid, GetGVarInt("OOCUnjailnt"));
 				}
@@ -2671,7 +2671,7 @@ ptask PT_JailSecond[1000](playerid)
 				case 1:
 				{
 					// arestine
-					if(!IsPlayerInRangeOfPoint(playerid, 50.0, GetGVarFloat("ArrestSpawnX", SERVER_VARS_ID), GetGVarFloat("ArrestSpawnY", SERVER_VARS_ID), GetGVarFloat("ArrestSpawnZ", SERVER_VARS_ID)))
+					if(!IsPlayerInRangeOfPoint(playerid, 50.0, GetGVarFloat("ArrestSpawnX"), GetGVarFloat("ArrestSpawnY"), GetGVarFloat("ArrestSpawnZ")))
 					{
 						KickPlayer(playerid, "Sistema", "Air-break");
 					}
@@ -2679,7 +2679,7 @@ ptask PT_JailSecond[1000](playerid)
 				case 2:
 				{
 					// kalejimas
-					if(!IsPlayerInRangeOfPoint(playerid, 300.0, 168.75, 1415.69, 10.63) && !IsPlayerInRangeOfPoint(playerid, 200.0, GetGVarFloat("JailSpawnX", SERVER_VARS_ID), GetGVarFloat("JailSpawnY", SERVER_VARS_ID), GetGVarFloat("JailSpawnZ", SERVER_VARS_ID)))
+					if(!IsPlayerInRangeOfPoint(playerid, 300.0, 168.75, 1415.69, 10.63) && !IsPlayerInRangeOfPoint(playerid, 200.0, GetGVarFloat("JailSpawnX"), GetGVarFloat("JailSpawnY"), GetGVarFloat("JailSpawnZ")))
 					{
 						KickPlayer(playerid, "Sistema", "Air-break");
 					}
@@ -2687,7 +2687,7 @@ ptask PT_JailSecond[1000](playerid)
 				case 3:
 				{
 					// ooc
-					if(!IsPlayerInRangeOfPoint(playerid, 150.0, GetGVarFloat("OOCJailSpawnX", SERVER_VARS_ID), GetGVarFloat("OOCJailSpawnY", SERVER_VARS_ID), GetGVarFloat("OOCJailSpawnZ", SERVER_VARS_ID)))
+					if(!IsPlayerInRangeOfPoint(playerid, 150.0, GetGVarFloat("OOCJailSpawnX"), GetGVarFloat("OOCJailSpawnY"), GetGVarFloat("OOCJailSpawnZ")))
 					{
 						KickPlayer(playerid, "Sistema", "Air-break");
 					}
@@ -3248,7 +3248,7 @@ task T_MinuteTimer[60000]()
 					{
 						format(varname, sizeof varname, "BusinessPayLevel%d", BusinessInfo[businessid][bLevel]);
 						new 
-							pay = GetGVarInt(varname, SERVER_VARS_ID);
+							pay = GetGVarInt(varname);
 						if(GetOnlinePlayers() >= 35) pay = floatround(pay * 1.1);
 						else if(GetOnlinePlayers() >= 50) pay = floatround(pay * 1.2);
 						BusinessInfo[businessid][bBudget] += pay;
@@ -3399,7 +3399,7 @@ public FuelOrdersFinished()
 				SendFormat(added, 0x78E1A4FF, "------------------------------------------------");
 			}
 		}
-		BusinessInfo[tmp][bFuel] = GetGVarInt("BusinessFuelCapacity", SERVER_VARS_ID);
+		BusinessInfo[tmp][bFuel] = GetGVarInt("BusinessFuelCapacity");
 		log_init(true);
 		log_set_table("logs_business");
 		log_set_keys("`PlayerId`,`BusinessId`,`BusinessId`,`ActionText`,`Amount`");
@@ -3474,9 +3474,9 @@ public PickupDrugsList(playerid)
 
 stock CalculateFactionWares(factionid)
 {
-	new minus_weapons = GetGVarInt("AddPDWaresAmount", SERVER_VARS_ID)/GetGVarInt("PaydaysToPDWeaponsEmpty", SERVER_VARS_ID),
-		minus_skins = GetGVarInt("AddPDWaresAmount", SERVER_VARS_ID)/GetGVarInt("PaydaysToPDSkinsEmpty", SERVER_VARS_ID),
-		minus_special = GetGVarInt("AddPDWaresAmount", SERVER_VARS_ID)/GetGVarInt("PaydaysToPDSpecialEmpty", SERVER_VARS_ID);
+	new minus_weapons = GetGVarInt("AddPDWaresAmount")/GetGVarInt("PaydaysToPDWeaponsEmpty"),
+		minus_skins = GetGVarInt("AddPDWaresAmount")/GetGVarInt("PaydaysToPDSkinsEmpty"),
+		minus_special = GetGVarInt("AddPDWaresAmount")/GetGVarInt("PaydaysToPDSpecialEmpty");
 	//SendFormat(0, -1, "%d %d %d", minus_weapons, minus_skins, minus_special);
 	if(FactionInfo[factionid][fWares][0] > 0)
 	{
@@ -4743,7 +4743,7 @@ public OnPlayerEnterCheckpoint(playerid)
 			if(cargo_type <= 0 || cargo_type > 3 || VehicleInfo[vehicleid][vFaction] != PlayerInfo[playerid][pFaction]) return MsgError(playerid, "UÞSAKYMAS", "Uþsakymas nëra ðioje tr. priemonëje.");
 			new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
 			if(factionid == -1) return 0;
-			FactionInfo[factionid][fWares][cargo_type-1] = GetGVarInt("AddPDWaresAmount", SERVER_VARS_ID);
+			FactionInfo[factionid][fWares][cargo_type-1] = GetGVarInt("AddPDWaresAmount");
 			log_init(true);
 			log_set_table("logs_factions");
 			log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraString`");
@@ -5783,31 +5783,31 @@ stock SpawnPlayerEx(playerid, type = 0, bool:set = false)
 				case 1:
 				{
 					// arestine
-					x = GetGVarFloat("ArrestSpawnX", SERVER_VARS_ID),
-					y = GetGVarFloat("ArrestSpawnY", SERVER_VARS_ID),
-					z = GetGVarFloat("ArrestSpawnZ", SERVER_VARS_ID);
-					SetPlayerVirtualWorld(playerid, GetGVarInt("ArrestSpawnVW", SERVER_VARS_ID));
-					SetPlayerInterior(playerid, GetGVarInt("ArrestSpawnInt", SERVER_VARS_ID));
+					x = GetGVarFloat("ArrestSpawnX"),
+					y = GetGVarFloat("ArrestSpawnY"),
+					z = GetGVarFloat("ArrestSpawnZ");
+					SetPlayerVirtualWorld(playerid, GetGVarInt("ArrestSpawnVW"));
+					SetPlayerInterior(playerid, GetGVarInt("ArrestSpawnInt"));
 					SetSpawnInfo(playerid, playerid, PlayerInfo[playerid][pSkin], x, y, z, 0.0, 0, 0, 0, 0, 0, 0);
 				}
 				case 2:
 				{
 					// prison
-					x = GetGVarFloat("JailSpawnX", SERVER_VARS_ID),
-					y = GetGVarFloat("JailSpawnY", SERVER_VARS_ID),
-					z = GetGVarFloat("JailSpawnZ", SERVER_VARS_ID);
-					SetPlayerVirtualWorld(playerid, GetGVarInt("JailSpawnVW", SERVER_VARS_ID));
-					SetPlayerInterior(playerid, GetGVarInt("JailSpawnInt", SERVER_VARS_ID));
+					x = GetGVarFloat("JailSpawnX"),
+					y = GetGVarFloat("JailSpawnY"),
+					z = GetGVarFloat("JailSpawnZ");
+					SetPlayerVirtualWorld(playerid, GetGVarInt("JailSpawnVW"));
+					SetPlayerInterior(playerid, GetGVarInt("JailSpawnInt"));
 					SetSpawnInfo(playerid, playerid, PlayerInfo[playerid][pSkin], x, y, z, 0.0, 0, 0, 0, 0, 0, 0);
 				}
 				case 3:
 				{
 					// oc
-					x = GetGVarFloat("OOCJailSpawnX", SERVER_VARS_ID),
-					y = GetGVarFloat("OOCJailSpawnY", SERVER_VARS_ID),
-					z = GetGVarFloat("OOCJailSpawnZ", SERVER_VARS_ID);
-					SetPlayerVirtualWorld(playerid, GetGVarInt("OOCJailSpawnVW", SERVER_VARS_ID));
-					SetPlayerInterior(playerid, GetGVarInt("OOCJailSpawnInt", SERVER_VARS_ID));
+					x = GetGVarFloat("OOCJailSpawnX"),
+					y = GetGVarFloat("OOCJailSpawnY"),
+					z = GetGVarFloat("OOCJailSpawnZ");
+					SetPlayerVirtualWorld(playerid, GetGVarInt("OOCJailSpawnVW"));
+					SetPlayerInterior(playerid, GetGVarInt("OOCJailSpawnInt"));
 					SetSpawnInfo(playerid, playerid, PlayerInfo[playerid][pSkin], x, y, z, 0.0, 0, 0, 0, 0, 0, 0);
 				}
 			}
@@ -5831,9 +5831,9 @@ stock SpawnPlayerEx(playerid, type = 0, bool:set = false)
 				}
 				case PLAYER_STATUS_DEATH:
 				{
-					SetSpawnInfo(playerid, playerid, PlayerInfo[playerid][pSkin], GetGVarFloat("SpawnHospitalX", SERVER_VARS_ID), GetGVarFloat("SpawnHospitalY", SERVER_VARS_ID), GetGVarFloat("SpawnHospitalZ", SERVER_VARS_ID), 0.0, 0, 0, 0, 0, 0, 0);
-					SetPlayerVirtualWorld(playerid, GetGVarInt("SpawnHopitalVW", SERVER_VARS_ID));
-					SetPlayerInterior(playerid, GetGVarInt("SpawnHopitalInt", SERVER_VARS_ID));
+					SetSpawnInfo(playerid, playerid, PlayerInfo[playerid][pSkin], GetGVarFloat("SpawnHospitalX"), GetGVarFloat("SpawnHospitalY"), GetGVarFloat("SpawnHospitalZ"), 0.0, 0, 0, 0, 0, 0, 0);
+					SetPlayerVirtualWorld(playerid, GetGVarInt("SpawnHopitalVW"));
+					SetPlayerInterior(playerid, GetGVarInt("SpawnHopitalInt"));
 					if(IsValidDynamic3DTextLabel(PlayerExtra[playerid][peDeathLabel])) DestroyDynamic3DTextLabel(PlayerExtra[playerid][peDeathLabel]);
 					for(new i = 0; i < MAX_DRUG_TYPES; i++)
 					{
@@ -7143,7 +7143,7 @@ hook OnPlayerSubmitNewChar(playerid)
 {
 	// ADMINAMS
 
-	if(GetCharCount(playerid) > GetGVarInt("MaxCharacters", SERVER_VARS_ID) && GetGVarInt("MaxCharacters", SERVER_VARS_ID) > 0) return SendWarning(playerid, "Veikëjø limitas pasiektas!");
+	if(GetCharCount(playerid) > GetGVarInt("MaxCharacters") && GetGVarInt("MaxCharacters") > 0) return SendWarning(playerid, "Veikëjø limitas pasiektas!");
 	if(player_CharSkin[playerid] <= 0 || strlen(player_CharName[playerid]) < 3 || player_CharGender[playerid] <= 0 || player_CharDate[playerid] <= 0 || player_CharOrigin[playerid] <= -1 || !strlen(player_CharAnswers[playerid][0]) || !strlen(player_CharAnswers[playerid][1]) || !strlen(player_CharAnswers[playerid][2]))
 	{
 		return SendError(playerid, "Neuþpildëte anketos!");
@@ -8582,9 +8582,9 @@ public OptionsLoad()
 		cache_get_value_name_int(row, "Type", type);
 		switch(type)
 		{
-			case GLOBAL_VARTYPE_INT: SetGVarInt(varname, strval(value), SERVER_VARS_ID);
-			case GLOBAL_VARTYPE_STRING: SetGVarString(varname, value, SERVER_VARS_ID);
-			case GLOBAL_VARTYPE_FLOAT: SetGVarFloat(varname, floatstr(value), SERVER_VARS_ID);
+			case GLOBAL_VARTYPE_INT: SetGVarInt(varname, strval(value));
+			case GLOBAL_VARTYPE_STRING: SetGVarString(varname, value);
+			case GLOBAL_VARTYPE_FLOAT: SetGVarFloat(varname, floatstr(value));
 		}
 	}
 
@@ -8595,14 +8595,55 @@ public OptionsLoad()
 hook OnServerOptionsLoad()
 {
 	PreparePoliceWaresUsage();
-	LoadJobs();
+	Jobs_LoadPickups();
 	LoadDroppedItems();
 	LoadHouses(false);
 	LoadDealerHouses(false);
 	LoadBusiness(false);
 
-	BankPickup = sd_CreateDynamicPickup(PICKUP_TYPE_BANK, 0, 1274, 2, GetGVarFloat("BankX", SERVER_VARS_ID), GetGVarFloat("BankY", SERVER_VARS_ID), GetGVarFloat("BankZ", SERVER_VARS_ID), GetGVarInt("BankVW", SERVER_VARS_ID), GetGVarInt("BankInt", SERVER_VARS_ID));
-	BankLabel = CreateDynamic3DTextLabel("Norëdami naudotis banku, raðykite /bank", 0x66C729FF, GetGVarFloat("BankX", SERVER_VARS_ID), GetGVarFloat("BankY", SERVER_VARS_ID), GetGVarFloat("BankZ", SERVER_VARS_ID), 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, GetGVarInt("BankVW", SERVER_VARS_ID), GetGVarInt("BankInt", SERVER_VARS_ID));
+	Bank_CreatePickup();
+	AdPlace_CreateLabel();
+	return 1;
+}
+
+stock AdPlace_CreateLabel()
+{
+	IsValidDynamic3DTextLabel(AdLabel) && DestroyDynamic3DTextLabel(AdLabel);
+	AdLabel = CreateDynamic3DTextLabel("Reklamuotis galite naudodami /ad\n(tel. numeris pridedamas automatiðkai)\nKaina: "#DEFAULT_AD_PRICE"$", 
+		0x66C729FF,
+		GetGVarFloat("AdX"),
+		GetGVarFloat("AdY"),
+		GetGVarFloat("AdZ"), 
+		10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1,
+		GetGVarInt("AdVW"),
+		GetGVarInt("AdInt")
+	);
+}
+
+stock Bank_CreatePickup()
+{
+	IsValidDynamicPickup(BankPickup) && sd_DestroyDynamicPickup(BankPickup);
+	IsValidDynamic3DTextLabel(BankLabel) && DestroyDynamic3DTextLabel(BankLabel);
+
+	BankPickup = sd_CreateDynamicPickup(PICKUP_TYPE_BANK, 0, 1274, 2, 
+		GetGVarFloat("BankX"),
+		GetGVarFloat("BankY"),
+		GetGVarFloat("BankZ"),
+		GetGVarInt("BankVW"),
+		GetGVarInt("BankInt")
+	);
+
+	BankLabel = CreateDynamic3DTextLabel("Norëdami naudotis banku, raðykite /bank", 0x66C729FF, 
+		GetGVarFloat("BankX"),
+		GetGVarFloat("BankY"),
+		GetGVarFloat("BankZ"), 
+		10.0,
+		INVALID_PLAYER_ID,
+		INVALID_VEHICLE_ID,
+		1,
+		GetGVarInt("BankVW"),
+		GetGVarInt("BankInt")
+	);
 	return 1;
 }
 
@@ -8611,9 +8652,9 @@ stock PreparePoliceWaresUsage()
 	#if SERVER_DEBUG_LEVEL >= 3
 		printf("[debug] PreparePoliceWaresUsage");
 	#endif
-	if(GetGVarInt("PaydaysToPDWeaponsEmpty") == 0) SetGVarInt("PaydaysToPDWeaponsEmpty", DEFAULT_PAYDAYS_TO_EMPTY_POLICE_WEAPONS, SERVER_VARS_ID);
-	if(GetGVarInt("PaydaysToPDSkinsEmpty") == 0) SetGVarInt("PaydaysToPDSkinsEmpty", DEFAULT_PAYDAYS_TO_EMPTY_POLICE_SKINS, SERVER_VARS_ID);
-	if(GetGVarInt("PaydaysToPDSpecialEmpty") == 0) SetGVarInt("PaydaysToPDSpecialEmpty", DEFAULT_PAYDAYS_TO_EMPTY_POLICE_SPECIAL, SERVER_VARS_ID);
+	if(GetGVarInt("PaydaysToPDWeaponsEmpty") == 0) SetGVarInt("PaydaysToPDWeaponsEmpty", DEFAULT_PAYDAYS_TO_EMPTY_POLICE_WEAPONS);
+	if(GetGVarInt("PaydaysToPDSkinsEmpty") == 0) SetGVarInt("PaydaysToPDSkinsEmpty", DEFAULT_PAYDAYS_TO_EMPTY_POLICE_SKINS);
+	if(GetGVarInt("PaydaysToPDSpecialEmpty") == 0) SetGVarInt("PaydaysToPDSpecialEmpty", DEFAULT_PAYDAYS_TO_EMPTY_POLICE_SPECIAL);
 
 	new array[3],
 		highest;
@@ -8630,7 +8671,7 @@ stock PreparePoliceWaresUsage()
 		if((i % array[0] == 0) && (i % array[1] == 0) && (i % array[2] == 0))
 		{
 			printf("[load] bus pridedama %d i frakcijos sandeli.", i);
-			SetGVarInt("AddPDWaresAmount", i, SERVER_VARS_ID);
+			SetGVarInt("AddPDWaresAmount", i);
 			break;
 		}
 	}
@@ -9780,7 +9821,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							else
 							{
 								new string[126];
-								format(string, sizeof string, "Degalø uþsakymas (%d/%d)\nDegalø kaina", BusinessInfo[businessid][bFuel], GetGVarInt("BusinessFuelCapacity", SERVER_VARS_ID));
+								format(string, sizeof string, "Degalø uþsakymas (%d/%d)\nDegalø kaina", BusinessInfo[businessid][bFuel], GetGVarInt("BusinessFuelCapacity"));
 								ShowPlayerDialog(playerid, DIALOG_BM_FUEL_MAIN, DIALOG_STYLE_LIST, "Degalai", string, "Tæsti", "Atðaukti");
 							}
 						}
@@ -9801,7 +9842,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					businessid = tmpIter[playerid];
 				if(sscanf(inputtext,"d",price) || !(0 <= price <= 500)) return OnDialogResponse(playerid, DIALOG_BM_MAIN, 1, 4, "");
 				BusinessInfo[businessid][bEnterPrice] = price;
-				Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+				Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels"));
 				SaveBusinessIntEx(businessid, "EnterPrice", price);
 				MsgSuccess(playerid, "VERSLAS", "Sëkmingai pakeitëte áëjimo kainà á $%d", price);
 				pc_cmd_bmenu(playerid, "");
@@ -9816,7 +9857,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					businessid = tmpIter[playerid];
 				if(sscanf(inputtext,"d",price) || price < 0) OnDialogResponse(playerid, DIALOG_BM_MAIN, 1, 3, "");
 				BusinessInfo[businessid][bSale] = price;
-				Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+				Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels"));
 				SaveBusinessIntEx(businessid, "Sale", price);
 				MsgSuccess(playerid, "VERSLAS", "Sëkmingai ádëjote verslà á pardavimà uþ $%d", price);
 				pc_cmd_bmenu(playerid, "");
@@ -9833,7 +9874,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						// uzsakymas
 						new businessid = tmpIter[playerid];
-						if(BusinessInfo[businessid][bFuel] >= GetGVarInt("BusinessFuelCapacity", SERVER_VARS_ID))
+						if(BusinessInfo[businessid][bFuel] >= GetGVarInt("BusinessFuelCapacity"))
 						{
 							SendWarning(playerid, "Degalø netrûksta.");
 							return pc_cmd_bmenu(playerid, "");
@@ -9848,7 +9889,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							else
 							{
 								new string[126],
-									price = floatround(((GetGVarInt("BusinessFuelCapacity", SERVER_VARS_ID) - BusinessInfo[businessid][bFuel])*GetGVarFloat("BusinessOrderFuelPrice", SERVER_VARS_ID)))+3000;
+									price = floatround(((GetGVarInt("BusinessFuelCapacity") - BusinessInfo[businessid][bFuel])*GetGVarFloat("BusinessOrderFuelPrice")))+3000;
 								if(BusinessInfo[businessid][bBudget] < price)
 								{
 									SendWarning(playerid, "Biudþete tiek pinigø nëra ($%d).", price);
@@ -9856,7 +9897,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								}
 								else
 								{
-									format(string, sizeof string, "{FFFFFF}Uþsakomas degalø kiekis: %dltr\n{FFFFFF}Kaina: $%d", GetGVarInt("BusinessFuelCapacity", SERVER_VARS_ID) - BusinessInfo[businessid][bFuel], price);
+									format(string, sizeof string, "{FFFFFF}Uþsakomas degalø kiekis: %dltr\n{FFFFFF}Kaina: $%d", GetGVarInt("BusinessFuelCapacity") - BusinessInfo[businessid][bFuel], price);
 									ShowPlayerDialog(playerid, DIALOG_BM_FUEL_ORDER_CONFIRM, DIALOG_STYLE_MSGBOX, "Degalø uþsakymas", string, "Tæsti", "Atðaukti");
 								}
 							}
@@ -9877,7 +9918,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new string[126],
 					businessid = tmpIter[playerid],
-					price = floatround(((GetGVarInt("BusinessFuelCapacity", SERVER_VARS_ID) - BusinessInfo[businessid][bFuel])*GetGVarFloat("BusinessOrderFuelPrice", SERVER_VARS_ID)))+3000;
+					price = floatround(((GetGVarInt("BusinessFuelCapacity") - BusinessInfo[businessid][bFuel])*GetGVarFloat("BusinessOrderFuelPrice")))+3000;
 				if(BusinessInfo[businessid][bBudget] < price)
 				{
 					SendWarning(playerid, "Biudþete tiek pinigø nëra.");
@@ -10308,7 +10349,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(HouseInfo[tmpIter[playerid]][hSale] > 0)
 						{
 							HouseInfo[tmpIter[playerid]][hSale] = 0;
-							House_FixLabels(tmpIter[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+							House_FixLabels(tmpIter[playerid], GetGVarInt("EnabledHouseLabels"));
 							SaveHouseIntEx(tmpIter[playerid], "Sale", 0);
 							log_init(true);
 							log_set_table("logs_houses");
@@ -10381,7 +10422,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					houseid = tmpIter[playerid];
 				if(sscanf(inputtext,"d",price) || price < 0) OnDialogResponse(playerid, DIALOG_HM_MAIN, 1, 4, "");
 				HouseInfo[houseid][hSale] = price;
-				House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+				House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels"));
 				SaveHouseIntEx(houseid, "Sale", price);
 				MsgSuccess(playerid, "NAMAS", "Sëkmingai ádëjote namà á pardavimà uþ $%d", price);
 				pc_cmd_hmenu(playerid, "");
@@ -10434,7 +10475,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							// isjungem
 							MsgSuccess(playerid, "NAMO NUOMA", "Namo nuoma iðjungta.");
 						}
-						House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+						House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels"));
 						SaveHouseIntEx(houseid, "Rent", HouseInfo[houseid][hRent]);
 						OnDialogResponse(playerid, DIALOG_HM_MAIN, 1, 1, "");
 					}
@@ -10451,7 +10492,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				HouseInfo[tmpIter[playerid]][hRentPrice] = price;
 				SaveHouseIntEx(tmpIter[playerid], "RentPrice", price);
 				MsgSuccess(playerid, "NAMO NUOMA", "Nuomos kaina sëkmingai atnaujinta.");
-				House_FixLabels(tmpIter[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+				House_FixLabels(tmpIter[playerid], GetGVarInt("EnabledHouseLabels"));
 				pc_cmd_hmenu(playerid, "");
 			}
 		}
@@ -10695,7 +10736,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 6:
 					{
 						// pervedimai
-						if(GetGVarInt("EnabledTransactions", SERVER_VARS_ID) >= 1)
+						if(GetGVarInt("EnabledTransactions") >= 1)
 						{
 							/*if(PlayerInfo[playerid][pSavings] > 0)
 							{
@@ -12741,508 +12782,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BM_MAIN, 1, 0, "");
 		}
-		case DIALOG_AM_SPAWN_MAIN:
-		{
-			if(response)
-			{
-				new Float:x,
-					Float:y,
-					Float:z;
-				GetPlayerPos(playerid, x, y, z);
-				switch(listitem)
-				{
-					case 0:
-					{
-						if(HaveAdminPermission(playerid, "SetJailSpawn"))
-						{
-							SetGVarFloatEx("JailSpawnX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("JailSpawnY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("JailSpawnZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("JailSpawnInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("JailSpawnVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						if(HaveAdminPermission(playerid, "SetUnjailSpawn"))
-						{
-							SetGVarFloatEx("UnjailX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("UnjailY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("UnjailZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("UnjailInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("UnjailVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 2:
-					{
-						if(HaveAdminPermission(playerid, "SetArrestSpawn"))
-						{
-							SetGVarFloatEx("ArrestSpawnX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("ArrestSpawnY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("ArrestSpawnZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("ArrestSpawnInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("ArrestSpawnVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 3:
-					{
-						if(HaveAdminPermission(playerid, "SetUnarrestSpawn"))
-						{
-							SetGVarFloatEx("UnarrestX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("UnarrestY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("UnarrestZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("UnarrestInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("UnarrestVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 4:
-					{
-						if(HaveAdminPermission(playerid, "SetOOCJailSpawn"))
-						{
-							SetGVarFloatEx("OOCJailSpawnX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("OOCJailSpawnY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("OOCJailSpawnZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("OOCJailSpawnInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("OOCJailSpawnVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 5:
-					{
-						if(HaveAdminPermission(playerid, "SetOOCUnjailSpawn"))
-						{
-							SetGVarFloatEx("OOCUnjailX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("OOCUnjailY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("OOCUnjailZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("OOCUnjailInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("OOCUnjailVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 6:
-					{
-						if(HaveAdminPermission(playerid, "SetBankPos"))
-						{
-							SetGVarFloatEx("BankX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("BankY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("BankZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("BankInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("BankVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							sd_DestroyDynamicPickup(BankPickup);
-							if(IsValidDynamic3DTextLabel(BankLabel)) DestroyDynamic3DTextLabel(BankLabel);
-							BankPickup = sd_CreateDynamicPickup(PICKUP_TYPE_BANK, 0, 1274, 2, GetGVarFloat("BankX", SERVER_VARS_ID), GetGVarFloat("BankY", SERVER_VARS_ID), GetGVarFloat("BankZ", SERVER_VARS_ID), GetGVarInt("BankVW", SERVER_VARS_ID), GetGVarInt("BankInt", SERVER_VARS_ID));
-							BankLabel = CreateDynamic3DTextLabel("Norëdami naudotis banku, raðykite /bank", 0x66C729FF, GetGVarFloat("BankX", SERVER_VARS_ID), GetGVarFloat("BankY", SERVER_VARS_ID), GetGVarFloat("BankZ", SERVER_VARS_ID), 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, GetGVarInt("BankVW", SERVER_VARS_ID), GetGVarInt("BankInt", SERVER_VARS_ID));
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 7:
-					{
-						if(HaveAdminPermission(playerid, "SetHospitalSpawnPos"))
-						{
-							SetGVarFloatEx("SpawnHospitalX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("SpawnHospitalY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("SpawnHospitalZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("SpawnHopitalInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("SpawnHopitalVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 8:
-					{
-						if(HaveAdminPermission(playerid, "SetJailSpawn"))
-						{
-							SetGVarFloatEx("JailX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("JailY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("JailZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("JailInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("JailVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 9:
-					{
-						if(HaveAdminPermission(playerid, "SetArrestSpawn"))
-						{
-							SetGVarFloatEx("ArrestX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("ArrestY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("ArrestZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("ArrestInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("ArrestVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 10:
-					{
-						if(HaveAdminPermission(playerid, "SetAdPos"))
-						{
-							SetGVarFloatEx("AdX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("AdY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("AdZ", z, SERVER_VARS_ID);
-							SetGVarIntEx("AdInt", GetPlayerInterior(playerid), SERVER_VARS_ID);
-							SetGVarIntEx("AdVW", GetPlayerVirtualWorld(playerid), SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							if(IsValidDynamic3DTextLabel(AdLabel)) DestroyDynamic3DTextLabel(AdLabel);
-							AdLabel = CreateDynamic3DTextLabel("Reklamuotis galite naudodami /ad\n(tel. numeris pridedamas automatiðkai)\nKaina: "#DEFAULT_AD_PRICE"$", 0x66C729FF, GetGVarFloat("AdX", SERVER_VARS_ID), GetGVarFloat("AdY", SERVER_VARS_ID), GetGVarFloat("AdZ", SERVER_VARS_ID), 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, GetGVarInt("AdVW", SERVER_VARS_ID), GetGVarInt("AdInt", SERVER_VARS_ID));
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 11:
-					{
-						if(HaveAdminPermission(playerid, "SetHospitalSpawnPos"))
-						{
-							SetGVarFloatEx("SpawnX", x, SERVER_VARS_ID);
-							SetGVarFloatEx("SpawnY", y, SERVER_VARS_ID);
-							SetGVarFloatEx("SpawnZ", z, SERVER_VARS_ID);
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
-							ShowPlayerAdminMenu(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 0, "");
-		}
-		case DIALOG_AM_ENABLES_DISABLES_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						if(HaveAdminPermission(playerid, "EnableFurnitureMultiSelect"))
-						{
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-							SetGVarInt("EnabledFurnitureMultiSelect", GetGVarInt("EnabledFurnitureMultiSelect", SERVER_VARS_ID) > 0 ? 0 : 1, SERVER_VARS_ID);
-							SaveServerIntEx("EnabledFurnitureMultiSelect", GetGVarInt("EnabledFurnitureMultiSelect", SERVER_VARS_ID));
-							if(GetGVarInt("EnabledFurnitureMultiSelect") <= 0)
-							{
-								foreach(new receiver : Player)
-								{
-									if(FurnitureMultiSelectionEnabled{playerid} == true) FurnitureMultiSelectionEnabled{playerid} = false;
-								}
-							}
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						if(HaveAdminPermission(playerid, "EnableTransactions"))
-						{
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-							SetGVarInt("EnabledTransactions", GetGVarInt("EnabledTransactions", SERVER_VARS_ID) > 0 ? 0 : 1, SERVER_VARS_ID);
-							SaveServerIntEx("EnabledTransactions", GetGVarInt("EnabledTransactions", SERVER_VARS_ID));
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 2:
-					{
-						if(HaveAdminPermission(playerid, "EnableLoginTimer"))
-						{
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-							SetGVarInt("EnabledLoginTimer", GetGVarInt("EnabledLoginTimer", SERVER_VARS_ID) > 0 ? 0 : 1, SERVER_VARS_ID);
-							SaveServerIntEx("EnabledLoginTimer", GetGVarInt("EnabledLoginTimer", SERVER_VARS_ID));
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 3:
-					{
-						if(HaveAdminPermission(playerid, "EnableDroppedItemsSaving"))
-						{
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-							SetGVarInt("EnabledDroppedItemsSaving", GetGVarInt("EnabledDroppedItemsSaving", SERVER_VARS_ID) > 0 ? 0 : 1, SERVER_VARS_ID);
-							SaveServerIntEx("EnabledDroppedItemsSaving", GetGVarInt("EnableDroppedItemsSaving", SERVER_VARS_ID));
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 4:
-					{
-						if(HaveAdminPermission(playerid, "EnablePoliceWeaponUsage"))
-						{
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-							SetGVarInt("EnabledPoliceWeaponUsage", GetGVarInt("EnabledPoliceWeaponUsage", SERVER_VARS_ID) > 0 ? 0 : 1, SERVER_VARS_ID);
-							SaveServerIntEx("EnabledPoliceWeaponUsage", GetGVarInt("EnabledPoliceWeaponUsage", SERVER_VARS_ID));
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 5:
-					{
-						if(HaveAdminPermission(playerid, "EnableJobLabels"))
-						{
-							SetGVarInt("EnabledJobLabels", GetGVarInt("EnabledJobLabels", SERVER_VARS_ID) > 0 ? 0 : 1, SERVER_VARS_ID);
-							SaveServerIntEx("EnabledJobLabels", GetGVarInt("EnabledJobLabels", SERVER_VARS_ID));
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-							if(GetGVarInt("EnabledJobLabels", SERVER_VARS_ID) == 0)
-							{
-								for(new i = 0; i < sizeof Jobs; i++)
-								{
-									if(Jobs[i][jobId] == 0) { break; }
-									if(IsValidDynamic3DTextLabel(Jobs[i][jobLabel]))
-									{
-										DestroyDynamic3DTextLabel(Jobs[i][jobLabel]);
-									}
-									Jobs[i][jobLabel] = INVALID_3DTEXT_ID;
-								}
-							}
-							else
-							{
-								new string[256];
-								for(new i = 0; i < sizeof Jobs; i++)
-								{
-									if(Jobs[i][jobId] == 0) { break; }
-									format(string, sizeof string, "%s\n{F1F1F1}Kontrakto laikas: {66C729}%d{F1F1F1}val\nNorëdami ásidarbinti, raðykite {81C558}/takejob", Jobs[i][jobName], Jobs[i][jobContract]);
-									Jobs[i][jobLabel] = CreateDynamic3DTextLabel(string, 0x66C729FF, Jobs[i][jobX], Jobs[i][jobY], Jobs[i][jobZ], 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1);
-								}
-							}
-							Streamer_Update(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 6:
-					{
-						if(HaveAdminPermission(playerid, "EnableBusinessLabels"))
-						{
-							SetGVarInt("EnabledBusinessLabels", GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID) > 0 ? 0 : 1, SERVER_VARS_ID);
-							SaveServerIntEx("EnabledBusinessLabels", GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-							foreach(new businessid : Business)
-							{
-								Business_FixLabels(businessid, 1);
-							}
-							Streamer_Update(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 7:
-					{
-						if(HaveAdminPermission(playerid, "EnableHouseLabels"))
-						{
-							SetGVarInt("EnabledHouseLabels", GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID) > 0 ? 0 : 1, SERVER_VARS_ID);
-							SaveServerIntEx("EnabledHouseLabels", GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-							foreach(new houseid : House)
-							{
-								House_FixLabels(houseid, 1);
-							}
-							Streamer_Update(playerid);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-				OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 3, "");
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_HOUSE_TAXES_MAIN:
-		{
-			if(response)
-			{
-				if(HaveAdminPermission(playerid, "EditHouseTaxes"))
-				{
-					switch(listitem)
-					{
-						case 0:
-						{
-							// keisti mokescius
-							ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_TAXES_SET, DIALOG_STYLE_INPUT, "Namo mokeðèiai", "{FFFFFF}Áveskite mokeðèiø dydá:", "Tæsti", "Atðaukti");
-						}
-					}
-				}
-				else InfoBox(playerid, IB_NO_PRIVILEGE);
-			}
-			else
-			{
-				// bendrieji nustatymai
-				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 0, "");
-			}
-		}
-		case DIALOG_AM_HOUSE_TAXES_SET:
-		{
-			if(response)
-			{
-				new taxes;
-				if(sscanf(inputtext,"d",taxes)) return OnDialogResponse(playerid, DIALOG_AM_HOUSE_TAXES_MAIN, 1, 0, "");
-				if(0 < taxes <= 200)
-				{
-					SetGVarIntEx("HouseTaxes", taxes, SERVER_VARS_ID);
-					OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 2, "");
-					SaveServerIntEx("HouseTaxes", GetGVarInt("HouseTaxes"));
-					MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-					ShowPlayerAdminMenu(playerid);
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-					log_set_values("'%d','%e','Nustate namu mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), taxes);
-					log_commit();
-				}
-				else
-				{
-					SendError(playerid, "Mokeðèiai turi bûti nuo 1$ iki 200$");
-					OnDialogResponse(playerid, DIALOG_AM_HOUSE_TAXES_MAIN, 1, 0, "");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 1, "");
-		}
-		case DIALOG_AM_OTHER_OPTIONS_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// visas proc
-						if(HaveAdminPermission(playerid, "EditCityTaxes"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_OTHER_TAXES_TOTAL, DIALOG_STYLE_INPUT, "Bendri mokeðèiai", "\
-								{FFFFFF}Ávestas bendras procentas bus nuimamas nuo algos ir atitinkamai\n\
-								padalintas á savivaldybës ir policijos biudþetà\n\
-							 	{BABABA}Áveskite procentà:", "Tæsti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						// proc i pd
-						if(HaveAdminPermission(playerid, "EditCityTaxes"))
-						{
-							new string[800];
-							strcat(string, "{FFFFFF}Ávestas procentas bus atimamas ið bendro procento nuo algos\n\
-								ir pervedamas á policijos biudþetà, o likusi suma á savivaldybës biudþetà.\n\
-								Pvz. jei þaidëjas uþdirba 300$, o bendras mokeðèiø procentas yra 10proc.\n");
-							strcat(string, "nuo þaidëjo ið viso algos nuimami 30$. Tad ðiame lange ávedus 50proc.,\n\
-								nuo tø 30$ yra nuskaièiuojami 15$ ir pervedami á policijos biudþetà, o\n\
-								likusi suma atitenka savivaldybei.\n{BABABA}Áveskite procentà:");
-							ShowPlayerDialog(playerid, DIALOG_AM_OTHER_TAXES_POLICE, DIALOG_STYLE_INPUT, "Bendri mokeðèiai", string, "Tæsti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 2:
-					{
-						ShowPlayerDialog(playerid, DIALOG_AM_OTHER_POLICE_WEAPONS, DIALOG_STYLE_INPUT, "Policijos nustatymai", "{FFFFFF}Áveskite kiek ginklø vienetø telpa policijos frakcijoms.\nPo 1 vnt. nuimama kiekvienà kartà pasiëmus ginklà ið /wepstore", "Tæsti", "Atðaukti");
-					}
-					case 3:
-					{
-						ShowPlayerDialog(playerid, DIALOG_AM_OTHER_POLICE_SKINS, DIALOG_STYLE_INPUT, "Policijos nustatymai", "{FFFFFF}Áveskite kiek aprangø vienetø telpa policijos frakcijoms.\nPo 1 vnt. nuimama keièiant aprangà /pdskins arba /duty", "Tæsti", "Atðaukti");
-					}
-					case 4:
-					{
-						ShowPlayerDialog(playerid, DIALOG_AM_OTHER_POLICE_SPECIAL, DIALOG_STYLE_INPUT, "Policijos nustatymai", "{FFFFFF}Áveskite kiek spec. daiktø vienetø telpa policijos frakcijoms.\nPo 1 vnt. nuimama duodant þenklelá, imant grenatas, SWAT skinus", "Tæsti", "Atðaukti");
-					}
-					case 5:
-					{
-						ShowPlayerDialog(playerid, DIALOG_AM_OTHER_MAX_CHARACTERS, DIALOG_STYLE_INPUT, "Maks. veikëjø skaièius", "{FFFFFF}Áveskite maksimalø veikëjø skaièiø vienam þaidëjui", "Tæsti", "Atðaukti");
-					}
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_OTHER_TAXES_TOTAL:
-		{
-			if(response)
-			{
-				new percent;
-				if(sscanf(inputtext,"d",percent)) return OnDialogResponse(playerid, DIALOG_AM_OTHER_OPTIONS_MAIN, 1, 0, "");
-				if(0 < percent <= 99)
-				{
-					SetGVarIntEx("TaxesToCity", percent, SERVER_VARS_ID);
-					OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 5, "");
-					SaveServerIntEx("TaxesToCity", GetGVarInt("TaxesToCity"));
-					MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-					log_set_values("'%d','%e','Nustate bendra proc. mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), percent);
-					log_commit();
-				}
-				else
-				{
-					SendError(playerid, "Mokeðèiai turi bûti nuo 1 iki 99proc.");
-					OnDialogResponse(playerid, DIALOG_AM_OTHER_OPTIONS_MAIN, 1, 0, "");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 5, "");
-		}
-		case DIALOG_AM_OTHER_TAXES_POLICE:
-		{
-			if(response)
-			{
-				new percent;
-				if(sscanf(inputtext,"d",percent)) return OnDialogResponse(playerid, DIALOG_AM_OTHER_OPTIONS_MAIN, 1, 1, "");
-				if(0 < percent <= 99)
-				{
-					SetGVarIntEx("TaxesToPolice", percent, SERVER_VARS_ID);
-					OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 5, "");
-					SaveServerIntEx("TaxesToPolice", GetGVarInt("TaxesToPolice"));
-					MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-					log_set_values("'%d','%e','Nustate proc. i pd','%d'", LogPlayerId(playerid), LogPlayerName(playerid), percent);
-					log_commit();
-				}
-				else
-				{
-					SendError(playerid, "Mokeðèiai turi bûti nuo 1 iki 99proc.");
-					OnDialogResponse(playerid, DIALOG_AM_OTHER_OPTIONS_MAIN, 1, 1, "");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 5, "");
-		}
-		case DIALOG_AM_OTHER_MAX_CHARACTERS:
-		{
-			if(response)
-			{
-				new limit;
-				if(sscanf(inputtext,"d",limit)) return OnDialogResponse(playerid, DIALOG_AM_OTHER_OPTIONS_MAIN, 1, 0, "");
-				if(0 < limit <= 20)
-				{
-					SetGVarIntEx("MaxCharacters", limit, SERVER_VARS_ID);
-					OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 5, "");
-					SaveServerIntEx("MaxCharacters", GetGVarInt("MaxCharacters"));
-					MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-					log_set_values("'%d','%e','Nustate maks. veikeju skaiciu','%d'", LogPlayerId(playerid), LogPlayerName(playerid), limit);
-					log_commit();
-				}
-				else
-				{
-					SendError(playerid, "Limitas turi bûti nuo 1 iki 20.");
-					OnDialogResponse(playerid, DIALOG_AM_OTHER_OPTIONS_MAIN, 1, 0, "");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 5, "");
-		}
-
-
 		case DIALOG_AM_ENTER_CREATE:
 		{
 			if(response)
@@ -14196,7 +13735,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new string[126];
 					mysql_format(chandler, string, sizeof string, "UPDATE `houses_data` SET Price = '%d' WHERE id = '%d'", amount, HouseInfo[tmpSelected[playerid]][hId]);
 					mysql_fquery(chandler, string, "HouseUpdated");
-					House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+					House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels"));
 					log_init(true);
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
@@ -14224,7 +13763,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						mysql_fquery(chandler, string, "HouseUpdated");
 						MsgSuccess(playerid, "NAMAS", "Paðalinote namo savininkà.");
 						OnDialogResponse(playerid, DIALOG_AM_HOUSES_MAIN, 1, 1, "");
-						House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+						House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels"));
 						
 						
 						House_CreatePickup(tmpSelected[playerid]);
@@ -14241,7 +13780,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							mysql_fquery(chandler, string, "HouseUpdated");
 							HouseInfo[tmpSelected[playerid]][hOwner] = strval(inputtext);
 							MsgSuccess(playerid, "NAMAS", "Pakeitëte namo savininkà.");
-							House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+							House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels"));
 							
 							House_CreatePickup(tmpSelected[playerid]);
 							log_set_values("'%d','%e','(AM) Pakeite namo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpSelected[playerid]][hOwner], strval(inputtext));
@@ -14267,7 +13806,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						mysql_fquery(chandler, string, "HouseUpdated");
 						HouseInfo[tmpSelected[playerid]][hOwner] = id;
 						MsgSuccess(playerid, "NAMAS", "Pakeitëte namo savininkà.");
-						House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+						House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels"));
 						
 						House_CreatePickup(tmpSelected[playerid]);
 						log_set_values("'%d','%e','(AM) Pakeite namo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpSelected[playerid]][hOwner], id);
@@ -14326,7 +13865,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							mysql_fquery(chandler, string, "HouseUpdated");
 							
 							House_CreatePickup(selected);
-							House_FixLabels(selected, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+							House_FixLabels(selected, GetGVarInt("EnabledHouseLabels"));
 
 							log_init(true);
 							log_set_table("logs_admins");
@@ -14684,7 +14223,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new string[126];
 					mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET Price = '%d' WHERE id = '%d'", amount, BusinessInfo[tmpSelected[playerid]][bId]);
 					mysql_fquery(chandler, string, "BusinessUpdated");
-					Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+					Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels"));
 					log_init(true);
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
@@ -14713,7 +14252,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						MsgSuccess(playerid, "VERSLAS", "Paðalinote verslo savininkà.");
 						OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
 
-						Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+						Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels"));
 						Business_CreatePickup(tmpSelected[playerid]);
 					}
 					else
@@ -14730,7 +14269,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							MsgSuccess(playerid, "VERSLAS", "Pakeitëte verslo savininkà.");
 							OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
 							
-							Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+							Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels"));
 							Business_CreatePickup(tmpSelected[playerid]);
 
 							log_set_values("'%d','%e','(AM) Pakeite verslo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], strval(inputtext));
@@ -14758,7 +14297,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						MsgSuccess(playerid, "VERSLAS", "Pakeitëte verslo savininkà.");
 						OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
 						
-						Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+						Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels"));
 						Business_CreatePickup(tmpSelected[playerid]);
 
 						log_set_values("'%d','%e','(AM) Pakeite verslo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], id);
@@ -14785,7 +14324,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				mysql_fquery(chandler, string, "BusinessUpdated");
 				format(BusinessInfo[selected][bName], 24, inputtext);
 				MsgSuccess(playerid, "VERSLAS", "Verslo pavadinimas pakeistas.");
-				Business_FixLabels(selected, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+				Business_FixLabels(selected, GetGVarInt("EnabledBusinessLabels"));
 				ShowPlayerAdminMenu(playerid);
 				log_init(true);
 				log_set_table("logs_admins");
@@ -14807,7 +14346,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				MsgSuccess(playerid, "VERSLAS", "Verslo tipas sëkmingai pakeistas. %s", (listitem == BUSINESS_TYPE_FUEL ? ("Nustatykite papildomas koordinates, kur galima naudoti /fill") : ("")));
 				if(listitem == BUSINESS_TYPE_FUEL)
 				{
-					BusinessInfo[selected][bFuel] = GetGVarInt("BusinessFuelCapacity", SERVER_VARS_ID);
+					BusinessInfo[selected][bFuel] = GetGVarInt("BusinessFuelCapacity");
 					BusinessInfo[selected][bFuelPrice] = 3;
 				}
 				ShowPlayerAdminMenu(playerid);
@@ -14887,7 +14426,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET EnterX = '%f', EnterY = '%f', EnterZ = '%f', OutVW = '%d', Exterior = '%d' WHERE id = '%d'", x, y, z, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), BusinessInfo[selected][bId]);
 							mysql_fquery(chandler, string, "BusinessUpdated");
 							
-							Business_FixLabels(selected, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+							Business_FixLabels(selected, GetGVarInt("EnabledBusinessLabels"));
 							Business_CreatePickup(selected);
 
 							log_init(true);
@@ -15044,10 +14583,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							new string[512] = "{BABABA}Lygis\t{BABABA}Iðmoka verslui per payday\n",
 								varname[24];
-							for(new i = 0, j = GetGVarInt("BusinessPayMaxLevels", SERVER_VARS_ID); i <= j; i++)
+							for(new i = 0, j = GetGVarInt("BusinessPayMaxLevels"); i <= j; i++)
 							{
 								format(varname, sizeof varname, "BusinessPayLevel%d", i);
-								format(string, sizeof string, "%s%d\t$%d\n", string, i, GetGVarInt(varname, SERVER_VARS_ID));
+								format(string, sizeof string, "%s%d\t$%d\n", string, i, GetGVarInt(varname));
 							}
 							ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_EDIT_LEVEL, DIALOG_STYLE_TABLIST_HEADERS, "Verslo redagavimas", string, "Tæsti", "Atðaukti");
 						}
@@ -15231,7 +14770,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							BusinessInfo[businessid][bVW] = BUSINESS_VIRTUAL_WORLD+BusinessInfo[businessid][bId];
 							Iter_Add(Business, businessid);
 							
-							Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+							Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels"));
 							Business_CreatePickup(businessid);
 							
 							MsgSuccess(playerid, "VERSLAI", "Sëkmingai sukûrëte verslà, kurio ID: %d", BusinessInfo[businessid][bId]);
@@ -15276,10 +14815,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new string[2024] = "{BABABA}Lygis\t{BABABA}Iðmoka\n",
 						line[56],
 						varname[22];
-					for(new i = 0, j = GetGVarInt("BusinessPayMaxLevels", SERVER_VARS_ID); i <= j; i++)
+					for(new i = 0, j = GetGVarInt("BusinessPayMaxLevels"); i <= j; i++)
 					{
 						format(varname, sizeof varname, "BusinessPayLevel%d", i);
-						format(line, sizeof line, "%d\t$%d\n", i, GetGVarInt(varname, SERVER_VARS_ID));
+						format(line, sizeof line, "%d\t$%d\n", i, GetGVarInt(varname));
 						strcat(string, line);
 					}
 					ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_LEVELS_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Verslo lygiai", string, "Tæsti", "Atðaukti");
@@ -15306,7 +14845,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					varname[22];
 				if(sscanf(inputtext,"d",amount) || amount < 0) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_LEVELS_MAIN, 1, tmpSelected[playerid], "");
 				format(varname, sizeof varname, "BusinessPayLevel%d", tmpSelected[playerid]);
-				SetGVarInt(varname, amount, SERVER_VARS_ID);
+				SetGVarInt(varname, amount);
 				OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 3, "");
 				SaveServerIntEx(varname, amount);
 				log_init(true);
@@ -18200,7 +17739,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			if(response)
 			{
 				new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-				if(FactionInfo[factionid][fType] != FACTION_TYPE_POLICE || FactionInfo[factionid][fWares][0] <= 0 && GetGVarInt("EnabledPoliceWeaponUsage", SERVER_VARS_ID) > 0)
+				if(FactionInfo[factionid][fType] != FACTION_TYPE_POLICE || FactionInfo[factionid][fWares][0] <= 0 && GetGVarInt("EnabledPoliceWeaponUsage") > 0)
 				{
 					SendWarning(playerid, "Jûsø frakcijos sandëlyje nebëra atsargø.");
 					return 1;
@@ -18638,7 +18177,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							return MsgWarning(playerid, "FRAKCIJA", "Jûsø frakcija ðios funkcijos neturi.");
 						}
 						new string[126];
-						new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount", SERVER_VARS_ID);
+						new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount");
 						format(string, sizeof string, "Ginklai, amunicija: %d%%\nUniformos, aprangos: %d%%\nSpecialiøjø operacijø ir kita áranga: %d%%\nPapildyti ginkluotæ", floatround(FactionInfo[factionid][fWares][0]*onepercent, floatround_ceil), floatround(FactionInfo[factionid][fWares][1]*onepercent, floatround_ceil), floatround(FactionInfo[factionid][fWares][2]*onepercent, floatround_ceil));
 						ShowPlayerDialog(playerid, DIALOG_FM_WEAPONS_MAIN, DIALOG_STYLE_LIST, "Frakcijos ginklai", string, "Tæsti", "Atðaukti");
 					}
@@ -18648,7 +18187,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		}
 		case DIALOG_FM_WEAPONS_MAIN:
 		{
-			if(GetGVarInt("EnabledPoliceWeaponUsage", SERVER_VARS_ID))
+			if(GetGVarInt("EnabledPoliceWeaponUsage"))
 			{
 				if(response)
 				{
@@ -18676,7 +18215,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(listitem == 0)
 				{
 					// ginklai ammo
-					new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount", SERVER_VARS_ID);
+					new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount");
 					new Float:currentpercent = floatround(FactionInfo[factionid][fWares][0]*onepercent, floatround_ceil);
 					if(currentpercent > 10.0)
 					{
@@ -18695,7 +18234,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				else if(listitem == 1)
 				{
 					// skinai
-					new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount", SERVER_VARS_ID);
+					new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount");
 					new Float:currentpercent = floatround(FactionInfo[factionid][fWares][0]*onepercent, floatround_ceil);
 					if(currentpercent > 10.0)
 					{
@@ -18714,7 +18253,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				else if(listitem == 2)
 				{
 					// special forces
-					new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount", SERVER_VARS_ID);
+					new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount");
 					new Float:currentpercent = floatround(FactionInfo[factionid][fWares][0]*onepercent, floatround_ceil);
 					if(currentpercent > 10.0)
 					{
@@ -19262,7 +18801,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				/*if(listitem >= tmpTexture_MarkStart_CP[playerid])
 				{
-					if(GetGVarInt("EnabledFurnitureMultiSelect", SERVER_VARS_ID))
+					if(GetGVarInt("EnabledFurnitureMultiSelect"))
 					{
 						// paspaude Ijungti/isjungti zymejima
 						if(listitem == tmpTexture_MarkStart_CP[playerid])
@@ -25207,7 +24746,7 @@ stock PayDay(playerid)
 		string[1012];
 
 	// procentai i biudzeta savivaldybes
-	new taxes = GetGVarInt("TaxesToCity", SERVER_VARS_ID);
+	new taxes = GetGVarInt("TaxesToCity");
 	new pay_to_city = payday*taxes/100;
 
 	// ================================================================
@@ -25217,7 +24756,7 @@ stock PayDay(playerid)
 	for(new i = 0, rows = cache_num_rows(); i < rows; i++)
 	{
 		cache_get_value_name_int(0, "Model", taxes_business);
-		taxes_vehicle += ((GetGVarInt("VehicleTaxes", SERVER_VARS_ID)/2)*VehicleClassLevel[taxes_business-400]);
+		taxes_vehicle += ((GetGVarInt("VehicleTaxes")/2)*VehicleClassLevel[taxes_business-400]);
 	}
 	cache_delete(result);
 	// ================================================================
@@ -25226,7 +24765,7 @@ stock PayDay(playerid)
 	// MOKESCIAI UZ VERSLUS
 	mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `business_data` WHERE Owner = '%d'", PlayerInfo[playerid][pId]);
 	result = mysql_query(chandler, string, true);
-	taxes_business = GetGVarInt("BusinessTaxes", SERVER_VARS_ID)*cache_num_rows();
+	taxes_business = GetGVarInt("BusinessTaxes")*cache_num_rows();
 	if(PlayerInfo[playerid][pDonator] >= DONATOR_GOLD) taxes_business = floatround(taxes_business * 0.8);
 	cache_delete(result);
 	// ================================================================
@@ -25235,7 +24774,7 @@ stock PayDay(playerid)
 	// ================================================================
 	mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `houses_data` WHERE Owner = '%d'", PlayerInfo[playerid][pId]);
 	result = mysql_query(chandler, string, true);
-	taxes_houses = GetGVarInt("HouseTaxes", SERVER_VARS_ID)*cache_num_rows();
+	taxes_houses = GetGVarInt("HouseTaxes")*cache_num_rows();
 	cache_delete(result);
 	// ================================================================
 
@@ -25338,7 +24877,7 @@ stock PayDay(playerid)
 	PlayerInfo[playerid][pPayCheck] = 0;
 
 	// PRIDEDAM SAVIVALDYBEI PINIGU IR POLICIJAI
-	new pd_taxes = GetGVarInt("TaxesToPolice", SERVER_VARS_ID);
+	new pd_taxes = GetGVarInt("TaxesToPolice");
 	new pay_to_police = pay_to_city*pd_taxes/100;
 	pay_to_city -= pay_to_police;
 
@@ -25784,7 +25323,7 @@ stock ShowOwnedFurniture(playerid, page, type, iter)
 	}
 	if(strlen(mainstr))
 	{
-		/*if(GetGVarInt("EnabledFurnitureMultiSelect", SERVER_VARS_ID))
+		/*if(GetGVarInt("EnabledFurnitureMultiSelect"))
 		{
 			if(FurnitureMultiSelectionEnabled{playerid} == true) strcat(mainstr, "{E67D32}Iðjungti þymëjimà\nPaþymëti visus\nAtþymëti visus\nRedaguoti paþymëtus");
 			else strcat(mainstr, "{E6A732}Ájungti þymëjimà");
@@ -26385,7 +25924,7 @@ public BusinessLoad()
 {
 	Iter_Clear(Business);
 	new rows = cache_num_rows(),
-		enabled_labels = GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID),
+		enabled_labels = GetGVarInt("EnabledBusinessLabels"),
 		string[86];
 	for(new i = 0; i < rows; i++)
 	{
@@ -26794,7 +26333,7 @@ public HousesLoad()
 {
 	Iter_Clear(House);
 	new rows = cache_num_rows(),
-		enabled_labels = GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID);
+		enabled_labels = GetGVarInt("EnabledHouseLabels");
 	for(new i = 0; i < rows; i++)
 	{
 		cache_get_value_name_int(i, "id", HouseInfo[i][hId]);
@@ -27618,17 +27157,24 @@ public DropsLoad()
 	return 1;
 }
 
-stock LoadJobs()
+stock Jobs_LoadPickups()
 {
 	new string[136],
-		enabled_labels = GetGVarInt("EnabledJobLabels", SERVER_VARS_ID);
-	for(new i = 0;i < sizeof Jobs; i++)
+		enabled_labels = GetGVarInt("EnabledJobLabels");
+
+	for(new i = 0; i < sizeof Jobs; i++)
 	{
 		if(enabled_labels)
 		{
 			format(string, sizeof string, "%s\n{F1F1F1}Kontrakto laikas: {66C729}%d{F1F1F1}val\nNorëdami ásidarbinti, raðykite {81C558}/takejob", Jobs[i][jobName], Jobs[i][jobContract]);
 			Jobs[i][jobLabel] = CreateDynamic3DTextLabel(string, 0x66C729FF, Jobs[i][jobX], Jobs[i][jobY], Jobs[i][jobZ], 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1);
 		}
+		else 
+		{
+			IsValidDynamic3DTextLabel(Jobs[i][jobLabel]) && DestroyDynamic3DTextLabel(Jobs[i][jobLabel]);
+			Jobs[i][jobLabel] = INVALID_3DTEXT_ID;
+		}
+		IsValidDynamicPickup(Jobs[i][jobPickup]) && sd_DestroyDynamicPickup(Jobs[i][jobPickup]);
 		Jobs[i][jobPickup] = sd_CreateDynamicPickup(PICKUP_TYPE_JOB, i, 1275, 1, Jobs[i][jobX], Jobs[i][jobY], Jobs[i][jobZ]);
 	}
 	printf("[load] %d darbu", sizeof Jobs);
@@ -31687,7 +31233,7 @@ CMD:stop(playerid, params[])
 
 CMD:bank(playerid, params[])
 {
-	if(IsPlayerInRangeOfPoint(playerid, 5.0, GetGVarFloat("BankX", SERVER_VARS_ID), GetGVarFloat("BankY", SERVER_VARS_ID), GetGVarFloat("BankZ", SERVER_VARS_ID)) && GetPlayerVirtualWorld(playerid) == GetGVarInt("BankVW", SERVER_VARS_ID))
+	if(IsPlayerInRangeOfPoint(playerid, 5.0, GetGVarFloat("BankX"), GetGVarFloat("BankY"), GetGVarFloat("BankZ")) && GetPlayerVirtualWorld(playerid) == GetGVarInt("BankVW"))
 	{
 		ShowPlayerBank(playerid, true);
 	}
@@ -33590,21 +33136,21 @@ stock JailPlayer(playerid, adminname[], reason[], time = 0, type = 3)
 			// arestine
 			SetPlayerInterior(playerid, GetGVarInt("ArrestSpawnInt"));
 			SetPlayerVirtualWorld(playerid, GetGVarInt("ArrestSpawnVW"));
-			SetPlayerPos(playerid, GetGVarFloat("ArrestSpawnX", SERVER_VARS_ID), GetGVarFloat("ArrestSpawnY", SERVER_VARS_ID), GetGVarFloat("ArrestSpawnZ", SERVER_VARS_ID));
+			SetPlayerPos(playerid, GetGVarFloat("ArrestSpawnX"), GetGVarFloat("ArrestSpawnY"), GetGVarFloat("ArrestSpawnZ"));
 		}
 		case 2:
 		{
 			// prison
 			SetPlayerInterior(playerid, GetGVarInt("JailSpawnInt"));
 			SetPlayerVirtualWorld(playerid, GetGVarInt("JailSpawnVW"));
-			SetPlayerPos(playerid, GetGVarFloat("JailSpawnX", SERVER_VARS_ID), GetGVarFloat("JailSpawnY", SERVER_VARS_ID), GetGVarFloat("JailSpawnZ", SERVER_VARS_ID));
+			SetPlayerPos(playerid, GetGVarFloat("JailSpawnX"), GetGVarFloat("JailSpawnY"), GetGVarFloat("JailSpawnZ"));
 		}
 		case 3:
 		{
 			// ooc
 			SetPlayerInterior(playerid, GetGVarInt("OOCJailSpawnInt"));
 			SetPlayerVirtualWorld(playerid, GetGVarInt("OOCJailSpawnVW"));
-			SetPlayerPos(playerid, GetGVarFloat("OOCJailSpawnX", SERVER_VARS_ID), GetGVarFloat("OOCJailSpawnY", SERVER_VARS_ID), GetGVarFloat("OOCJailSpawnZ", SERVER_VARS_ID));
+			SetPlayerPos(playerid, GetGVarFloat("OOCJailSpawnX"), GetGVarFloat("OOCJailSpawnY"), GetGVarFloat("OOCJailSpawnZ"));
 		}
 	}
 	log_init(true);
@@ -35750,7 +35296,7 @@ CMD:checkbusiness(playerid, params[])
 		}
 		format(varname, sizeof varname, "BusinessPayLevel%d", BusinessInfo[businessid][bLevel]);
 		SendFormat(playerid, 0xE3EEB1FF, "Verslo savininkas: %s, verslo tipas: %s", GetNameBySql(BusinessInfo[businessid][bOwner]), btype);
-		SendFormat(playerid, 0xE3EEB1FF, "Verslo gaunamos pajamos: $%d", GetGVarInt(varname, SERVER_VARS_ID));
+		SendFormat(playerid, 0xE3EEB1FF, "Verslo gaunamos pajamos: $%d", GetGVarInt(varname));
 		log_init(true);
 		log_set_table("logs_factions");
 		log_set_keys("`FactionId`,`FactionName`,`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
@@ -35773,7 +35319,7 @@ CMD:arrest(playerid, params[])
 	if(price <= 0) return SendWarning(playerid, "Bauda turi bûti nuo 1$ iki 99999$");
 	if(!CheckPlayerid(receiverid) || receiverid == playerid) return InfoBox(playerid, IB_WRONG_PLAYER);
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 5.0)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
-	if(!IsPlayerInRangeOfPoint(playerid, 25.0, GetGVarFloat("ArrestX", SERVER_VARS_ID), GetGVarFloat("ArrestY", SERVER_VARS_ID), GetGVarFloat("ArrestZ", SERVER_VARS_ID))) return SendWarning(playerid, "Nesate kalëjime.");
+	if(!IsPlayerInRangeOfPoint(playerid, 25.0, GetGVarFloat("ArrestX"), GetGVarFloat("ArrestY"), GetGVarFloat("ArrestZ"))) return SendWarning(playerid, "Nesate kalëjime.");
 	GivePlayerMoney(receiverid, -price);
 	JailPlayer(receiverid, GetPlayerNameEx(playerid, true, true), "", time, .type = 1);
 	SendFormatToAll(0x6BBFFFFF, "Policininkas %s uþdarë %s á areðtinæ %d minutëm.", GetPlayerNameEx(playerid, true, true), GetPlayerNameEx(receiverid, true, true), time);
@@ -35806,7 +35352,7 @@ CMD:prison(playerid, params[])
 	if(price <= 0) return SendWarning(playerid, "Bauda turi bûti nuo 1$ iki 99999$");
 	if(!CheckPlayerid(receiverid) || receiverid == playerid) return InfoBox(playerid, IB_WRONG_PLAYER);
 	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 5.0)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
-	if(!IsPlayerInRangeOfPoint(playerid, 25.0, GetGVarFloat("JailX", SERVER_VARS_ID), GetGVarFloat("JailY", SERVER_VARS_ID), GetGVarFloat("JailZ", SERVER_VARS_ID))) return SendWarning(playerid, "Nesate kalëjime.");
+	if(!IsPlayerInRangeOfPoint(playerid, 25.0, GetGVarFloat("JailX"), GetGVarFloat("JailY"), GetGVarFloat("JailZ"))) return SendWarning(playerid, "Nesate kalëjime.");
 	GivePlayerMoney(receiverid, -price);
 	JailPlayer(receiverid, GetPlayerNameEx(playerid, true, true), "", time, .type = 2);
 	SendFormatToAll(0x6BBFFFFF, "Policininkas %s pasodino %s á kalëjimà %d minutëm.", GetPlayerNameEx(playerid, true, true), GetPlayerNameEx(receiverid, true, true), time);
@@ -39130,7 +38676,7 @@ CMD:buyhouse(playerid, params[])
 		HouseInfo[houseid][hSale] = 0;
 		HouseInfo[houseid][hOwner] = PlayerInfo[playerid][pId];
 		SaveHouseIntEx(houseid, "Owner", PlayerInfo[playerid][pId]);
-		House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID));
+		House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels"));
 		
 		House_CreatePickup(houseid);
 		// CreateDynamicPickup(modelid, type, Float:x, Float:y, Float:z, worldid = -1, interiorid = -1, playerid = -1, Float:streamdistance = STREAMER_PICKUP_SD, STREAMER_TAG_AREA areaid = STREAMER_TAG_AREA -1)
@@ -39200,7 +38746,7 @@ CMD:buybusiness(playerid, params[])
 		BusinessInfo[businessid][bOwner] = PlayerInfo[playerid][pId];
 		SaveBusinessIntEx(businessid, "Owner", PlayerInfo[playerid][pId]);
 		
-		Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID));
+		Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels"));
 		Business_CreatePickup(businessid);
 	}
 	else SendWarning(playerid, "Ásitikinkite, kad esate lauke prie verslo.");
@@ -39452,7 +38998,7 @@ CMD:ad(playerid, params[])
 	if(sscanf(params,"s[256]",string)) return SendUsage(playerid, "/ad [tekstas]");
 	if(GetPlayerMoney(playerid) < DEFAULT_AD_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_AD_PRICE);
 	if(PlayerExtra[playerid][peAdCooldown]+60 > gettime() && PlayerInfo[playerid][pDonator] <= 0) return SendWarning(playerid, "/ad galite naudoti kas minutæ.");
-	if(IsPlayerInRangeOfPoint(playerid, 10.0, GetGVarFloat("AdX", SERVER_VARS_ID), GetGVarFloat("AdY", SERVER_VARS_ID), GetGVarFloat("AdZ", SERVER_VARS_ID)) && GetPlayerVirtualWorld(playerid) == GetGVarInt("AdVW", SERVER_VARS_ID) && GetPlayerInterior(playerid) == GetGVarInt("AdInt", SERVER_VARS_ID))
+	if(IsPlayerInRangeOfPoint(playerid, 10.0, GetGVarFloat("AdX"), GetGVarFloat("AdY"), GetGVarFloat("AdZ")) && GetPlayerVirtualWorld(playerid) == GetGVarInt("AdVW") && GetPlayerInterior(playerid) == GetGVarInt("AdInt"))
 	{
 		format(string, sizeof string, "[Ad] %s; Kontaktai: %d", string, PlayerInfo[playerid][pPhoneNumber]);
 		PlayerExtra[playerid][peAdCooldown] = gettime();

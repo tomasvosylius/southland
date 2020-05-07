@@ -70,24 +70,24 @@ hook OnNewDay()
 }
 static _BlackMarket_CheckDays(add = -1)
 {
-    new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID) + add;
+    new days = GetGVarInt("DAYS_REROLL_GUNS") + add;
     if(days <= 0)
     {
         _GunDealer_RerollWeapons();
         days = DAYS_TO_REROLL_WEAPONS;
     }
 
-    SetGVarInt("DAYS_REROLL_GUNS", days, SERVER_VARS_ID);
+    SetGVarInt("DAYS_REROLL_GUNS", days);
     SaveServerIntEx("DAYS_REROLL_GUNS", days);
 
-    // new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID) - 1;
+    // new days = GetGVarInt("DAYS_REROLL_GUNS") - 1;
 
     // if(days <= 0)
     // {
-    //     SetGVarInt("DAYS_REROLL_GUNS", 7, SERVER_VARS_ID);
+    //     SetGVarInt("DAYS_REROLL_GUNS", 7);
     //     _GunDealer_RerollWeapons(.save = true);
     // }
-    // else SetGVarInt("DAYS_REROLL_GUNS", 7, SERVER_VARS_ID);
+    // else SetGVarInt("DAYS_REROLL_GUNS", 7);
     return 1;
 }
 
@@ -156,7 +156,7 @@ static _GunDealer_RerollPlace()
 
 static _GunDealer_RerollWeapons()
 {
-    printf("_GunDealer_RerollWeapons(%d):", GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID));
+    printf("_GunDealer_RerollWeapons(%d):", GetGVarInt("DAYS_REROLL_GUNS"));
     for(new w = 0; w < MAX_WEAPONS_PER_WEEK; w++)
     {
         new index = NONE;

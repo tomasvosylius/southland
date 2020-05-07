@@ -64,9 +64,6 @@
 #define reset(%0,%1,%2) 					new _rV_%0[%2];\
 											%1 = _rV_%0
 #define KickEx(%0)							SetTimerEx("Kicker", 100, false, "d", %0)
-/** Server vars **/
-#define SetGVarFloatEx(%0,%1,%2)			SetGVarFloat(%0,%1,%2) , SaveServerFloatEx(%0,%1)
-#define SetGVarIntEx(%0,%1,%2)				SetGVarInt(%0,%1,%2) , SaveServerIntEx(%0,%1)
 /** Chat **/
 #define SendFormat							va_SendClientMessage
 #define SendFormatToAll						va_SendClientMessageToAll
