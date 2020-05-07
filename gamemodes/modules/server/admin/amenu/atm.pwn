@@ -24,8 +24,8 @@ static _ATM_Main(playerid)
     }
     inline select(response, listitem)
     {
-        if(!response) AMenu_Main(playerid);
-
+        if(!response) return AMenu_Main(playerid);
+        
         dialog_Row("Kurti naujà")               return _ATM_CreateNew(playerid);
         dialog_Row("Perþiûrëti visus")          return _ATM_ShowList(playerid);
         dialog_Row("Nuëmimo limitas")           return _ATM_InputWithdrawLimit(playerid, atmid);
