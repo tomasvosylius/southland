@@ -3547,7 +3547,7 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 		if(FindPlayerBySql(id) != INVALID_PLAYER_ID)
 		{
 			CharListTD_ShowMessage(playerid, "~w~Sis veikejas jau yra ~r~zaidime~w~!");
-			return;
+			return 1;
 		}
 	}
 
@@ -3606,14 +3606,17 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 
 	if(player_NewCharDetails[playerid] > 0)
 	{
-		mysql_format(chandler, string, sizeof string, "UPDATE `players_new` SET Reviewed = '0' WHERE Reviewed = '%d'", PlayerInfo[playerid][pUserId]);
-		mysql_fquery(chandler, string, "NewCharUpdate");
+		inline updateReviewedStatus() return 1;
+		mysql_tquery_inline(chandler, using inline updateReviewedStatus, "\
+			UPDATE `players_new` SET Reviewed = '0' WHERE Reviewed = '%d'", PlayerInfo[playerid][pUserId]
+		);
 	}
 
 	if(changechar > 0)
 	{
 		call OnPlayerSpawnChar(playerid, changechar - 1);
 	}
+	return 1;
 }
 
 
@@ -6665,10 +6668,11 @@ stock User_GetNewCharacterStatus(playerid)
 
 stock User_UpdateNewCharacterStatus(playerid, status)
 {
-	new 
-		string[126];
-	mysql_format(chandler, string, sizeof string, "UPDATE `players_new` SET Status = '%d' WHERE UserId = '%d' AND Status < '2'", status, PlayerInfo[playerid][pUserId]);
-	mysql_fquery(chandler, string, "NewCharUpdate");
+	inline updateReviewedStatus() return 1;
+	mysql_tquery_inline(chandler, using inline updateReviewedStatus, "\
+		UPDATE `players_new` SET Status = '%d' WHERE UserId = '%d' AND Status < '2'",
+		status, PlayerInfo[playerid][pUserId]
+	);
 	return 1;
 }
 
@@ -29200,9 +29204,21 @@ stock sd_Prepare()
 	mdskinslist = LoadModelSelectionMenu("mdskins.txt");
 	pdskinslist = LoadModelSelectionMenu("pdskins.txt");
 	clskinslist = LoadModelSelectionMenu("clskins.txt");
-	mysql_fquery(chandler, "UPDATE `vehicles_data` SET `SpawnedId` = '0'", "VehicleSavedEx");
-	mysql_fquery(chandler, "UPDATE `business_orders` SET `Status` = '1' WHERE Status > '1'", "BusinessSavedEx");
-	mysql_fquery(chandler, "UPDATE `players_new` SET Reviewed = '0' WHERE Reviewed > '0'", "NewCharUpdate");
+
+	inline resetSpawned() return 1;
+	mysql_tquery_inline(chandler, using inline resetSpawned, "\
+		UPDATE `vehicles_data` SET `SpawnedId` = '0'"
+	);
+
+	inline resetOrders() return 1;
+	mysql_tquery_inline(chandler, using inline resetOrders, "\
+		UPDATE `business_orders` SET `Status` = '1' WHERE Status > '1'"
+	);
+
+	inline updateReviewedStatus() return 1;
+	mysql_tquery_inline(chandler, using inline updateReviewedStatus, "\
+		UPDATE `players_new` SET Reviewed = '0' WHERE Reviewed > '0'"
+	);
 	return 1;
 }
 
@@ -32316,8 +32332,11 @@ public ShowNewChars(playerid)
 		cache_get_value_name(0, "Name", name);
 		cache_get_value_name(0, "Date", date);
 		
-		mysql_format(chandler, string, 86, "UPDATE `players_new` SET Reviewed = '%d' WHERE id = '%d'", PlayerInfo[playerid][pUserId], player_NewCharDetails[playerid]);
-		mysql_fquery(chandler, string, "NewCharUpdate");
+		inline updateReviewedStatus() return 1;
+		mysql_tquery_inline(chandler, using inline updateReviewedStatus, "\
+			UPDATE `players_new` SET Reviewed = '%d' WHERE id = '%d'",
+			PlayerInfo[playerid][pUserId], player_NewCharDetails[playerid]
+		);
 
 		format(string, sizeof string, "Veikëjo vardas: %s\nData: %s\nVartotojas: %s\n\n1. %s\n%s\n\n2. %s\n%s\n\n3. %s\n%s", 
 			name, date, GetUserNameById(player_NewCharUserId[playerid]),
@@ -32328,8 +32347,9 @@ public ShowNewChars(playerid)
 		Dialog_Show(playerid, DialogAdminNewCharDetail, DIALOG_STYLE_MSGBOX, "Naujo veikëjo patvirtinimas", string, "Priimti", "Atmesti");
 	}
 	else Admin_NewChars_ShowMain(playerid);
+	return 1;
 }
-thread(NewCharUpdate);
+
 
 Dialog:DialogAdminNewCharDetail(playerid, response, listitem, inputtext[])
 {
@@ -32385,10 +32405,10 @@ Dialog:DialogAdminNewCharsReas(playerid, response, listitem, inputtext[])
 	}
 	else
 	{
-		new 
-			string[86];
-		mysql_format(chandler, string, 86, "UPDATE `players_new` SET Reviewed = '0' WHERE id = '%d'", player_NewCharDetails[playerid]);
-		mysql_fquery(chandler, string, "NewCharUpdate");
+		inline updateReviewedStatus() return 1;
+		mysql_tquery_inline(chandler, using inline updateReviewedStatus, "\
+			UPDATE `players_new` SET Reviewed = '0' WHERE id = '%d'", player_NewCharDetails[playerid]
+		);
 	}
 	return 1;
 }
@@ -32455,7 +32475,6 @@ public CharAcceptMoveSelect(charid, playerid)
 			skinid, 
 			userid,
 			origin[18],
-			string[1084],
 			gender,
 			gpci_string[41],
 			year;
@@ -32468,26 +32487,33 @@ public CharAcceptMoveSelect(charid, playerid)
 		cache_get_value_name_int(0, "Skin", skinid);
 		cache_get_value_name_int(0, "Years", year);
 
-		mysql_format(chandler, string, sizeof string, "INSERT INTO `players_data` (`Name`,`BirthDate`,`Skin`,`Gender`,`Origin`,`Money`,`LastVersion_Server`,`UserId`,`X`,`Y`,`Z`,`gpci`) VALUES ('%e','%d','%d','%d','%e','%d','"#CODE_VERSION_P"','%d','%f','%f','%f','%e')", name, year, skinid, gender, origin, GetGVarInt("StartMoney"), userid, GetGVarFloat("SpawnX"), GetGVarFloat("SpawnY"), GetGVarFloat("SpawnZ"), gpci_string);
-		mysql_tquery(chandler, string, "CharAcceptMoveInsert", "dd", charid, playerid);
-		// printf(string);
-	}
-}
+		inline insertNewPlayer()
+		{
+			if(playerid != INVALID_PLAYER_ID)
+			{
+				User_SaveCharCountTotal(playerid);
 
-forward CharAcceptMoveInsert(charid, playerid);
-public CharAcceptMoveInsert(charid, playerid)
-{
-	if(playerid != INVALID_PLAYER_ID)
-	{
-		User_SaveCharCountTotal(playerid);
-		if(GetESCType(playerid) == ESC_TYPE_CHARSELECT)
-		{
-			CharListTD_ShowSelect(playerid, 0, true, 2);
+				if(GetESCType(playerid) == ESC_TYPE_CHARSELECT)
+				{
+					CharListTD_ShowSelect(playerid, 0, true, 2);
+				}
+				else
+				{
+					SendFormat(playerid, 0xbababaff, "Daugiau informacijos: /ucp");
+				}
+			}
+			return 1;
 		}
-		else
-		{
-			SendFormat(playerid, 0xbababaff, "Daugiau informacijos: /ucp");
-		}
+		mysql_tquery_inline(chandler, using inline insertNewPlayer, "\
+			INSERT INTO `players_data` (`Name`,`BirthDate`,`Skin`,`Gender`,`Origin`,`Money`,`LastVersion_Server`,`UserId`,`X`,`Y`,`Z`,`gpci`) \
+			VALUES \
+			('%e','%d','%d','%d','%e','%d','"#CODE_VERSION_P"','%d','%f','%f','%f','%e')", 
+			name, year, skinid, gender, origin,
+			GetGVarInt("StartMoney"),
+			userid,
+			GetGVarFloat("SpawnX"), GetGVarFloat("SpawnY"), GetGVarFloat("SpawnZ"),
+			gpci_string
+		);
 	}
 	return 1;
 }
