@@ -24039,9 +24039,9 @@ stock Inventory_ShowActionSelect(playerid, type, iter, slot, itemid)
 							return SendWarning(playerid, "Ðis verslas nepriklauso Jums.");
 					}
 				}
-				if(!IsInventorySlotClear(playerid, tmpSelected[playerid]))
+				if(!IsInventorySlotClear(playerid, slot))
 				{
-					OnPlayerPutInventoryItem(playerid, tmpSelected[playerid], put_to_type, put_to_iter);
+					OnPlayerPutInventoryItem(playerid, slot, put_to_type, put_to_iter);
 				}
 				else SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
 			}
@@ -24055,9 +24055,9 @@ stock Inventory_ShowActionSelect(playerid, type, iter, slot, itemid)
 				vehicleid = INVALID_VEHICLE_ID;
 			if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID)
 			{
-				if(!IsInventorySlotClear(playerid, tmpSelected[playerid]))
+				if(!IsInventorySlotClear(playerid, slot))
 				{
-					OnPlayerPutInventoryItem(playerid, tmpSelected[playerid], INVENTORY_TYPE_VEHICLE, vehicleid);
+					OnPlayerPutInventoryItem(playerid, slot, INVENTORY_TYPE_VEHICLE, vehicleid);
 				}
 				else SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
 			}
@@ -36325,8 +36325,8 @@ CMD:rolldice(playerid, params[])
 alias:inventory("inv","inventorius","backpack");
 CMD:inventory(playerid, params[])
 {
-	tmpSelected[playerid] = -1;
 	if(PlayerExtra[playerid][peCuffed] >= 1) return SendWarning(playerid, "Esate surakintas.");
+
 	Inventory_ShowItems(playerid, INVENTORY_TYPE_PLAYER);//INVENTORY_PAGE_MAIN, INVENTORY_TYPE_PLAYER, 0, true);
 	return 1;
 }

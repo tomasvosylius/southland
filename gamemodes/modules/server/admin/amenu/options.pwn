@@ -33,25 +33,6 @@ static _Opts_Main(playerid)
     return 1;
 }
 
-/**
-					case 4:
-					{
-						// spawn nustatymai
-						MsgInfo(playerid, "SPAWN", "Pasirinkta vieta bus nustatyta á jûsø dabartinæ.");
-						ShowPlayerDialog(playerid, DIALOG_AM_SPAWN_MAIN, DIALOG_STYLE_LIST, "Vietø nustatymai", "Kalëjmo pasodinimo vieta\nIðleidimo ið kalëjimo vieta\nAreðtinës pasodinimo vieta\nIðleidimo ið areðtinës vieta\nOOC kalëjimo vidus\nIðleidimo ið OOC kalëjimo vieta\nBanko vidaus vieta\nSPAWN po mirties vieta\nKalëjimo vieta (/prison)\nAreðtinës vieta (/arrest)\n/ad vieta\nSPAWN vieta", "Nustatyti", "Atðaukti");
-					}
-					case 5:
-					{
-						// visi kiti mokesciai
-						new string[512];
-						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiai nuo algos\t%dproc.\nProcentas á policijos biudþetà\t%dproc.\n", GetGVarInt("TaxesToCity"), GetGVarInt("TaxesToPolice"));
-						format(string, sizeof string, "%sPolicijos ginklø atsargø talpa\t%dvnt.\nPolicijos aprangos atsargø talpa\t%dvnt.\nPolicijos spec atsargø talpa\t%dvnt.\nMaks. veikëjø vartotojui\t%d", string, GetGVarInt("PoliceWeaponCapacity"), GetGVarInt("PoliceSkinsCapacity"), GetGVarInt("PoliceSpecialCapacity"), GetGVarInt("MaxCharacters"));
-						ShowPlayerDialog(playerid, DIALOG_AM_OTHER_Opts_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Kiti nustatymai", string, "Tæsti", "Atðaukti");
-					}
-				}
- */
-
-
 static _Opts_Vehicles_Main(playerid)
 {
     // tr. priemoniu mokesciai
@@ -332,6 +313,7 @@ stock _Opts_Houses_InputTaxes(playerid, error[] = "")
 */
 static _Opts_OnOff_Main(playerid)
 {
+    dialog_Clear();
     dialog_AddLine("{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë");
     dialog_AddLine("{FFFFFF}Furniture multi-select sistema\t%s", GetGVarInt("EnabledFurnitureMultiSelect") > 0 ? ("Ájungta") : ("Iðjungta"));
     dialog_AddLine("Pervedimø sistema\t%s", GetGVarInt("EnabledTransactions") > 0 ? ("Ájungta") : ("Iðjungta"));
@@ -407,7 +389,7 @@ static _Opts_OnOff_Main(playerid)
                     }
                     case _I<EnabledHouseLabels>: 
                     {
-                        foreach(new businessid : Business) House_FixLabels(businessid, current_set);
+                        foreach(new houseid : House) House_FixLabels(houseid, current_set);
                     }
                     case _I<EnabledJobLabels>: 
                     {
@@ -537,7 +519,7 @@ static _Opts_Places_Main(playerid)
             SetGVarIntEx(va_return("%sInt", set), int);
             SetGVarIntEx(va_return("%sVW", set), vw);
         }
-        
+
         switch(YHash(set, false))
         {
             case _I<Bank>: Bank_CreatePickup();
@@ -693,85 +675,3 @@ static _Opts_Other_MaxChars(playerid, error[] = "")
     dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Maks. veikëjø skaièius", "Tæsti", "Atðaukti");
     return 1;
 }
-
-// if(response)
-// {
-//     switch(listitem)
-//     {
-//         case 0:
-//         {
-//             // visas proc
-//             if(HaveAdminPermission(playerid, "EditCityTaxes"))
-//             {
-//                 ShowPlayerDialog(playerid, DIALOG_AM_OTHER_TAXES_TOTAL, DIALOG_STYLE_INPUT, "Bendri mokeðèiai", "\
-//                     {FFFFFF}Ávestas bendras procentas bus nuimamas nuo algos ir atitinkamai\n\
-//                     padalintas á savivaldybës ir policijos biudþetà\n\
-//                     {BABABA}Áveskite procentà:", "Tæsti", "Atðaukti");
-//             }
-//             else InfoBox(playerid, IB_NO_PRIVILEGE);
-//         }
-//         case 1:
-//         {
-//             // proc i pd
-//             if(HaveAdminPermission(playerid, "EditCityTaxes"))
-//             {
-//                 new string[800];
-//                 strcat(string, "{FFFFFF}Ávestas procentas bus atimamas ið bendro procento nuo algos\n\
-//                     ir pervedamas á policijos biudþetà, o likusi suma á savivaldybës biudþetà.\n\
-//                     Pvz. jei þaidëjas uþdirba 300$, o bendras mokeðèiø procentas yra 10proc.\n");
-//                 strcat(string, "nuo þaidëjo ið viso algos nuimami 30$. Tad ðiame lange ávedus 50proc.,\n\
-//                     nuo tø 30$ yra nuskaièiuojami 15$ ir pervedami á policijos biudþetà, o\n\
-//                     likusi suma atitenka savivaldybei.\n{BABABA}Áveskite procentà:");
-//                 ShowPlayerDialog(playerid, DIALOG_AM_OTHER_TAXES_POLICE, DIALOG_STYLE_INPUT, "Bendri mokeðèiai", string, "Tæsti", "Atðaukti");
-//             }
-//             else InfoBox(playerid, IB_NO_PRIVILEGE);
-//         }
-//         case 2:
-//         {
-//             ShowPlayerDialog(playerid, DIALOG_AM_OTHER_POLICE_WEAPONS, DIALOG_STYLE_INPUT, "Policijos nustatymai", "{FFFFFF}Áveskite kiek ginklø vienetø telpa policijos frakcijoms.\nPo 1 vnt. nuimama kiekvienà kartà pasiëmus ginklà ið /wepstore", "Tæsti", "Atðaukti");
-//         }
-//         case 3:
-//         {
-//             ShowPlayerDialog(playerid, DIALOG_AM_OTHER_POLICE_SKINS, DIALOG_STYLE_INPUT, "Policijos nustatymai", "{FFFFFF}Áveskite kiek aprangø vienetø telpa policijos frakcijoms.\nPo 1 vnt. nuimama keièiant aprangà /pdskins arba /duty", "Tæsti", "Atðaukti");
-//         }
-//         case 4:
-//         {
-//             ShowPlayerDialog(playerid, DIALOG_AM_OTHER_POLICE_SPECIAL, DIALOG_STYLE_INPUT, "Policijos nustatymai", "{FFFFFF}Áveskite kiek spec. daiktø vienetø telpa policijos frakcijoms.\nPo 1 vnt. nuimama duodant þenklelá, imant grenatas, SWAT skinus", "Tæsti", "Atðaukti");
-//         }
-//         case 5:
-//         {
-//             ShowPlayerDialog(playerid, DIALOG_AM_OTHER_MAX_CHARACTERS, DIALOG_STYLE_INPUT, "Maks. veikëjø skaièius", "{FFFFFF}Áveskite maksimalø veikëjø skaièiø vienam þaidëjui", "Tæsti", "Atðaukti");
-//         }
-//     }
-// }
-
-
-
-// case 2:
-// {
-//     // namo mokesciai
-//     new string[256];
-//     format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiø dydis\t$%d", GetGVarInt("HouseTaxes"));
-//     ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_TAXES_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Namo nustatymai", string, "Tæsti", "Atðaukti");
-// }
-// case 3:
-// {
-//     // ijungimai/isjungimai
-//     new string[512];
-//     format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Furniture multi-select sistema\t%s\nPervedimø sistema\t%s\nPrisijungimo 30s laikmatis\t%s\nIðmestø daiktø saugojimas\t%s\nPolicijos atsargø sistema\t%s\nDarbø 3DTextLabel\t%s\nVerslø 3DTextLabel\t%s\nNamø 3DTextLabel\t%s",
-//         GetGVarInt("EnabledFurnitureMultiSelect") > 0 ? ("Ájungta") : ("Iðjungta"),
-//         GetGVarInt("EnabledTransactions") > 0 ? ("Ájungta") : ("Iðjungta"),
-//         GetGVarInt("EnabledLoginTimer") > 0 ? ("Ájungta") : ("Iðjungta"),
-//         GetGVarInt("EnabledDroppedItemsSaving") > 0 ? ("Ájungta") : ("Iðjungta"),
-//         GetGVarInt("EnabledPoliceWeaponUsage") > 0 ? ("Ájungta") : ("Iðjungta"),
-//         GetGVarInt("EnabledJobLabels") > 0 ? ("Ájungta") : ("Iðjungta"),
-//         GetGVarInt("EnabledBusinessLabels") > 0 ? ("Ájungta") : ("Iðjungta"),
-//         GetGVarInt("EnabledHouseLabels") > 0 ? ("Ájungta") : ("Iðjungta"));
-//     ShowPlayerDialog(playerid, DIALOG_AM_ENABLES_DISABLES_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Ájungimai/iðjungimai", string, "Tæsti", "Atðaukti");
-// }
-// case 4:
-// {
-//     // spawn nustatymai
-//     MsgInfo(playerid, "SPAWN", "Pasirinkta vieta bus nustatyta á jûsø dabartinæ.");
-//     ShowPlayerDialog(playerid, DIALOG_AM_SPAWN_MAIN, DIALOG_STYLE_LIST, "Vietø nustatymai", "Kalëjmo pasodinimo vieta\nIðleidimo ið kalëjimo vieta\nAreðtinës pasodinimo vieta\nIðleidimo ið areðtinës vieta\nOOC kalëjimo vidus\nIðleidimo ið OOC kalëjimo vieta\nBanko vidaus vieta\nSPAWN po mirties vieta\nKalëjimo vieta (/prison)\nAreðtinës vieta (/arrest)\n/ad vieta\nSPAWN vieta", "Nustatyti", "Atðaukti");
-// }
