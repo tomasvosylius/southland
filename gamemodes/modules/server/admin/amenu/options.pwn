@@ -312,5 +312,59 @@ static _Opts_Places_Main(playerid)
 */
 static _Opts_Other_Main(playerid)
 {
+    dialog_Clear();
+    // dialog_AddLine("Mokeðèiai valstybei");
     return 1;
 }
+
+
+// if(response)
+// {
+//     switch(listitem)
+//     {
+//         case 0:
+//         {
+//             // visas proc
+//             if(HaveAdminPermission(playerid, "EditCityTaxes"))
+//             {
+//                 ShowPlayerDialog(playerid, DIALOG_AM_OTHER_TAXES_TOTAL, DIALOG_STYLE_INPUT, "Bendri mokeðèiai", "\
+//                     {FFFFFF}Ávestas bendras procentas bus nuimamas nuo algos ir atitinkamai\n\
+//                     padalintas á savivaldybës ir policijos biudþetà\n\
+//                     {BABABA}Áveskite procentà:", "Tæsti", "Atðaukti");
+//             }
+//             else InfoBox(playerid, IB_NO_PRIVILEGE);
+//         }
+//         case 1:
+//         {
+//             // proc i pd
+//             if(HaveAdminPermission(playerid, "EditCityTaxes"))
+//             {
+//                 new string[800];
+//                 strcat(string, "{FFFFFF}Ávestas procentas bus atimamas ið bendro procento nuo algos\n\
+//                     ir pervedamas á policijos biudþetà, o likusi suma á savivaldybës biudþetà.\n\
+//                     Pvz. jei þaidëjas uþdirba 300$, o bendras mokeðèiø procentas yra 10proc.\n");
+//                 strcat(string, "nuo þaidëjo ið viso algos nuimami 30$. Tad ðiame lange ávedus 50proc.,\n\
+//                     nuo tø 30$ yra nuskaièiuojami 15$ ir pervedami á policijos biudþetà, o\n\
+//                     likusi suma atitenka savivaldybei.\n{BABABA}Áveskite procentà:");
+//                 ShowPlayerDialog(playerid, DIALOG_AM_OTHER_TAXES_POLICE, DIALOG_STYLE_INPUT, "Bendri mokeðèiai", string, "Tæsti", "Atðaukti");
+//             }
+//             else InfoBox(playerid, IB_NO_PRIVILEGE);
+//         }
+//         case 2:
+//         {
+//             ShowPlayerDialog(playerid, DIALOG_AM_OTHER_POLICE_WEAPONS, DIALOG_STYLE_INPUT, "Policijos nustatymai", "{FFFFFF}Áveskite kiek ginklø vienetø telpa policijos frakcijoms.\nPo 1 vnt. nuimama kiekvienà kartà pasiëmus ginklà ið /wepstore", "Tæsti", "Atðaukti");
+//         }
+//         case 3:
+//         {
+//             ShowPlayerDialog(playerid, DIALOG_AM_OTHER_POLICE_SKINS, DIALOG_STYLE_INPUT, "Policijos nustatymai", "{FFFFFF}Áveskite kiek aprangø vienetø telpa policijos frakcijoms.\nPo 1 vnt. nuimama keièiant aprangà /pdskins arba /duty", "Tæsti", "Atðaukti");
+//         }
+//         case 4:
+//         {
+//             ShowPlayerDialog(playerid, DIALOG_AM_OTHER_POLICE_SPECIAL, DIALOG_STYLE_INPUT, "Policijos nustatymai", "{FFFFFF}Áveskite kiek spec. daiktø vienetø telpa policijos frakcijoms.\nPo 1 vnt. nuimama duodant þenklelá, imant grenatas, SWAT skinus", "Tæsti", "Atðaukti");
+//         }
+//         case 5:
+//         {
+//             ShowPlayerDialog(playerid, DIALOG_AM_OTHER_MAX_CHARACTERS, DIALOG_STYLE_INPUT, "Maks. veikëjø skaièius", "{FFFFFF}Áveskite maksimalø veikëjø skaièiø vienam þaidëjui", "Tæsti", "Atðaukti");
+//         }
+//     }
+// }
