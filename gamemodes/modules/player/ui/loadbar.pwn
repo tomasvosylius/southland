@@ -57,7 +57,7 @@ timer PT_LoadBarUpdate[100](playerid, value, finishValue)
 
     value += 1;
 
-    PlayerTextDrawTextSize(playerid, TD_Core[playerid][idx_Core_Value], (26.50 / finishValue * value) * 2.65, 3.0);
+    PlayerTextDrawTextSize(playerid, TD_Core[playerid][idx_Core_Value], (26.50 / finishValue * value) * 10.0, 3.0);
     PlayerTextDrawShow(playerid, TD_Core[playerid][idx_Core_Value]);
 
     if(value >= finishValue)

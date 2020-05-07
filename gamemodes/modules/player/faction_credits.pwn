@@ -1,6 +1,7 @@
 #include <YSI_Coding\y_hooks>
 
 #define MAX_WEAPONS_PER_WEEK    3
+#define DAYS_TO_REROLL_WEAPONS  7
 
 static 
     player_FactionCredits[MAX_PLAYERS],
@@ -58,26 +59,38 @@ static
 
 /* Events */
 hook OnServerOptionsLoad()
-{
-    new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID);
-    if(days <= 0)
-    {
-        _GunDealer_RerollWeapons(.save = true);
-    }
-    return 1;
+{  
+    _BlackMarket_CheckDays(.add = 0);
 }
 
 hook OnNewDay()
 {
-    new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID) - 1;
-    SetGVarInt("DAYS_REROLL_GUNS", days, SERVER_VARS_ID);
-
-    if(days <= 0)
-    {
-        _GunDealer_RerollWeapons(.save = true);
-    }
+    _BlackMarket_CheckDays();
     return 1;
 }
+static _BlackMarket_CheckDays(add = -1)
+{
+    new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID) + add;
+    if(days <= 0)
+    {
+        _GunDealer_RerollWeapons();
+        days = DAYS_TO_REROLL_WEAPONS;
+    }
+
+    SetGVarInt("DAYS_REROLL_GUNS", days, SERVER_VARS_ID);
+    SaveServerIntEx("DAYS_REROLL_GUNS", days);
+
+    // new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID) - 1;
+
+    // if(days <= 0)
+    // {
+    //     SetGVarInt("DAYS_REROLL_GUNS", 7, SERVER_VARS_ID);
+    //     _GunDealer_RerollWeapons(.save = true);
+    // }
+    // else SetGVarInt("DAYS_REROLL_GUNS", 7, SERVER_VARS_ID);
+    return 1;
+}
+
 
 hook OnGameModeInit()
 {
@@ -140,9 +153,9 @@ static _GunDealer_RerollPlace()
     return 1;
 }
 
-static _GunDealer_RerollWeapons(bool:save = false)
+static _GunDealer_RerollWeapons()
 {
-    printf("_GunDealer_RerollWeapons(%d, %d):", save, GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID));
+    printf("_GunDealer_RerollWeapons(%d):", GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID));
     for(new w = 0; w < MAX_WEAPONS_PER_WEEK; w++)
     {
         new index = NONE;
@@ -164,11 +177,6 @@ static _GunDealer_RerollWeapons(bool:save = false)
             GetInventoryItemName(dealer_WeaponsList[index][dw_WeaponId]),
             dealer_WeaponsSelected_Price[w]
         );
-    }
-    if(save)
-    {
-        new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID);
-        SaveServerIntEx("DAYS_REROLL_GUNS", days);
     }
     return 1;
 }
