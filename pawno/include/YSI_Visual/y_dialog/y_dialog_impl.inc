@@ -76,6 +76,8 @@ static stock
 	YSI_g_sPlayerDialog[MAX_PLAYERS] = {-1, ...},
 	bool:YSI_g_sPlayerMaster[MAX_PLAYERS] = {false, ...},
 	Func:YSI_g_sPlayerCallback[MAX_PLAYERS]<ii>;
+new 
+	YSI_g_sDialogInput[144];
 
 stock Dialog_Get(playerid)
 {
@@ -161,6 +163,8 @@ HOOK__ OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			// we don't free the memory for the callback prematurely.
 			broadcastfunc Dialog_Set(playerid, -1);
 			// Call the callback.
+			//@.callback(playerid, YSI_DIALOG_ID, response, listitem, isnull(inputtext) ? ("\1") : inputtext);
+			format(YSI_g_sDialogInput, 144, inputtext);
 			@.callback(response, listitem);
 			// Free the data.
 			Indirect_Release(callback);

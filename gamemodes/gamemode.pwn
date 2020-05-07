@@ -6579,7 +6579,8 @@ hook OnPlayerLeaveCharSelect(playerid)
 stock ShowPlayerLeaveConfirm(playerid)
 {
 	player_charList_ConfirmShown[playerid] = true;
-	dialog_SetHeader("Ar tikrai norite palikti serverá?");
+	dialog_Clear();
+	dialog_AddLine("Ar tikrai norite palikti serverá?");
 	Dialog_Show(playerid, ConfirmLeaveServer, DIALOG_STYLE_MSGBOX, "Patvirtinimas", dialog_GetBody(), "Taip", "Ne");
 	return 1;
 }
@@ -6746,12 +6747,15 @@ stock User_GetNewCharacterReason(playerid)
 
 stock Register_ShowDiscordInput(playerid)
 {
-	dialog_SetHeader("{f1f1f1}Norëdami þaisti ðiame serveryje, turite sujungti savo vartotojà su Discord.");
-	dialog_SetBody("{f1f1f1}1. Prisijunkite prie mûsø Discord serverio: {FAD831}invite.gg/southland");
-	dialog_SetBody("{f1f1f1}2. Ásitikinkite, jog esate patvirtines Discord vartotojo tel. numerá.");
-	dialog_SetBody("{f1f1f1}3. Discord kanale paraðykite {FAD831}!verify %s", GetPlayerNameEx(playerid));
+	dialog_Clear();
+
+	dialog_AddLine("{f1f1f1}Norëdami þaisti ðiame serveryje, turite sujungti savo vartotojà su Discord.");
+	dialog_AddLine("{f1f1f1}1. Prisijunkite prie mûsø Discord serverio: {FAD831}invite.gg/southland");
+	dialog_AddLine("{f1f1f1}2. Ásitikinkite, jog esate patvirtines Discord vartotojo tel. numerá.");
+	dialog_AddLine("{f1f1f1}3. Discord kanale paraðykite {FAD831}!verify %s", GetPlayerNameEx(playerid));
 	dialog_SkipLine();
-	dialog_SetBody("{f1f1f1}4. Áveskite {FA9231}gautà kodà:");
+	dialog_AddLine("{f1f1f1}4. Áveskite {FA9231}gautà kodà:");
+
 	Dialog_Show(playerid, InputDiscordCode, DIALOG_STYLE_INPUT, "Discord kodas", dialog_GetBody(), "Patvirtinti", "Iðeiti");
 	return 1;
 }
@@ -6789,8 +6793,8 @@ Dialog:InputDiscordCode(playerid, response, listitem, inputtext[])
 forward OnDiscordVerified(playerid);
 public OnDiscordVerified(playerid)
 {
-	dialog_SetHeader("");
-	dialog_SetBody("{ffffff}Sëkmingai patvirtinote vartotojà!\nDabar bûsite perkeltas á veikëjo kûrimà.");
+	dialog_Clear();
+	dialog_AddLine("{ffffff}Sëkmingai patvirtinote vartotojà!\nDabar bûsite perkeltas á veikëjo kûrimà.");
 	Dialog_Show(playerid, DialogRegisterInfo, DIALOG_STYLE_MSGBOX, "Registracija", dialog_GetBody(), "Gerai", "");
 	return 1;
 }
@@ -8031,9 +8035,10 @@ public QuestionLoad(playerid)
 	if(cache_num_rows())
 	{
 		cache_get_value_name(0, "Question", string);
-		dialog_SetHeader("Kadangi jungiatës ið kito IP, praðome atsakyti á saugos klausimà:");
-		dialog_SkipLine();
-		dialog_SetBody(string);
+		dialog_Clear();
+		dialog_AddLine("Kadangi jungiatës ið kito IP, praðome atsakyti á saugos klausimà:");
+		dialog_AddLine(string);
+
 		Dialog_Show(playerid, DialogUserLoginSecurity, DIALOG_STYLE_INPUT, "Saugos klausimas", dialog_GetBody(), "Toliau", "Iðeiti");
 	}
 	else
@@ -32301,8 +32306,8 @@ CMD:newchars(playerid, params[])
 
 stock Admin_NewChars_ShowMain(playerid)
 {
-	dialog_SetHeader("");
-	dialog_SetBody("Perþiûrëti visas anketas");
+	dialog_Clear();
+	dialog_AddLine("Perþiûrëti visas anketas");
 	Dialog_Show(playerid, DialogAdminNewCharsMain, DIALOG_STYLE_LIST, "Nepatvirtinti veikëjai", dialog_GetBody(), "Tæsti", "Atðaukti");
 	return 1;
 }

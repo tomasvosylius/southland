@@ -232,22 +232,18 @@ CMD:orderweapons(playerid, params[])
 {
     if(player_FactionCredits[playerid] <= 0) return SendError(playerid, "Neturi nei 1 frakcijos kredito.");
 
-    dialog_SetHeader("{F2F2F2}Ðià savaitæ galiu pasiûlyt:\n");
-	
-    new 
-        body[1024];
+    dialog_Clear();
+    dialog_AddLine("{F2F2F2}Ðià savaitæ galiu pasiûlyt:\n");
 
     for(new w = 0; w < MAX_WEAPONS_PER_WEEK; w++)
     {
-        format(body, sizeof body, "%s{F2F2F2} - [%s] \t[%d$]  ((+%d f. kred.))\n",  
-            body,
+        dialog_AddLine("{F2F2F2} - [%s] \t[%d$]  ((+%d f. kred.))",
             GetInventoryItemName(dealer_WeaponsList[dealer_WeaponsSelected[w]][dw_WeaponId]),
             dealer_WeaponsSelected_Price[w],
             dealer_WeaponsList[dealer_WeaponsSelected[w]][dw_PriceCredits]
         );
     }
 
-	dialog_SetBody(body);
 	Dialog_Show(playerid, ConfirmWeaponsOrder, DIALOG_STYLE_MSGBOX, "Þinutë nuo 5649998:", dialog_GetBody(), "Paþymëti", "Uþdaryti");
     return 1;
 }
@@ -316,12 +312,11 @@ static _GunDealer_MarkCheckpoint(playerid)
 
 static _GunDealer_ShowPurchaseList(playerid)
 {
-    dialog_SetHeader("");
-	
+    dialog_Clear();
 
     for(new w = 0; w < MAX_WEAPONS_PER_WEEK; w++)
     {
-        dialog_SetBody("{F2F2F2}%s\t[%d$]\t((+%d frakc. kred.))",
+        dialog_AddLine("{F2F2F2}%s\t[%d$]\t((+%d frakc. kred.))",
             GetInventoryItemName(dealer_WeaponsList[dealer_WeaponsSelected[w]][dw_WeaponId]),
             dealer_WeaponsSelected_Price[w],
             dealer_WeaponsList[dealer_WeaponsSelected[w]][dw_PriceCredits]
