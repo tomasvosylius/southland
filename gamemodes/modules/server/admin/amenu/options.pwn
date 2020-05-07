@@ -65,27 +65,28 @@ static _Opts_Vehicles_Main(playerid)
     {
         if(response)
         {
-            if(HaveAdminPermission(playerid, "EditVehicleTaxes"))
+            if(!HaveAdminPermission(playerid, "EditVehicleTaxes"))
             {
-                dialog_Row("Mokeðèiø dydis") return _Opts_Vehicles_InputTaxes(playerid);
-
-                dialog_Row("Ar papildomai priskaièiuoti pagal tr. priemonës klasæ?")     
-                {
-                    SetGVarIntEx("CountVehicleClass", !GetGVarInt("CountVehicleClass"));
-                    
-                    SaveServerIntEx("CountVehicleClass", GetGVarInt("CountVehicleClass"));
-                    MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-
-                    log_init(true);
-                    log_set_table("logs_admins");
-                    log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-                    log_set_values("'%d','%e','Nustate automobilio klases priskaiciavima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GetGVarInt("CountVehicleClass"));
-                    log_commit();
-
-                    return _Opts_Main(playerid);
-                }
+                InfoBox(playerid, IB_NO_PRIVILEGE);
+                return _Opts_Main(playerid);
             }
-            else InfoBox(playerid, IB_NO_PRIVILEGE);
+
+            dialog_Row("Mokeðèiø dydis") return _Opts_Vehicles_InputTaxes(playerid);
+
+            dialog_Row("Ar papildomai priskaièiuoti pagal tr. priemonës klasæ?")     
+            {
+                SetGVarIntEx("CountVehicleClass", !GetGVarInt("CountVehicleClass"));
+                SaveServerIntEx("CountVehicleClass", GetGVarInt("CountVehicleClass"));
+
+                MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+
+                log_init(true);
+                log_set_table("logs_admins");
+                log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
+                log_set_values("'%d','%e','Nustate automobilio klases priskaiciavima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GetGVarInt("CountVehicleClass"));
+                log_commit();
+            }
+            _Opts_Vehicles_Main(playerid);
         }
         else AMenu_Main(playerid);
     }
@@ -185,7 +186,7 @@ static _Opts_Business_InputTaxes(playerid, error[] = "")
         _Opts_Business_Main(playerid);
         return 1;
     }
-    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "", "Pakeisti", "Iðeiti");
+    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Verslo mokeðèiai", "Pakeisti", "Iðeiti");
     return 1;
 }
 
@@ -531,17 +532,18 @@ static _Opts_Places_Main(playerid)
 
         MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
 
+        if(!isequal(set, "Spawn"))
+        {
+            SetGVarIntEx(va_return("%sInt", set), int);
+            SetGVarIntEx(va_return("%sVW", set), vw);
+        }
+        
         switch(YHash(set, false))
         {
             case _I<Bank>: Bank_CreatePickup();
             case _I<Ad>: AdPlace_CreateLabel();
         }
 
-        if(!isequal(set, "Spawn"))
-        {
-            SetGVarIntEx(va_return("%sInt", set), int);
-            SetGVarIntEx(va_return("%sVW", set), vw);
-        }
     }  
     dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, "Vietø nustatymai", "Nustatyti", "Atðaukti");
     return 1;
