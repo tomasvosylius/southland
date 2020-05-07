@@ -408,6 +408,7 @@ CREATE TABLE IF NOT EXISTS `drops_data` (
 CREATE TABLE IF NOT EXISTS `enters_exits` (
 `id` int(11) NOT NULL,
   `Name` varchar(32) NOT NULL,
+  `PickupType` int NOT NULL default 0,
   `EnterX` float NOT NULL,
   `EnterY` float NOT NULL,
   `EnterZ` float NOT NULL,

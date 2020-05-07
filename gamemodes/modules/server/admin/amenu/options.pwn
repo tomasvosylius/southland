@@ -28,6 +28,7 @@ static _Opts_Main(playerid)
             dialog_Row("Vietø nustatymai")         return _Opts_Places_Main(playerid);
             dialog_Row("Kiti nustatymai")          return _Opts_Other_Main(playerid);
         }
+        else AMenu_Main(playerid);
     }
     dialog_Show(playerid, using inline options, DIALOG_STYLE_LIST, "Bendrieji serverio nustatymai", "Tæsti", "Atðaukti");
     return 1;

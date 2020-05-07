@@ -298,15 +298,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_CLOTHE_CHANGE_BONE 		63
 #define DIALOG_CLOTHES_LIST_EDIT		64
 #define DIALOG_AM_MAIN					65
-#define DIALOG_AM_OPTIONS_SERVER		66
-#define DIALOG_AM_HOUSE_TAXES_MAIN		67
-#define DIALOG_AM_HOUSE_TAXES_SET 		68
-#define DIALOG_AM_ENABLES_DISABLES_MAIN 73
-#define DIALOG_AM_ENTERS_MAIN 			74
-#define DIALOG_AM_ENTER_CREATE 			75
-#define DIALOG_AM_ENTERS_ALL 			76
-#define DIALOG_AM_ENTER_EDIT_NAME		77
-#define DIALOG_AM_ENTER_EDIT_MAIN		78
 #define DIALOG_AM_ATMS_MAIN				79
 #define DIALOG_AM_ATM_WITHDRAW_LIMIT	80
 #define DIALOG_AM_SPAWN_MAIN			81
@@ -538,9 +529,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_GM_SELL_MAIN 				310
 #define DIALOG_PAY_FINE 					311
 #define DIALOG_PAY_FINE_TYPE 				312
-#define DIALOG_AM_OTHER_OPTIONS_MAIN 		313
-#define DIALOG_AM_OTHER_TAXES_TOTAL 		314
-#define DIALOG_AM_OTHER_TAXES_POLICE 		315
 #define DIALOG_WEAPON_TRUNK 				316
 #define DIALOG_FM_USER_PRIVILEGES 			317
 #define DIALOG_AM_OTHER_POLICE_WEAPONS 		318
@@ -996,6 +984,8 @@ enum E_ENTER_EXIT_DATA
 	Float:eeEnterZ,
 	eeEnterVW,
 	eeEnterInt,
+	eeEnterPickupType,
+	eeEnterPickup,
 	Float:eeExitX,
 	Float:eeExitY,
 	Float:eeExitZ,
@@ -2232,6 +2222,8 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // Amenu
 #include "modules\server\admin\amenu/main.pwn"
 #include "modules\server\admin\amenu/options.pwn"
+#include "modules\server\admin\amenu/enters.pwn"
+#include "modules\server\admin\amenu/atm.pwn"
 
 // Jobs
 #include "modules\server\jobs/thief.pwn"
@@ -12782,217 +12774,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BM_MAIN, 1, 0, "");
 		}
-		case DIALOG_AM_ENTER_CREATE:
-		{
-			if(response)
-			{
-				if(strlen(inputtext) < 3 || strlen(inputtext) > 32)
-				{
-					SendError(playerid, "Pavadinimas per trumpas arba per ilgas.");
-					return OnDialogResponse(playerid, DIALOG_AM_ENTERS_MAIN, 1, 0, "");
-				}
-				new itter = -1;
-				if((itter = Iter_Free(EnterExit)) != -1)
-				{
-					new Float:x, Float:y, Float:z, string[256];
-					GetPlayerPos(playerid, x, y, z);
-					mysql_format(chandler, string, sizeof string, "INSERT INTO `enters_exits` (`EnterX`, `EnterY`, `EnterZ`, `Name`, `EnterVW`, `EnterInt`, `Added`) VALUES ('%f','%f','%f','%e','%d','%d','%d')",
-						x, y, z, inputtext, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), PlayerInfo[playerid][pId]);
-					new Cache:result = mysql_query(chandler, string, true);
-					if(mysql_errno() == 0)
-					{
-						cache_set_active(result);
-						EntersExits[itter][eeId] = cache_insert_id();
-						Iter_Add(EnterExit, itter);
-						MsgSuccess(playerid, "ÁËJIMAI/IÐËJIMAI", "Sëkmingai sukûrëte áëjimà, kurio ID: %d. Praðome nustatyti iðëjimo koordinates.", EntersExits[itter][eeId]);
-						tmpSelected[playerid] = itter;
-						format(EntersExits[itter][eeName], 32, inputtext);
-						EntersExits[itter][eeEnterX] = x,
-						EntersExits[itter][eeEnterY] = y,
-						EntersExits[itter][eeEnterZ] = z,
-						EntersExits[itter][eeEnterVW] = GetPlayerVirtualWorld(playerid),
-						EntersExits[itter][eeEnterInt] = GetPlayerInterior(playerid);
-						format(string, sizeof string, "%s\n{DBDBDB}Raðykite /enter", EntersExits[itter][eeName]);
-						EntersExits[itter][eeEnterLabel] = CreateDynamic3DTextLabel(string, 0xFFAB00FF, EntersExits[itter][eeEnterX], EntersExits[itter][eeEnterY], EntersExits[itter][eeEnterZ], 13.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, EntersExits[itter][eeEnterVW], EntersExits[itter][eeEnterInt]);
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-						log_set_values("'%d','%e','(AM) Sukure nauja iejima (EE)','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[itter][eeId], inputtext);
-						log_commit();
-					}
-					else
-					{
-						SendError(playerid, "Siøsta uþklausa nepavyko [%d]", mysql_errno());
-					}
-					if(cache_is_valid(result)) cache_delete(result);
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 1, "");
-		}
-		case DIALOG_AM_ENTERS_ALL:
-		{
-			if(response)
-			{
-				tmpSelected[playerid] = tmpArray[playerid][listitem];
-				ShowPlayerDialog(playerid, DIALOG_AM_ENTER_EDIT_MAIN, DIALOG_STYLE_LIST, "Serverio iðëjimo/áëjimo redagavimas", "Keisti pavadinimà\nKeisti áëjimà\nKeisti iðëjimà\nTeleportuotis á áëjimà\nTeleportuotis á iðëjimà\n{C60000}Iðtrinti", "Tæsti", "Atðaukti");
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 1, "");
-		}
-		case DIALOG_AM_ENTER_EDIT_NAME:
-		{
-			if(response)
-			{
-				new name[32];
-				if(sscanf(inputtext,"s[32]",name)) return OnDialogResponse(playerid, DIALOG_AM_ENTER_EDIT_MAIN, 1, 0, "");
-				new selected = tmpSelected[playerid];
-				format(EntersExits[selected][eeName], 32, name);
-				new string[256];
-				mysql_format(chandler, string, sizeof string, "UPDATE `enters_exits` SET Name = '%e' WHERE id = '%d'", name, EntersExits[selected][eeId]);
-				mysql_fquery(chandler, string, "OptionsSavedEx");
-				if(IsValidDynamic3DTextLabel(EntersExits[selected][eeEnterLabel])) DestroyDynamic3DTextLabel(EntersExits[selected][eeEnterLabel]);
-				format(string, sizeof string, "%s\n{DBDBDB}Raðykite /enter", EntersExits[selected][eeName]);
-				EntersExits[selected][eeEnterLabel] = CreateDynamic3DTextLabel(string, 0xFFAB00FF, EntersExits[selected][eeEnterX], EntersExits[selected][eeEnterY], EntersExits[selected][eeEnterZ], 13.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, EntersExits[selected][eeEnterVW], EntersExits[selected][eeEnterInt]);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-				log_set_values("'%d','%e','(AM) Pakeite iejimo pavadinima','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[selected][eeId], name);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 1, "");
-		}
-		case DIALOG_AM_ENTER_EDIT_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// pavadinima
-						ShowPlayerDialog(playerid, DIALOG_AM_ENTER_EDIT_NAME, DIALOG_STYLE_INPUT, "Serverio iðëjimo/áëjimo redagavimas", "{FFFFFF}Áveskite naujà áëjimo pavadinimà.\n{BABABA}Jis bus rodomas tik áëjimo vietoje. Iðëjimo vietoje bus rodoma \"Iðëjimas\"", "Keisti", "Atðaukti");
-					}
-					case 1:
-					{
-						// keisti iejima
-						new Float:x, Float:y, Float:z, string[256],
-							selected = tmpSelected[playerid];
-						GetPlayerPos(playerid, x, y, z);
-						EntersExits[selected][eeEnterX] = x,
-						EntersExits[selected][eeEnterY] = y,
-						EntersExits[selected][eeEnterZ] = z,
-						EntersExits[selected][eeEnterVW] = GetPlayerVirtualWorld(playerid),
-						EntersExits[selected][eeEnterInt] = GetPlayerInterior(playerid);
-						MsgSuccess(playerid, "ÁËJIMAI/IÐËJIMAI", "Áëjimo vieta sëkmingai pakeista");
-						mysql_format(chandler, string, sizeof string, "UPDATE `enters_exits` SET EnterX = '%f', EnterY = '%f', EnterZ = '%f', EnterInt = '%d', EnterVW = '%d' WHERE id = '%d'", x, y, z, GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid), EntersExits[selected][eeId]);
-						mysql_fquery(chandler, string, "EnterExitPosChange");
-						if(IsValidDynamic3DTextLabel(EntersExits[selected][eeEnterLabel])) DestroyDynamic3DTextLabel(EntersExits[selected][eeEnterLabel]);
-						format(string, sizeof string, "%s\n{DBDBDB}Raðykite /enter", EntersExits[selected][eeName]);
-						EntersExits[selected][eeEnterLabel] = CreateDynamic3DTextLabel(string, 0xFFAB00FF, EntersExits[selected][eeEnterX], EntersExits[selected][eeEnterY], EntersExits[selected][eeEnterZ], 13.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, EntersExits[selected][eeEnterVW], EntersExits[selected][eeEnterInt]);
-						OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 1, "");
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-						log_set_values("'%d','%e','(AM) Pakeite EE iejimo vieta','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[selected][eeId], EntersExits[selected][eeName]);
-						log_commit();
-					}
-					case 2:
-					{
-						// keisti isejima
-						new Float:x, Float:y, Float:z, string[256],
-							selected = tmpSelected[playerid];
-						GetPlayerPos(playerid, x, y, z);
-						EntersExits[selected][eeExitX] = x,
-						EntersExits[selected][eeExitY] = y,
-						EntersExits[selected][eeExitZ] = z,
-						EntersExits[selected][eeExitVW] = GetPlayerVirtualWorld(playerid),
-						EntersExits[selected][eeExitInt] = GetPlayerInterior(playerid);
-						MsgSuccess(playerid, "ÁËJIMAI/IÐËJIMAI", "Iðëjimo vieta sëkmingai pakeista");
-						mysql_format(chandler, string, sizeof string, "UPDATE `enters_exits` SET ExitX = '%f', ExitY = '%f', ExitZ = '%f', ExitInt = '%d', ExitVW = '%d' WHERE id = '%d'", x, y, z, GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid), EntersExits[selected][eeId]);
-						mysql_fquery(chandler, string, "EnterExitPosChange");
-						if(IsValidDynamic3DTextLabel(EntersExits[selected][eeExitLabel])) DestroyDynamic3DTextLabel(EntersExits[selected][eeExitLabel]);
-						EntersExits[selected][eeExitLabel] = CreateDynamic3DTextLabel("Iðëjimas\nRaðykite /exit", 0x618B4CFF, EntersExits[selected][eeExitX], EntersExits[selected][eeExitY], EntersExits[selected][eeExitZ], 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, EntersExits[selected][eeExitVW], EntersExits[selected][eeExitInt]);
-						OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 1, "");
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-						log_set_values("'%d','%e','(AM) Pakeite EE isejimo vieta','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[selected][eeId], EntersExits[selected][eeName]);
-						log_commit();
-					}
-					case 3:
-					{
-						new selected = tmpSelected[playerid];
-						SetPlayerPos(playerid, EntersExits[selected][eeEnterX], EntersExits[selected][eeEnterY], EntersExits[selected][eeEnterZ]);
-						SetPlayerInterior(playerid, EntersExits[selected][eeEnterInt]);
-						SetPlayerVirtualWorld(playerid, EntersExits[selected][eeEnterVW]);
-					}
-					case 4:
-					{
-						new selected = tmpSelected[playerid];
-						SetPlayerPos(playerid, EntersExits[selected][eeExitX], EntersExits[selected][eeExitY], EntersExits[selected][eeExitZ]);
-						SetPlayerInterior(playerid, EntersExits[selected][eeExitInt]);
-						SetPlayerVirtualWorld(playerid, EntersExits[selected][eeExitVW]);
-					}
-					case 5:
-					{
-						// istrinti
-						new selected = tmpSelected[playerid];
-						if(IsValidDynamic3DTextLabel(EntersExits[selected][eeExitLabel])) DestroyDynamic3DTextLabel(EntersExits[selected][eeExitLabel]);
-						if(IsValidDynamic3DTextLabel(EntersExits[selected][eeEnterLabel])) DestroyDynamic3DTextLabel(EntersExits[selected][eeEnterLabel]);
 
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-						log_set_values("'%d','%e','(AM) Istryne EE','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[selected][eeId], EntersExits[selected][eeName]);
-						log_commit();
-
-						new string[126],
-							__reset_EnterExit[E_ENTER_EXIT_DATA];
-						mysql_format(chandler, string, sizeof string, "DELETE FROM `enters_exits` WHERE id = '%d'", EntersExits[selected][eeId]);
-						mysql_fquery(chandler, string, "EnterExitDeleted");
-						EntersExits[selected] = __reset_EnterExit;
-						EntersExits[selected][eeExitLabel] = 
-						EntersExits[selected][eeEnterLabel] = INVALID_3DTEXT_ID;
-						Iter_Remove(EnterExit, selected);
-						MsgSuccess(playerid, "ÁËJIMAI/IÐËJIMAI", "Áëjimas sëkmingai iðtrintas.");
-						ShowPlayerAdminMenu(playerid);
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_ENTERS_MAIN, 1, 1, "");
-		}
-		case DIALOG_AM_ENTERS_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// kurti
-						ShowPlayerDialog(playerid, DIALOG_AM_ENTER_CREATE, DIALOG_STYLE_INPUT, "Serverio iðëjimo/áëjimo kûrimas", "{FFFFFF}Áveskite naujo áëjimo pavadinimà.\n{BABABA}Jis bus rodomas tik áëjimo vietoje. Iðëjimo vietoje bus rodoma \"Iðëjimas\"", "Kurti", "Atðaukti");
-					}
-					case 1:
-					{
-						// esami iejimai
-						new string[2024],
-							line[56],
-							real_itter;
-						foreach(new id : EnterExit)
-						{
-							if(EntersExits[id][eeId] != 0)
-							{
-								tmpArray[playerid][real_itter] = id;
-								format(line, sizeof line, "%d. %.12s(ID:%d)\n", real_itter+1, EntersExits[id][eeName], strlen(EntersExits[id][eeName]) > 14 ? ("...") : (" "), EntersExits[id][eeId]);
-								strcat(string, line);
-								real_itter++;
-							}
-						}
-						ShowPlayerDialog(playerid, DIALOG_AM_ENTERS_ALL, DIALOG_STYLE_LIST, "Serverio iðëjimai/áëjimai", string, "Tæsti", "Atðaukti");
-					}
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
 		case DIALOG_AM_ATM_WITHDRAW_LIMIT:
 		{
 			if(response)
@@ -16069,11 +15851,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 				{
-					case 1:
-					{
-						// serverio iejimai/isejimai
-						ShowPlayerDialog(playerid, DIALOG_AM_ENTERS_MAIN, DIALOG_STYLE_LIST, "Serverio iðëjimai/áëjimai", "Kurti naujà\nPerþiûrëti visus", "Tæsti", "Atðaukti");
-					}
 					case 2:
 					{
 						// bankomatai
@@ -26270,6 +26047,7 @@ stock LoadEntersExits(bool:restart = false)
 		{
 			IsValidDynamic3DTextLabel(EntersExits[i][eeEnterLabel]) && DestroyDynamic3DTextLabel(EntersExits[i][eeEnterLabel]);
 			IsValidDynamic3DTextLabel(EntersExits[i][eeExitLabel]) && DestroyDynamic3DTextLabel(EntersExits[i][eeExitLabel]);
+			
 			EntersExits[i][eeEnterLabel] = 
 			EntersExits[i][eeExitLabel] = INVALID_3DTEXT_ID;
 		}
@@ -26277,17 +26055,66 @@ stock LoadEntersExits(bool:restart = false)
 	}
 	mysql_tquery(chandler, "SELECT * FROM `enters_exits`", "EntersExitsLoad");
 }
+
+stock EnterExit_CreateLabel(iter)
+{
+	IsValidDynamic3DTextLabel(EntersExits[iter][eeEnterLabel]) && DestroyDynamic3DTextLabel(EntersExits[iter][eeEnterLabel]);
+	IsValidDynamic3DTextLabel(EntersExits[iter][eeExitLabel]) && DestroyDynamic3DTextLabel(EntersExits[iter][eeExitLabel]);
+	IsValidDynamicPickup(EntersExits[iter][eeEnterPickup]) && sd_DestroyDynamicPickup(EntersExits[iter][eeEnterPickup]);
+
+	new string[256];
+	format(string, sizeof string, "%s\n{DBDBDB}Raðykite /enter", EntersExits[iter][eeName]);
+	EntersExits[iter][eeEnterLabel] = CreateDynamic3DTextLabel(string, 0xFFAB00FF, 
+		EntersExits[iter][eeEnterX],
+		EntersExits[iter][eeEnterY],
+		EntersExits[iter][eeEnterZ], 
+		13.0, 
+		INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 
+		EntersExits[iter][eeEnterVW], EntersExits[iter][eeEnterInt]
+	);
+
+	if(EntersExits[iter][eeEnterPickupType] != 0)
+	{
+		EntersExits[iter][eeEnterPickup] = sd_CreateDynamicPickup(
+			PICKUP_TYPE_NONE,
+			iter,
+			EntersExits[iter][eeEnterPickupType],
+			1,
+			EntersExits[iter][eeEnterX],
+			EntersExits[iter][eeEnterY],
+			EntersExits[iter][eeEnterZ],
+			EntersExits[iter][eeEnterVW], EntersExits[iter][eeEnterInt]
+		);
+	}
+
+	if(EntersExits[iter][eeExitX] != 0.0 && EntersExits[iter][eeExitY] != 0.0 && EntersExits[iter][eeExitZ] != 0.0)
+	{
+		EntersExits[iter][eeExitLabel] = CreateDynamic3DTextLabel("Iðëjimas\nRaðykite /exit",
+			0x618B4CFF,
+			EntersExits[iter][eeExitX],
+			EntersExits[iter][eeExitY],
+			EntersExits[iter][eeExitZ],
+			10.0,
+			INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, EntersExits[iter][eeExitVW], EntersExits[iter][eeExitInt]
+		);
+	}
+	else EntersExits[iter][eeExitLabel] = INVALID_3DTEXT_ID;
+
+	return 1;
+}
+
+
 forward EntersExitsLoad();
 public EntersExitsLoad()
 {
 	Iter_Clear(EnterExit);
 	new rows = cache_num_rows();
-	new string[256];
 	for(new i = 0; i < rows; i++)
 	{
 		printf("i: %d", i);
 
 		cache_get_value_name_int(i, "id", EntersExits[i][eeId]);
+		cache_get_value_name_int(i, "PickupType", EntersExits[i][eeEnterPickupType]);
 		cache_get_value_name_int(i, "EnterInt", EntersExits[i][eeEnterInt]);
 		cache_get_value_name_int(i, "ExitInt", EntersExits[i][eeExitInt]);
 		cache_get_value_name_int(i, "EnterVW", EntersExits[i][eeEnterVW]);
@@ -26299,9 +26126,8 @@ public EntersExitsLoad()
 		cache_get_value_name_float(i, "ExitX", EntersExits[i][eeExitX]);
 		cache_get_value_name_float(i, "ExitY", EntersExits[i][eeExitY]);
 		cache_get_value_name_float(i, "ExitZ", EntersExits[i][eeExitZ]);
-		format(string, sizeof string, "\"%s\"\n{DBDBDB}Raðykite /enter", EntersExits[i][eeName]);
-		EntersExits[i][eeEnterLabel] = CreateDynamic3DTextLabel(string, 0xFFAB00FF, EntersExits[i][eeEnterX], EntersExits[i][eeEnterY], EntersExits[i][eeEnterZ], 13.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, EntersExits[i][eeEnterVW], EntersExits[i][eeEnterInt]);
-		EntersExits[i][eeExitLabel] = CreateDynamic3DTextLabel("Iðëjimas\nRaðykite /exit", 0x618B4CFF, EntersExits[i][eeExitX], EntersExits[i][eeExitY], EntersExits[i][eeExitZ], 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, EntersExits[i][eeExitVW], EntersExits[i][eeExitInt]);
+		
+		EnterExit_CreateLabel(i);
 		Iter_Add(EnterExit, i);
 	}
 	printf("[load] %d iejimu/isejimu", rows);
