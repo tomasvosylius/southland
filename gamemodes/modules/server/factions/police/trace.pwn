@@ -171,7 +171,7 @@ public T_TraceTimer(playerid, targetid, index)
 stock Player_Trace_ShowTracing(playerid, index, targetid, number = 0)
 {
 	static 
-		string[MAX_PLAYERS][512],
+		player_string[MAX_PLAYERS][512],
 		towers_saved[MAX_PLAYERS][4],
 		best_tower[MAX_PLAYERS],
 		Float:best_distance[MAX_PLAYERS];
@@ -181,10 +181,11 @@ stock Player_Trace_ShowTracing(playerid, index, targetid, number = 0)
 
 	if(index == 0) 
 	{
+		// Reset data
 		for(new i = 0; i < 4; i++) towers_saved[playerid][i] = -1;
 		best_tower[playerid] = -1;
 		best_distance[playerid] = -1.0;
-		format(string[playerid], 512, "{ba804d}Numerio %d susekimas pradëtas!\n", number);
+		format(player_string[playerid], 512, "{ba804d}Numerio %d susekimas pradëtas!\n", number);
 	}
 	else
 	{
@@ -212,22 +213,26 @@ stock Player_Trace_ShowTracing(playerid, index, targetid, number = 0)
 				}
 				format(line, sizeof line, "\n{bababa}Gautas signalas ið {eccf75}%s{bababa}: {f1c745}%s", Towers[towers_saved[playerid][index]][twName], Trace_GetStrenghtNameByDistance(distance));
 			}
-			strcat(string[playerid], line);
+			strcat(player_string[playerid], line);
 		}
 		else
 		{
 			if(best_tower[playerid] != -1)
 			{
 				format(line, sizeof line, "\n{89c245}Numeris susektas, jo apytikslë vieta paþymëta þemëlapyje.");
-				strcat(string[playerid], line);
+				strcat(player_string[playerid], line);
 
 				Trace_ShowGangZone(playerid, targetid, best_tower[playerid], best_distance[playerid]);
 			}
 			else return SendWarning(playerid, "{e03241}Numerio susekti nepavyko.");
 		}
 	}
-	Dialog_Show(playerid, D_Trace, DIALOG_STYLE_MSGBOX, "Numerio sekimas", string[playerid], "Gerai", "");
-	//ShowPlayerDialog(playerid, 0, DIALOG_STYLE_MSGBOX, "Numerio sekimas", string[playerid], "Gerai", "");
+	
+	dialog_Clear();
+	dialog_AddLine(player_string[playerid]);
+
+	inline traceDialog(response, listitem) return 1;
+	dialog_Show(playerid, using inline traceDialog, DIALOG_STYLE_MSGBOX, "Numerio sekimas", "Gerai", "");
 	return 1;
 }
 

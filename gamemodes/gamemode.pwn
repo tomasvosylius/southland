@@ -13,7 +13,7 @@
 
 // ==============================================================================#
 // Includinam funkciju failus
-#pragma warning disable 239, 217, 214
+#pragma warning disable 203, 239, 217, 214
 #define YSI_NO_HEAP_MALLOC
 #define CGEN_MEMORY 		(100000)
 
@@ -33,8 +33,7 @@
 #include <YSI_Coding\y_inline>
 #include <YSI_Coding\y_timers>
 #include <YSI_Coding\y_stringhash>
-//#include <YSI\y_dialog>
-#include <easyDialog>
+#include <YSI_Visual\y_dialog>
 #include <sscanf2>
 #include <pawn.CMD>
 #include <md5>
@@ -299,14 +298,10 @@ native gpci(playerid, serial[], len);
 #define DIALOG_CLOTHE_EDIT 				62
 #define DIALOG_CLOTHE_CHANGE_BONE 		63
 #define DIALOG_CLOTHES_LIST_EDIT		64
-#define DIALOG_AM_MAIN 					65
-#define DIALOG_AM_OPTIONS_SERVER 		66
+#define DIALOG_AM_MAIN					65
+#define DIALOG_AM_OPTIONS_SERVER		66
 #define DIALOG_AM_HOUSE_TAXES_MAIN		67
 #define DIALOG_AM_HOUSE_TAXES_SET 		68
-#define DIALOG_AM_BUSINESS_OPTIONS_MAIN	69
-#define DIALOG_AM_BUSINESS_TAXES_SET	70
-#define DIALOG_AM_VEHICLE_TAXES_MAIN	71
-#define DIALOG_AM_VEHICLE_TAXES_SET		72
 #define DIALOG_AM_ENABLES_DISABLES_MAIN 73
 #define DIALOG_AM_ENTERS_MAIN 			74
 #define DIALOG_AM_ENTER_CREATE 			75
@@ -511,8 +506,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_AM_BM_HOUSE_EDIT_PRICE 		275
 #define DIALOG_AM_BM_HOUSE_EDIT_OWNER 		276
 #define DIALOG_AM_BM_HOUSE_EDIT_TYPE 		277
-#define DIALOG_AM_BUSINESS_FUEL_CAPACITY 	278
-#define DIALOG_AM_BUSINESS_FUEL_PRICE 	 	279
 #define DIALOG_BM_FUEL_ORDER_CONFIRM 		280
 #define DIALOG_BM_FUEL_MAIN 				281
 #define DIALOG_AM_BM_DEALER_EDIT_DRUGS_ALL 	282
@@ -869,7 +862,7 @@ native gpci(playerid, serial[], len);
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-#define USING_VIRTUAL_PRIVATE_SERVER
+// #define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -2161,26 +2154,26 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 //#include "core\map\newbie.pwn"
 //#include "core\map\alhambra_replacement.pwn"
 // #include "core\map\empty_houses.pwn"
-// #include "other\map\central_hotel.pwn"
-#include "other\map\vm.pwn"
-#include "other\map\misc.pwn"
-#include "other\map\detailings.pwn"
-#include "other\map\interiors.pwn"
-#include "other\map\school.pwn"
-#include "other\map\docks.pwn"
-#include "other\map\corona247.pwn"
-#include "other\map\willowfield_garage.pwn"
-#include "other\map\idlewood_pizza_corner.pwn"
-#include "other\map\prison.pwn"
-#include "other\map\mechanics.pwn"
-#include "other\map\government.pwn"
-#include "other\map\ls_dump.pwn"
-#include "other\map\ls_logistics.pwn"
-#include "other\map\bank.pwn"
+// #include "other\map\vm.pwn"
+// #include "other\map\misc.pwn"
+// #include "other\map\detailings.pwn"
+// #include "other\map\interiors.pwn"
+// #include "other\map\school.pwn"
+// #include "other\map\docks.pwn"
+// #include "other\map\corona247.pwn"
+// #include "other\map\willowfield_garage.pwn"
+// #include "other\map\idlewood_pizza_corner.pwn"
+// #include "other\map\prison.pwn"
+// #include "other\map\mechanics.pwn"
+// #include "other\map\government.pwn"
+// #include "other\map\ls_dump.pwn"
+// #include "other\map\ls_logistics.pwn"
+// #include "other\map\bank.pwn"
 
 // #include "other\map\interiors.pwn"
 // #include "other\map\china_town.pwn"
 
+// #include "other\map\central_hotel.pwn"
 // #include "core\map\squatters.pwn"
 // #include "core\map\ganton_basketball.pwn"
 // #include "core\map\idlewood_basket.pwn"
@@ -2229,12 +2222,16 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player\ui/loadbar.pwn"
 
 /** Server modules */
-#include "modules\bots/npc.pwn"
+// #include "modules\bots/npc.pwn"
 #include "modules\server/inventory.pwn"
-#include "modules\server/graffiti.pwn"
+// #include "modules\server/graffiti.pwn"
 #include "modules\server/boombox.pwn"
 #include "modules\server/paynspray.pwn"
 //#include "modules\server/gifts.pwn"
+
+// Amenu
+#include "modules\server\admin\amenu/main.pwn"
+#include "modules\server\admin\amenu/options.pwn"
 
 // Jobs
 #include "modules\server\jobs/thief.pwn"
@@ -3945,7 +3942,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			}
 			else if(RentedBy[vehicleid] == INVALID_PLAYER_ID)
 			{
-				Dialog_Show(playerid, DialogRentMain, DIALOG_STYLE_MSGBOX, "Nuoma", "{BABABA}Ði tr. priemonë yra nuomos.\nAr norite jà iðsinuomoti uþ "#DEFAULT_CAR_RENT_PRICE"/min?\nNuomà nutraukti galësite su /cancelvehiclerent", "Taip", "Ne");
+				Rent_ShowConfirmDialog(playerid);
 			}
 		}
 		if(VehicleInfo[vehicleid][vFaction] == -1)
@@ -4115,29 +4112,38 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	return 1;
 }
 
-Dialog:DialogRentMain(playerid, response, listitem, inputtext[])
+stock Rent_ShowConfirmDialog(playerid)
 {
-	if(response)
+	dialog_Clear();
+	dialog_AddLine("{BABABA}Ði tr. priemonë yra nuomos.");
+	dialog_AddLine("Ar norite jà iðsinuomoti uþ "#DEFAULT_CAR_RENT_PRICE"/min?");
+	dialog_AddLine("Nuomà nutraukti galësite su /cancelvehiclerent");
+	
+	inline rentDg(response, listitem)
 	{
-		new 
-			vehicleid = GetPlayerVehicleID(playerid);
-		if(RentedVeh[playerid] != INVALID_VEHICLE_ID)
+		if(response)
 		{
-			SendWarning(playerid, "Jûs jau nuomuojatës automobilá. Naudokite /cancelvehiclerent");
-			RemovePlayerFromVehicle(playerid);
-			return 1;
-		}		
-		else
-		{
-			RentedVeh[playerid] = vehicleid;
-			RentedBy[vehicleid] = playerid;
+			new 
+				vehicleid = GetPlayerVehicleID(playerid);
+			if(RentedVeh[playerid] != INVALID_VEHICLE_ID)
+			{
+				SendWarning(playerid, "Jûs jau nuomuojatës automobilá. Naudokite /cancelvehiclerent");
+				RemovePlayerFromVehicle(playerid);
+				return 1;
+			}		
+			else
+			{
+				RentedVeh[playerid] = vehicleid;
+				RentedBy[vehicleid] = playerid;
 
-			SendFormat(playerid, 0xBABABAFF, "Iðsinuomavote automobilá. Tai jums kainuos $25/min");
-			SendFormat(playerid, 0xFFFFFFFF, "Norëdami atðaukti nuomà, naudokite /cancelvehiclerent");
-			SendFormat(playerid, 0xBABABAFF, "Susprogdinus nuomos automobilá, gausite $500 baudà!");
+				SendFormat(playerid, 0xBABABAFF, "Iðsinuomavote automobilá. Tai jums kainuos $25/min");
+				SendFormat(playerid, 0xFFFFFFFF, "Norëdami atðaukti nuomà, naudokite /cancelvehiclerent");
+				SendFormat(playerid, 0xBABABAFF, "Susprogdinus nuomos automobilá, gausite $500 baudà!");
+			}
 		}
+		else RemovePlayerFromVehicle(playerid);
 	}
-	else RemovePlayerFromVehicle(playerid);
+	dialog_Show(playerid, using inline rentDg, DIALOG_STYLE_MSGBOX, "Nuoma", "Taip", "Ne");
 	return 1;
 }
 
@@ -6581,39 +6587,32 @@ stock ShowPlayerLeaveConfirm(playerid)
 	player_charList_ConfirmShown[playerid] = true;
 	dialog_Clear();
 	dialog_AddLine("Ar tikrai norite palikti serverá?");
-	Dialog_Show(playerid, ConfirmLeaveServer, DIALOG_STYLE_MSGBOX, "Patvirtinimas", dialog_GetBody(), "Taip", "Ne");
-	return 1;
-}
+	inline confirmLeaveServer(response, listitem)
+	{
+		player_charList_ConfirmShown[playerid] = false;
+		player_WaitCharTextdraw[playerid] = 1;
 
-Dialog:ConfirmLeaveServer(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-		Kick(playerid);
+		if(response) 	Kick(playerid);
+		else 			SelectTextDraw(playerid, CHARSELECT_COLOR);
 	}
-	else
-	{
-		SelectTextDraw(playerid, CHARSELECT_COLOR);
-	}
-	player_charList_ConfirmShown[playerid] = false;
-	player_WaitCharTextdraw[playerid] = 1;
+	dialog_Show(playerid, using inline confirmLeaveServer, DIALOG_STYLE_MSGBOX, "Patvirtinimas", "Taip", "Ne");
 	return 1;
 }
 
 stock ShowPlayerCharCreateHelp(playerid)
 {
 	player_charList_GUIShown[playerid] = true;
-	Dialog_Show(playerid, CharCreateHelp, DIALOG_STYLE_MSGBOX, "Trumpa info [?]", "Roleplay - realybës atkartojimas þaidime. Þaidþiant roleplay tipo serveryje jûsø tikslas yra savo veiksmus iðreikðti kuo realistiðkiau.", "Gerai", "");
+	dialog_AddLine("Roleplay - realybës atkartojimas þaidime.");
+	dialog_AddLine("Þaidþiant roleplay tipo serveryje jûsø tikslas yra savo veiksmus iðreikðti kuo realistiðkiau.");
+
+	inline charCreateHelp(response, listitem)
+	{
+		player_charList_GUIShown[playerid] = false;
+		player_WaitCharTextdraw[playerid] = 1;
+	}
+	dialog_Show(playerid, using inline charCreateHelp, DIALOG_STYLE_MSGBOX, "[?] Trumpa info", "Gerai", "");
 	return 1;
 }
-
-Dialog:CharCreateHelp(playerid, result, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	player_WaitCharTextdraw[playerid] = 1;
-	return 1;
-}
-
 
 stock Dialog_PrepareAnswer(const given[])
 {	
@@ -6756,51 +6755,41 @@ stock Register_ShowDiscordInput(playerid)
 	dialog_SkipLine();
 	dialog_AddLine("{f1f1f1}4. Áveskite {FA9231}gautà kodà:");
 
-	Dialog_Show(playerid, InputDiscordCode, DIALOG_STYLE_INPUT, "Discord kodas", dialog_GetBody(), "Patvirtinti", "Iðeiti");
-	return 1;
-}
-
-Dialog:InputDiscordCode(playerid, response, listitem, inputtext[])
-{
-	if(response)
+	inline inputDiscordCode(response, listitem)
 	{
-		if(!strlen(inputtext)) return Register_ShowDiscordInput(playerid);
-
-		new string[126];
-		inline checkCode()
+		if(response)
 		{
-			if(cache_num_rows())
+			if(!strlen(dialog_Input())) return Register_ShowDiscordInput(playerid);
+
+			inline checkCode()
 			{
-				MsgSuccess(playerid, "Serveris", "Sëkmingai patvirtinote vartotojà! Gero þaidimo.");
-				PlayerInfo[playerid][pDiscordVerified] = 2;
-				mysql_format(chandler, string, sizeof string, "\
-					UPDATE `users_data` SET `DiscordVerified`='2' WHERE id = '%d'", PlayerInfo[playerid][pUserId]);
-				mysql_tquery(chandler, string, "OnDiscordVerified", "d", playerid);
+				if(cache_num_rows())
+				{
+					MsgSuccess(playerid, "Serveris", "Sëkmingai patvirtinote vartotojà! Gero þaidimo.");
+					PlayerInfo[playerid][pDiscordVerified] = 2;
+
+					inline verifyDc()
+					{
+						SendFormat(playerid, -1,  "Sëkmingai patvirtinote vartotojà! Dabar bûsite perkeltas á veikëjo kûrimà.");
+						CharCreateTD_Show(playerid);
+						return 1;
+					}
+					mysql_tquery_inline(chandler, using inline verifyDc, "\
+						UPDATE `users_data` SET `DiscordVerified`='2' WHERE id = '%d'", PlayerInfo[playerid][pUserId]);
+				}
+				else 
+				{
+					SendError(playerid, "Patvirtinimo kodas neteisingas!");
+					return Register_ShowDiscordInput(playerid);
+				}
 			}
-			else 
-			{
-				SendError(playerid, "Patvirtinimo kodas neteisingas!");
-				Register_ShowDiscordInput(playerid);
-			}
+			mysql_tquery_inline(chandler, using inline checkCode, "\
+				SELECT NULL FROM `users_data` WHERE id = '%d' AND DiscordCode='%e' AND DiscordVerified!='2'",
+				PlayerInfo[playerid][pUserId], dialog_Input());
 		}
-		mysql_tquery_inline(chandler, using inline checkCode, "\
-			SELECT NULL FROM `users_data` WHERE id = '%d' AND DiscordCode='%e' AND DiscordVerified!='2'",
-			PlayerInfo[playerid][pUserId], inputtext);
+		else Kick(playerid);
 	}
-	else Kick(playerid);
-	return 1;
-}
-forward OnDiscordVerified(playerid);
-public OnDiscordVerified(playerid)
-{
-	dialog_Clear();
-	dialog_AddLine("{ffffff}Sëkmingai patvirtinote vartotojà!\nDabar bûsite perkeltas á veikëjo kûrimà.");
-	Dialog_Show(playerid, DialogRegisterInfo, DIALOG_STYLE_MSGBOX, "Registracija", dialog_GetBody(), "Gerai", "");
-	return 1;
-}
-Dialog:DialogRegisterInfo(playerid, response, listitem, inputtext[])
-{
-	CharCreateTD_Show(playerid);
+	dialog_Show(playerid, using inline inputDiscordCode, DIALOG_STYLE_INPUT, "Discord kodas", "Patvirtinti", "Iðeiti");
 	return 1;
 }
 
@@ -6985,150 +6974,169 @@ stock GetCharCount(playerid)
 }
 
 stock CharCreate_ShowAnswerInput(playerid, q)
-{
-	new 
-		string[512];
+{	
+	dialog_Clear();
+	dialog_AddLine("{c9c9c9}Klausimas nr. %d:", q + 1);
+	dialog_AddLine("{bbe0ea}%s", NewCharQuestions[q]);
+	dialog_SkipLine();
+	dialog_AddLine("Jûsø ávestas atsakymas:");
+	dialog_AddLine(Dialog_PrepareAnswer(player_CharAnswers[playerid][q]));
+	dialog_SkipLine();
+	dialog_AddLine("Ávedus naujà tekstà, senasis iðsitrins. Atsakymà veskite kaip galima trumpesná!\t \t \t \t ");
 
-	format(string, sizeof string, "{c9c9c9}Klausimas nr. %d:\n{bbe0ea}%s\n{c9c9c9}Jûsø ávestas atsakymas:\n{bbe0ea}%s\n\n{f0a046}Ávedus naujà tekstà, senasis iðsitrins. Atsakymà veskite kaip galima trumpesná!\t \t \t \t ", q + 1, NewCharQuestions[q], Dialog_PrepareAnswer(player_CharAnswers[playerid][q]));
-	Dialog_Show(playerid, CharCreateAnswer, DIALOG_STYLE_INPUT, "Atsakymas", string, "Pakeisti", "Uþdaryti");
-	player_AnswerInput[playerid] = q;
-	player_charList_GUIShown[playerid] = true;
-	return 1;
-}
-Dialog:CharCreateAnswer(playerid, response, listitem, inputtext[])
-{
-	if(response)
+	inline inputAnswer(response, listitem)
 	{
-		new q = player_AnswerInput[playerid];
-		if(strlen(inputtext) <= 0) return CharCreate_ShowAnswerInput(playerid, q);
-		strmid(player_CharAnswers[playerid][q], inputtext, 0, strlen(inputtext));
-		strreplace(player_CharAnswers[playerid][q], "~", "-");
-		strreplace(player_CharAnswers[playerid][q], "%", "#");
-		strcat(player_CharAnswers[playerid][q], "_");
-		PlayerTextDrawSetString(playerid, create_p_td_answer[playerid][q], Textdraw_PrepareAnswer(player_CharAnswers[playerid][q]));
+		if(response)
+		{
+			if(strlen(dialog_Input()) <= 0)
+				return CharCreate_ShowAnswerInput(playerid, q);
+
+			strmid(player_CharAnswers[playerid][q], dialog_Input(), 0, strlen(dialog_Input()));
+			
+			strreplace(player_CharAnswers[playerid][q], "~", "-");
+			strreplace(player_CharAnswers[playerid][q], "%", "#");
+			strcat(player_CharAnswers[playerid][q], "_");
+
+			PlayerTextDrawSetString(playerid, create_p_td_answer[playerid][q], Textdraw_PrepareAnswer(player_CharAnswers[playerid][q]));
+		}
+		player_charList_GUIShown[playerid] = false;
 	}
-	player_charList_GUIShown[playerid] = false;
+	player_charList_GUIShown[playerid] = true;
+
+	dialog_Show(playerid, using inline inputAnswer, DIALOG_STYLE_INPUT, "Atsakymas", "Pakeisti", "Uþdaryti");
 	return 1;
 }
 
 stock CharCreate_ShowAgeInput(playerid)
 {
-	Dialog_Show(playerid, DialogNewCharAgeInput, DIALOG_STYLE_INPUT, "Veikëjo amþius", "{c9c9c9}Áveskite naujai kuriamo veikëjo gimimo metus {f0a046}(1930-2017)", "Pakeisti", "Atðaukti");
-	player_charList_GUIShown[playerid] = true;
-	return 1;
-}
-Dialog:DialogNewCharAgeInput(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	player_WaitCharTextdraw[playerid] = 1;
-	if(response)
+	dialog_Clear();
+	dialog_AddLine("{c9c9c9}Áveskite naujai kuriamo veikëjo gimimo metus {f0a046}(1930-2017)");
+
+	inline inputAge(response, listitem)
 	{
-		new 
-			date,
-			string[126];
-		if(sscanf(inputtext,"d",date) || !(1930 <= date <= 2017)) return SendError(playerid, "Formatas netinkamas!");
-		player_CharDate[playerid] = date;
-		format(string, sizeof string, "%d", date);
-		PlayerTextDrawSetString(playerid, create_p_td_age[playerid], string);
+		player_charList_GUIShown[playerid] = false;
+		player_WaitCharTextdraw[playerid] = 1;
+
+		if(response)
+		{
+			new 
+				date;
+
+			if(sscanf(dialog_Input(),"d",date) || !(1930 <= date <= 2017))
+				return SendError(playerid, "Formatas netinkamas!");
+
+			player_CharDate[playerid] = date;
+			PlayerTextDrawSetString(playerid, create_p_td_age[playerid], va_return("%d", date));
+		}
 	}
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline inputAge, DIALOG_STYLE_INPUT, "Veikëjo amþius", "Pakeisti", "Atðaukti");
 	return 1;
 }
 
 stock CharCreate_ShowNameInput(playerid)
 {
-	Dialog_Show(playerid, DialogNewCharNameInput, DIALOG_STYLE_INPUT, "Veikëjo vardas", "{c9c9c9}Áveskite naujai kuriamo veikëjo vardà ir pavardæ.\n{f0a046}Formatas: Vardas_Pavardë, 1-24 simboliai", "Pakeisti", "Atðaukti");
+	dialog_Clear();
+	dialog_AddLine("{c9c9c9}Áveskite naujai kuriamo veikëjo vardà ir pavardæ.");
+	dialog_AddLine("{f0a046}Formatas: Vardas_Pavardë, 6-24 simboliai");
+
+	inline inputName(response, listitem)
+	{
+		player_charList_GUIShown[playerid] = false;
+		player_WaitCharTextdraw[playerid] = 1;
+
+		if(response)
+		{
+			if(!(6 < strlen(dialog_Input()) <= 24) || !CheckRoleplayName(dialog_Input()))
+				return SendError(playerid, "Vardo formatas netinkamas!");
+
+			format(player_CharName[playerid], 24, "%s", dialog_Input());
+			PlayerTextDrawSetString(playerid, create_p_td_name[playerid], dialog_Input());
+		}
+	}
 	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline inputName, DIALOG_STYLE_INPUT, "Veikëjo vardas", "Pakeisti", "Atðaukti");
 	return 1;
 }
 
-Dialog:DialogNewCharNameInput(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	player_WaitCharTextdraw[playerid] = 1;
-	if(response)
-	{
-		if(!(3 < strlen(inputtext) <= 24) || !CheckRoleplayName(inputtext)) return SendError(playerid, "Vardo formatas netinkamas!");
-		format(player_CharName[playerid], 24, "%s", inputtext);
-		PlayerTextDrawSetString(playerid, create_p_td_name[playerid], inputtext);
-	}
-	return 1;
-}
 
 stock CharCreate_ShowGenderSelect(playerid)
 {
-	Dialog_Show(playerid, DialogNewCharGender, DIALOG_STYLE_LIST, "Veikëjo lytis", "Vyras\nMoteris", "Pakeisti", "Atðaukti");
-	player_charList_GUIShown[playerid] = true;
-	return 1;
-}
-Dialog:DialogNewCharGender(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	player_WaitCharTextdraw[playerid] = 1;
-	if(response)
+	dialog_Clear();
+	dialog_AddOption(">", "Vyras");
+	dialog_AddOption(">", "Moteris");
+
+	inline selectGender(response, listitem)
 	{
-		player_CharGender[playerid] = listitem + 1;
-		PlayerTextDrawSetString(playerid, create_p_td_gender[playerid], listitem == 0 ? ("Vyras") : ("Moteris"));
+		player_charList_GUIShown[playerid] = false;
+		player_WaitCharTextdraw[playerid] = 1;
+		if(response)
+		{
+			player_CharGender[playerid] = listitem + 1;
+			PlayerTextDrawSetString(playerid, create_p_td_gender[playerid], listitem == 0 ? ("Vyras") : ("Moteris"));
+		}
 	}
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline selectGender, DIALOG_STYLE_LIST, "Veikëjo lytis", "Pakeisti", "Atðaukti");
 	return 1;
 }
 
 stock CharCreate_ShowSkinSelect(playerid)
 {
-	player_charList_GUIShown[playerid] = true;
-	Dialog_Show(playerid, DialogNewCharSkin, DIALOG_STYLE_INPUT, "Veikëjo tautybë", "{c9c9c9}Áveskite iðvaizdos numerá (1-312)", "Pakeisti", "Atðaukti");
-	return 1;
-}
-Dialog:DialogNewCharSkin(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	player_WaitCharTextdraw[playerid] = 1;
-	if(response)
+	dialog_Clear();
+	dialog_AddLine("{c9c9c9}Áveskite iðvaizdos numerá (1-312)");
+
+	inline inputSkin(response, listitem)
 	{
-		new 	
-			skin,
-			str[12];
-		if(sscanf(inputtext,"d",skin) || !(1 <= skin <= 312)) return SendError(playerid, "Formatas netinkamas!");
-		player_CharSkin[playerid] = skin;
+		player_charList_GUIShown[playerid] = false;
+		player_WaitCharTextdraw[playerid] = 1;
 
-			
-		format(str, sizeof str, "%d", skin);
-		PlayerTextDrawSetString(playerid, create_p_td_skin[playerid], str);
+		if(response)
+		{
+			new 	
+				skin;
 
-		PlayerTextDrawSetPreviewModel(playerid, create_p_td_model[playerid], skin);
+			if(sscanf(dialog_Input(),"d",skin) || !(1 <= skin <= 312))
+				return SendError(playerid, "Formatas netinkamas!");
 
-
-		PlayerTextDrawHide(playerid, create_p_td_model[playerid]);
-		PlayerTextDrawShow(playerid, create_p_td_model[playerid]);
+			player_CharSkin[playerid] = skin;
+				
+			PlayerTextDrawSetString(playerid, create_p_td_skin[playerid], va_return("%d", skin));
+			PlayerTextDrawSetPreviewModel(playerid, create_p_td_model[playerid], skin);
+			PlayerTextDrawHide(playerid, create_p_td_model[playerid]);
+			PlayerTextDrawShow(playerid, create_p_td_model[playerid]);
+		}
 	}
+
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline inputSkin, DIALOG_STYLE_INPUT, "Veikëjo iðvaizda", "Pakeisti", "Atðaukti");
 	return 1;
 }
-
 
 stock CharCreate_ShowOriginSelect(playerid)
 {
-	player_charList_GUIShown[playerid] = true;
-	new 
-		string[512];
+	dialog_Clear();
 	for(new i = 0; i < sizeof OriginsList; i++)
 	{
-		i && strcat(string, "\n");
-		strcat(string, OriginsList[i]);
+		dialog_AddLine(OriginsList[i]);
 	}
-	Dialog_Show(playerid, DialogNewCharOrigin, DIALOG_STYLE_LIST, "Veikëjo tautybë", string, "Pakeisti", "Atðaukti");
-	return 1;
-}
-Dialog:DialogNewCharOrigin(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	player_WaitCharTextdraw[playerid] = 1;
-	if(response)
-	{
-		player_CharOrigin[playerid] = listitem + 1;
-		PlayerTextDrawSetString(playerid, create_p_td_origin[playerid], formatlt(OriginsList[listitem]));
-	}
-	return 1;
-}
 
+	inline selectOrigin(response, listitem)
+	{
+		player_charList_GUIShown[playerid] = false;
+		player_WaitCharTextdraw[playerid] = 1;
+
+		if(response)
+		{
+			player_CharOrigin[playerid] = listitem + 1;
+			PlayerTextDrawSetString(playerid, create_p_td_origin[playerid], formatlt(OriginsList[listitem]));
+		}
+	}
+
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline selectOrigin, DIALOG_STYLE_LIST, "Veikëjo tautybë", "Pakeisti", "Atðaukti");
+	return 1;
+}
 
 hook OnPlayerSubmitNewChar(playerid)
 {
@@ -7284,61 +7292,66 @@ stock DonatorMenu_Main(playerid, selected)
 {
 	new 
 		index = player_charList_Page[playerid]*2 + selected,
-		bool:is_confirmed = (player_CharArray[playerid][index][1] == 1 ? true : false),
-		string[246];
+		bool:is_confirmed = (player_CharArray[playerid][index][1] == 1 ? true : false);
 	
 	if(!is_confirmed)
 	{
 		return SendError(playerid, "Ðis veikëjas yra nepatvirtintas.");
 	}
 
-	format(string, sizeof string, "Informacija apie remëjus\nVeikëjo vardo keitimas (%d)\nTelefono numerio keitimas (%d)\nAutomobilio numeriø keitimas (%d)\n", PlayerInfo[playerid][pNameChanges], PlayerInfo[playerid][pNumberChanges], PlayerInfo[playerid][pPlateChanges]);
-	Dialog_Show(playerid, DialogDonatorMenuMain, DIALOG_STYLE_LIST, "Remëjo meniu", string, "Tæsti", "Atðaukti");
+	dialog_Clear();
+	dialog_AddLine("Informacija apie remëjus");
+	dialog_AddLine("Veikëjo vardo keitimas (%d)", PlayerInfo[playerid][pNameChanges]);
+	dialog_AddLine("Telefono numerio keitimas (%d)", PlayerInfo[playerid][pNumberChanges]);
+	dialog_AddLine("Automobilio numeriø keitimas (%d)", PlayerInfo[playerid][pPlateChanges]);
 
-	player_charList_GUIShown[playerid] = true;
-	return 1;
-}
-
-Dialog:DialogDonatorMenuMain(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	if(response)
+	inline donatorMain(response, listitem)
 	{
-		switch(listitem)
+		player_charList_GUIShown[playerid] = false;
+		if(response)
 		{
-			case 0:
+			dialog_Row("Informacija apie remëjus")
 			{
-				new 
-					string[512];
-				strcat(string, "Remëjo statusà gauna kiekvienas þmogus remiantis projektà.\n");
-				strcat(string, "Remëjo statusas yra uþdedamas vartotojui ir já galima naudoti su visais veikëjais.\n");
-				strcat(string, "Informacijà apie paramà, remëjø privilegijas rasite www.southland.lt > Parama");
-				Dialog_Show(playerid, DialogDonatorAbout, DIALOG_STYLE_MSGBOX, "Remëjo meniu > Informacija", string, "Uþdaryti", "");
+				
+				dialog_AddLine("Remëjo statusà gauna kiekvienas þmogus remiantis projektà.");
+				dialog_AddLine("Remëjo statusas yra uþdedamas vartotojui ir já galima naudoti su visais veikëjais.");
+				dialog_AddLine("Informacijà apie paramà, remëjø privilegijas rasite www.southland.lt > Parama");
+
+				inline about(r1, l1)
+				{
+					player_charList_GUIShown[playerid] = false;
+					return 1;
+				}
+				dialog_Show(playerid, using inline about, DIALOG_STYLE_MSGBOX, "Remëjo meniu > Informacija", "Uþdaryti", "");
+
 				player_charList_GUIShown[playerid] = true;
 			}
-			case 1:
+			dialog_Row("Veikëjo vardo keitimas")
 			{
 				// vardo keitimas
-				if(PlayerInfo[playerid][pNameChanges] <= 0) return SendWarning(playerid, "Jûs nebeturite vardo keitimø.");
-				new 
-					string[86];
-				mysql_format(chandler, string, sizeof string, "SELECT id,Name FROM `players_data` WHERE UserId = '%d'", PlayerInfo[playerid][pUserId]);
-				mysql_tquery(chandler, string, "PlayerDonatorCharsLoadForName", "d", playerid);
+				if(PlayerInfo[playerid][pNameChanges] <= 0)
+					return SendWarning(playerid, "Jûs nebeturite vardo keitimø.");
+
+				DonatorMenu_SelectCharForName(playerid);
 			}
-			case 2:
+			dialog_Row("Telefono numerio keitimas")
 			{
 				// numerio keitimas
-				if(PlayerInfo[playerid][pNumberChanges] <= 0) return SendWarning(playerid, "Jûs nebeturite tel. numerio keitimø.");
+				if(PlayerInfo[playerid][pNumberChanges] <= 0)
+					return SendWarning(playerid, "Jûs nebeturite tel. numerio keitimø.");
+
 				new 
 					string[86];
 				mysql_format(chandler, string, sizeof string, "SELECT id,Name FROM `players_data` WHERE UserId = '%d'", PlayerInfo[playerid][pUserId]);
 				mysql_tquery(chandler, string, "PlayerDonatorCharsLoadForNumber", "d", playerid);
 				
 			}
-			case 3:
+			dialog_Row("Automobilio numeriø keitimas")
 			{
 				// masinos numeriu keitimas
-				if(PlayerInfo[playerid][pPlateChanges] <= 0) return SendWarning(playerid, "Jûs nebeturite tr. priemonës numerio keitimø.");
+				if(PlayerInfo[playerid][pPlateChanges] <= 0)
+					return SendWarning(playerid, "Jûs nebeturite tr. priemonës numerio keitimø.");
+
 				SendWarning(playerid, "Atsipraðome, taèiau ði funkcija laikinai neveikia!");
 				//new 
 				//	string[86];
@@ -7346,102 +7359,117 @@ Dialog:DialogDonatorMenuMain(playerid, response, listitem, inputtext[])
 				//mysql_tquery(chandler, string, "PlayerDonatorCharsLoadForPlate", "d", playerid);
 			}
 		}
-	}
-	SelectTextDraw(playerid, CHARSELECT_COLOR);
+		else SelectTextDraw(playerid, CHARSELECT_COLOR);
+	}	
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline donatorMain, DIALOG_STYLE_LIST, "Remëjo meniu", "Tæsti", "Atðaukti");
 	return 1;
 }
+
 
 forward PlayerDonatorCharsLoadForNumber(playerid);
 public PlayerDonatorCharsLoadForNumber(playerid)
 {
 	new 
-		string[512],
 		line[48],
 		id,
 		rows = cache_num_rows();
+
 	if(!rows) return SendWarning(playerid, "Atsirado klaida ieðkant jûsø veikëjo.");
+
+	dialog_Clear();
+
 	for(new i = 0; i < rows; i++)
 	{
 		cache_get_value_name(i, "Name", line);
 		cache_get_value_name_int(i, "id", id);
 
-		format(line, sizeof line, "%d. %s(%d)\n", i + 1, line, id);
-		strcat(string, line);
+		dialog_AddLine(line, sizeof line, "%d. %s(%d)", i + 1, line, id);
 	}
 	SendFormat(playerid, 0xBABABAFF, "Pasirinkite veikëjà, kurio numerá norite pakeisti. Likæ numeriø keitimai: %d", PlayerInfo[playerid][pNumberChanges]);
-	Dialog_Show(playerid, D_DonatorCharListNumber, DIALOG_STYLE_LIST, "Remëjo meniu > Numerio keitimas", string, "Tæsti", "Atðaukti");
-	player_charList_GUIShown[playerid] = true;
-	return 1;
-}
-Dialog:D_DonatorCharListNumber(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	if(response)
+	
+	inline selectChar(response, listitem)
 	{
-		new 
-			string[126];
-		mysql_format(chandler, string, sizeof string, "SELECT id FROM `players_data` WHERE UserId = '%d' ORDER BY id ASC LIMIT 1 OFFSET %d", PlayerInfo[playerid][pUserId], listitem);
-		mysql_tquery(chandler, string, "DonatorSelectCharIdLoadNumber", "d", playerid);
-	}
-	else DonatorMenu_Main(playerid, player_charList_Selected[playerid]);
-	return 1;
-}
+		player_charList_GUIShown[playerid] = false;
 
-forward DonatorSelectCharIdLoadNumber(playerid);
-public DonatorSelectCharIdLoadNumber(playerid)
-{
-	if(cache_num_rows())
-	{
-		cache_get_value_name_int(0, "id", tmpSelected[playerid]);
-		DonatorMenu_ShowNumberInput(playerid);
-	}
-	else SendWarning(playerid, "Atsirado klaida ieðkant jûsø veikëjo.");
-	return 1;
-}
-
-stock DonatorMenu_ShowNumberInput(playerid)
-{
-	Dialog_Show(playerid, D_DonatorNumberInput, DIALOG_STYLE_INPUT, "Remëjo meniu > Numerio keitimas", "{c9c9c9}Áveskite naujà numerá.\n{ff0000}Numeris turi bûti tarp 200000 ir 300000", "Keisti", "Gráþti");
-	player_charList_GUIShown[playerid] = true;
-	return 1;
-}
-
-Dialog:D_DonatorNumberInput(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	new charid = tmpSelected[playerid];
-	if(response)
-	{
-		new 
-			string[126],
-			number,
-			online;
-		if(sscanf(inputtext,"d",number) || !(200000 <= number <= 300000)) return SendWarning(playerid, "Numeris turi bûti tarp 200000 ir 300000.") , DonatorMenu_ShowNumberInput(playerid);
-		if(IsPhoneNumberExisting(number)) return SendWarning(playerid, "Ðis numeris jau yra naudojamas.") , DonatorMenu_ShowNumberInput(playerid);
-
-		if((online = FindPlayerBySql(charid)) != INVALID_PLAYER_ID)
+		if(response)
 		{
-			PlayerInfo[online][pPhoneNumber] = number;
+			inline getId()
+			{
+				if(cache_num_rows())
+				{
+					new charid;
+					cache_get_value_name_int(0, "id", charid);
+					DonatorMenu_ShowNumberInput(playerid, charid);
+				}
+				else SendWarning(playerid, "Atsirado klaida ieðkant jûsø veikëjo.");
+			}
+			mysql_tquery_inline(chandler, using inline getId, "\
+				SELECT id FROM `players_data` WHERE UserId = '%d' ORDER BY id ASC LIMIT 1 OFFSET %d",
+				PlayerInfo[playerid][pUserId], listitem
+			);
 		}
-
-		PlayerInfo[playerid][pNumberChanges] --;
-		SaveUserIntEx(PlayerInfo[playerid][pUserId], "NumberChanges", PlayerInfo[playerid][pNumberChanges]);
-
-		SendFormat(playerid, 0xBABABAFF, "Numeris pakeistas á %d", number);
-
-		mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET PhoneNumber = '%d' WHERE id = '%d'", charid);
-		mysql_fquery(chandler, string, "PlayerSavedEx");
-
-		log_init(true);
-		log_set_table("logs_donators");
-		log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`,`ExtraId`");
-		log_set_values("'%d','%e','Pakeite veikejo numeri','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GetNameBySql(charid), number);
-		log_commit();
+		else DonatorMenu_Main(playerid, player_charList_Selected[playerid]);
 	}
-	else DonatorMenu_Main(playerid, charid);
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline selectChar, DIALOG_STYLE_LIST, "Remëjo meniu > Numerio keitimas", "Tæsti", "Atðaukti");
 	return 1;
 }
 
+stock DonatorMenu_ShowNumberInput(playerid, charid)
+{
+	dialog_Clear();
+	dialog_AddLine("{c9c9c9}Áveskite naujà numerá.");
+	dialog_AddLine("{ff0000}Numeris turi bûti tarp 100000 ir 999999");
+	inline inputNumber(response, listitem)
+	{
+		player_charList_GUIShown[playerid] = false;
+	
+		if(response)
+		{
+			new 
+				number,
+				online;
+			if(sscanf(dialog_Input(),"d",number) || !(100000 <= number <= 999999))
+				return SendWarning(playerid, "Numeris turi bûti tarp 100000 ir 999999."), DonatorMenu_ShowNumberInput(playerid, charid);
+
+			if(IsPhoneNumberExisting(number))
+				return SendWarning(playerid, "Ðis numeris jau yra naudojamas."), DonatorMenu_ShowNumberInput(playerid, charid);
+
+			if((online = FindPlayerBySql(charid)) != INVALID_PLAYER_ID)
+			{
+				PlayerInfo[online][pPhoneNumber] = number;
+			}
+
+			PlayerInfo[playerid][pNumberChanges] --;
+			SaveUserIntEx(PlayerInfo[playerid][pUserId], "NumberChanges", PlayerInfo[playerid][pNumberChanges]);
+
+			SendFormat(playerid, 0xBABABAFF, "Numeris pakeistas á %d", number);
+
+			inline updatePlayerNumber() return 1;
+
+			mysql_tquery_inline(chandler, using inline updatePlayerNumber, "\
+				UPDATE `players_data` SET PhoneNumber = '%d' WHERE id = '%d'", charid
+			);
+			
+			mysql_tquery_inline(chandler, using inline updatePlayerNumber, "\
+				DELETE FROM `unused_phone_numbers` WHERE Number = '%d'", number
+			);
+
+			log_init(true);
+			log_set_table("logs_donators");
+			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`,`ExtraId`");
+			log_set_values("'%d','%e','Pakeite veikejo numeri','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GetNameBySql(charid), number);
+			log_commit();
+		}
+		else DonatorMenu_Main(playerid, charid);
+	}
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline inputNumber, DIALOG_STYLE_INPUT, "Remëjo meniu > Numerio keitimas", "Keisti", "Gráþti");
+	return 1;
+}
+
+/*
 forward PlayerDonatorCharsLoadForPlate(playerid);
 public PlayerDonatorCharsLoadForPlate(playerid)
 {
@@ -7529,46 +7557,51 @@ Dialog:D_DonatorVehicles(playerid, response, listitem, inputtext[])
 	}
 	return 1;
 }
+*/
 
 
 
 
-
-forward PlayerDonatorCharsLoadForName(playerid);
-public PlayerDonatorCharsLoadForName(playerid)
+stock DonatorMenu_SelectCharForName(playerid)
 {
-	new 
-		string[512],
-		line[48],
-		id,
-		rows = cache_num_rows();
-
-	if(!rows) return SendWarning(playerid, "Atsirado klaida ieðkant jûsø veikëjo.");
-	for(new i = 0; i < rows; i++)
-	{
-		cache_get_value_name(i, "Name", line);
-		cache_get_value_name_int(i, "id", id);
-
-		format(line, sizeof line, "%d. %s(%d)\n", i + 1, line, id);
-		strcat(string, line);
-	}
-	SendFormat(playerid, 0xBABABAFF, "Pasirinkite veikëjà, kurio vardà norite pakeisti. Likæ vardo keitimai: %d", PlayerInfo[playerid][pNameChanges]);
-	Dialog_Show(playerid, D_DonatorCharListName, DIALOG_STYLE_LIST, "Remëjo meniu > Veikëjo vardo keitimas", string, "Tæsti", "Atðaukti");
-	player_charList_GUIShown[playerid] = true;
-	return 1;
-}
-
-Dialog:D_DonatorCharListName(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	if(response)
+	inline loadChars()
 	{
 		new 
-			string[126];
-		mysql_format(chandler, string, sizeof string, "SELECT id FROM `players_data` WHERE UserId = '%d' ORDER BY id ASC LIMIT 1 OFFSET %d", PlayerInfo[playerid][pUserId], listitem);
-		mysql_tquery(chandler, string, "DonatorSelectCharIdLoad", "d", playerid);
+			id,
+			name[MAX_PLAYER_NAME + 1],
+			rows = cache_num_rows();
+
+		if(!rows) return SendWarning(playerid, "Atsirado klaida ieðkant jûsø veikëjo.");
+		for(new i = 0; i < rows; i++)
+		{
+			cache_get_value_name(i, "Name", name);
+			cache_get_value_name_int(i, "id", id);
+
+			dialog_AddLine("%d. %s(%d)", i + 1, name, id);
+		}
+		SendFormat(playerid, 0xBABABAFF, "Pasirinkite veikëjà, kurio vardà norite pakeisti. Likæ vardo keitimai: %d", PlayerInfo[playerid][pNameChanges]);
+
+		inline selectChar(response, listitem)
+		{
+			player_charList_GUIShown[playerid] = false;
+			if(response)
+			{
+				new 
+					string[126];
+				mysql_format(chandler, string, sizeof string, "SELECT id FROM `players_data` WHERE UserId = '%d' ORDER BY id ASC LIMIT 1 OFFSET %d", PlayerInfo[playerid][pUserId], listitem);
+				mysql_tquery(chandler, string, "DonatorSelectCharIdLoad", "d", playerid);
+			}
+			else DonatorMenu_Main(playerid, player_charList_Selected[playerid]);
+		}
+
+		player_charList_GUIShown[playerid] = true;
+		dialog_Show(playerid, using inline selectChar, DIALOG_STYLE_LIST, "Remëjo meniu > Veikëjo vardo keitimas", "Tæsti", "Atðaukti");
 	}
-	else DonatorMenu_Main(playerid, player_charList_Selected[playerid]);
+	mysql_tquery_inline(chandler, using inline loadChars, "\
+		SELECT id,Name FROM `players_data` WHERE UserId = '%d'",
+		PlayerInfo[playerid][pUserId]
+	);
+
 	return 1;
 }
 
@@ -7577,70 +7610,114 @@ public DonatorSelectCharIdLoad(playerid)
 {
 	if(cache_num_rows())
 	{
-		cache_get_value_name_int(0, "id", tmpSelected[playerid]);
-		Dialog_Show(playerid, D_DonatorNameInput, DIALOG_STYLE_INPUT, "Remëjo meniu > Veikëjo vardo keitimas", "Áveskite naujà veikëjo vardà", "Keisti", "Gráþti");
-		player_charList_GUIShown[playerid] = true;
+		new charid;
+		cache_get_value_name_int(0, "id", charid);
+		Donator_ChangeName_NewName(playerid, charid);
 	}
 	else SendWarning(playerid, "Atsirado klaida ieðkant jûsø veikëjo.");
 	return 1;
 }
-Dialog:D_DonatorNameInput(playerid, response, listitem, inputtext[])
+
+stock Donator_ChangeName_NewName(playerid, charid)
 {
-	player_charList_GUIShown[playerid] = false;
-	if(response)
+	dialog_Clear();
+	dialog_AddLine("Áveskite naujà veikëjo vardà");
+
+	inline inputName(response, listitem)
 	{
-		if(!CheckRoleplayName(inputtext) || CheckNameUsageAnywhere(inputtext, true) || !(4 <= strlen(inputtext) <= MAX_PLAYER_NAME)) return SendWarning(playerid, "Veikëjo vardas netinkamas arba yra uþimtas. Formatas: Vardas_Pavarde"), DonatorMenu_Main(playerid, player_charList_Selected[playerid]);
-		format(player_CharName[playerid], MAX_PLAYER_NAME, "%s", inputtext);
-		Dialog_Show(playerid, D_DonatorGender, DIALOG_STYLE_LIST, "Remëjo meniu > Veikëjo lyties keitimas", "Vyras\nMoteris", "Pakeisti", "Atðaukti");
-		player_charList_GUIShown[playerid] = true;
-	}
-	return 1;
-}
-Dialog:D_DonatorGender(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	if(response)
-	{
+		player_charList_GUIShown[playerid] = false;
+
 		if(response)
 		{
-			player_CharGender[playerid] = listitem + 1;		
-			Dialog_Show(playerid, D_DonatorDate, DIALOG_STYLE_INPUT, "Remëjo meniu > Veikëjo gimimo datos keitimas", "{c9c9c9}Áveskite veikëjo naujus gimimo metus {f0a046}(1930-2017)", "Pakeisti", "Atðaukti");
+			if(!CheckRoleplayName(dialog_Input()) ||
+				CheckNameUsageAnywhere(dialog_Input(), true) || 
+				!(4 <= strlen(dialog_Input()) <= MAX_PLAYER_NAME))
+			{
+				SendWarning(playerid, "Veikëjo vardas netinkamas arba yra uþimtas. Formatas: Vardas_Pavarde");
+				DonatorMenu_Main(playerid, player_charList_Selected[playerid]);
+				return 1;
+			}
+			format(player_CharName[playerid], MAX_PLAYER_NAME, "%s", dialog_Input());
+
+			Donator_ChangeName_NewAge(playerid, charid);
 		}
 	}
-	return 1;
-}
-Dialog:D_DonatorDate(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	if(response)
-	{
-		new 
-			date,
-			string[512];
-		if(sscanf(inputtext,"d",date) || !(1930 <= date <= 2017)) return SendError(playerid, "Formatas netinkamas!");
-		player_CharDate[playerid] = date;
-		
-		for(new i = 0; i < sizeof OriginsList; i++)
-		{
-			i && strcat(string, "\n");
-			strcat(string, OriginsList[i]);
-		}
-		Dialog_Show(playerid, D_DonatorOrigin, DIALOG_STYLE_LIST, "Remëjo meniu > Veikëjo tautybës keitimas", string, "Pakeisti", "Atðaukti");
-		player_charList_GUIShown[playerid] = true;
-	}
+
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline inputName, DIALOG_STYLE_INPUT, "Remëjo meniu > Veikëjo vardo keitimas", "Keisti", "Gráþti");
 	return 1;
 }
 
-Dialog:D_DonatorOrigin(playerid, response, listitem, inputtext[])
+
+stock Donator_ChangeName_NewAge(playerid, charid)
 {
-	player_charList_GUIShown[playerid] = false;
-	if(response)
+	dialog_Clear();
+	dialog_AddLine("Vyras");
+	dialog_AddLine("Moteris");
+
+	inline selectGender(response, listitem)
 	{
-		player_CharOrigin[playerid] = listitem + 1;
-		call OnPlayerRenameChar(playerid, tmpSelected[playerid], player_CharGender[playerid], player_CharDate[playerid], player_CharOrigin[playerid], player_CharName[playerid]);
+		player_charList_GUIShown[playerid] = false;
+
+		if(response)
+		{
+			player_CharGender[playerid] = listitem + 1;		
+			Donator_ChangeName_NewDate(playerid, charid);
+		}
 	}
+
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline selectGender, DIALOG_STYLE_LIST, "Remëjo meniu > Veikëjo lyties keitimas", "Pakeisti", "Atðaukti");
 	return 1;
 }
+
+stock Donator_ChangeName_NewDate(playerid, charid)
+{
+	dialog_Clear();
+	dialog_AddLine("{c9c9c9}Áveskite veikëjo naujus gimimo metus {f0a046}(1930-2017)");
+
+	inline inputDate(response, listitem)
+	{
+		player_charList_GUIShown[playerid] = false;
+		if(response)
+		{
+			new 
+				date;
+			if(sscanf(dialog_Input(),"d",date) || !(1930 <= date <= 2017)) return SendError(playerid, "Formatas netinkamas!");
+			player_CharDate[playerid] = date;
+			
+			Donator_ChangeName_NewOrigin(playerid, charid);
+		}
+	}	
+	
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline inputDate, DIALOG_STYLE_INPUT, "Remëjo meniu > Veikëjo gimimo datos keitimas", "Pakeisti", "Atðaukti");
+	return 1;
+}
+
+stock Donator_ChangeName_NewOrigin(playerid, charid)
+{
+	dialog_Clear();
+	for(new i = 0; i < sizeof OriginsList; i++)
+	{
+		dialog_AddLine(OriginsList[i]);
+	}
+
+	inline newOrigin(response, listitem)
+	{
+		player_charList_GUIShown[playerid] = false;
+		if(response)
+		{
+			player_CharOrigin[playerid] = listitem + 1;
+			call OnPlayerRenameChar(playerid,charid,player_CharGender[playerid],player_CharDate[playerid],player_CharOrigin[playerid],player_CharName[playerid]);
+		}
+	}
+
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline newOrigin, DIALOG_STYLE_LIST, "Remëjo meniu > Veikëjo tautybës keitimas", "Pakeisti", "Atðaukti");
+	return 1;
+}
+
 
 hook OnPlayerRenameChar(playerid, charid, gender, date, origin, name[])
 {
@@ -7648,52 +7725,49 @@ hook OnPlayerRenameChar(playerid, charid, gender, date, origin, name[])
 	if(PlayerInfo[playerid][pNameChanges] <= 0) return SendWarning(playerid, "Jûs nebeturite vardo keitimø.");
 
 	new 
-		string[256],
 		online = INVALID_PLAYER_ID;
 
-	mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET Name = '%e', Gender = '%d', BirthDate = '%d', Origin = '%e'  WHERE id = '%d'", name, gender, date, OriginsList[origin - 1], charid);
-	mysql_fquery(chandler, string, "PlayerSavedEx");
-
-	SendFormat(playerid, 0xBABABAFF, "Veikëjo vardas sëkmingai pakeistas á: %s", name);
-	CharListTD_ShowSelect(playerid, player_charList_Page[playerid], false, 2);
-
-	if((online = FindPlayerBySql(charid)) != INVALID_PLAYER_ID)
+	inline updatePlayer()
 	{
-		PlayerInfo[online][pGender] = gender;
-		PlayerInfo[online][pBirthDate] = date;
-		format(PlayerInfo[online][pOrigin], 30, "%s", OriginsList[origin - 1]);
-		
-		if(PlayerInfo[online][pJailTime] > 0)
+		SendFormat(playerid, 0xBABABAFF, "Veikëjo vardas sëkmingai pakeistas á: %s", name);
+		CharListTD_ShowSelect(playerid, player_charList_Page[playerid], false, 2);
+
+		if((online = FindPlayerBySql(charid)) != INVALID_PLAYER_ID)
 		{
-			PlayerInfo[online][pJailTime] = 1;
+			PlayerInfo[online][pGender] = gender;
+			PlayerInfo[online][pBirthDate] = date;
+			format(PlayerInfo[online][pOrigin], 30, "%s", OriginsList[origin - 1]);
+			
+			if(PlayerInfo[online][pJailTime] > 0)
+			{
+				PlayerInfo[online][pJailTime] = 1;
+			}
+
+			if(!(strlen(name) && SetPlayerName(online, name)))
+			{
+				SendError(playerid, "Praðome prisijungti ið naujo.");
+				KickEx(playerid);
+			}
+
+			format(PlayerInfo[playerid][pName], MAX_PLAYER_NAME, "%s", name);
 		}
 
-		if(!(strlen(name) && SetPlayerName(online, name)))
-		{
-			SendError(playerid, "Praðome prisijungti ið naujo.");
-			KickEx(playerid);
-		}
+		PlayerInfo[playerid][pNameChanges] --;
+		SaveUserIntEx(PlayerInfo[playerid][pUserId], "NameChanges", PlayerInfo[playerid][pNameChanges]);
 
-		format(PlayerInfo[playerid][pName], MAX_PLAYER_NAME, "%s", name);
+		log_init(true);
+		log_set_table("logs_donators");
+		log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
+		log_set_values("'%d','%e','Pakeite veikejo varda','%e'", LogPlayerId(playerid), LogPlayerName(playerid), name);
+		log_commit();
+		return 1;
 	}
 
-	PlayerInfo[playerid][pNameChanges] --;
-	SaveUserIntEx(PlayerInfo[playerid][pUserId], "NameChanges", PlayerInfo[playerid][pNameChanges]);
-
-	log_init(true);
-	log_set_table("logs_donators");
-	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
-	log_set_values("'%d','%e','Pakeite veikejo varda','%e'", LogPlayerId(playerid), LogPlayerName(playerid), name);
-	log_commit();
-	return 1;
-}
-
-
-
-Dialog:DialogDonatorAbout(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	DonatorMenu_Main(playerid, player_charList_Selected[playerid]);
+	mysql_tquery_inline(chandler, using inline updatePlayer, "\
+		UPDATE `players_data` SET Name = '%e', Gender = '%d', BirthDate = '%d', Origin = '%e' \
+		WHERE id = '%d'", 
+		name, gender, date, OriginsList[origin - 1], charid
+	);
 	return 1;
 }
 
@@ -7724,7 +7798,6 @@ public CharDetailedInfoLoad(playerid)
 	if(cache_num_rows())
 	{
 		new 
-			string[512],
 			id, level,
 			money, bank, 
 			savings, xp,
@@ -7748,53 +7821,73 @@ public CharDetailedInfoLoad(playerid)
 		cache_get_value_name_int(0, "BoatLic", boatlic);
 		cache_get_value_name_int(0, "PhoneNumber", number);
 
-		format(string, sizeof string, "{FFFFFF}MySQL numeris: %d\t \t \t \nLygis: %d (%d XP)\nGrynieji: $%d, banke: $%d\nIndëlis: $%d\nFrakcija: %s\nDarbas: %s\nLytis: %s\n", id, level, xp, money, bank, savings, GetFactionName(faction, true), GetJobName(job, true), gender == 1 ? ("vyras") : ("moteris"));
-		format(string, sizeof string, "%sAutomobilio teisës: %s\nMotociklo teisës: %s\nLëktuvo teisës: %s\nValties teisës: %s\nTelefono numeris: %d", string, carlic > 0 ? ("taip") : ("ne"), carlic > 0 ? ("taip") : ("ne"), motolic > 0 ? ("taip") : ("ne"), flylic > 0 ? ("taip") : ("ne"), boatlic > 0 ? ("taip") : ("ne"), number);
+		dialog_Clear();
 
-		Dialog_Show(playerid, DialogCharMoreInfo, DIALOG_STYLE_MSGBOX, "Informacija apie veikëjà", string, "Uþdaryti", "Iðvaizdos keitimas");
+		dialog_AddLine("{FFFFFF}MySQL numeris: %d\t \t \t ", id);
+
+		dialog_AddLine("Lygis: %d (%d XP)", level, xp);
+		dialog_AddLine("Grynieji: $%d, banke: $%d", money, bank);
+		dialog_AddLine("Indëlis: $%d", savings);
+		dialog_AddLine("Frakcija: %s", GetFactionName(faction, true));
+		dialog_AddLine("Darbas: %s", GetJobName(job, true));
+		dialog_AddLine("Lytis: %s", gender == 1 ? ("vyras") : ("moteris"));
+
+		dialog_AddLine("Automobilio teisës: %s", carlic > 0 ? ("taip") : ("ne"));
+		dialog_AddLine("Motociklo teisës: %s", motolic > 0 ? ("taip") : ("ne"));
+		dialog_AddLine("Lëktuvo teisës: %s", flylic > 0 ? ("taip") : ("ne"));
+		dialog_AddLine("Valties teisës: %s", boatlic > 0 ? ("taip") : ("ne"));
+		dialog_AddLine("Telefono numeris: %d", number);
+
+		inline charDetails(response, listitem)
+		{
+			player_charList_GUIShown[playerid] = false;
+			SelectTextDraw(playerid, CHARSELECT_COLOR);
+
+			if(response)
+			{
+				Player_UCP_ChangeSkin(playerid);	
+			}
+		}
+
 		player_charList_GUIShown[playerid] = true;
+		dialog_Show(playerid, using inline charDetails, DIALOG_STYLE_MSGBOX, "Informacija apie veikëjà", "Skin", "Uþdaryti");
 	}
 }
 
-Dialog:DialogCharMoreInfo(playerid, response, listitem, inputtext[])
+stock Player_UCP_ChangeSkin(playerid)
 {
-	player_charList_GUIShown[playerid] = false;
-	if(response)
+	dialog_Clear();
+	dialog_AddLine("{c9c9c9}Áveskite naujà iðvaizdos ID");
+
+	inline inputSkin(response, listitem)
 	{
-		SelectTextDraw(playerid, CHARSELECT_COLOR);
-	}
-	else
-	{
-		Dialog_Show(playerid, DialogCharChangeSkin, DIALOG_STYLE_INPUT, "Iðvaizdos keitimas", "{c9c9c9}Áveskite naujà iðvaizdos ID", "Tæsti", "Atðaukti");
-		player_charList_GUIShown[playerid] = true;
-	}
-	return 1;
-}
-Dialog:DialogCharChangeSkin(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	if(response)
-	{
-		new 
-			index = player_charList_Page[playerid]*2 + player_charList_Selected[playerid],
-			id = player_CharArray[playerid][index][0],
-			skin;
-		if(sscanf(inputtext,"d",skin) || !(1 <= skin <= 312)) return SendError(playerid, "Formatas netinkamas!");
-		new 
-			online = FindPlayerBySql(id);
-		if(online != INVALID_PLAYER_ID)
+		player_charList_GUIShown[playerid] = false;
+		if(response)
 		{
-			SetPlayerSkin(online, skin);
-			SaveAccountIntEx(online, "Skin", skin);
+			new 
+				index = player_charList_Page[playerid]*2 + player_charList_Selected[playerid],
+				id = player_CharArray[playerid][index][0],
+				skin;
+			if(sscanf(dialog_Input(),"d",skin) || !(1 <= skin <= 312)) return SendError(playerid, "Formatas netinkamas!");
+			new 
+				online = FindPlayerBySql(id);
+			if(online != INVALID_PLAYER_ID)
+			{
+				SetPlayerSkin(online, skin);
+				SaveAccountIntEx(online, "Skin", skin);
+			}
+			else
+			{
+				inline savePlayerSkin() return 1;
+				mysql_tquery_inline(chandler, using inline savePlayerSkin, "\
+					UPDATE `players_data` SET Skin = '%d' WHERE id = '%d'", skin, id);
+			}
+			SendFormat(playerid, 0xBABABAFF, "Iðvaizda sëkmingai pakeista.");
 		}
-		else
-		{
-			new string[126];
-			mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET Skin = '%d' WHERE id = '%d'", skin, id);
-			mysql_fquery(chandler, string, "PlayerSavedEx");
-		}
-		SendFormat(playerid, 0xBABABAFF, "Iðvaizda sëkmingai pakeista.");
 	}
+
+	player_charList_GUIShown[playerid] = true;
+	dialog_Show(playerid, using inline inputSkin, DIALOG_STYLE_INPUT, "Iðvaizdos keitimas", "Tæsti", "Atðaukti");
 	return 1;
 }
 
@@ -8020,94 +8113,99 @@ public CharSelectData(playerid, page, id, i)
 
 stock User_Login_ShowSecurity(playerid)
 {
-	new 
-		string[256];
-	mysql_format(chandler, string, sizeof string, "SELECT Question FROM `users_safe_questions` WHERE UserId = '%d'", PlayerInfo[playerid][pUserId]);
-	mysql_tquery(chandler, string, "QuestionLoad", "d", playerid);
+	inline questionLoad()
+	{
+		if(cache_num_rows())
+		{
+			new 
+				string[256];
+			cache_get_value_name(0, "Question", string);
+			User_Login_ShowAnswerInput(playerid, string);
+		}
+		else
+		{
+			call OnPlayerLogIn(playerid);
+		}
+	}
+	mysql_tquery_inline(chandler, using inline questionLoad, "\
+		SELECT Question FROM `users_safe_questions` WHERE UserId = '%d'", PlayerInfo[playerid][pUserId]);
 	return 1;
 }
 
-forward QuestionLoad(playerid);
-public QuestionLoad(playerid)
+stock User_Login_ShowAnswerInput(playerid, question[])
 {
-	new 
-		string[256];
-	if(cache_num_rows())
-	{
-		cache_get_value_name(0, "Question", string);
-		dialog_Clear();
-		dialog_AddLine("Kadangi jungiatës ið kito IP, praðome atsakyti á saugos klausimà:");
-		dialog_AddLine(string);
+	dialog_Clear();
+	dialog_AddLine("Kadangi jungiatës ið kito IP, praðome atsakyti á saugos klausimà:");
+	dialog_AddLine(question);
 
-		Dialog_Show(playerid, DialogUserLoginSecurity, DIALOG_STYLE_INPUT, "Saugos klausimas", dialog_GetBody(), "Toliau", "Iðeiti");
-	}
-	else
+	inline userLoginSecurity(response, listitem)
 	{
-		call OnPlayerLogIn(playerid);
-	}
-	return 1;
-}
+		if(response)
+		{
+			if(!strlen(dialog_Input()))
+				return User_Login_ShowAnswerInput(playerid, question);
 
-Dialog:DialogUserLoginSecurity(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-		new 
-			string[256];
-		mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `users_safe_questions` WHERE UserId = '%d' AND Answer = '%e'", PlayerInfo[playerid][pUserId], MD5_Hash(inputtext));
-		mysql_tquery(chandler, string, "LoginAnswerCheck", "d", playerid);
+			inline loginAnswerCheck()
+			{
+				if(cache_num_rows())
+				{
+					call OnPlayerLogIn(playerid);
+				}
+				else
+				{
+					PlayerInfo[playerid][pWrongPassword] ++ ;
+					if(PlayerInfo[playerid][pWrongPassword] >= 3) Kick(playerid);
+					else User_Login_ShowAnswerInput(playerid, question);
+				}
+				return 1;
+			}
+			mysql_tquery_inline(chandler, using inline loginAnswerCheck, "\
+				SELECT NULL FROM `users_safe_questions` WHERE UserId = '%d' AND Answer = '%e'",
+				PlayerInfo[playerid][pUserId], MD5_Hash(dialog_Input())
+			);
+		}
+		else 
+		{
+			Kick(playerid);
+		}
 	}
-	else 
-	{
-		Kick(playerid);
-	}
-}
-
-forward LoginAnswerCheck(playerid);
-public LoginAnswerCheck(playerid)
-{
-	if(cache_num_rows())
-	{
-		call OnPlayerLogIn(playerid);
-	}
-	else
-	{
-		PlayerInfo[playerid][pWrongPassword] ++ ;
-		if(PlayerInfo[playerid][pWrongPassword] >= 3) Kick(playerid);
-		else User_Login_ShowSecurity(playerid);
-	}
+	dialog_Show(playerid, using inline userLoginSecurity, DIALOG_STYLE_INPUT, "Saugos klausimas", "Toliau", "Iðeiti");
 	return 1;
 }
 
 stock Login_ShowPassword(playerid)
 {
-	new 
-		string[512];
-	strcat(string, "{adcf70}Sveiki sugráþæ á Community roleplay!\n\n\
-		{f9f9f9}Norëdami tæsti þaidimà, praðome ávesti vartotojo slaptaþodá:");
+	dialog_Clear();
+	dialog_AddLine("{adcf70}Sveiki sugráþæ á southland roleplay!");
+	dialog_AddLine("{f9f9f9}Norëdami tæsti þaidimà, praðome ávesti vartotojo slaptaþodá:");
 
-	Dialog_Show(playerid, DialogUserLogin, DIALOG_STYLE_PASSWORD, "Prisijungimas", string, "Jungtis", "Iðeiti");
-	return 1;
-}
-
-Dialog:DialogUserLogin(playerid, response, listitem, inputtext[])
-{
-	if(response)
+	inline userInputPassword(response, listitem)
 	{
-		new 
-			string[256],
-			salted[130];
+		if(response)
+		{
+			if(!strlen(dialog_Input())) return Login_ShowPassword(playerid);
 
-		format(string, 60, "%s%s", inputtext, PlayerInfo[playerid][pSalt]);
-		WP_Hash(salted, sizeof salted, string);
-		mysql_format(chandler, string, sizeof string, "\
-			SELECT RegisterIp,DiscordCode,DiscordVerified,TutorialDone FROM `users_data` WHERE id = '%d' AND Password = '%e'", PlayerInfo[playerid][pUserId], salted);
-		mysql_tquery(chandler, string, "CheckRegisterIp", "d", playerid);
+			new 
+				string[256],
+				salted[130];
+
+			format(string, 60, "%s%s", dialog_Input(), PlayerInfo[playerid][pSalt]);
+			WP_Hash(salted, sizeof salted, string);
+			
+			mysql_format(chandler, string, sizeof string, "\
+				SELECT RegisterIp,DiscordCode,DiscordVerified,TutorialDone \
+				FROM \
+				`users_data` WHERE id = '%d' AND Password = '%e'", 
+				PlayerInfo[playerid][pUserId], salted
+			);
+			mysql_tquery(chandler, string, "CheckRegisterIp", "d", playerid);
+		}
+		else
+		{
+			KickEx(playerid);
+		}
 	}
-	else
-	{
-		KickEx(playerid);
-	}
+	dialog_Show(playerid, using inline userInputPassword, DIALOG_STYLE_PASSWORD, "Prisijungimas", "Jungtis", "Iðeiti");
 	return 1;
 }
 
@@ -8143,85 +8241,76 @@ public CheckRegisterIp(playerid)
 }
 
 
-stock Register_SecurityAnswer(playerid)
-{
-	new 
-		string[512];
-
-	format(string, sizeof string, "{f9f9f9}Praðome paraðyti atsakymà á savo sukurtà klausimà:\n\
-		%s\n\n\
-		Praðome sugalvoti ásimenamà atsakymà, kadangi administracija jo matyti taip pat negalës.", tmpArray[playerid]);
-	
-	Dialog_Show(playerid, DialogRegisterAnswer, DIALOG_STYLE_INPUT, "Vartotojo saugumas 2/2", string, "Tæsti", "Atðaukti");
-	return 1;
-}
-Dialog:DialogRegisterAnswer(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-		if(!strlen(inputtext))
-		{
-			return Register_SecurityAnswer(playerid);
-		}
-		User_AddToDb(playerid, .i_password = PlayerInfo[playerid][pPassword], .i_salt = PlayerInfo[playerid][pSalt], .i_question = tmpArray[playerid], .i_answer = inputtext);
-	}
-	else Register_SecurityAnswer(playerid);
-	return 1;
-}
-
-
-stock Register_SecurityQuestion(playerid)
-{
-	new 
-		string[512];
-
-	strcat(string, "{f9f9f9}Jûsø vartotojø saugumui sukûrëme sistemà, kuri apsaugos Jûsø vartotojus nuo vagystës.\n\
-		Praðome sugalvoti apsaugos klausimà, kuris bus uþduodamas kiekvienà kartà jungiantis ið kito IP.");
-
-	Dialog_Show(playerid, DialogRegisterQuestion, DIALOG_STYLE_INPUT, "Vartotojo saugumas 1/2", string, "Tæsti", "Atðaukti");
-	return 1;
-}
-Dialog:DialogRegisterQuestion(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-		if(!strlen(inputtext)) Register_SecurityQuestion(playerid);
-		format(tmpArray[playerid], 128, inputtext);
-		Register_SecurityAnswer(playerid);
-	}
-	else User_Register_Show(playerid);
-	return 1;
-}
-
 stock User_Register_Show(playerid)
 {
-	new 
-		string[512];
-	strcat(string, "{adcf70}Sveikas atvykæs á Community roleplay!\n\n\
-		{f9f9f9}Tai yra roleplay tipo serveris, kuriame atkartojama realybë.\n\
-		Jei tokiame serveryje lankotës pirmà kartà, perskaitykite informacijà {a9d659}www.southland.lt\n");
+	dialog_AddLine("{adcf70}Sveikas atvykæs á Southland roleplay!");
+	dialog_AddLine("{f9f9f9}Tai yra roleplay tipo serveris, kuriame atkartojama realybë.");
+	dialog_AddLine("Jei tokiame serveryje lankotës pirmà kartà, perskaitykite informacijà {a9d659}www.southland.lt");
+	dialog_SkipLine();
+	dialog_AddLine("ATSIMINKITE: Tai nëra jûsø veikëjas! Tai yra jûsø UCP vartotojas, prie kurio");
+	dialog_AddLine("Prisijungus galësite kurti atskirus veikëjus ir juos valdyti!");
+	dialog_SkipLine();
+	dialog_AddLine("{d78484}Slaptaþodis turi bûti nuo 6 iki 30 simboliø.");
 
-	strcat(string, "\nATSIMINKITE: Tai nëra jûsø veikëjas! Tai yra jûsø UCP vartotojas, prie kurio\n\
-		Prisijungus galësite kurti atskirus veikëjus ir juos valdyti!\n");
+	inline inputPassword(response, listitem)
+	{
+		if(response)
+		{
+			if(!CheckPasswordComplexity(dialog_Input(), -1)) return User_Register_Show(playerid);
+			
+			GenerateSalt(PlayerInfo[playerid][pSalt], GetPlayerIpEx(playerid), 30);
+			format(PlayerInfo[playerid][pPassword], 130, dialog_Input());
 
-	strcat(string, "\n\n\
-		{d78484}Slaptaþodis turi bûti nuo 6 iki 30 simboliø.");
-
-	Dialog_Show(playerid, DialogRegisterPassword, DIALOG_STYLE_PASSWORD, "Registracija", string, "Registruotis", "Iðeiti");
+			Register_CreateQuestion(playerid);
+		}
+		else Kick(playerid);
+	}
+	dialog_Show(playerid, using inline inputPassword, DIALOG_STYLE_PASSWORD, "Registracija", "Registruotis", "Iðeiti");
 	return 1;
 }
-Dialog:DialogRegisterPassword(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-		if(!CheckPasswordComplexity(inputtext, -1)) return User_Register_Show(playerid);
-		
-		GenerateSalt(PlayerInfo[playerid][pSalt], GetPlayerIpEx(playerid), 30);
-		format(PlayerInfo[playerid][pPassword], 130, inputtext);
 
-		Register_SecurityQuestion(playerid);
+
+stock Register_CreateQuestion(playerid)
+{
+	dialog_Clear();
+	dialog_AddLine("{f9f9f9}Jûsø vartotojø saugumui sukûrëme sistemà, kuri apsaugos Jûsø vartotojus nuo vagystës.");
+	dialog_AddLine("Praðome sugalvoti apsaugos klausimà, kuris bus uþduodamas kiekvienà kartà jungiantis ið kito IP.");
+
+	inline inputQuestion(response, listitem)
+	{
+		if(response)
+		{
+			if(!strlen(dialog_Input())) Register_CreateQuestion(playerid);
+			Register_CreateAnswer(playerid, dialog_Input());
+		}
+		else User_Register_Show(playerid);
 	}
-	else Kick(playerid);
+	dialog_Show(playerid, using inline inputQuestion, DIALOG_STYLE_INPUT, "Vartotojo saugumas 1/2", "Tæsti", "Atðaukti");
+	return 1;
+}
+
+stock Register_CreateAnswer(playerid, question[])
+{
+	dialog_AddLine("{f9f9f9}Praðome paraðyti atsakymà á savo sukurtà klausimà:");
+	dialog_AddLine(question);
+	dialog_AddLine("Praðome sugalvoti ásimenamà atsakymà, kadangi administracija jo matyti taip pat negalës.");
+	
+	inline inputAnswer(response, listitem)
+	{
+		if(response)
+		{
+			if(!strlen(dialog_Input())) return Register_CreateAnswer(playerid, question); 
+
+			User_AddToDb(playerid,
+				.i_password = PlayerInfo[playerid][pPassword],
+				.i_salt = PlayerInfo[playerid][pSalt],
+				.i_question = question,
+				.i_answer = dialog_Input()
+			);
+		}
+		else Register_CreateAnswer(playerid, question);
+	}
+	dialog_Show(playerid, using inline inputAnswer, DIALOG_STYLE_INPUT, "Vartotojo saugumas 2/2", "Tæsti", "Atðaukti");
 	return 1;
 }
 
@@ -8679,6 +8768,8 @@ thread(AttachedClotheAddFromClth);
 // on dialog response
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
+	printf("OnDialogResponse: %d, %d", playerid, dialogid);
+
 	switch(dialogid)
 	{
 		case DIALOG_VEHICLE_SCRAP:
@@ -10733,66 +10824,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_commit();
 				}
 			}
-		}
-		case DIALOG_AM_OPTIONS_SERVER:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// tr. priemoniu mokesciai
-						new string[256];
-						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiø dydis\t$%d\nAr papildomai priskaièiuoti pagal tr. priemonës klasæ?\t%s", GetGVarInt("VehicleTaxes", SERVER_VARS_ID), GetGVarInt("CountVehicleClass", SERVER_VARS_ID) > 0 ? ("Taip") : ("Ne"));
-						ShowPlayerDialog(playerid, DIALOG_AM_VEHICLE_TAXES_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Tr. priemoniø nustatymai", string, "Tæsti", "Atðaukti");
-					}
-					case 1:
-					{
-						// verslo mokesciai
-						new string[256];
-						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiø dydis\t$%d\nDegalø talpa degalinëse\t%dltr\nDegalø litro kaina uþsakant\t%f$", GetGVarInt("BusinessTaxes", SERVER_VARS_ID), GetGVarInt("BusinessFuelCapacity", SERVER_VARS_ID), GetGVarFloat("BusinessOrderFuelPrice", SERVER_VARS_ID));
-						ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_OPTIONS_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Verslo nustatymai", string, "Tæsti", "Atðaukti");
-					}
-					case 2:
-					{
-						// namo mokesciai
-						new string[256];
-						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiø dydis\t$%d", GetGVarInt("HouseTaxes", SERVER_VARS_ID));
-						ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_TAXES_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Namo nustatymai", string, "Tæsti", "Atðaukti");
-					}
-					case 3:
-					{
-						// ijungimai/isjungimai
-						new string[512];
-						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Furniture multi-select sistema\t%s\nPervedimø sistema\t%s\nPrisijungimo 30s laikmatis\t%s\nIðmestø daiktø saugojimas\t%s\nPolicijos atsargø sistema\t%s\nDarbø 3DTextLabel\t%s\nVerslø 3DTextLabel\t%s\nNamø 3DTextLabel\t%s",
-							GetGVarInt("EnabledFurnitureMultiSelect", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledTransactions", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledLoginTimer", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledDroppedItemsSaving", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledPoliceWeaponUsage", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledJobLabels", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledBusinessLabels", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"),
-							GetGVarInt("EnabledHouseLabels", SERVER_VARS_ID) > 0 ? ("Ájungta") : ("Iðjungta"));
-						ShowPlayerDialog(playerid, DIALOG_AM_ENABLES_DISABLES_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Ájungimai/iðjungimai", string, "Tæsti", "Atðaukti");
-					}
-					case 4:
-					{
-						// spawn nustatymai
-						MsgInfo(playerid, "SPAWN", "Pasirinkta vieta bus nustatyta á jûsø dabartinæ.");
-						ShowPlayerDialog(playerid, DIALOG_AM_SPAWN_MAIN, DIALOG_STYLE_LIST, "Vietø nustatymai", "Kalëjmo pasodinimo vieta\nIðleidimo ið kalëjimo vieta\nAreðtinës pasodinimo vieta\nIðleidimo ið areðtinës vieta\nOOC kalëjimo vidus\nIðleidimo ið OOC kalëjimo vieta\nBanko vidaus vieta\nSPAWN po mirties vieta\nKalëjimo vieta (/prison)\nAreðtinës vieta (/arrest)\n/ad vieta\nSPAWN vieta", "Nustatyti", "Atðaukti");
-					}
-					case 5:
-					{
-						// visi kiti mokesciai
-						new string[512];
-						format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\n{FFFFFF}Mokeðèiai nuo algos\t%dproc.\nProcentas á policijos biudþetà\t%dproc.\n", GetGVarInt("TaxesToCity", SERVER_VARS_ID), GetGVarInt("TaxesToPolice", SERVER_VARS_ID));
-						format(string, sizeof string, "%sPolicijos ginklø atsargø talpa\t%dvnt.\nPolicijos aprangos atsargø talpa\t%dvnt.\nPolicijos spec atsargø talpa\t%dvnt.\nMaks. veikëjø vartotojui\t%d", string, GetGVarInt("PoliceWeaponCapacity", SERVER_VARS_ID), GetGVarInt("PoliceSkinsCapacity", SERVER_VARS_ID), GetGVarInt("PoliceSpecialCapacity", SERVER_VARS_ID), GetGVarInt("MaxCharacters", SERVER_VARS_ID));
-						ShowPlayerDialog(playerid, DIALOG_AM_OTHER_OPTIONS_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Kiti nustatymai", string, "Tæsti", "Atðaukti");
-					}
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
 		}
 		case DIALOG_AM_BM_MAIN:
 		{
@@ -13204,182 +13235,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 5, "");
 		}
-		case DIALOG_AM_BUSINESS_OPTIONS_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						if(HaveAdminPermission(playerid, "EditBusinessTaxes"))
-						{
-							// keisti mokescius
-							ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_TAXES_SET, DIALOG_STYLE_INPUT, "Verslo mokeðèiai", "{FFFFFF}Áveskite mokeðèiø dydá:", "Tæsti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						if(HaveAdminPermission(playerid, "EditFuelSettings"))
-						{
-							// keisti talpa
-							ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_FUEL_CAPACITY, DIALOG_STYLE_INPUT, "Verslo nustatymai", "{FFFFFF}Áveskite degalinës talpà:", "Tæsti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 2:
-					{
-						if(HaveAdminPermission(playerid, "EditFuelSettings"))
-						{
-							// keisti uzsakymo kaina
-							ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_FUEL_PRICE, DIALOG_STYLE_INPUT, "Verslo nustatymai", "{FFFFFF}Áveskite degalø litro kainà, uþsakant juos savininkui:", "Tæsti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-			}
-			else
-			{
-				// bendrieji nustatymai
-				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 0, "");
-			}
-		}
-		case DIALOG_AM_BUSINESS_FUEL_CAPACITY:
-		{
-			if(response)
-			{
-				new capacity;
-				if(sscanf(inputtext,"d",capacity)) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_OPTIONS_MAIN, 1, 0, "");
-				if(0 < capacity <= 9999999)
-				{
-					SetGVarIntEx("BusinessFuelCapacity", capacity, SERVER_VARS_ID);
-					OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 1, "");
-					SaveServerIntEx("BusinessFuelCapacity", GetGVarInt("BusinessFuelCapacity"));
-					MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-					log_set_values("'%d','%e','Nustate verslo degalu talpa','%d'", LogPlayerId(playerid), LogPlayerName(playerid), capacity);
-					log_commit();
-				}
-				else
-				{
-					SendError(playerid, "Talpa turi bûti nuo 1 iki 9999999");
-					OnDialogResponse(playerid, DIALOG_AM_BUSINESS_OPTIONS_MAIN, 1, 1, "");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 1, "");
-		}
-		case DIALOG_AM_BUSINESS_FUEL_PRICE:
-		{
-			if(response)
-			{
-				new Float:price;
-				if(sscanf(inputtext,"f",price)) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_OPTIONS_MAIN, 1, 0, "");
-				if(0.0 < price <= 9999999.0)
-				{
-					SetGVarFloatEx("BusinessOrderFuelPrice", price, SERVER_VARS_ID);
-					OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 1, "");
-					SaveServerFloatEx("BusinessOrderFuelPrice", GetGVarFloat("BusinessOrderFuelPrice"));
-					MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-					log_set_values("'%d','%e','Nustate verslo degalu kaina','%d'", LogPlayerId(playerid), LogPlayerName(playerid), floatround(price));
-					log_commit();
-				}
-				else
-				{
-					SendError(playerid, "Kaina turi bûti nuo 0.1$ iki 9999999.0$");
-					OnDialogResponse(playerid, DIALOG_AM_BUSINESS_OPTIONS_MAIN, 1, 2, "");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 1, "");
-		}
-		case DIALOG_AM_BUSINESS_TAXES_SET:
-		{
-			if(response)
-			{
-				new taxes;
-				if(sscanf(inputtext,"d",taxes)) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_OPTIONS_MAIN, 1, 0, "");
-				if(0 < taxes <= 200)
-				{
-					SetGVarIntEx("BusinessTaxes", taxes, SERVER_VARS_ID);
-					OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 1, "");
-					SaveServerIntEx("BusinessTaxes", GetGVarInt("BusinessTaxes"));
-					MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-					log_set_values("'%d','%e','Nustate verslu mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), taxes);
-					log_commit();
-				}
-				else
-				{
-					SendError(playerid, "Mokeðèiai turi bûti nuo 1$ iki 200$");
-					OnDialogResponse(playerid, DIALOG_AM_BUSINESS_OPTIONS_MAIN, 1, 0, "");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 1, "");
-		}
-		case DIALOG_AM_VEHICLE_TAXES_MAIN:
-		{
-			if(response)
-			{
-				if(HaveAdminPermission(playerid, "EditVehicleTaxes"))
-				{
-					switch(listitem)
-					{
-						case 0:
-						{
-							// nustatyti mokesti
-							ShowPlayerDialog(playerid, DIALOG_AM_VEHICLE_TAXES_SET, DIALOG_STYLE_INPUT, "Tr. priemoniø mokeðèiai", "{FFFFFF}Áveskite mokeðèiø dydá:\n{BABABA}Mokeðèiai(TAXES) skaièiuojami pagal formulæ:\n{FFB3B3}Jei priskaièiuojama tr. priemonës klasë (CLASS):\n\tTAXES/2*CLASS\nJei nepriskaièiuojama:\n\tTAXES/2", "Keisti", "Atðaukti");
-						}
-						case 1:
-						{
-							SetGVarIntEx("CountVehicleClass", !GetGVarInt("CountVehicleClass"), SERVER_VARS_ID);
-							OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 0, "");
-							SaveServerIntEx("CountVehicleClass", GetGVarInt("CountVehicleClass"));
-							MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-							log_set_values("'%d','%e','Nustate automobilio klases priskaiciavima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GetGVarInt("CountVehicleClass"));
-							log_commit();
-						}
-					}
-				}
-				else InfoBox(playerid, IB_NO_PRIVILEGE);
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 0, "");
-		}
-		case DIALOG_AM_VEHICLE_TAXES_SET:
-		{
-			if(response)
-			{
-				new taxes;
-				if(sscanf(inputtext,"d",taxes)) return OnDialogResponse(playerid, DIALOG_AM_VEHICLE_TAXES_MAIN, 1, 0, "");
-				if(0 < taxes <= 200)
-				{
-					SetGVarIntEx("VehicleTaxes", taxes, SERVER_VARS_ID);
-					OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 0, "");
-					SaveServerIntEx("VehicleTaxes", GetGVarInt("VehicleTaxes"));
-					MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
-					log_set_values("'%d','%e','Nustate automobiliu mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), taxes);
-					log_commit();
-				}
-				else
-				{
-					SendError(playerid, "Mokeðèiai turi bûti nuo 1$ iki 200$");
-					OnDialogResponse(playerid, DIALOG_AM_VEHICLE_TAXES_MAIN, 1, 0, "");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_OPTIONS_SERVER, 1, 0, "");
-		}
+
+
 		case DIALOG_AM_ENTER_CREATE:
 		{
 			if(response)
@@ -16667,11 +16524,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 				{
-					case 0:
-					{
-						// bendrieji nustatymai
-						ShowPlayerDialog(playerid, DIALOG_AM_OPTIONS_SERVER, DIALOG_STYLE_LIST, "Bendrieji serverio nustatymai", "Tr. priemoniø nustatymai\nVerslo nustatymai\nNamo nustatymai\nÁjungimai/iðjungimai\nVietø nustatymai\nKiti nustatymai", "Tæsti", "Atðaukti");
-					}
 					case 1:
 					{
 						// serverio iejimai/isejimai
@@ -23672,12 +23524,6 @@ stock ShowPlayerPhoneOptions(playerid)
 	return 1;
 }
 
-stock ShowPlayerAdminMenu(playerid)
-{
-	ShowPlayerDialog(playerid, DIALOG_AM_MAIN, DIALOG_STYLE_LIST, "Administravimo meniu", "Bendrieji serverio nustatymai\nServerio áëjimai/iðëjimai\nBankomatai\nGaraþai\nNamai\nVerslai\nTr. priemoniø salonai\nTr. priemonës\nFrakcijos\nParduodamos tr. priemonës frakcijoms\nAikðtelës\nGrupës\nIkonos þemëlapyje\nInterjerø meniu\nTaksofonai\nJuodoji rinka\nInformaciniai labeliai", "Tæsti", "Atðaukti");
-	return 1;
-}
-
 stock GetClotheName(modelid)
 {
 	new name[36];
@@ -23847,9 +23693,11 @@ stock HidePlayerMechTune(playerid)
 
 stock CheckAccountLock(playerid, name[])
 {
-	new string[356];
+	new string[126];
+
 	mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_locks` WHERE PlayerName = '%e' AND Valid = '1'", name);
 	new Cache:result = mysql_query(chandler, string, true);
+
 	if(cache_num_rows())
 	{
 		new lockdate[20],
@@ -23860,32 +23708,39 @@ stock CheckAccountLock(playerid, name[])
 		cache_get_value_name(0, "AdminName", lockedby, 24);
 		cache_delete(result);
 		
-		player_charList_GUIShown[playerid] = true;
+		dialog_Clear();
+		dialog_AddLine("{E12525}JÛSØ VEIKËJAS UÞRAKINTAS");
+		dialog_SkipLine();
+		dialog_AddLine("{EEEEEE}Uþrakino: {FF672B}%s", lockedby);
+		dialog_AddLine("{EEEEEE}Prieþastis: {FF672B}%s", reason);
+		dialog_AddLine("{EEEEEE}Uþrakinimo data: {FF672B}%s", lockdate);
+		
+		inline locked(response, listitem)
+		{
+			player_charList_GUIShown[playerid] = false;
+			return 1;
+		}
 
-		format(string, sizeof string, "\t{E12525}JÛSØ VEIKËJAS UÞRAKINTAS\n\n{EEEEEE}Uþrakino: {FF672B}%s\n{EEEEEE}Prieþastis: {FF672B}%s\n{EEEEEE}Uþrakinimo data: {FF672B}%s", lockedby, reason, lockdate);
-		Dialog_Show(playerid, DialogLockAcc, DIALOG_STYLE_MSGBOX, " ", string, "Uþdaryti", "");
+		player_charList_GUIShown[playerid] = true;
+		dialog_Show(playerid, using inline locked, DIALOG_STYLE_MSGBOX, "Veikëjas uþrakintas", "Uþdaryti", "");
 		return true;
 	}
 	cache_delete(result);
 	return false;
 }
 
-Dialog:DialogLockAcc(playerid, response, listitem, inputtext[])
-{
-	player_charList_GUIShown[playerid] = false;
-	return 1;
-}
-
-
 stock CheckBan(playerid)
 {
 	new name[MAX_PLAYER_NAME+1],
 		ip[22];
+		
 	GetPlayerName(playerid, name, sizeof name);
 	GetPlayerIp(playerid, ip, sizeof ip);
-	new string[356];
+
+	new string[126];
 	mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_bans` WHERE PlayerName = '%e' AND Valid = '1' OR PlayerIP = '%e' AND Valid = '1'", name, ip);
 	new Cache:result = mysql_query(chandler, string, true);
+
 	if(cache_num_rows())
 	{
 		new unbandate[28],
@@ -23893,6 +23748,7 @@ stock CheckBan(playerid)
 			bandate[20],
 			bannedby[24],
 			reason[128];
+
 		cache_get_value_name(0, "Reason", reason, 128);
 		cache_get_value_name(0, "AdminName", bannedby, 24);
 		cache_get_value_name(0, "Date", bandate, 20);
@@ -23900,7 +23756,6 @@ stock CheckBan(playerid)
 		if(unbantime == -1) format(unbandate, 13, "visam laikui");
 		else
 		{
-			//TimestampToDate(unbantime, unban_yr, unban_mn, unban_dd, unban_hr, unban_min, unban_sec, 3); // gmt
 			if(unbantime > 60)
 			{
 				if(unbantime > 1440)
@@ -23911,8 +23766,20 @@ stock CheckBan(playerid)
 			}
 			else format(unbandate, sizeof unbandate, "uþ %d minuèiø.", unbantime);
 		}
-		format(string, sizeof string, "\t{E12525}JÛS ESATE BLOKUOJAMAS\n\n{EEEEEE}Uþblokavo: {FF672B}%s\n{EEEEEE}Prieþastis: {FF672B}%s\n{EEEEEE}Uþblokavimo data: {FF672B}%s\n{EEEEEE}Galioja: {FF672B}%s", bannedby, reason, bandate, unbandate);
-		ShowPlayerDialog(playerid, DIALOG_NONE, DIALOG_STYLE_MSGBOX, " ", string, "Uþdaryti", "");
+
+		dialog_Clear();
+		dialog_AddLine("{E12525}JÛS ESATE BLOKUOJAMAS");
+		dialog_AddLine("{EEEEEE}Uþblokavo: {FF672B}%s", bannedby);
+		dialog_AddLine("{EEEEEE}Prieþastis: {FF672B}%s", reason);
+		dialog_AddLine("{EEEEEE}Uþblokavimo data: {FF672B}%s", bandate);
+		dialog_AddLine("{EEEEEE}Galioja: {FF672B}%s", unbandate);
+
+		inline banned(response, listitem)
+		{
+			return 1;
+		}
+		dialog_Show(playerid, using inline banned, DIALOG_STYLE_MSGBOX, "Esate uþblokuotas", "Uþdaryti", "");
+
 		cache_delete(result);
 		KickEx(playerid);
 		return true;
@@ -24157,7 +24024,7 @@ public OnPlayerUseInventoryItem(playerid, slotid)
 {
 	if(IsInventorySlotClear(playerid, slotid))
 	{
-		ShowPlayerInventory(playerid, INVENTORY_TYPE_PLAYER, 0);
+		Inventory_ShowItems(playerid, INVENTORY_TYPE_PLAYER, 0);
 		SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
 		return 1;
 	}
@@ -24392,16 +24259,17 @@ public OnPlayerUseInventoryItem(playerid, slotid)
 	return 1;
 }
 
-stock ShowPlayerInventory(playerid, type, itter = 0)
+stock Inventory_ShowItems(playerid, type, iter = 0)
 {
 	new 
-		string[1024] = "{bababa}Pavadinimas\t \t{bababa}Kiekis\n",
 		line[126],
 		count,
 		slot_item[MAX_INVENTORY_SLOTS_AT_ALL],
 		slot_amount[MAX_INVENTORY_SLOTS_AT_ALL],
 		slot_extra[MAX_INVENTORY_SLOTS_AT_ALL];
 
+	dialog_Clear();
+	dialog_AddLine("{bababa}Pavadinimas\t \t{bababa}Kiekis");
 
 	switch(type)
 	{
@@ -24409,9 +24277,9 @@ stock ShowPlayerInventory(playerid, type, itter = 0)
 		{
 			for(new i = 0; i < MAX_INVENTORY_SLOTS; i++)
 			{
-				slot_item[i] = InventoryInfo[playerid][i][invId],
-				slot_amount[i] = InventoryInfo[playerid][i][invAmount],
-				slot_extra[i] = InventoryInfo[playerid][i][invExtraId];
+				slot_item[i] 	= InventoryInfo[playerid][i][invId],
+				slot_amount[i] 	= InventoryInfo[playerid][i][invAmount],
+				slot_extra[i] 	= InventoryInfo[playerid][i][invExtraId];
 			}
 			count = MAX_INVENTORY_SLOTS;
 		}
@@ -24419,9 +24287,9 @@ stock ShowPlayerInventory(playerid, type, itter = 0)
 		{
 			for(new i = 0; i < MAX_HOUSE_INVENTORY_SLOTS; i++)
 			{
-				slot_item[i] = HouseInventory[itter][i][invId],
-				slot_amount[i] = HouseInventory[itter][i][invAmount],
-				slot_extra[i] = HouseInventory[itter][i][invExtraId];
+				slot_item[i] 	= HouseInventory[iter][i][invId],
+				slot_amount[i] 	= HouseInventory[iter][i][invAmount],
+				slot_extra[i] 	= HouseInventory[iter][i][invExtraId];
 			}
 			count = MAX_HOUSE_INVENTORY_SLOTS;
 		}
@@ -24429,9 +24297,9 @@ stock ShowPlayerInventory(playerid, type, itter = 0)
 		{
 			for(new i = 0; i < MAX_DEALER_HOUSE_INVENTORY_SLOTS; i++)
 			{
-				slot_item[i] = DealerHouseInventory[itter][i][invId],
-				slot_amount[i] = DealerHouseInventory[itter][i][invAmount],
-				slot_extra[i] = DealerHouseInventory[itter][i][invExtraId];
+				slot_item[i] 	= DealerHouseInventory[iter][i][invId],
+				slot_amount[i] 	= DealerHouseInventory[iter][i][invAmount],
+				slot_extra[i] 	= DealerHouseInventory[iter][i][invExtraId];
 			}
 			count = MAX_DEALER_HOUSE_INVENTORY_SLOTS;
 		}
@@ -24439,9 +24307,9 @@ stock ShowPlayerInventory(playerid, type, itter = 0)
 		{
 			for(new i = 0; i < MAX_VEHICLE_INVENTORY_SLOTS; i++)
 			{
-				slot_item[i] = VehicleInventory[itter][i][invId],
-				slot_amount[i] = VehicleInventory[itter][i][invAmount],
-				slot_extra[i] = VehicleInventory[itter][i][invExtraId];
+				slot_item[i] 	= VehicleInventory[iter][i][invId],
+				slot_amount[i] 	= VehicleInventory[iter][i][invAmount],
+				slot_extra[i] 	= VehicleInventory[iter][i][invExtraId];
 			}
 			count = MAX_VEHICLE_INVENTORY_SLOTS;
 		}
@@ -24449,9 +24317,9 @@ stock ShowPlayerInventory(playerid, type, itter = 0)
 		{
 			for(new i = 0; i < MAX_BUSINESS_INVENTORY_SLOTS; i++)
 			{
-				slot_item[i] = BusinessInventory[itter][i][invId],
-				slot_amount[i] = BusinessInventory[itter][i][invAmount],
-				slot_extra[i] = BusinessInventory[itter][i][invExtraId];
+				slot_item[i] 	= BusinessInventory[iter][i][invId],
+				slot_amount[i] 	= BusinessInventory[iter][i][invAmount],
+				slot_extra[i] 	= BusinessInventory[iter][i][invExtraId];
 			}
 			count = MAX_BUSINESS_INVENTORY_SLOTS;
 		}
@@ -24461,7 +24329,12 @@ stock ShowPlayerInventory(playerid, type, itter = 0)
 	{
 		if(slot_item[slot] > 0)
 		{
-			if(slot_item[slot] == ITEM_PHONE) slot_extra[slot] = PlayerInfo[playerid][pPhoneNumber];
+			/* Isgauname EXTRA id */
+			if(slot_item[slot] == ITEM_PHONE)
+			{
+				slot_extra[slot] = PlayerInfo[playerid][pPhoneNumber];
+			}
+
 			if(1 <= slot_item[slot] < 50)
 			{
 				if(slot_extra[slot] > 0)
@@ -24486,24 +24359,17 @@ stock ShowPlayerInventory(playerid, type, itter = 0)
 			}
 		}
 		else format(line, sizeof line, "{6a6a6a}%d. Tuðèia\n", slot + 1);
-		strcat(string, line);
+		
+		dialog_AddLine(line);
 	}
 
-	tmpIter[playerid] = itter;
-	tmpType_Salon[playerid] = type;
 
-	Dialog_Show(playerid, DialogInventoryMain, DIALOG_STYLE_TABLIST_HEADERS, "{ededed}Inventorius", string, "Tæsti", "Atðaukti");
-	return 1;
-}
-
-Dialog:DialogInventoryMain(playerid, response, listitem, inputtext[])
-{
-	if(response)
+	inline inventoryMain(response, listitem)
 	{
+		if(!response) return 1;
+
 		new 
-			slot = tmpSelected[playerid] = listitem,
-			type = tmpType_Salon[playerid],
-			itter = tmpIter[playerid],
+			slot = listitem,
 			itemid;
 
 		switch(type)
@@ -24513,183 +24379,158 @@ Dialog:DialogInventoryMain(playerid, response, listitem, inputtext[])
 				if(IsInventorySlotClear(playerid, slot))
 				{
 					SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
-					return ShowPlayerInventory(playerid, type, itter);
+					return Inventory_ShowItems(playerid, type, iter);
 				}
-				else 
-				{
-					itemid = InventoryInfo[playerid][slot][invId];
-				}
+				itemid = InventoryInfo[playerid][slot][invId];
 			}
 			case INVENTORY_TYPE_HOUSE: 
 			{
-				if(IsHouseInventorySlotClear(itter, slot))
+				if(IsHouseInventorySlotClear(iter, slot))
 				{
 					SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
-					return ShowPlayerInventory(playerid, type, itter);
+					return Inventory_ShowItems(playerid, type, iter);
 				}
-				else 
-				{
-					itemid = HouseInventory[itter][slot][invId];
-				}
+				itemid = HouseInventory[iter][slot][invId];
 			}
 			case INVENTORY_TYPE_DEALER_HOUSE: 
 			{
-				if(IsDealerHouseInventorySlotClear(itter, slot))
+				if(IsDealerHouseInventorySlotClear(iter, slot))
 				{
 					SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
-					return ShowPlayerInventory(playerid, type, itter);
+					return Inventory_ShowItems(playerid, type, iter);
 				}
-				else 
-				{
-					itemid = DealerHouseInventory[itter][slot][invId];
-				}
+				itemid = DealerHouseInventory[iter][slot][invId];
 			}
 			case INVENTORY_TYPE_VEHICLE: 
 			{
-				if(IsVehicleInventorySlotClear(itter, slot))
+				if(IsVehicleInventorySlotClear(iter, slot))
 				{
 					SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
-					return ShowPlayerInventory(playerid, type, itter);
+					return Inventory_ShowItems(playerid, type, iter);
 				}
-				else 
-				{
-					itemid = VehicleInventory[itter][slot][invId];
-				}
+				itemid = VehicleInventory[iter][slot][invId];
 			}
 			case INVENTORY_TYPE_BUSINESS: 
 			{
-				if(IsBusinessInventorySlotClear(itter, slot))
+				if(IsBusinessInventorySlotClear(iter, slot))
 				{
 					SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
-					return ShowPlayerInventory(playerid, type, itter);
+					return Inventory_ShowItems(playerid, type, iter);
 				}
-				else 
-				{
-					itemid = BusinessInventory[itter][slot][invId];
-				}
+				itemid = BusinessInventory[iter][slot][invId];
 			}
 		}
 
-		new 
-			title[86],
-			string[512];
-		format(title, sizeof title, "{dbdbdb}Inventorius {5ea4e2}> {ededed}%s", GetInventoryItemName(itemid));
-		
-		if(type == INVENTORY_TYPE_PLAYER)
-		{
-			strcat(string, "Naudoti daiktà\nPerduoti daiktà kitam\nPadëti daiktà á namà/verslà\nPadëti daiktà á bagaþinæ\n{cf4e4e}Iðmesti");
-		}
-		else if(type == INVENTORY_TYPE_VEHICLE)
-		{
-			strcat(string, "Paimti\n{cf4e4e}Iðmesti");
-		}
-		else 
-		{
-			strcat(string, "Paimti");
-		}
-		// {ababab}Informacija apie daiktà
-		Dialog_Show(playerid, DialogInventoryItem, DIALOG_STYLE_LIST, title, string, "Tæsti", "Gráþti");
+		Inventory_ShowActionSelect(playerid, 
+			.type = type,
+			.iter = iter,
+			.slot = slot,
+			.itemid = itemid
+		);
 	}
+	dialog_Show(playerid, using inline inventoryMain, DIALOG_STYLE_TABLIST_HEADERS, "{ededed}Inventorius", "Tæsti", "Atðaukti");
 	return 1;
 }
 
-Dialog:DialogInventoryItem(playerid, response, listitem, inputtext[])
-{
-	if(response)
+stock Inventory_ShowActionSelect(playerid, type, iter, slot, itemid)
+{	
+	dialog_Clear();
+	if(type == INVENTORY_TYPE_PLAYER)
 	{
-		new 
-			type = tmpType_Salon[playerid];
-		switch(listitem)
-		{
-			case 0:
-			{
-				// naudoti | paimti
-				if(type == INVENTORY_TYPE_PLAYER)
-				{
-					OnPlayerUseInventoryItem(playerid, tmpSelected[playerid]);
-				}
-				else 
-				{
-					OnPlayerTakeInventoryItem(playerid, tmpType_Salon[playerid], tmpIter[playerid], tmpSelected[playerid]);
-				}
-			}
-			case 1:
-			{
-				// perduoti | ismesti
-				if(type == INVENTORY_TYPE_PLAYER)
-				{
-					OnPlayerGiveInventoryItem(playerid, tmpSelected[playerid]);
-				}
-				else
-				{
-					OnPlayerDropInventoryItem(playerid, INVENTORY_TYPE_VEHICLE, tmpIter[playerid], tmpSelected[playerid]);
-				}
-			}
-			case 2:
-			{
-				// padeti i spintele | info
-				if(type == INVENTORY_TYPE_PLAYER)
-				{
-					new 
-						put_to_type = -1,
-						put_to_itter = -1;
-					if((put_to_itter = GetClosestHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID) put_to_type = INVENTORY_TYPE_HOUSE;
-					else if((put_to_itter = GetClosestDealerHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID) put_to_type = INVENTORY_TYPE_DEALER_HOUSE;
-					else if((put_to_itter = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID) put_to_type = INVENTORY_TYPE_BUSINESS;
-					
-					if(put_to_type != -1 && put_to_itter != -1)
-					{
-						switch(put_to_type)
-						{
-							case INVENTORY_TYPE_HOUSE: if(!HaveHouseKey(playerid, put_to_itter, .check_only_owner = true)) return SendWarning(playerid, "Ðis namas nepriklauso Jums.");
-							case INVENTORY_TYPE_DEALER_HOUSE: if(!HaveDealerHouseKey(playerid, put_to_itter)) return SendWarning(playerid, "Ðis konsp. namas nepriklauso Jums.");
-							case INVENTORY_TYPE_BUSINESS: if(!HaveBusinessKey(playerid, put_to_itter, .check_only_owner = true)) return SendWarning(playerid, "Ðis verslas nepriklauso Jums.");
-						}
-						if(!IsInventorySlotClear(playerid, tmpSelected[playerid]))
-						{
-							OnPlayerPutInventoryItem(playerid, tmpSelected[playerid], put_to_type, put_to_itter);
-						}
-						else SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
-					}
-					else SendWarning(playerid, "Jûs nesate name arba versle.");
-				}
-				else
-				{
-					// info
-				}
-			}
-			case 3:
-			{
-				// padeti i trunk
-				new 	
-					vehicleid = INVALID_VEHICLE_ID;
-				if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID)
-				{
-					if(!IsInventorySlotClear(playerid, tmpSelected[playerid]))
-					{
-						OnPlayerPutInventoryItem(playerid, tmpSelected[playerid], INVENTORY_TYPE_VEHICLE, vehicleid);
-					}
-					else SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
-				}
-			}
-			case 4:
-			{
-				// ismesti
-				OnPlayerDropInventoryItem(playerid, INVENTORY_TYPE_PLAYER, 0, tmpSelected[playerid]);
-			}
-		}
-	}	
+		dialog_AddLine("Naudoti daiktà");
+		dialog_AddLine("Perduoti daiktà kitam");
+		dialog_AddLine("Padëti daiktà á namà/verslà");
+		dialog_AddLine("Padëti daiktà á bagaþinæ");
+		dialog_AddLine("{cf4e4e}Iðmesti");
+	}
+	else if(type == INVENTORY_TYPE_VEHICLE)
+	{
+		dialog_AddLine("Paimti");
+		dialog_AddLine("{cf4e4e}Iðmesti");
+	}
 	else 
 	{
-		ShowPlayerInventory(playerid, tmpType_Salon[playerid], tmpIter[playerid]);
+		dialog_AddLine("Paimti");
 	}
+
+	inline selectAction(response, listitem)
+	{	
+		if(!response) return Inventory_ShowItems(playerid, type, iter);
+
+		dialog_Row("Paimti") return OnPlayerTakeInventoryItem(playerid, type, iter, slot);
+		dialog_Row("Naudoti daiktà") return OnPlayerUseInventoryItem(playerid, slot);
+		dialog_Row("Perduoti daiktà kitam") return OnPlayerGiveInventoryItem(playerid, slot);
+		dialog_Row("Iðmesti") return OnPlayerDropInventoryItem(playerid, type, iter, slot);
+		dialog_Row("Padëti daiktà á namà/verslà")
+		{
+			new 
+				put_to_type = -1, put_to_iter = -1;
+			if((put_to_iter = GetClosestHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID) 
+				put_to_type = INVENTORY_TYPE_HOUSE;
+
+			else if((put_to_iter = GetClosestDealerHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID) 
+				put_to_type = INVENTORY_TYPE_DEALER_HOUSE;
+
+			else if((put_to_iter = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+				put_to_type = INVENTORY_TYPE_BUSINESS;
+			
+			if(put_to_type != -1 && put_to_iter != -1)
+			{
+				switch(put_to_type)
+				{
+					case INVENTORY_TYPE_HOUSE: 
+					{
+						if(!HaveHouseKey(playerid, put_to_iter, .check_only_owner = true))
+							return SendWarning(playerid, "Ðis namas nepriklauso Jums.");
+					}
+					case INVENTORY_TYPE_DEALER_HOUSE:
+					{
+						if(!HaveDealerHouseKey(playerid, put_to_iter))
+							return SendWarning(playerid, "Ðis konsp. namas nepriklauso Jums.");
+					}
+					case INVENTORY_TYPE_BUSINESS:
+					{
+						if(!HaveBusinessKey(playerid, put_to_iter, .check_only_owner = true))
+							return SendWarning(playerid, "Ðis verslas nepriklauso Jums.");
+					}
+				}
+				if(!IsInventorySlotClear(playerid, tmpSelected[playerid]))
+				{
+					OnPlayerPutInventoryItem(playerid, tmpSelected[playerid], put_to_type, put_to_iter);
+				}
+				else SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
+			}
+			else SendWarning(playerid, "Jûs nesate name arba versle.");
+
+			return 1;
+		}
+		dialog_Row("Padëti daiktà á bagaþinæ")
+		{
+			new 	
+				vehicleid = INVALID_VEHICLE_ID;
+			if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID)
+			{
+				if(!IsInventorySlotClear(playerid, tmpSelected[playerid]))
+				{
+					OnPlayerPutInventoryItem(playerid, tmpSelected[playerid], INVENTORY_TYPE_VEHICLE, vehicleid);
+				}
+				else SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
+			}
+			return 1;
+		}
+	}
+	dialog_Show(playerid, using inline selectAction, DIALOG_STYLE_LIST, 
+		va_return("{dbdbdb}Inventorius {5ea4e2}> {ededed}%s", GetInventoryItemName(itemid)),
+		"Tæsti", "Gráþti");
 	return 1;
 }
 
 
 stock IsItemDrug(itemid)
 {
-	if(InArray(itemid, ITEM_MARIJUANA, ITEM_MDMA, ITEM_CRACK, ITEM_HEROINE, ITEM_METHAMPHETAMINE, ITEM_COCAINE, ITEM_XANAX)) return true;
+	switch(itemid) {
+		case ITEM_MARIJUANA, ITEM_MDMA, ITEM_CRACK, ITEM_HEROINE, ITEM_METHAMPHETAMINE, ITEM_COCAINE, ITEM_XANAX: return true;
+	}
 	return false;
 }
 
@@ -29691,20 +29532,22 @@ CMD:damages(playerid, params[])
 
 	if(sscanf(params, "d", targetid)) return SendUsage(playerid, "/damages [þaidëjo id]");
 	if(!IsPlayerInRangeOfPlayer(playerid, targetid, 5.0)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
-
-	new
-		string[1024],
-		line[126];
-
 	if(Iter_Count(PlayerDamages[targetid]) <= 0) return SendWarning(playerid, "Suþalojimø nëra.");
+
+	dialog_Clear();
 
 	foreach(new i : PlayerDamages[targetid])
 	{
-		format(line, sizeof(line), "%0.1f þalos ið %s á %s prieð %d sek.\n", PlayerDamages[targetid][i][pd_amount], GetInventoryItemName(PlayerDamages[targetid][i][pd_weaponid]), GetBodyPartName(PlayerDamages[targetid][i][pd_bodypart]), gettime() - PlayerDamages[targetid][i][pd_time]);
-		strcat(string, line);
+		dialog_AddLine("%0.1f þalos ið %s á %s prieð %d sek.",
+			PlayerDamages[targetid][i][pd_amount],
+			GetInventoryItemName(PlayerDamages[targetid][i][pd_weaponid]),
+			GetBodyPartName(PlayerDamages[targetid][i][pd_bodypart]),
+			gettime() - PlayerDamages[targetid][i][pd_time]
+		);
 	}
 
-	Dialog_Show(playerid, NONE, DIALOG_STYLE_LIST, "Þaidëjo suþalojimai", string, "Uþdaryti", "");
+	inline damages(response, listitem) return 1;
+	dialog_Show(playerid, using inline damages, DIALOG_STYLE_LIST, "Þaidëjo suþalojimai", "Uþdaryti", "");
 	return 1;
 }
 
@@ -32088,6 +31931,9 @@ CMD:hideadmins(playerid, params[])
 	SendFormat(playerid, -1, "Dabar jus %s /admins sàraðe.", PlayerExtra[playerid][peHideAdmin] > 0 ? ("nerodys") : ("rodys"));
 	return 1;
 }
+
+stock ShowPlayerAdminMenu(playerid) return 1;
+
 CMD:admins(playerid, params[])
 {
 	SendFormat(playerid, 0x40B733FF, "__________________ PRISIJUNGÆ ADMINISTRATORIAI __________________");
@@ -32273,12 +32119,7 @@ CMD:b(playerid, params[])
 	return 1;
 }
 
-flags:amenu(CMD_TYPE_ADMIN);
-CMD:amenu(playerid, params[])
-{
-	ShowPlayerAdminMenu(playerid);
-	return 1;
-}
+
 
 flags:ucp(CMD_TYPE_ALLOW_NEWBIE);
 CMD:ucp(playerid, params[])
@@ -32300,83 +32141,56 @@ CMD:ucp(playerid, params[])
 flags:newchars(CMD_TYPE_ADMIN);
 CMD:newchars(playerid, params[])
 {
-	Admin_NewChars_ShowMain(playerid);	
-	return 1;
-}
-
-stock Admin_NewChars_ShowMain(playerid)
-{
-	dialog_Clear();
-	dialog_AddLine("Perþiûrëti visas anketas");
-	Dialog_Show(playerid, DialogAdminNewCharsMain, DIALOG_STYLE_LIST, "Nepatvirtinti veikëjai", dialog_GetBody(), "Tæsti", "Atðaukti");
-	return 1;
-}
-Dialog:DialogAdminNewCharsMain(playerid, response, listitem, inputtext[])
-{
-	if(response)
+	
+	inline loadNewChars()
 	{
-		switch(listitem)
-		{
-			case 0: Admin_NewChars_ShowList(playerid);
-		}
-	}
-	return 1;
-}
+		dialog_Clear();
+		dialog_AddLine("Þaidëjo vardas [ID]\tVVP vartotojas [ID]\tPerþiûri administratorius");
 
-stock Admin_NewChars_ShowList(playerid)
-{
-	mysql_tquery(chandler, "\
+		new 
+			rows = cache_num_rows(),
+			uname[21], uid,
+			pname[MAX_PLAYER_NAME + 1], pid,
+			date[20], aid, aname[MAX_PLAYER_NAME + 1];
+
+		if(rows > 0)
+		{
+			for(new i = 0; i < rows; i++)
+			{
+				cache_get_value_name_int(i, "pid", pid);
+				cache_get_value_name(i, "pname", pname);
+
+				cache_get_value_name_int(i, "uid", uid);
+				cache_get_value_name(i, "uname", uname);
+
+				cache_get_value_name_int(i, "Reviewed", aid);
+				cache_get_value_name(i, "Date", date);
+
+				if(aid != 0) format(aname, sizeof aname, GetUserNameById(aid));
+				else format(aname, 3, "-");
+
+				dialog_AddLine("%d. %s [%d]\t%s [%d]\t%s", i + 1, pname, pid, uname, uid, aname);
+			}
+		}
+		else
+		{
+			dialog_AddLine("Nëra nepatvirtinø veikëjø");
+		}
+
+		inline newCharsList(response, listitem)
+		{
+			if(response)
+			{
+				Admin_NewChars_ShowDetails(playerid, .offset = listitem);
+			}
+		}
+		dialog_Show(playerid, using inline newCharsList, DIALOG_STYLE_TABLIST_HEADERS, "Nepatvirtinti veikëjai", "Tæsti", "Atðaukti");
+	}
+	mysql_tquery_inline(chandler, using inline loadNewChars, "\
 		SELECT players_new.id pid,players_new.Date,players_new.Name pname,players_new.Reviewed,users_data.Name uname,users_data.id uid \
 		FROM players_new INNER JOIN users_data \
 		ON users_data.id = players_new.UserId AND players_new.Status = '0' \
-		ORDER BY players_new.Date DESC", "AdminNewCharsLoad", "d", playerid);
-	return 1;
-}
-
-/*
-	================================================================================================
-	Uzkrauname visa lista.
-*/
-forward AdminNewCharsLoad(playerid);
-public AdminNewCharsLoad(playerid)
-{
-	new 
-		string[512] = "Þaidëjo vardas [ID]\tVVP vartotojas [ID]\tPerþiûri administratorius\n",
-		rows = cache_num_rows(),
-		uname[21], uid,
-		pname[MAX_PLAYER_NAME + 1], pid,
-		date[20], aid, aname[MAX_PLAYER_NAME + 1];
-	if(rows > 0)
-	{
-		for(new i = 0; i < rows; i++)
-		{
-			cache_get_value_name_int(i, "pid", pid);
-			cache_get_value_name(i, "pname", pname);
-
-			cache_get_value_name_int(i, "uid", uid);
-			cache_get_value_name(i, "uname", uname);
-
-			cache_get_value_name_int(i, "Reviewed", aid);
-			cache_get_value_name(i, "Date", date);
-
-			if(aid != 0) format(aname, sizeof aname, GetUserNameById(aid));
-			else format(aname, 3, "-");
-
-			format(string, sizeof string, "%s%d. %s [%d]\t%s [%d]\t%s\n", string, i + 1, pname, pid, uname, uid, aname);
-		}
-	}
-	else format(string, sizeof string, "Nepatvirtintø veikëjø nëra\nNëra");
-
-	Dialog_Show(playerid, DialogAdminNewCharsList, DIALOG_STYLE_TABLIST_HEADERS, "Nepatvirtinti veikëjai", string, "Tæsti", "Atðaukti");
-	return 1;
-}
-Dialog:DialogAdminNewCharsList(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-		Admin_NewChars_ShowDetails(playerid, listitem);
-	}
-	else Admin_NewChars_ShowMain(playerid);
+		ORDER BY players_new.Date DESC");
 	return 1;
 }
 
@@ -32384,115 +32198,103 @@ Dialog:DialogAdminNewCharsList(playerid, response, listitem, inputtext[])
 	================================================================================================
 	Pasirinkto veikejo informacija uzkrauname:
 */
-stock Admin_NewChars_ShowDetails(playerid, listitem)
+stock Admin_NewChars_ShowDetails(playerid, offset)
 {
-	new 
-		string[1024];
+	inline loadNewCharDetails()
+	{
+		if(cache_num_rows())
+		{
+			new 
+				answer1[129], answer2[129], answer3[129],
+				name[MAX_PLAYER_NAME + 1], date[20];
 
-	mysql_format(chandler, string, 256, "\
+			cache_get_value_name_int(0, "id", player_NewCharDetails[playerid]);
+			cache_get_value_name_int(0, "UserId", player_NewCharUserId[playerid]);
+			cache_get_value_name(0, "Answer1", answer1);
+			cache_get_value_name(0, "Answer2", answer2);
+			cache_get_value_name(0, "Answer3", answer3);
+			cache_get_value_name(0, "Name", name);
+			cache_get_value_name(0, "Date", date);
+			
+			// Padarome, kad rodytu kuris adminas perziuri
+			inline updateReviewedStatus() return 1;
+			mysql_tquery_inline(chandler, using inline updateReviewedStatus, "\
+				UPDATE `players_new` SET Reviewed = '%d' WHERE id = '%d'",
+				PlayerInfo[playerid][pUserId], player_NewCharDetails[playerid]
+			);
+
+			dialog_AddLine("Veikëjo vardas: %s", name);
+			dialog_AddLine("Data: %s", date);
+			dialog_AddLine("Vartotojas: %s", GetUserNameById(player_NewCharUserId[playerid]));
+
+			dialog_AddLine("1. %s", NewCharQuestions[0][ncq_Lt]);
+			dialog_AddLine("%s", Dialog_PrepareAnswer(answer1));
+			
+			dialog_AddLine("2. %s", NewCharQuestions[1][ncq_Lt]);
+			dialog_AddLine("%s", Dialog_PrepareAnswer(answer2));
+			
+			dialog_AddLine("2. %s", NewCharQuestions[2][ncq_Lt]);
+			dialog_AddLine("%s", Dialog_PrepareAnswer(answer3));
+
+			inline confirmOrReject(response, listitem)
+			{
+				if(response)
+				{
+					// priimti
+					if(CheckNewCharStatus(player_NewCharDetails[playerid]) == 0) // ar dar nepriimtas
+					{
+						call OnCharAccepted(player_NewCharDetails[playerid], player_NewCharUserId[playerid], playerid);
+					}
+					else  SendError(playerid, "Veikëjà jau yra priëmë arba atmetë kitas administratorius.");
+				}
+				else
+				{
+					// atmesti
+					if(CheckNewCharStatus(player_NewCharDetails[playerid]) == 0)
+					{
+						Admin_NewChars_ShowReasonInput(playerid);
+					}
+					else SendError(playerid, "Veikëjà jau yra priëmë arba atmetë kitas administratorius.");
+				}
+			}
+			dialog_Show(playerid, using inline confirmOrReject, DIALOG_STYLE_MSGBOX, "Naujo veikëjo patvirtinimas", "Priimti", "Atmesti");
+		}
+	}
+	mysql_tquery_inline(chandler, using inline loadNewCharDetails, "\
 		SELECT id,Answer1,Answer2,Answer3,Name,Date,UserId FROM `players_new` \
-		WHERE Status = '0' ORDER BY Date DESC LIMIT 1 OFFSET %d", listitem);
-	mysql_tquery(chandler, string, "ShowNewChars", "d", playerid);
-	return 1;
-}
-forward ShowNewChars(playerid);
-public ShowNewChars(playerid)
-{
-	if(cache_num_rows())
-	{
-		new 
-			answer1[129], answer2[129], answer3[129], string[1024],
-			name[MAX_PLAYER_NAME + 1], date[20];
-
-		cache_get_value_name_int(0, "id", player_NewCharDetails[playerid]);
-		cache_get_value_name_int(0, "UserId", player_NewCharUserId[playerid]);
-		cache_get_value_name(0, "Answer1", answer1);
-		cache_get_value_name(0, "Answer2", answer2);
-		cache_get_value_name(0, "Answer3", answer3);
-		cache_get_value_name(0, "Name", name);
-		cache_get_value_name(0, "Date", date);
-		
-		inline updateReviewedStatus() return 1;
-		mysql_tquery_inline(chandler, using inline updateReviewedStatus, "\
-			UPDATE `players_new` SET Reviewed = '%d' WHERE id = '%d'",
-			PlayerInfo[playerid][pUserId], player_NewCharDetails[playerid]
-		);
-
-		format(string, sizeof string, "Veikëjo vardas: %s\nData: %s\nVartotojas: %s\n\n1. %s\n%s\n\n2. %s\n%s\n\n3. %s\n%s", 
-			name, date, GetUserNameById(player_NewCharUserId[playerid]),
-			NewCharQuestions[0][ncq_Lt], Dialog_PrepareAnswer(answer1),
-			NewCharQuestions[1][ncq_Lt], Dialog_PrepareAnswer(answer2), 
-			NewCharQuestions[2][ncq_Lt], Dialog_PrepareAnswer(answer3));
-
-		Dialog_Show(playerid, DialogAdminNewCharDetail, DIALOG_STYLE_MSGBOX, "Naujo veikëjo patvirtinimas", string, "Priimti", "Atmesti");
-	}
-	else Admin_NewChars_ShowMain(playerid);
+		WHERE Status = '0' ORDER BY Date DESC LIMIT 1 OFFSET %d", offset);
 	return 1;
 }
 
-
-Dialog:DialogAdminNewCharDetail(playerid, response, listitem, inputtext[])
+stock Admin_NewChars_ShowReasonInput(playerid)
 {
-	if(response)
+	dialog_Clear();
+	dialog_AddLine("Áveskite prieþastá, dël kurios atmetate veikëjà.");
+	inline inputRejectReason(response, listitem)
 	{
-		// priimti
-		if(CheckNewCharStatus(player_NewCharDetails[playerid]) == 0) // ar dar nepriimtas
+		if(response)
 		{
-			call OnCharAccepted(player_NewCharDetails[playerid], player_NewCharUserId[playerid], playerid);
-		}
-		else 
-		{
-			Admin_NewChars_ShowMain(playerid);
-			SendError(playerid, "Veikëjà jau yra priëmë arba atmetë kitas administratorius.");
-		}
-	}
-	else
-	{
-		// atmesti
-		if(CheckNewCharStatus(player_NewCharDetails[playerid]) == 0)
-		{
-			Admin_NewChars_ShowReason(playerid);
+			if(!strlen(dialog_Input())) return Admin_NewChars_ShowReasonInput(playerid);
+			if(CheckNewCharStatus(player_NewCharDetails[playerid]) == 0)
+			{
+				call OnCharRejected(player_NewCharDetails[playerid], player_NewCharUserId[playerid], playerid, dialog_Input());
+			}
+			else
+			{
+				SendError(playerid, "Veikëjà jau yra priëmë arba atmetë kitas administratorius.");
+			}
 		}
 		else
 		{
-			Admin_NewChars_ShowMain(playerid);
-			SendError(playerid, "Veikëjà jau yra priëmë arba atmetë kitas administratorius.");
+			inline updateReviewedStatus() return 1;
+			mysql_tquery_inline(chandler, using inline updateReviewedStatus, "\
+				UPDATE `players_new` SET Reviewed = '0' WHERE id = '%d'", player_NewCharDetails[playerid]
+			);
 		}
 	}
+	dialog_Show(playerid, using inline inputRejectReason, DIALOG_STYLE_INPUT, "Atmetimas", "Atmesti", "Gráþti");
 	return 1;
 }
-
-stock Admin_NewChars_ShowReason(playerid)
-{
-	Dialog_Show(playerid, DialogAdminNewCharsReas, DIALOG_STYLE_INPUT, "Atmetimas", "Áveskite prieþastá, dël kurios atmetate veikëjà.", "Atmesti", "");
-	return 1;
-}
-
-Dialog:DialogAdminNewCharsReas(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-		if(!strlen(inputtext)) return Admin_NewChars_ShowReason(playerid);
-		if(CheckNewCharStatus(player_NewCharDetails[playerid]) == 0)
-		{
-			call OnCharRejected(player_NewCharDetails[playerid], player_NewCharUserId[playerid], playerid, inputtext);
-		}
-		else
-		{
-			Admin_NewChars_ShowMain(playerid);
-			SendError(playerid, "Veikëjà jau yra priëmë arba atmetë kitas administratorius.");
-		}
-	}
-	else
-	{
-		inline updateReviewedStatus() return 1;
-		mysql_tquery_inline(chandler, using inline updateReviewedStatus, "\
-			UPDATE `players_new` SET Reviewed = '0' WHERE id = '%d'", player_NewCharDetails[playerid]
-		);
-	}
-	return 1;
-}
-
 
 stock CheckNewCharStatus(id)
 {
@@ -32635,14 +32437,6 @@ public CharRejectUpdate(playerid)
 			CharListTD_ShowSelect(playerid, 0, true, 2);
 		}
 	}
-	return 1;
-}
-
-
-
-public OnDialogPerformed(playerid, dialog[], response, success)
-{
-	printf("OnDialogPerformed(%d, %s, %d, %d)", playerid, dialog, response, success);
 	return 1;
 }
 
@@ -35533,40 +35327,39 @@ forward SanNewsSMSLoad(playerid);
 public SanNewsSMSLoad(playerid)
 {
 	new 
-		string[1024],
-		line[86],
 		number,
 		text[128];
+
+	dialog_Clear();
+
 	for(new i = 0, rows = cache_num_rows(); i < rows; i++)
 	{
 		cache_get_value_name_int(i, "PlayerNumber", number);
 		cache_get_value_name(i, "Text", text);
 
-		format(line, sizeof line, "%d. %d: %.56s\n", i + 1, number, text);
-		strcat(string, line);
+		dialog_AddLine("%d: %.56s", number, text);
 	}
-	Dialog_Show(playerid, DialogSanNewsSms, DIALOG_STYLE_LIST, "San News SMS", string, "Daugiau", "Atðaukti");
-	return 1;
-}
-
-Dialog:DialogSanNewsSms(playerid, response, listitem, inputtext[])
-{
-	if(response)
+	inline sanNews_SMSList(response, listitem)
 	{
-		new 
-			string[256];
+		if(response)
+		{
+			new 
+				string[256];
 
-		mysql_format(chandler, string, sizeof string, "SELECT * FROM `san_news_sms` ORDER BY Date DESC LIMIT 1 OFFSET %d", listitem);
-		mysql_tquery(chandler, string, "SanNewsSmsData", "d", playerid);
+			mysql_format(chandler, string, sizeof string, "SELECT * FROM `san_news_sms` ORDER BY Date DESC LIMIT 1 OFFSET %d", listitem);
+			mysql_tquery(chandler, string, "SanNewsSmsData", "d", playerid);
+		}
+		return 1;
 	}
+	dialog_Show(playerid, sanNews_SMSList, DIALOG_STYLE_LIST, "San News SMS", "Daugiau", "Atðaukti");
 	return 1;
 }
+
 
 forward SanNewsSmsData(playerid);
 public SanNewsSmsData(playerid)
 {
 	new 
-		string[512],
 		text[128],
 		number;
 
@@ -35575,8 +35368,11 @@ public SanNewsSmsData(playerid)
 		cache_get_value_name_int(0, "PlayerNumber", number);
 		cache_get_value_name(0, "Text", text);
 	
-		format(string, sizeof string, "%d paraðë þinutæ:\n%s", number, text);
-		ShowPlayerDialog(playerid, 0, DIALOG_STYLE_MSGBOX, "Þinutë", string, "Gerai", "");
+		dialog_AddLine("%d paraðë þinutæ:", number);
+		dialog_AddLine(text);
+
+		inline smsText(response, listitem) return 1;
+		dialog_Show(playerid, using inline smsText, DIALOG_STYLE_MSGBOX, "Þinutë", "Gerai", "");
 	}
 	return 1;
 }
@@ -36803,7 +36599,7 @@ CMD:dhinv(playerid, params[])
 	new houseid = INVALID_HOUSE_ID;
 	if((houseid = GetClosestDealerHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID && HaveDealerHouseKey(playerid, houseid))
 	{
-		ShowPlayerInventory(playerid, INVENTORY_TYPE_DEALER_HOUSE, houseid);
+		Inventory_ShowItems(playerid, INVENTORY_TYPE_DEALER_HOUSE, houseid);
 	}
 	else SendError(playerid, "Nesate konspiraciniame name.");
 	return 1;
@@ -36813,7 +36609,7 @@ CMD:hinv(playerid, params[])
 	new houseid = INVALID_HOUSE_ID;
 	if((houseid = GetClosestHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, houseid, .check_only_owner = true))
 	{
-		ShowPlayerInventory(playerid, INVENTORY_TYPE_HOUSE, houseid);
+		Inventory_ShowItems(playerid, INVENTORY_TYPE_HOUSE, houseid);
 	}
 	else SendError(playerid, "Nesate namie.");
 	return 1;
@@ -36823,7 +36619,7 @@ CMD:binv(playerid, params[])
 	new businessid = INVALID_BUSINESS_ID;
 	if((businessid = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID && HaveBusinessKey(playerid, businessid, .check_only_owner = true))
 	{
-		ShowPlayerInventory(playerid, INVENTORY_TYPE_BUSINESS, businessid);
+		Inventory_ShowItems(playerid, INVENTORY_TYPE_BUSINESS, businessid);
 	}
 	else SendError(playerid, "Nesate versle.");
 	return 1;
@@ -36977,7 +36773,7 @@ CMD:inventory(playerid, params[])
 {
 	tmpSelected[playerid] = -1;
 	if(PlayerExtra[playerid][peCuffed] >= 1) return SendWarning(playerid, "Esate surakintas.");
-	ShowPlayerInventory(playerid, INVENTORY_TYPE_PLAYER);//INVENTORY_PAGE_MAIN, INVENTORY_TYPE_PLAYER, 0, true);
+	Inventory_ShowItems(playerid, INVENTORY_TYPE_PLAYER);//INVENTORY_PAGE_MAIN, INVENTORY_TYPE_PLAYER, 0, true);
 	return 1;
 }
 CMD:invweapon(playerid, params[])
@@ -38142,7 +37938,7 @@ CMD:trunk(playerid, params[])
 		if(boot == 0) return SendWarning(playerid, "Tr. priemonës bagaþinë uþdaryta (/trunko)");
 	}
 	if(VehicleTrunkSpace[GetVehicleModel(vehicleid)-400] <= 0) return SendError(playerid, "Tr. priemonë neturi bagaþinës.");
-	ShowPlayerInventory(playerid, INVENTORY_TYPE_VEHICLE, vehicleid);
+	Inventory_ShowItems(playerid, INVENTORY_TYPE_VEHICLE, vehicleid);
 	return 1;
 }
 alias:bonnet("hood","kapotas");
@@ -40520,7 +40316,7 @@ public InteriorsMenuLoad(playerid, page)
 	if(rows >= 51) strcat(string, "{BABABA}>>> KITAS\n");
 
 	strcat(string, "PRIDËTI");
-	Dialog_Show(playerid, Dialog_Am_Interiors, DIALOG_STYLE_TABLIST_HEADERS, "Interjerø meniu", string, "Tæsti", "Atðaukti");
+	// Dialog_Show(playerid, Dialog_Am_Interiors, DIALOG_STYLE_TABLIST_HEADERS, "Interjerø meniu", string, "Tæsti", "Atðaukti");
 	return 1;
 }
 
@@ -40545,12 +40341,12 @@ Dialog:Dialog_Am_Interiors(playerid, response, listitem, inputtext[])
 		else if(strfind(inputtext, "PRIDËTI") != -1)
 		{
 			// prideti
-			Dialog_Show(playerid, Dialog_Am_InteriorAdd, DIALOG_STYLE_INPUT, "Interjerø menu", "{FFFFFF}Áveskite naujojo interjero pavadinimà.", "Pridëti", "Atðaukti");
+			// Dialog_Show(playerid, Dialog_Am_InteriorAdd, DIALOG_STYLE_INPUT, "Interjerø menu", "{FFFFFF}Áveskite naujojo interjero pavadinimà.", "Pridëti", "Atðaukti");
 		}
 		else
 		{
 			tmpSelected[playerid] = listitem;
-			Dialog_Show(playerid, Dialog_Am_InteriorEdit, DIALOG_STYLE_LIST, "Interjerø menu", "Teleportuotis\n{C60000}Iðtrinti", "Tæsti", "Atðaukti");
+			// Dialog_Show(playerid, Dialog_Am_InteriorEdit, DIALOG_STYLE_LIST, "Interjerø menu", "Teleportuotis\n{C60000}Iðtrinti", "Tæsti", "Atðaukti");
 		}
 	}
 }

@@ -53,51 +53,28 @@ CMD:boombox(playerid, params[])
 }
 hook OnPlayerBoomboxUse(playerid)
 {
-	new 
-		string[512];
-	strcat(string, "Pakeisti stotá\nPadëti ant þemës\nPaimti nuo þemës");
-	Dialog_Show(playerid, BoomboxMain, DIALOG_STYLE_LIST, "Magnetola", string, "Tæsti", "Atðaukti");
-	return 1;
-}
+	dialog_Clear();
+	dialog_AddLine("Pakeisti stotá");
+	dialog_AddLine("Padëti ant þemës");
+	dialog_AddLine("Paimti nuo þemës");
 
-flags:clearboombox(CMD_TYPE_ADMIN);
-CMD:clearboombox(playerid, params[])
-{
-	foreach(new audio : 3DAudio)
+	inline boomboxMain(response, listitem)
 	{
-		if(IsPlayerInDynamicArea(playerid, audioInfo[audio][aArea]))
+		if(response)
 		{
-			ResetBoombox(audio);
-			break;
-		}
-	}
-	SendFormat(playerid, -1, "Iðvalëte artimiausià boomboxà");
-	return 1;
-}
-
-Dialog:BoomboxMain(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-		switch(listitem)
-		{
-			case 0:
+			dialog_Row("Pakeisti stotá")
 			{
-				new string[4084];
-				for(new i = 0; i < sizeof RadioStations; i++)
-				{
-					format(string, sizeof string, "%s%s\n", string, RadioStations[i][stationName]);
-				}
-				strcat(string, "{BABABA}Ávesti savo stotá");
-				Dialog_Show(playerid, BoomboxStation, DIALOG_STYLE_LIST, "Magnetola", string, "Tæsti", "Atðaukti");
+				BoomBox_ShowStations(playerid);
 			}
-			case 1:
+			dialog_Row("Padëti ant þemës")
 			{
 				foreach(new receiverid : 3DAudio)
 			    {
-			    	if(IsPlayerInDynamicArea(playerid, audioInfo[receiverid][aArea])) return SendWarning(playerid, "Ðalia jûsø jau yra pastatyta magnetola.");
+			    	if(IsPlayerInDynamicArea(playerid, audioInfo[receiverid][aArea]))
+						return SendWarning(playerid, "Ðalia jûsø jau yra pastatyta magnetola.");
 				}
 				if(audioInfo[playerid][aObject] > 0) return SendError(playerid, "Jûs jau esate padëjæs magnetolà.");
+
 				new 
 					Float:x, 
 					Float:y,
@@ -124,7 +101,7 @@ Dialog:BoomboxMain(playerid, response, listitem, inputtext[])
 				rp_me(playerid, _, "padeda ant þemës magnetolà ir jà ájungia.");
 				SendFormat(playerid, 0xbababaff, "Nustatymams naudokite /boombox");
 			}
-			case 2:
+			dialog_Row("Paimti nuo þemës")
 			{
 				if(audioInfo[playerid][aObject] > 0)
 				{
@@ -136,57 +113,93 @@ Dialog:BoomboxMain(playerid, response, listitem, inputtext[])
 			}
 		}
 	}
+	dialog_Show(playerid, using inline boomboxMain, DIALOG_STYLE_LIST, "Magnetola", "Tæsti", "Atðaukti");
 	return 1;
 }
 
-Dialog:BoomboxStation(playerid, response, listitem, inputtext[])
+flags:clearboombox(CMD_TYPE_ADMIN);
+CMD:clearboombox(playerid, params[])
 {
-	if(response)
+	foreach(new audio : 3DAudio)
 	{
-		if(audioInfo[playerid][aObject] <= 0) return SendError(playerid, "Jûs nesate pastatæs magnetolos.");
-		if(listitem < sizeof RadioStations)
+		if(IsPlayerInDynamicArea(playerid, audioInfo[audio][aArea]))
 		{
-			// pasirinko stoti
-			format(audioInfo[playerid][aLink], 128, RadioStations[listitem][stationLink]);
-			foreach(new receiverid : Player)
-			{
-				if(IsPlayerInDynamicArea(receiverid, audioInfo[playerid][aArea]))
-				{
-					if(!IsPlayerInAnyVehicle(receiverid)) SetPlayerRadio(receiverid, audioInfo[playerid][aLink]);
-				}
-			}
-			rp_me(playerid, _, "pakeièia magnetolos stotá.");
-		}
-		else
-		{
-			// iveda
-			Dialog_Show(playerid, BoomboxInput, DIALOG_STYLE_INPUT, "Magnetola", "{FFFFFF}Áveskite stoties adresà:", "Tæsti", "Atðaukti");
+			ResetBoombox(audio);
+			break;
 		}
 	}
+	SendFormat(playerid, -1, "Iðvalëte artimiausià boomboxà");
 	return 1;
 }
 
-Dialog:BoomboxInput(playerid, response, listitem, inputtext[])
+stock BoomBox_ShowStations(playerid)
 {
-	if(response)
+	
+	dialog_Clear();
+	for(new i = 0; i < sizeof RadioStations; i++)
 	{
-		if(audioInfo[playerid][aObject] <= 0) return SendError(playerid, "Jûs nesate pastatæs magnetolos.");
-		if(strlen(inputtext) > 0)
+		dialog_AddLine(RadioStations[i][stationName]);
+	}
+	dialog_AddLine("{BABABA}Ávesti savo stotá");
+
+	inline stations(response, listitem)
+	{
+		if(response)
 		{
-			// pasirinko stoti
-			format(audioInfo[playerid][aLink], 128, inputtext);
-			foreach(new receiverid : Player)
+			if(audioInfo[playerid][aObject] <= 0) return SendError(playerid, "Jûs nesate pastatæs magnetolos.");
+			if(listitem < sizeof RadioStations)
 			{
-				if(IsPlayerInDynamicArea(receiverid, audioInfo[playerid][aArea]))
+				// pasirinko stoti
+				format(audioInfo[playerid][aLink], 128, RadioStations[listitem][stationLink]);
+				foreach(new receiverid : Player)
 				{
-					if(!IsPlayerInAnyVehicle(receiverid)) SetPlayerRadio(receiverid, inputtext);
+					if(IsPlayerInDynamicArea(receiverid, audioInfo[playerid][aArea]))
+					{
+						if(!IsPlayerInAnyVehicle(receiverid)) SetPlayerRadio(receiverid, audioInfo[playerid][aLink]);
+					}
 				}
+				rp_me(playerid, _, "pakeièia magnetolos stotá.");
 			}
-			rp_me(playerid, _, "pakeièia magnetolos stotá.");
+			else
+			{
+				BoomBox_ShowInput(playerid);
+			}
 		}
 	}
+	dialog_Show(playerid, using inline stations, DIALOG_STYLE_LIST, "Magnetola", "Tæsti", "Atðaukti");
 	return 1;
 }
+
+stock BoomBox_ShowInput(playerid)
+{
+	// iveda
+	dialog_Clear();
+	dialog_AddLine("{FFFFFF}Áveskite stoties adresà:");
+
+	inline boomboxInput(response, listitem)
+	{
+		if(response)
+		{
+			if(audioInfo[playerid][aObject] <= 0) return SendError(playerid, "Jûs nesate pastatæs magnetolos.");
+			if(strlen(dialog_Input()) > 0)
+			{
+				// pasirinko stoti
+				format(audioInfo[playerid][aLink], 128, dialog_Input());
+				foreach(new receiverid : Player)
+				{
+					if(IsPlayerInDynamicArea(receiverid, audioInfo[playerid][aArea]))
+					{
+						if(!IsPlayerInAnyVehicle(receiverid)) SetPlayerRadio(receiverid, dialog_Input());
+					}
+				}
+				rp_me(playerid, _, "pakeièia magnetolos stotá.");
+			}
+		}
+	}
+	dialog_Show(playerid, using inline boomboxInput, DIALOG_STYLE_INPUT, "Magnetola", "Tæsti", "Atðaukti");
+	return 1;
+}
+
 
 stock ResetBoombox(playerid)
 {

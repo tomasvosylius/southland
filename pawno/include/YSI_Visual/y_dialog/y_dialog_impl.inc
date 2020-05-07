@@ -176,22 +176,6 @@ HOOK__ OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		return Y_HOOKS_CONTINUE_RETURN_0;
 }
 
-stock _ShowPlayerDialog(playerid, dialog, style, const string:title[], const string:caption[], const string:button1[], const string:button2[])
-{
-	// Fail.
-	if (dialog == YSI_DIALOG_ID)
-		return 0;
-	broadcastfunc Dialog_Set(playerid, dialog);
-	YSI_g_sPlayerMaster[playerid] = true;
-	return ShowPlayerDialog(playerid, dialog, style, title, caption, button1, button2);
-}
-
-#if defined _ALS_ShowPlayerDialog
-	#undef ShowPlayerDialog
-#else
-	#define _ALS_ShowPlayerDialog
-#endif
-#define ShowPlayerDialog _ShowPlayerDialog
 
 #define _ALS_HidePlayerDialog
 #define HidePlayerDialog Dialog_Hide

@@ -245,16 +245,12 @@ CMD:orderweapons(playerid, params[])
         );
     }
 
-	Dialog_Show(playerid, ConfirmWeaponsOrder, DIALOG_STYLE_MSGBOX, "Þinutë nuo 5649998:", dialog_GetBody(), "Paþymëti", "Uþdaryti");
+    inline confirmOrder(response, listitem)
+    {
+        response && _GunDealer_MarkCheckpoint(playerid);
+    }
+	dialog_Show(playerid, using inline confirmOrder, DIALOG_STYLE_MSGBOX, "Þinutë nuo 5649998:", "Paþymëti", "Uþdaryti");
     return 1;
-}
-Dialog:ConfirmWeaponsOrder(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-        _GunDealer_MarkCheckpoint(playerid);
-	}
-	return 1;
 }
 
 CMD:buyguns(playerid, params[])
@@ -323,49 +319,49 @@ static _GunDealer_ShowPurchaseList(playerid)
             dealer_WeaponsList[dealer_WeaponsSelected[w]][dw_PriceCredits]
         );
     }
-	Dialog_Show(playerid, BuyBlackMarketGuns, DIALOG_STYLE_TABLIST, "Black market", dialog_GetBody(), "Pirkti", "Uþdaryti");
-    return 1;
-}
-Dialog:BuyBlackMarketGuns(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-        if(0 <= listitem < MAX_WEAPONS_PER_WEEK)
+
+    inline buyBlackMarketGuns(response, listitem)
+    {
+        if(response)
         {
-            new 
-                weapon = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_WeaponId], 
-                ammo = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_WeaponAmmo],
-                price = dealer_WeaponsSelected_Price[listitem],
-                creds = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_PriceCredits];
-
-            if(player_FactionCredits[playerid] < creds) 
-                return SendError(playerid, "Neturi frakc. kreditø.");
-            
-            if(GetPlayerMoney(playerid) < price) 
-                return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
-
-            new 
-                slot = -1;
-
-            if((slot = GetPlayerFreeInventorySlot(playerid)) != -1)
+            if(0 <= listitem < MAX_WEAPONS_PER_WEEK)
             {
-                GivePlayerInventoryItem(playerid, weapon, ammo, 0, slot);
+                new 
+                    weapon = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_WeaponId], 
+                    ammo = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_WeaponAmmo],
+                    price = dealer_WeaponsSelected_Price[listitem],
+                    creds = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_PriceCredits];
 
-                new final[256];
-                format(final, sizeof final, "** Kaukëtasis perduoda %s daiktà, kuris atrodo kaip %s.",
-                    GetPlayerNameEx(playerid, true), 
-                    GetInventoryItemName(weapon)
-                );
+                if(player_FactionCredits[playerid] < creds) 
+                    return SendError(playerid, "Neturi frakc. kreditø.");
+                
+                if(GetPlayerMoney(playerid) < price) 
+                    return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
 
-                ProxDetector(10.0, playerid, final, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA);
+                new 
+                    slot = -1;
 
-                Player_GiveFactionCredits(playerid, -creds);
-                GivePlayerMoney(playerid, -price);
+                if((slot = GetPlayerFreeInventorySlot(playerid)) != -1)
+                {
+                    GivePlayerInventoryItem(playerid, weapon, ammo, 0, slot);
+
+                    new final[256];
+                    format(final, sizeof final, "** Kaukëtasis perduoda %s daiktà, kuris atrodo kaip %s.",
+                        GetPlayerNameEx(playerid, true), 
+                        GetInventoryItemName(weapon)
+                    );
+
+                    ProxDetector(10.0, playerid, final, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA);
+
+                    Player_GiveFactionCredits(playerid, -creds);
+                    GivePlayerMoney(playerid, -price);
+                }
+                else SendWarning(playerid, "Neturi vietos inventoriuje.");
             }
-            else SendWarning(playerid, "Neturi vietos inventoriuje.");
         }
-	}
-	return 1;
+    }
+	dialog_Show(playerid, using inline buyBlackMarketGuns, DIALOG_STYLE_TABLIST, "Black market", "Pirkti", "Uþdaryti");
+    return 1;
 }
 
 

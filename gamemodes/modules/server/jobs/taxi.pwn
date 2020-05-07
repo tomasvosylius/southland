@@ -390,68 +390,62 @@ hook OnPlayerStateChange(playerid, newstate, oldstate)
 
 stock Taxi_Player_ShowAccept(playerid, vehicleid)
 {
-	new 
-		string[256];
-	format(string, sizeof string, "{ffffff}Taksi kilometro kaina: $%d\nAr norite pradëti kelionæ?", vehicle_Taxi_Price[vehicleid]);
-	Dialog_Show(playerid, DialogTaxiStart, DIALOG_STYLE_MSGBOX, "Taksi", string, "Taip", "Ne");
-	return 1;
-}
+	dialog_Clear();
+	dialog_AddLine("{ffffff}Taksi kilometro kaina: $%d", vehicle_Taxi_Price[vehicleid]);
+	dialog_AddLine("Ar norite pradëti kelionæ?");
 
-
-
-Dialog:DialogTaxiStart(playerid, response, listitem, inputtext[])
-{
-	if(response)
+	inline taxiStart(response, listitem)
 	{
-		new 
-			vehicleid = GetPlayerVehicleID(playerid),
-			driverid = GetVehicleDriverID(vehicleid);
-
-		if(vehicle_Taxi_Duty[vehicleid])
-		{
-			if(IsPlayerConnected(driverid))
-			{
-				vehicle_Taxi_IsFree[vehicleid] = false;
-				vehicle_Taxi_KM[vehicleid] = VehicleInfo[vehicleid][vKM];
-				player_Taxi_First[playerid] = true;
-				player_Taxi_Vehicle[playerid] = vehicleid;
-
-
-				SendFormat(playerid, -1, "Pradëjote kelionæ. Uþ kilometrà mokësite $%d/km", vehicle_Taxi_Price[vehicleid]);
-				SendFormat(playerid, -1, "Jei norite patikrinti, kiek turësite mokëti naudokite /taxifee");
-				SendFormat(driverid, -1, "Þaidëjas sutiko pradëti kelionæ.");
-
-
-				PlayerTextDrawShow(playerid, TaxometerTD[playerid]);
-				PlayerTextDrawSetString(playerid, TaxometerTD[playerid], "Taksometras:_0$");
-
-				rp_me(driverid, _, "ájungia taksometrà.");
-			}
-		}
-	}
-	else
-	{
-		new 
-			vehicleid = GetPlayerVehicleID(playerid);
-
-		if(IsValidVehicle(vehicleid))
+		if(response)
 		{
 			new 
-				driverid = GetVehicleDriverID(vehicleid),
-				new_payer;
+				driverid = GetVehicleDriverID(vehicleid);
 
-			RemovePlayerFromVehicle(playerid);
-			SendFormat(driverid, -1, "Þaidëjas nesutiko pradëti kelionës.");
-
-			vehicle_Taxi_IsFree[vehicleid] = true;
-			if((new_payer = Taxi_LookForNewPayer(vehicleid)) != INVALID_PLAYER_ID)
+			if(vehicle_Taxi_Duty[vehicleid])
 			{
-				// Islipo tas, kuris pats pirmas ilipo ir sumokejo uz visus.
-				// Ieskom naujo, kuris sumokes uz viska.
-				Taxi_Player_ShowAccept(new_payer, vehicleid);
+				if(IsPlayerConnected(driverid))
+				{
+					vehicle_Taxi_IsFree[vehicleid] = false;
+					vehicle_Taxi_KM[vehicleid] = VehicleInfo[vehicleid][vKM];
+					player_Taxi_First[playerid] = true;
+					player_Taxi_Vehicle[playerid] = vehicleid;
+
+
+					SendFormat(playerid, -1, "Pradëjote kelionæ. Uþ kilometrà mokësite $%d/km", vehicle_Taxi_Price[vehicleid]);
+					SendFormat(playerid, -1, "Jei norite patikrinti, kiek turësite mokëti naudokite /taxifee");
+					SendFormat(driverid, -1, "Þaidëjas sutiko pradëti kelionæ.");
+
+
+					PlayerTextDrawShow(playerid, TaxometerTD[playerid]);
+					PlayerTextDrawSetString(playerid, TaxometerTD[playerid], "Taksometras:_0$");
+
+					rp_me(driverid, _, "ájungia taksometrà.");
+				}
+			}
+		}
+		else
+		{
+			if(IsValidVehicle(vehicleid))
+			{
+				new 
+					driverid = GetVehicleDriverID(vehicleid),
+					new_payer;
+
+				RemovePlayerFromVehicle(playerid);
+				SendFormat(driverid, -1, "Þaidëjas nesutiko pradëti kelionës.");
+
+				vehicle_Taxi_IsFree[vehicleid] = true;
+				if((new_payer = Taxi_LookForNewPayer(vehicleid)) != INVALID_PLAYER_ID)
+				{
+					// Islipo tas, kuris pats pirmas ilipo ir sumokejo uz visus.
+					// Ieskom naujo, kuris sumokes uz viska.
+					Taxi_Player_ShowAccept(new_payer, vehicleid);
+				}
 			}
 		}
 	}
+	dialog_Show(playerid, using inline taxiStart, DIALOG_STYLE_MSGBOX, "Taksi", "Taip", "Ne");
+	return 1;
 }
 
 stock Taxi_LookForNewPayer(vehicleid)
