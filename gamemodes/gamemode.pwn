@@ -2072,7 +2072,7 @@ new CargoList[][E_CARGO_LIST_DATA] = {
 new AvailableWeaponsShop[][3] = {
 	// Ginklo ID 		Ammo 	Kaina
 	{WEAPON_GOLFCLUB, 	1, 		180},
-	{WEAPON_KNIFE, 		1, 		240},
+	// {WEAPON_KNIFE, 		1, 		240},
 	{WEAPON_POOLSTICK, 	1, 		150},
 	{WEAPON_CANE, 		1, 		200},
 	{WEAPON_SPRAYCAN, 	800, 	150},
@@ -2156,12 +2156,12 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 
 
 
-// objects
+/** Maps */
 //#include "core\map\newbie.pwn"
 //#include "core\map\alhambra_replacement.pwn"
 //#include "core\map\central_hotel.pwn"
 // #include "core\map\empty_houses.pwn"
-
+#include "core\map\vm.pwn"
 // #include "core\map\interiors.pwn"
 // #include "core\map\school.pwn"
 // #include "core\map\squatters.pwn"
@@ -2200,6 +2200,8 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\hospital.pwn"
 // #include "core\map\deja_vu.pwn"
 // #include "core\map\idlewood_park.pwn"
+
+
 
 /** Lists etc. */
 #include "other/furniture_list.pwn"
