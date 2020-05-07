@@ -35,7 +35,7 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
         }
         case CHEAT_AIRBRK: {
             ignore_if_admin = true;
-            format(reason, sizeof reason, "Air-brk");
+            format(reason, sizeof reason, "AirBreak");
         }
         case CHEAT_FAKE_KILL: {
             format(reason, sizeof reason, "Fake-kill");

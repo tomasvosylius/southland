@@ -738,6 +738,7 @@ native gpci(playerid, serial[], len);
 #define PLAYER_STATUS_DEFAULT			0
 #define PLAYER_STATUS_ALMOST_DEATH		1
 #define PLAYER_STATUS_DEATH 			2
+#define DEFAULT_DEATH_TIME_SECONDS		600
 
 #define SCREEN_TYPE_NONE 				0
 #define SCREEN_TYPE_VEHICLE_SALON		1
@@ -2159,32 +2160,35 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 /** Maps */
 //#include "core\map\newbie.pwn"
 //#include "core\map\alhambra_replacement.pwn"
-//#include "core\map\central_hotel.pwn"
 // #include "core\map\empty_houses.pwn"
-#include "core\map\vm.pwn"
-// #include "core\map\interiors.pwn"
-// #include "core\map\school.pwn"
+// #include "other\map\central_hotel.pwn"
+#include "other\map\vm.pwn"
+#include "other\map\misc.pwn"
+#include "other\map\detailings.pwn"
+#include "other\map\interiors.pwn"
+#include "other\map\school.pwn"
+#include "other\map\docks.pwn"
+#include "other\map\corona247.pwn"
+#include "other\map\willowfield_garage.pwn"
+#include "other\map\idlewood_pizza_corner.pwn"
+#include "other\map\prison.pwn"
+#include "other\map\mechanics.pwn"
+#include "other\map\government.pwn"
+#include "other\map\ls_dump.pwn"
+#include "other\map\ls_logistics.pwn"
+#include "other\map\bank.pwn"
+
+// #include "other\map\interiors.pwn"
+// #include "other\map\china_town.pwn"
+
 // #include "core\map\squatters.pwn"
-// #include "core\map\china_town.pwn"
 // #include "core\map\ganton_basketball.pwn"
-// #include "core\map\docks.pwn"
-// #include "core\map\willowfield_garage.pwn"
 // #include "core\map\idlewood_basket.pwn"
-// #include "core\map\misc.pwn"
-// #include "core\map\corona247.pwn"
-// #include "core\map\idlewood_pizza_corner.pwn"
 // #include "core\map\china.pwn"
-// #include "core\map\prison.pwn"
-// #include "core\map\government.pwn"
-// #include "core\map\mechanics.pwn"
 // #include "core\map\train_ganton.pwn"
 // #include "core\map\train_jefferson.pwn"
 // #include "core\map\pier.pwn"
-// #include "core\map\interiors.pwn"
 // #include "core\map\ls_bus_station.pwn"
-// #include "core\map\ls_dump.pwn"
-// #include "core\map\ls_logistics.pwn"
-// #include "core\map\ganghood_details.pwn"
 // #include "core\map\taxi.pwn"
 // #include "core\map\corona_small.pwn"
 // #include "core\map\corona_big.pwn"
@@ -2194,14 +2198,11 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\downtown_parking.pwn"
 // #include "core\map\mall_parking.pwn"
 // #include "core\map\laundry.pwn"
-// #include "core\map\bank.pwn"
 // #include "core\map\grove.pwn"
 // #include "core\map\dmv_change.pwn"
 // #include "core\map\hospital.pwn"
 // #include "core\map\deja_vu.pwn"
 // #include "core\map\idlewood_park.pwn"
-
-
 
 /** Lists etc. */
 #include "other/furniture_list.pwn"
@@ -2249,8 +2250,8 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player/proxy.pwn"
 #include "modules\player/anims.pwn"
 #include "modules\player/newbie.pwn"
-// #include "modules\player/cheats.pwn"
-// #include "modules\player/afk.pwn"
+#include "modules\player/cheats.pwn"
+#include "modules\player/afk.pwn"
 #include "modules\player/faction_credits.pwn"
 
 #include <YSI_Coding\y_hooks>
@@ -2555,9 +2556,19 @@ ptask PT_MuteSecond[999](playerid)
 		}
 	}
 }
-ptask PT_DeathTimer[1000](playerid)
+ptask PT_DeathTimer[1002](playerid)
 {
 	// Deathscreen
+	static
+		player_DeathWarnings[MAX_PLAYERS];
+	
+	if(	PlayerExtra[playerid][peDeath] >= DEFAULT_DEATH_TIME_SECONDS && 
+		player_DeathWarnings[playerid] > 0)
+	{
+		// resetiname pati pirma karta visus pozicijos keitimo ispejimus
+		player_DeathWarnings[playerid] = 0;
+	}
+
 	if(PlayerExtra[playerid][peDeath] > 0)
 	{
 		PlayerExtra[playerid][peDeath]--;
@@ -2565,7 +2576,21 @@ ptask PT_DeathTimer[1000](playerid)
 		new string[86],
 			seconds, minutes;
 		divmod(PlayerExtra[playerid][peDeath], 60, seconds, minutes);
-		format(string, sizeof string, "_~n~~w~KOMOS_BUSENOJE:_~r~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~/die~n~_", seconds, minutes);
+		format(string, sizeof string, "_~n~~w~KOMOS BUSENOJE: ~r~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~/die~n~_", seconds, minutes);
+
+		if(GetPlayerDistanceFromPoint(playerid,
+			PlayerInfo[playerid][pPosX],
+			PlayerInfo[playerid][pPosY],
+			PlayerInfo[playerid][pPosZ]) >= 4.0)
+		{
+			SetPlayerPos(playerid, PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ]);
+			if((player_DeathWarnings[playerid] += 1) >= 15)
+			{
+				KickPlayer(playerid, "Sistema", "AirBreak (mirus)");
+				return;
+			}
+		}
+
 		PlayerTextDrawSetString(playerid, DeathScreenTD[playerid], string);
 		ApplyAnimation(playerid, "CRACK", "crckdeth2", 4.0, 1, 0, 0, 0, 0 );
 		
@@ -2637,7 +2662,7 @@ ptask PT_JailSecond[1000](playerid)
 			log_set_table("logs_players");
 			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`");
 			log_set_values("'%d','%e','Buvo paleistas is kalejimo'", LogPlayerId(playerid), LogPlayerName(playerid));
-			log_push();
+			log_commit();
 		}
 		else if(PlayerInfo[playerid][pCurrentStatus] == PLAYER_STATUS_DEFAULT)
 		{
@@ -3382,7 +3407,7 @@ public FuelOrdersFinished()
 		log_set_table("logs_business");
 		log_set_keys("`PlayerId`,`BusinessId`,`BusinessId`,`ActionText`,`Amount`");
 		log_set_values("'%d','%d','%e','Pristatytas degalu uzsakymas','%d'", BusinessInfo[tmp][bId], BusinessInfo[tmp][bName], price);
-		log_push();
+		log_commit();
 	}
 	mysql_fquery(chandler, "UPDATE `business_orders_fuel` SET Valid = '0' WHERE HoursLeft = '0' AND Valid = '1'", "BusinessSaved");
 	return 1;
@@ -3684,7 +3709,7 @@ public OnVehicleDeath(vehicleid, killerid)
 		log_set_table("logs_vehicles");
 		log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Insurance`");
 		log_set_values("'%d','%e','%d','%s','Susprogdino tr. priemone','%d'", LogPlayerId(killerid), LogPlayerName(killerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vInsurance]);
-		log_push();
+		log_commit();
 		new owner;
 		if((owner = FindPlayerBySql(VehicleInfo[vehicleid][vOwner])) != INVALID_PLAYER_ID)
 		{
@@ -3868,10 +3893,10 @@ stock GetTickDiff(newtick, oldtick)
 public OnPlayerStateChange(playerid, newstate, oldstate)
 {
 	/* Anticheat */
-	if(oldstate == PLAYER_STATE_DRIVER && newstate == PLAYER_STATE_DRIVER)
+	/*if(oldstate == PLAYER_STATE_DRIVER && newstate == PLAYER_STATE_DRIVER)
 	{
 		return KickPlayer(playerid, "Sistema", "State Change Hack");
-	}
+	}*/
 	if(newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
 		// if(ac__EnteringVehicle[playerid] == INVALID_VEHICLE_ID || ac__EnteringVehicle[playerid] != GetPlayerVehicleID(playerid))
@@ -4209,11 +4234,10 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
 	// ac__EnteringVehicle[playerid] = vehicleid;
-	if(VehicleInfo[vehicleid][vLocked])
+	if(VehicleInfo[vehicleid][vLocked] || PlayerExtra[playerid][peDeath] > 0)
 	{
-		new Float:x, Float:y, Float:z;
-		GetPlayerPos(playerid, x, y, z);
-		SetPlayerPos(playerid, x, y, z+0.085);
+		CancelVehicleEnter(playerid);
+		return 1;
 		// ac__EnteringVehicle[playerid] = INVALID_VEHICLE_ID;
 	}
 	if(!ispassenger)
@@ -4294,7 +4318,7 @@ public OnPlayerSprayAtVehicle(playerid, vehicleid)
 				log_set_table("logs_jobs");
 				log_set_keys("`PlayerId`,`PlayerName`,`JobName`,`ExtraId`,`ActionText`,`Amount`");
 				log_set_values("'%d','%e','Mechanikas','%d','Perdaze tr. priemone','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[jobvehicleid][vId], PlayerInfo[playerid][pJobCurrentType]);
-				log_push();
+				log_commit();
 				return 1;
 			}
 		}
@@ -4718,7 +4742,7 @@ public OnPlayerEnterCheckpoint(playerid)
 			log_set_table("logs_factions");
 			log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraString`");
 			log_set_values("'%d','%e','%d','%e','Atveze atsargas i garaza','%s'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), cargo_type == VEHICLE_CARGO_POLICE_WEAPONS ? ("Ginklai") : (cargo_type == VEHICLE_CARGO_POLICE_SKINS ? ("Apranga") : ("Special")));
-			log_push();
+			log_commit();
 			SendFactionMessage(PlayerInfo[playerid][pFaction], 0x009AB5FF, true, "-------------------------------------------------------");
 			SendFactionMessage(PlayerInfo[playerid][pFaction], 0x32B9D0FF, true, "DISPEÈERINË: {82CDDA}Krovinys sëkmingai perveþtas á sandëlá.");
 			SendFactionMessage(PlayerInfo[playerid][pFaction], 0x009AB5FF, true, "-------------------------------------------------------");
@@ -4747,7 +4771,7 @@ public OnPlayerEnterCheckpoint(playerid)
 							log_set_table("logs_factions");
 							log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraString`,`Amount`");
 							log_set_values("'%d','%e','%d','%e','Paeme atsargas','Ginklus','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), DEFAULT_POLICE_WEAPONS_PRICE);
-							log_push();
+							log_commit();
 						}
 					}
 					case CHECKPOINT_TYPE_PD_SKINS:
@@ -4761,7 +4785,7 @@ public OnPlayerEnterCheckpoint(playerid)
 							log_set_table("logs_factions");
 							log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraString`,`Amount`");
 							log_set_values("'%d','%e','%d','%e','Paeme atsargas','Apranga','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), DEFAULT_POLICE_SKINS_PRICE);
-							log_push();
+							log_commit();
 						}
 					}
 					case CHECKPOINT_TYPE_PD_SPECIAL:
@@ -4775,7 +4799,7 @@ public OnPlayerEnterCheckpoint(playerid)
 							log_set_table("logs_factions");
 							log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraString`,`Amount`");
 							log_set_values("'%d','%e','%d','%e','Paeme atsargas','Special','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), DEFAULT_POLICE_SPECIAL_PRICE);
-							log_push();
+							log_commit();
 						}
 					}
 				}
@@ -5403,7 +5427,7 @@ public OnPlayerText(playerid, text[])
 		log_set_table("logs_chat");
 		log_set_keys("`PlayerId`,`PlayerName`,`Text`");
 		log_set_values("'%d','%e','%e'", LogPlayerId(playerid), LogPlayerName(playerid), text);
-		log_push();
+		log_commit();
 		format(string, sizeof string, "%s sako", GetPlayerNameEx(playerid, true, false));
 		if((vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID && VehicleHaveWindows(GetVehicleModel(vehicleid)) && IsPlayerInAnyVehicle(playerid))
 		{
@@ -5583,9 +5607,33 @@ public OnPlayerDeath(playerid, killerid, reason)
 			PlayerPhoneHangup(playerid);
 		}
 		PlayerInfo[playerid][pCurrentStatus] = PLAYER_STATUS_ALMOST_DEATH;
+
 		GetPlayerPos(playerid, PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ]);
 		PlayerInfo[playerid][pVW] = GetPlayerVirtualWorld(playerid);
 		PlayerInfo[playerid][pInterior] = GetPlayerInterior(playerid);
+
+		new attempt = 1,
+			Float:groundZ;
+
+		while(attempt <= 5)
+		{
+			new result = CA_RayCastLine(
+				// Start
+				PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ] + (6.5*attempt) + ((attempt-1)*10.0),
+				// End
+				PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ] - (6.5*attempt) + ((attempt-1)*10.0),
+				// Store
+				PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], groundZ
+			);
+
+			if(result != 0)
+			{
+				PlayerInfo[playerid][pPosZ] = groundZ;
+				break;
+			}
+
+			attempt++;
+		}
 	}
 	else if(PlayerInfo[playerid][pCurrentStatus] == PLAYER_STATUS_ALMOST_DEATH)
 	{
@@ -5773,7 +5821,7 @@ stock SpawnPlayerEx(playerid, type = 0, bool:set = false)
 					format(string, sizeof string, "(( MIRÆS ÞAIDËJAS\nSuþalojimø kiekis: %d (/damages %d) ))", Iter_Count(PlayerDamages[playerid]), playerid);
 					PlayerExtra[playerid][peDeathLabel] = CreateDynamic3DTextLabel(string, 0xBF2D2DFF, 0.0, 0.0, 0.8, 8.0, playerid, INVALID_VEHICLE_ID, 1);
 					Streamer_Update(playerid);
-					PlayerExtra[playerid][peDeath] = 600;
+					PlayerExtra[playerid][peDeath] = DEFAULT_DEATH_TIME_SECONDS;
 				}
 				case PLAYER_STATUS_DEATH:
 				{
@@ -6218,7 +6266,7 @@ public OnPlayerCommandPerformed(playerid, cmd[], params[], result, flags)
 			log_set_table("logs_cmd");
 			log_set_keys("`PlayerId`,`PlayerName`,`Cmd`,`Params`,`Flags`");
 			log_set_values("'%d','%e','%e','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), cmd, params, flags);
-			log_push();
+			log_commit();
 		}
 	}
 	return 1;
@@ -7384,7 +7432,7 @@ Dialog:D_DonatorNumberInput(playerid, response, listitem, inputtext[])
 		log_set_table("logs_donators");
 		log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`,`ExtraId`");
 		log_set_values("'%d','%e','Pakeite veikejo numeri','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GetNameBySql(charid), number);
-		log_push();
+		log_commit();
 	}
 	else DonatorMenu_Main(playerid, charid);
 	return 1;
@@ -7632,7 +7680,7 @@ hook OnPlayerRenameChar(playerid, charid, gender, date, origin, name[])
 	log_set_table("logs_donators");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','Pakeite veikejo varda','%e'", LogPlayerId(playerid), LogPlayerName(playerid), name);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -8001,7 +8049,7 @@ Dialog:DialogUserLoginSecurity(playerid, response, listitem, inputtext[])
 	{
 		new 
 			string[256];
-		mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `users_safe_questions` WHERE UserId = '%d' AND Answer = '%e'", PlayerInfo[playerid][pUserId], MD5_Hash(dialog_Input()));
+		mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `users_safe_questions` WHERE UserId = '%d' AND Answer = '%e'", PlayerInfo[playerid][pUserId], MD5_Hash(inputtext));
 		mysql_tquery(chandler, string, "LoginAnswerCheck", "d", playerid);
 	}
 	else 
@@ -8045,7 +8093,7 @@ Dialog:DialogUserLogin(playerid, response, listitem, inputtext[])
 			string[256],
 			salted[130];
 
-		format(string, 60, "%s%s", dialog_Input(), PlayerInfo[playerid][pSalt]);
+		format(string, 60, "%s%s", inputtext, PlayerInfo[playerid][pSalt]);
 		WP_Hash(salted, sizeof salted, string);
 		mysql_format(chandler, string, sizeof string, "\
 			SELECT RegisterIp,DiscordCode,DiscordVerified,TutorialDone FROM `users_data` WHERE id = '%d' AND Password = '%e'", PlayerInfo[playerid][pUserId], salted);
@@ -8106,11 +8154,11 @@ Dialog:DialogRegisterAnswer(playerid, response, listitem, inputtext[])
 {
 	if(response)
 	{
-		if(!strlen(dialog_Input()))
+		if(!strlen(inputtext))
 		{
 			return Register_SecurityAnswer(playerid);
 		}
-		User_AddToDb(playerid, .i_password = PlayerInfo[playerid][pPassword], .i_salt = PlayerInfo[playerid][pSalt], .i_question = tmpArray[playerid], .i_answer = dialog_Input());
+		User_AddToDb(playerid, .i_password = PlayerInfo[playerid][pPassword], .i_salt = PlayerInfo[playerid][pSalt], .i_question = tmpArray[playerid], .i_answer = inputtext);
 	}
 	else Register_SecurityAnswer(playerid);
 	return 1;
@@ -8132,8 +8180,8 @@ Dialog:DialogRegisterQuestion(playerid, response, listitem, inputtext[])
 {
 	if(response)
 	{
-		if(!strlen(dialog_Input())) Register_SecurityQuestion(playerid);
-		format(tmpArray[playerid], 128, dialog_Input());
+		if(!strlen(inputtext)) Register_SecurityQuestion(playerid);
+		format(tmpArray[playerid], 128, inputtext);
 		Register_SecurityAnswer(playerid);
 	}
 	else User_Register_Show(playerid);
@@ -8161,10 +8209,10 @@ Dialog:DialogRegisterPassword(playerid, response, listitem, inputtext[])
 {
 	if(response)
 	{
-		if(!CheckPasswordComplexity(dialog_Input(), -1)) return User_Register_Show(playerid);
+		if(!CheckPasswordComplexity(inputtext, -1)) return User_Register_Show(playerid);
 		
 		GenerateSalt(PlayerInfo[playerid][pSalt], GetPlayerIpEx(playerid), 30);
-		format(PlayerInfo[playerid][pPassword], 130, dialog_Input());
+		format(PlayerInfo[playerid][pPassword], 130, inputtext);
 
 		Register_SecurityQuestion(playerid);
 	}
@@ -8647,7 +8695,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_vehicles");
 					log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','%d','%e','Pardave tr. priemone serveriui','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), money);
-					log_push();
+					log_commit();
 					DestroyVehicle(vehicleid);
 				}
 			}
@@ -8867,7 +8915,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId] = 0;
 					VehicleWeaponsInventory[vehicleid][listitem][ftwAmmo] = 0;
-					log_push();
+					log_commit();
 					rp_me(playerid, _, string);
 					MsgInfo(playerid, "GINKLAI", "Norëdami padëti ðá ginklà atgal á bagaþinæ, naudokite /trunkweapon");
 				}
@@ -8968,7 +9016,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_business");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`,`ExtraId`,`ExtraString`");
 				log_set_values("'%d','%e','Nusipirko ginkla','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), AvailableWeaponsShop[listitem][2], BusinessInfo[businessid][bId], GetInventoryItemName(weaponid));
-				log_push();
+				log_commit();
 			}
 		}
 		case DIALOG_BUY_CLOTHES_CONFIRM:
@@ -8990,7 +9038,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_clothes");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ClotheId`,`Amount`,`ExtraId`");
 					log_set_values("'%d','%e','Nusipirko drabuzi','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ClothesList[selected][clothesListModel], ClothesList[selected][clothesListPrice], BusinessInfo[businessid][bId]);
-					log_push();
+					log_commit();
 				}
 				else SendWarning(playerid, "Neturite laisvos vietos inventoriuje.");
 			}
@@ -9089,7 +9137,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_houses");
 						log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','Suteike furniture teise','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], tmpArray[playerid][tmpSelected[playerid]]);
-						log_push();
+						log_commit();
 					}
 					case 1:
 					{
@@ -9109,7 +9157,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_houses");
 						log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','Ateme furniture teise','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], tmpArray[playerid][tmpSelected[playerid]]);
-						log_push();
+						log_commit();
 					}
 					case 2:
 					{
@@ -9127,7 +9175,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_houses");
 						log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','Istryne rakta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], tmpArray[playerid][tmpSelected[playerid]]);
-						log_push();
+						log_commit();
 					}
 				}
 			}
@@ -9186,7 +9234,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_houses");
 						log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`ExtraId`,`ExtraString`");
 						log_set_values("'%d','%e','%d','Dave rakta','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], LogPlayerId(receiverid), LogPlayerName(receiverid));
-						log_push();
+						log_commit();
 					}
 					else InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
 				}
@@ -9213,7 +9261,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_houses");
 						log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 						log_set_values("'%d','%e','%d','Irenge clothes atnaujinima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], HOUSE_UPDATE_CLOTHES_PRICE);
-						log_push();
+						log_commit();
 					}
 					case 1:
 					{
@@ -9229,7 +9277,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_houses");
 						log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 						log_set_values("'%d','%e','%d','Irenge seifo atnaujinima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], HOUSE_UPDATE_SAFE_PRICE);
-						log_push();
+						log_commit();
 					}
 					case 2:
 					{
@@ -9245,7 +9293,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_houses");
 						log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 						log_set_values("'%d','%e','%d','Irenge eat atnaujinima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], HOUSE_UPDATE_EAT_PRICE);
-						log_push();
+						log_commit();
 
 					}
 				}
@@ -9293,7 +9341,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_houses");
 				log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 				log_set_values("'%d','%e','%d','Paeme is seifo','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], amount);
-				log_push();
+				log_commit();
 			}
 			else pc_cmd_hmenu(playerid, "");
 		}
@@ -9313,7 +9361,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_houses");
 				log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 				log_set_values("'%d','%e','%d','Padejo i seifa','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], amount);
-				log_push();
+				log_commit();
 			}
 			else pc_cmd_hmenu(playerid, "");
 		}
@@ -9360,7 +9408,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_business");
 						log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','%s furniture galimybe','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpIter[playerid]], current ? ("Isjunge") : ("Ijunge"), tmpSelected[playerid]);
-						log_push();
+						log_commit();
 						pc_cmd_bmenu(playerid, "");
 					}
 					case 1:
@@ -9384,7 +9432,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_business");
 						log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','%s biudzeto galimybe','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpIter[playerid]], current ? ("Isjunge") : ("Ijunge"), tmpSelected[playerid]);
-						log_push();
+						log_commit();
 						pc_cmd_bmenu(playerid, "");
 					}
 					case 2:
@@ -9407,7 +9455,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_business");
 						log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','%s darbuot. vald. galimybe','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpIter[playerid]], current ? ("Isjunge") : ("Ijunge"), tmpSelected[playerid]);
-						log_push();
+						log_commit();
 						pc_cmd_bmenu(playerid, "");
 					}
 					case 3:
@@ -9430,7 +9478,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_business");
 						log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','%s prekiu vald. galimybe','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpIter[playerid]], current ? ("Isjunge") : ("Ijunge"), tmpSelected[playerid]);
-						log_push();
+						log_commit();
 						pc_cmd_bmenu(playerid, "");
 					}
 					case 4:
@@ -9449,7 +9497,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_business");
 						log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','Ismete is verslo','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpIter[playerid]], tmpSelected[playerid]);
-						log_push();
+						log_commit();
 						pc_cmd_bmenu(playerid, "");
 					}
 				}
@@ -9811,7 +9859,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_business");
 				log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`Amount`");
 				log_set_values("'%d','%e','%d','Paeme is seifo','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[businessid][bId], amount);
-				log_push();
+				log_commit();
 				pc_cmd_bmenu(playerid, "");
 			}
 			else OnDialogResponse(playerid, DIALOG_BM_MAIN, 1, 2, "");
@@ -9837,7 +9885,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_business");
 				log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`Amount`");
 				log_set_values("'%d','%e','%d','Padejo i seifa','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[businessid][bId], amount);
-				log_push();
+				log_commit();
 				pc_cmd_bmenu(playerid, "");
 			}
 			else OnDialogResponse(playerid, DIALOG_BM_MAIN, 1, 2, "");
@@ -10013,7 +10061,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_business");
 						log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','Pridejo preke i prekyba','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[businessid][bId], AvailableWares[selected][awItem]);
-						log_push();
+						log_commit();
 					}
 					else
 					{
@@ -10065,7 +10113,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_business");
 				log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','%d','Pakeite prekes kaina','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[businessid][bId], BusinessWares[businessid][selected][bWareId], price);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_BM_MAIN, 1, 0, "");
 		}
@@ -10094,7 +10142,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								log_set_table("logs_business");
 								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`BusinessId`,`ExtraId`");
 								log_set_values("'%d','%e','Iseme preke is pardavimo','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[businessid][bId], BusinessWares[businessid][selected][bWareId]);
-								log_push();
+								log_commit();
 
 								BusinessWares[businessid][selected][bWareId] =
 								BusinessWares[businessid][selected][bWareAmount] =
@@ -10164,7 +10212,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_houses");
 							log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`");
 							log_set_values("'%d','%e','%d','Iseme is pardavimo'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId]);
-							log_push();
+							log_commit();
 						}
 						else
 						{
@@ -10193,7 +10241,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_garages");
 							log_set_keys("`PlayerId`,`PlayerName`,`GarageId`,`ActionText`");
 							log_set_values("'%d','%e','%d','Iseme is pardavimo'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[tmpIter[playerid]][gId]);
-							log_push();
+							log_commit();
 						}
 						else
 						{
@@ -10219,7 +10267,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_garages");
 				log_set_keys("`PlayerId`,`PlayerName`,`GarageId`,`ActionText`,`Amount`");
 				log_set_values("'%d','%e','%d','Idejo i pardavima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[tmpIter[playerid]][gId], price);
-				log_push();
+				log_commit();
 			}
 			else pc_cmd_hmenu(playerid, "");
 		}
@@ -10239,7 +10287,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_houses");
 				log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 				log_set_values("'%d','%e','%d','Idejo i pardavima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpIter[playerid]][hId], price);
-				log_push();
+				log_commit();
 			}
 			else pc_cmd_hmenu(playerid, "");
 		}
@@ -10393,7 +10441,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_money");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Padejo i saskaita','%d'", LogPlayerId(playerid), LogPlayerName(playerid), amount);
-					log_push();
+					log_commit();
 				}
 			}
 			ShowPlayerBank(playerid);
@@ -10416,7 +10464,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_money");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Paeme is saskaitos','%d'", LogPlayerId(playerid), LogPlayerName(playerid), amount);
-					log_push();
+					log_commit();
 				}
 			}
 			ShowPlayerBank(playerid);
@@ -10447,7 +10495,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_money");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 						log_set_values("'%d','%e','Padejo indeli','%d'", LogPlayerId(playerid), LogPlayerName(playerid), amount);
-						log_push();
+						log_commit();
 					}
 				}
 				else
@@ -10526,7 +10574,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_money");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 							log_set_values("'%d','%e','Nusieme indeli','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pSavings]);
-							log_push();
+							log_commit();
 							PlayerInfo[playerid][pSavings] = 0;
 							ShowPlayerBank(playerid);
 						}
@@ -10630,7 +10678,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_money");
 						log_set_keys("`PlayerId`,`PlayerName`,`ExtraId`,`ExtraString`,`ActionText`,`Amount`");
 						log_set_values("'%d','%e','%d','%e','Pervede pinigus','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), amount);
-						log_push();
+						log_commit();
 					}
 				}
 				else
@@ -10656,7 +10704,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_money");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Padejo i saskaita','%d'", LogPlayerId(playerid), LogPlayerName(playerid), amount);
-					log_push();
+					log_commit();
 				}
 			}
 		}
@@ -10677,7 +10725,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_money");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Nusieme is saskaitos','%d'", LogPlayerId(playerid), LogPlayerName(playerid), amount);
-					log_push();
+					log_commit();
 				}
 			}
 		}
@@ -10939,7 +10987,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 						log_set_values("'%d','%e','%d','%e','(BM) Uzdejo tiekejo statusa'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiver), LogPlayerName(receiver));
-						log_push();
+						log_commit();
 					}
 				}
 				else
@@ -10978,7 +11026,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`");
 					log_set_values("'%d','%e','%d','%e','(BM) Pridejo ginkla i sarasa tiekejui','%d'", LogPlayerId(playerid), LogPlayerName(playerid), selected, GetNameBySql(selected), weaponid);
-					log_push();
+					log_commit();
 					tmpTexture_MarkStart_CP[playerid] = 999999;
 					OnDialogResponse(playerid, DIALOG_AM_BM_DEALERS_ALL, 1, tmpSelected[playerid], "");
 				}
@@ -11012,7 +11060,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`");
 					log_set_values("'%d','%e','%d','%e','(BM) Pridejo narkotika i sarasa tiekejui','%d'", LogPlayerId(playerid), LogPlayerName(playerid), selected, GetNameBySql(selected), drugid);
-					log_push();
+					log_commit();
 					OnDialogResponse(playerid, DIALOG_AM_BM_DEALER_EDIT_MAIN, 1, 4, "");
 				}
 			}
@@ -11076,7 +11124,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','%d','%e','(BM) Pakeite ginklo limita tiekejui','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), weaponid, amount);
-					log_push();
+					log_commit();
 				}
 				if(cache_is_valid(result)) cache_delete(result);
 			}
@@ -11108,7 +11156,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','%d','%e','(BM) Pakeite ginklo kaina tiekejui','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), weaponid, price);
-					log_push();
+					log_commit();
 				}
 				if(cache_is_valid(result)) cache_delete(result);
 			}
@@ -11140,7 +11188,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','%d','%e','(BM) Pakeite ginklo kieki tiekejui','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), weaponid, amount);
-					log_push();
+					log_commit();
 				}
 				if(cache_is_valid(result)) cache_delete(result);
 			}
@@ -11193,7 +11241,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','%d','%e','(BM) Istryne narkotika is saraso tiekejui','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), drugid);
-							log_push();
+							log_commit();
 						}
 					}
 				}
@@ -11246,7 +11294,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','%d','%e','(BM) Istryne ginkla is saraso tiekejui','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), weaponid);
-							log_push();
+							log_commit();
 						}
 					}
 				}
@@ -11279,7 +11327,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','%d','%e','(BM) Pakeite narkotiko limita tiekejui','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), drugid, amount);
-					log_push();
+					log_commit();
 				}
 				if(cache_is_valid(result)) cache_delete(result);
 			}
@@ -11311,7 +11359,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','%d','%e','(BM) Pakeite narkotiko kaina tiekejui','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), drugid, price);
-					log_push();
+					log_commit();
 				}
 				if(cache_is_valid(result)) cache_delete(result);
 			}
@@ -11343,7 +11391,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','%d','%e','(BM) Pakeite narkotiko kieki tiekejui','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), drugid, amount);
-					log_push();
+					log_commit();
 				}
 				if(cache_is_valid(result)) cache_delete(result);
 			}
@@ -11424,7 +11472,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraString`");
 						log_set_values("'%d','%e','%d','%e','(BM) Istryne tiekejo tr. priemone','%e'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), GetModelName(model));
-						log_push();
+						log_commit();
 					}
 				}
 				else OnDialogResponse(playerid, DIALOG_AM_BM_DEALER_VEHICLES_ALL, 1, tmpIter[playerid], "");
@@ -11663,7 +11711,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 						log_set_values("'%d','%e','%d','%e','(BM) Pasalino tiekejo statusa'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid));
-						log_push();
+						log_commit();
 					}
 				}
 			}
@@ -11705,7 +11753,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`");
 				log_set_values("'%d','%e','%d','%e','(BM) Pakeite bendra ginklu limita tiekejui','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), amount);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BM_DEALER_EDIT_MAIN, 1, 3, "");
 		}
@@ -11745,7 +11793,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`");
 				log_set_values("'%d','%e','%d','%e','(BM) Pakeite bendra narkotiku limita tiekejui','%d'", LogPlayerId(playerid), LogPlayerName(playerid), dealerid, GetNameBySql(dealerid), amount);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BM_DEALER_EDIT_MAIN, 1, 3, "");
 		}
@@ -11904,7 +11952,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_dealers");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`");
 							log_set_values("'%d','%e','(DM) Atsauke siunta'", LogPlayerId(playerid), LogPlayerName(playerid));
-							log_push();
+							log_commit();
 						}
 						else
 						{
@@ -12336,7 +12384,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_dealer_houses");
 						log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 						log_set_values("'%d','%e','%d','Pardave nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), DealerHouseInfo[selected][dealerHouseId], DealerHouseInfo[selected][dealerHousePrice]/2);
-						log_push();
+						log_commit();
 						reset(House, DealerHouseInfo[selected], E_DEALER_HOUSE_DATA);
 						Iter_Remove(DealerHouse, selected);
 					}
@@ -12528,7 +12576,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','(BM) Pakeite konsp. namo kaina','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), DealerHouseInfo[tmpIter[playerid]][dealerHouseId], amount);
-					log_push();
+					log_commit();
 				}
 			}
 		}
@@ -12594,7 +12642,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					cache_delete(result);
 				}
-				log_push();
+				log_commit();
 				OnDialogResponse(playerid, DIALOG_AM_BM_HOUSES_MAIN, 1, 0, "");
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BM_HOUSES_MAIN, 1, 0, "");
@@ -12646,7 +12694,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SendError(playerid, "Siøsta uþklausa nepavyko [%d]", mysql_errno());
 				}
 				if(cache_is_valid(result)) cache_delete(result);
-				log_push();
+				log_commit();
 				ShowPlayerAdminMenu(playerid);
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BM_MAIN, 1, 0, "");
@@ -13009,7 +13057,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Nustate namu mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), taxes);
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -13089,7 +13137,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Nustate bendra proc. mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), percent);
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -13115,7 +13163,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Nustate proc. i pd','%d'", LogPlayerId(playerid), LogPlayerName(playerid), percent);
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -13141,7 +13189,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Nustate maks. veikeju skaiciu','%d'", LogPlayerId(playerid), LogPlayerName(playerid), limit);
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -13208,7 +13256,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Nustate verslo degalu talpa','%d'", LogPlayerId(playerid), LogPlayerName(playerid), capacity);
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -13234,7 +13282,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Nustate verslo degalu kaina','%d'", LogPlayerId(playerid), LogPlayerName(playerid), floatround(price));
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -13260,7 +13308,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Nustate verslu mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), taxes);
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -13293,7 +13341,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 							log_set_values("'%d','%e','Nustate automobilio klases priskaiciavima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GetGVarInt("CountVehicleClass"));
-							log_push();
+							log_commit();
 						}
 					}
 				}
@@ -13317,7 +13365,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','Nustate automobiliu mokesti','%d'", LogPlayerId(playerid), LogPlayerName(playerid), taxes);
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -13363,7 +13411,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 						log_set_values("'%d','%e','(AM) Sukure nauja iejima (EE)','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[itter][eeId], inputtext);
-						log_push();
+						log_commit();
 					}
 					else
 					{
@@ -13401,7 +13449,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 				log_set_values("'%d','%e','(AM) Pakeite iejimo pavadinima','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[selected][eeId], name);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 1, "");
 		}
@@ -13438,7 +13486,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 						log_set_values("'%d','%e','(AM) Pakeite EE iejimo vieta','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[selected][eeId], EntersExits[selected][eeName]);
-						log_push();
+						log_commit();
 					}
 					case 2:
 					{
@@ -13461,7 +13509,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 						log_set_values("'%d','%e','(AM) Pakeite EE isejimo vieta','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[selected][eeId], EntersExits[selected][eeName]);
-						log_push();
+						log_commit();
 					}
 					case 3:
 					{
@@ -13488,7 +13536,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 						log_set_values("'%d','%e','(AM) Istryne EE','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), EntersExits[selected][eeId], EntersExits[selected][eeName]);
-						log_push();
+						log_commit();
 
 						new string[126],
 							__reset_EnterExit[E_ENTER_EXIT_DATA];
@@ -13558,7 +13606,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite ATM nuemimo limita','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId], amount);
-				log_push();
+				log_commit();
 				ShowPlayerAdminMenu(playerid);
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 2, "");
@@ -13642,7 +13690,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								log_set_table("logs_admins");
 								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 								log_set_values("'%d','%e','(AM) Sukure nauja bankomata (ATM)','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId]);
-								log_push();
+								log_commit();
 							}
 							else
 							{
@@ -13691,7 +13739,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 						log_set_values("'%d','%e','(AM) Pakeite ATM inesimo nustatyma','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId], ATMs[atmid][atmCanDeposit]);
-						log_push();
+						log_commit();
 					}
 					case 4:
 					{
@@ -13719,7 +13767,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','(AM) Istryne bankomata (ATM)','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId]);
-						log_push();
+						log_commit();
 
 						mysql_format(chandler, string, sizeof string, "DELETE FROM `atms` WHERE id = '%d'", ATMs[atmid][atmId]);
 						mysql_fquery(chandler, string, "ATMDeleted");
@@ -13751,7 +13799,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','(AM) Pakeite garazo kaina','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[tmpSelected[playerid]][gId]);
-					log_push();
+					log_commit();
 				}
 			}
 		}
@@ -13822,7 +13870,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					cache_delete(result);
 				}
-				log_push();
+				log_commit();
 				OnDialogResponse(playerid, DIALOG_AM_GARAGES_MAIN, 1, 1, "");
 			}
 			ShowPlayerAdminMenu(playerid);
@@ -13873,7 +13921,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite garazo iejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -13898,7 +13946,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite garazo isejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -13927,7 +13975,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite garazo lauko vieta masinai','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -13956,7 +14004,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite garazo vidaus vieta masinai','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -13994,7 +14042,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 							log_set_values("'%d','%e','(AM) Isvale garazo furniture','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId], count_deleted);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -14053,7 +14101,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Istryne garaza','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_push();
+							log_commit();
 							mysql_format(chandler, string, sizeof string, "DELETE FROM `garages_data` WHERE id = '%d'; DELETE FROM `garages_furniture` WHERE GarageId = '%d'", GarageInfo[selected][gId], GarageInfo[selected][gId]);
 							mysql_fquery(chandler, string, "GarageDeleted");
 							GarageInfo[selected] = __reset_Garage;
@@ -14137,7 +14185,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								log_set_table("logs_admins");
 								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 								log_set_values("'%d','%e','(AM) Sukure nauja garaza','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[garage][gId]);
-								log_push();
+								log_commit();
 							}
 							else
 							{
@@ -14192,7 +14240,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`ExtraString`");
 				log_set_values("'%d','%e','(AM) Pakeite namo inventoriaus daikta','%d','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId], slot, GetInventoryItemName(item));
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_HOUSE_INV, 1, tmpIter[playerid], "");
 		}
@@ -14219,7 +14267,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`ExtraString`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite namo inventoriaus kieki','%d','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId], slot, GetInventoryItemName(HouseInventory[selected][slot][invId]), amount);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_HOUSE_INV, 1, tmpIter[playerid], "");
 		}
@@ -14244,7 +14292,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`,`ExtraString`");
 						log_set_values("'%d','%e','(AM) Istryne namo inventoriaus daikta','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpSelected[playerid]][hId], tmpIter[playerid], GetInventoryItemName(HouseInventory[tmpSelected[playerid]][tmpIter[playerid]][invId]));
-						log_push();
+						log_commit();
 						ClearHouseInventorySlot(tmpSelected[playerid], tmpIter[playerid]);
 						MsgSuccess(playerid, "NAMAS", "Iðtrynëte daiktà ið %d sloto.", tmpIter[playerid]+1);
 						SaveHouseInventory(tmpSelected[playerid]);
@@ -14285,7 +14333,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','(AM) Pakeite namo kaina','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), amount);
-					log_push();
+					log_commit();
 				}
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_HOUSES_MAIN, 1, 4, "");
@@ -14362,7 +14410,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					cache_delete(result);
 				}
-				log_push();
+				log_commit();
 				OnDialogResponse(playerid, DIALOG_AM_HOUSES_MAIN, 1, 1, "");
 			}
 			else ShowPlayerAdminMenu(playerid);
@@ -14416,7 +14464,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','Pakeite namo iejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId]);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -14440,7 +14488,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','Pakeite namo isejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId]);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -14478,7 +14526,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 							log_set_values("'%d','%e','Isvale namo furniture','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId], count_deleted);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -14548,7 +14596,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Istryne nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId]);
-							log_push();
+							log_commit();
 							mysql_format(chandler, string, sizeof string, "DELETE FROM `houses_data` WHERE id = '%d'; DELETE FROM `houses_inventory` WHERE HouseId = '%d'; DELETE FROM `houses_furniture` WHERE HouseId = '%d'; DELETE FROM `houses_dubkeys` WHERE HouseId = '%d'", HouseInfo[selected][hId], HouseInfo[selected][hId], HouseInfo[selected][hId], HouseInfo[selected][hId]);
 							mysql_fquery(chandler, string, "HouseDeleted");
 							HouseInfo[selected] = __reset_House;
@@ -14680,7 +14728,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`ExtraString`");
 				log_set_values("'%d','%e','(AM) Pakeite verslo inventoriaus daikta','%d','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], slot, GetInventoryItemName(item));
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_INV, 1, tmpIter[playerid], "");
 		}
@@ -14707,7 +14755,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`ExtraString`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite verslo inventoriaus kieki','%d','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], slot, GetInventoryItemName(BusinessInventory[selected][slot][invId]), amount);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_INV, 1, tmpIter[playerid], "");
 		}
@@ -14732,7 +14780,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`,`ExtraString`");
 						log_set_values("'%d','%e','(AM) Istryne verslo inventoriaus daikta','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], tmpIter[playerid], GetInventoryItemName(BusinessInventory[tmpSelected[playerid]][tmpIter[playerid]][invId]));
-						log_push();
+						log_commit();
 						ClearBusinessInventorySlot(tmpSelected[playerid], tmpIter[playerid]);
 						MsgSuccess(playerid, "VERSLAS", "Iðtrynëte daiktà ið %d sloto.", tmpIter[playerid]+1);
 						SaveBusinessInventory(tmpSelected[playerid]);
@@ -14773,7 +14821,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','Pakeite namo kaina','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], amount);
-					log_push();
+					log_commit();
 				}
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 4, "");
@@ -14853,7 +14901,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					cache_delete(result);
 				}
-				log_push();
+				log_commit();
 				OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
 			}
 			else ShowPlayerAdminMenu(playerid);
@@ -14875,7 +14923,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 				log_set_values("'%d','%e','(AM) Pakeite verslo pavadinima','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], inputtext);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_ALL, 1, tmpSelected[playerid], "");
 		}
@@ -14899,7 +14947,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite verslo tipa','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], listitem);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_ALL, 1, tmpSelected[playerid], "");
 		}
@@ -14916,7 +14964,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite verslo lygi','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], listitem);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_ALL, 1, tmpSelected[playerid], "");
 		}
@@ -14978,7 +15026,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite verslo iejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -15002,7 +15050,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite verslo isejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_push();
+							log_commit();
 						}
 						else InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -15041,7 +15089,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 							log_set_values("'%d','%e','(AM) Isvale verslo furniture','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], count_deleted);
-							log_push();
+							log_commit();
 						}
 					}
 					case 6:
@@ -15080,7 +15128,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite verslo papildomas koord.','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId]);
-							log_push();
+							log_commit();
 
 							// * Ideja: sukurti nauja table `business_coordinates` ir ten glaima kelt unlimited koordinates su tipais.
 							// * verslo id  	x 	y 	z 		type
@@ -15154,7 +15202,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite verslo iskrovimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_push();
+							log_commit();
 						}
 					}
 					case 13:
@@ -15175,7 +15223,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite verslo nunesimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_push();
+							log_commit();
 						}
 					}
 					case 14:
@@ -15212,7 +15260,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Istryne versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_push();
+							log_commit();
 
 							mysql_format(chandler, string, sizeof string, "DELETE FROM `business_data` WHERE id = '%d';DELETE FROM `business_wares` WHERE BusinessId = '%d'; DELETE FROM `business_furniture` WHERE BusinessId = '%d';", BusinessInfo[selected][bId], BusinessInfo[selected][bId], BusinessInfo[selected][bId]);
 							mysql_format(chandler, string, sizeof string, "%sDELETE FROM `business_dubkeys` WHERE BusinessId = '%d'; DELETE FROM `business_inventory` WHERE BusinessId = '%d'; DELETE FROM `business_orders` WHERE BusinessId = '%d';DELETE FROM `business_orders_fuel` WHERE BusinessId = '%d'", string, BusinessInfo[selected][bId], BusinessInfo[selected][bId], BusinessInfo[selected][bId], BusinessInfo[selected][bId]);
@@ -15324,7 +15372,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Sukure nauja versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[businessid][bId]);
-							log_push();
+							log_commit();
 						}
 						else
 						{
@@ -15397,7 +15445,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Nustate verslo lygio gaunama suma','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), tmpSelected[playerid], amount);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 3, "");
 		}
@@ -15445,7 +15493,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 					log_set_values("'%d','%e','(AM) Pridejo preke i galimas verslams','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GetInventoryItemName(itemid));
-					log_push();
+					log_commit();
 					SendFormat(playerid, -1, "Prekë pridëta á saraðà. Praðome jà suredaguoti.");
 				}
 				else return SendWarning(playerid, "Galimø prekiø limitas iðnaudotas ("#MAX_AVAILABLE_WARES")");
@@ -15495,7 +15543,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 						log_set_values("'%d','%e','(AM) Pasalino preke is galimu verslams','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GetInventoryItemName(AvailableWares[selected][awItem]));
-						log_push();
+						log_commit();
 
 						AvailableWares[selected] = __reset_AvailableWare;
 						/*for(new i = 0; i < MAX_AVAILABLE_WARES; i++)
@@ -15604,7 +15652,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 					log_set_values("'%d','%e','(AM) Sukure nauja salona','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[itter][salonId]);
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -15643,7 +15691,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','(AM) Pakeite salono spawn vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId]);
-						log_push();
+						log_commit();
 					}
 					case 1:
 					{
@@ -15676,7 +15724,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','(AM) Istryne salono spawn vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId]);
-						log_push();
+						log_commit();
 					}
 				}
 				OnDialogResponse(playerid, DIALOG_AM_SALON_EDIT, 1, 2, "");
@@ -15711,7 +15759,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_admins");
 					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 					log_set_values("'%d','%e','(AM) Pridejo spawn vieta i salona','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId]);
-					log_push();
+					log_commit();
 				}
 				else
 				{
@@ -15746,7 +15794,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite salono parduodama modeli','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId], model);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_SALON_EDIT, 1, 3, "");
 		}
@@ -15774,7 +15822,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite salono parduodamo modelio kaina','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId], tmpIter[playerid], price);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_SALON_EDIT, 1, 3, "");
 		}
@@ -15799,7 +15847,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite salono parduodamo modelio remeja','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId], tmpIter[playerid], listitem);
-				log_push();
+				log_commit();
 			}
 		}
 		case DIALOG_AM_SALON_VEHICLE_EDIT:
@@ -15832,7 +15880,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 						log_set_values("'%d','%e','(AM) Istryne modeli is salono parduodamu','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId], tmpIter[playerid]);
-						log_push();
+						log_commit();
 
 						mysql_format(chandler, string, sizeof string, "DELETE FROM `sell_vehicles` WHERE Model = '%d' AND SalonId = '%d'", tmpIter[playerid], SalonData[tmpSelected[playerid]][salonId]);
 						mysql_fquery(chandler, string, "SalonVehicleDeleted");
@@ -15874,7 +15922,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pridejo modeli i salono parduodamus','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId], model);
-				log_push();
+				log_commit();
 			}
 			else
 			{
@@ -15954,7 +16002,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite salono vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId]);
-							log_push();
+							log_commit();
 						}
 					}
 					case 2:
@@ -16019,7 +16067,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 							log_set_values("'%d','%e','(AM) Istryne salona','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), SalonData[tmpSelected[playerid]][salonId], SalonData[tmpSelected[playerid]][salonName]);
-							log_push();
+							log_commit();
 							mysql_format(chandler, string, sizeof string, "DELETE FROM `sell_salons` WHERE id = '%d'; DELETE FROM `sell_salons_spawns` WHERE SalonId = '%d'; DELETE FROM `sell_vehicles` WHERE SalonId = '%d'", SalonData[selected][salonId], SalonData[selected][salonId], SalonData[selected][salonId]);
 							mysql_fquery(chandler, string, "SalonDeleted");
 							sd_DestroyDynamicPickup(SalonData[selected][salonPickup]);
@@ -16102,7 +16150,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Sukure automobili','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], model);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 		}
@@ -16135,7 +16183,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite automobilio modeli','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], model);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 		}
@@ -16161,7 +16209,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite automobilio spalva','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], color1);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 		}
@@ -16186,7 +16234,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite automobilio darba','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vJob]);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 		}
@@ -16220,7 +16268,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite automobilio frakcija','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vFaction]);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 		}
@@ -16239,7 +16287,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite automobilio ranka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], rank);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
 		}
@@ -16414,7 +16462,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								log_set_table("logs_admins");
 								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 								log_set_values("'%d','%e','(AM) Pakeite automobilio vieta','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId]);
-								log_push();
+								log_commit();
 							}
 							else
 							{
@@ -16449,7 +16497,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								log_set_table("logs_admins");
 								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 								log_set_values("'%d','%e','(AM) Istryne automobili','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId]);
-								log_push();
+								log_commit();
 							}
 							else
 							{
@@ -16507,7 +16555,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Istryne taksofona','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PayPhoneInfo[selected][payPhoneId]);
-							log_push();
+							log_commit();
 							mysql_format(chandler, string, sizeof string, "DELETE FROM `payphones_data` WHERE id = '%d'", PayPhoneInfo[selected][payPhoneId]);
 							mysql_fquery(chandler, string, "PayPhoneDeleted");
 							if(IsValidDynamicObject(PayPhoneInfo[selected][payPhoneObject])) DestroyDynamicObject(PayPhoneInfo[selected][payPhoneObject], "payphone", "admin_delete");
@@ -16599,7 +16647,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								log_set_table("logs_admins");
 								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 								log_set_values("'%d','%e','(AM) Sukure nauja taksofona','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PayPhoneInfo[itter][payPhoneId]);
-								log_push();
+								log_commit();
 							}
 						}
 						else return InfoBox(playerid, IB_NO_PRIVILEGE);
@@ -16753,7 +16801,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','(AM) Pakeite parkingo ivaziavima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ParkingInfo[id][parkingId]);
-						log_push();
+						log_commit();
 					}
 					case 2:
 					{
@@ -16770,7 +16818,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','(AM) Pakeite parkingo isvaziavima','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ParkingInfo[id][parkingId]);
-						log_push();
+						log_commit();
 					}
 					case 3:
 					{
@@ -16798,7 +16846,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 						log_set_values("'%d','%e','(AM) Istryne parkinga','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), ParkingInfo[id][parkingId], ParkingInfo[id][parkingName]);
-						log_push();
+						log_commit();
 						DestroyDynamic3DTextLabel(ParkingInfo[id][parkingLabel]);
 						mysql_format(chandler, string, sizeof string, "DELETE FROM `parkings_data` WHERE id = '%d'", ParkingInfo[id][parkingId]);
 						mysql_fquery(chandler, string, "ParkingDeleted");
@@ -16877,7 +16925,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 				log_set_values("'%d','%e','(AM) Sukure nauja parkinga','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ParkingInfo[itter][parkingId]);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 10, "");
 		}
@@ -16970,7 +17018,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 				log_set_values("'%d','%e','(AM) Pridejo automobili i galimu sarasa frakcijoms','%d'", LogPlayerId(playerid), LogPlayerName(playerid), model);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 9, "");
 		}
@@ -17101,7 +17149,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite ikonos distancija','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), MapIconInfo[id][mapIconId], floatround(distance));
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_ICONS_ALL, 1, tmpSelected[playerid], "");
 		}
@@ -17124,7 +17172,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite ikonos tipa','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), MapIconInfo[id][mapIconId], type);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_ICONS_ALL, 1, tmpSelected[playerid], "");
 		}
@@ -17183,7 +17231,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 							log_set_values("'%d','%e','(AM) Pakeite ikonos vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), MapIconInfo[id][mapIconId]);
-							log_push();
+							log_commit();
 						}
 						else return InfoBox(playerid, IB_NO_PRIVILEGE);
 					}
@@ -17207,7 +17255,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_admins");
 							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 							log_set_values("'%d','%e','(AM) Istryne ikona','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), MapIconInfo[id][mapIconId], MapIconInfo[id][mapIconName]);
-							log_push();
+							log_commit();
 							mysql_format(chandler, string, sizeof string, "DELETE FROM `map_icons` WHERE id = '%d'", MapIconInfo[id][mapIconId]);
 							mysql_fquery(chandler, string, "MapIconDeleted");
 							DestroyDynamicMapIcon(MapIconInfo[id][mapIconIcon]);
@@ -17238,7 +17286,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 				log_set_values("'%d','%e','(AM) Pakeite ikonos pavadinima','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), MapIconInfo[id][mapIconId], inputtext);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_ICONS_ALL, 1, tmpSelected[playerid], "");
 		}
@@ -17475,7 +17523,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								log_set_table("logs_admins");
 								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 								log_set_values("'%d','%e','(AM) Istryne grupe','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GroupsInfo[groupid][groupId], GroupsInfo[groupid][groupName]);
-								log_push();
+								log_commit();
 
 								new groupSql = GroupsInfo[groupid][groupId];
 
@@ -17523,25 +17571,50 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if(response)
 			{
-				new name[30],
-					string[126];
+				new name[30];
+
 				if(sscanf(inputtext,"s[30]",name) || !strlen(name)) return OnDialogResponse(playerid, DIALOG_AM_GROUPS_MAIN, 1, 1, "");
-				mysql_format(chandler, string, sizeof string, "INSERT INTO `groups_data` (`Name`,`Super`,`Added`) VALUES ('%e','0','%d')", name, PlayerInfo[playerid][pId]);
-				new Cache:result = mysql_query(chandler, string, true);
-				cache_set_active(result);
-				new itter = Iter_Free(AdminGroup);
-				GroupsInfo[itter][groupId] = cache_insert_id();
-				format(GroupsInfo[itter][groupName], 30, name);
-				Iter_Add(AdminGroup, itter);
-				cache_delete(result);
-				mysql_tquery(chandler, "SELECT `Permission` FROM `groups_permissions_list` WHERE DefaultValue > '0'", "NewGroupPermissionListLoad", "d", playerid);
-				MsgSuccess(playerid, "GRUPËS", "Grupë sëkmingai sukurta.");
-				ShowPlayerAdminMenu(playerid);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-				log_set_values("'%d','%e','(AM) Sukure nauja grupe','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GroupsInfo[itter][groupId], inputtext);
-				log_push();
+				
+				inline createNewGroup()
+				{
+					new iter = Iter_Free(AdminGroup);
+					if(iter == ITER_NONE) return SendWarning(playerid, "Pasiektas grupiø limitas.");
+
+					new group_sql = GroupsInfo[iter][groupId] = cache_insert_id();
+
+					MsgSuccess(playerid, "GRUPËS", "Grupë sëkmingai sukurta.");
+					ShowPlayerAdminMenu(playerid);
+
+					format(GroupsInfo[iter][groupName], 30, name);
+					Iter_Add(AdminGroup, iter);
+
+					log_init(true);
+					log_set_table("logs_admins");
+					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
+					log_set_values("'%d','%e','(AM) Sukure nauja grupe','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GroupsInfo[iter][groupId], inputtext);
+					log_commit();
+
+					inline getPermissions()
+					{
+						new permission_name[30];
+						for(new i = 0, rows = cache_num_rows(); i < rows; i++)
+						{
+							cache_get_value_name(0, "Permission", permission_name);
+
+							inline insertPermission() return 1;
+							mysql_tquery_inline(chandler, using inline insertPermission, "\
+								INSERT INTO `groups_permissions` (`GroupId`,`Permission`) VALUES ('%d','%s')", group_sql, permission_name
+							);
+						}
+					}
+
+					mysql_tquery_inline(chandler, using inline getPermissions, "SELECT `Permission` FROM `groups_permissions_list` WHERE DefaultValue > '0'");
+					return 1;
+				}
+				mysql_tquery_inline(chandler, using inline createNewGroup, "\
+					INSERT INTO `groups_data` (`Name`,`Super`,`Added`) VALUES ('%e','0','%d')", 
+					name, PlayerInfo[playerid][pId]
+				);
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 11, "");
 		}
@@ -17656,7 +17729,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 				log_set_values("'%d','%e','(AM) Pakeite frakcijos pavadinima','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], inputtext);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 8, "");
 		}
@@ -17691,7 +17764,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`ReceiverId`");
 						log_set_values("'%d','%e','(AM) Istryne frakcijos ranka','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], FactionRankNames[factionid][selected], selected+1);
-						log_push();
+						log_commit();
 						for(new i = selected; i < MAX_FACTION_RANKS; i++)
 						{
 							if(i != MAX_FACTION_RANKS-1)
@@ -17726,7 +17799,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`ReceiverId`");
 				log_set_values("'%d','%e','(AM) Pakeite frakcijos ranko pavadinima','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], name, selected+1);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_FACTION_RANKS_ALL, 1, tmpIter[playerid], "");
 		}
@@ -17748,7 +17821,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`ReceiverId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite frakcijos ranko alga','%d','%e','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], FactionRankNames[factionid][selected], selected+1, salary);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_FACTION_RANKS_ALL, 1, tmpIter[playerid], "");
 		}
@@ -17794,7 +17867,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`ReceiverId`");
 				log_set_values("'%d','%e','(AM) Pridejo frakcijos ranka','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], name, selected+1);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_FACTION_EDIT_MAIN, 1, 1, "");
 		}
@@ -17811,7 +17884,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','(AM) Pakeite frakcijos tipa','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], listitem);
-				log_push();
+				log_commit();
 			}
 		}
 		case DIALOG_AM_FACTION_EDIT_MAIN:
@@ -17870,7 +17943,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','(AM) Pakeite frakcijos spawn','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId]);
-						log_push();
+						log_commit();
 					}
 					case 3:
 					{
@@ -17889,7 +17962,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 						log_set_values("'%d','%e','(AM) Pakeite frakcijos chat turejima','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], FactionInfo[selected][fHasChat]);
-						log_push();
+						log_commit();
 					}
 					case 5:
 					{
@@ -17901,7 +17974,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_admins");
 						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 						log_set_values("'%d','%e','(AM) Istryne frakcija','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], FactionInfo[selected][fName]);
-						log_push();
+						log_commit();
 						mysql_format(chandler, string, sizeof string, "DELETE FROM `factions_data` WHERE id = '%d'; DELETE FROM `factions_ranks` WHERE FactionId = '%d'; UPDATE `players_data` SET Faction = '0' AND JobLevel = '0' WHERE Faction = '%d'", FactionInfo[selected][fId], FactionInfo[selected][fId], FactionInfo[selected][fId]);
 						mysql_fquery(chandler, string, "FactionDeleted");
 						foreach(new receiverid : Player)
@@ -17950,7 +18023,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 				log_set_values("'%d','%e','(AM) Sukure nauja frakcija','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[itter][fId], FactionInfo[itter][fName]);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 8, "");
 		}
@@ -18227,7 +18300,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 				log_set_values("'%d','%e','(REPORT) Prieme reporta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), reportid);
-				log_push();
+				log_commit();
 				format(string, sizeof string, "Administratorius %s priëmë reportà nr. %d", GetPlayerNameEx(playerid), reportid);
 				SendAdminMessage(0xB0B0B0FF, false, string);
 				cache_delete(result);
@@ -18252,7 +18325,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 				log_set_values("'%d','%e','(REPORT) Atmete reporta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), reportid);
-				log_push();
+				log_commit();
 				format(string, sizeof string, "Administratorius %s atmetë reportà nr. %d", GetPlayerNameEx(playerid), reportid);
 				SendAdminMessage(0xB0B0B0FF, false, string);
 				cache_delete(result);
@@ -18302,7 +18375,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_values("'%d','%e','Pasieme ginkla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), WEAPON_CAMERA);
 					}
 				}
-				log_push();
+				log_commit();
 				pc_cmd_wepstore(playerid, "");
 			}
 		}
@@ -18444,7 +18517,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_factions");
 					log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ReceiverId`,`ReceiverName`");
 					log_set_values("'%d','%e','%d','%e','(FM) Prieme i frakcija','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), LogPlayerId(receiverid), LogPlayerName(receiverid));
-					log_push();
+					log_commit();
 				}
 			}
 			else OnDialogResponse(playerid, DIALOG_FM_RANKS_AND_USERS, 1, 0, "");
@@ -18491,7 +18564,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				MsgSuccess(playerid, "FRAKCIJA", "Nustatymai darbuotojui atnaujinti.");
 				OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
 
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
 		}
@@ -18582,7 +18655,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_factions");
 						log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`FactionId`,`FactionName`,`ActionText`");
 						log_set_values("'%d','%e','%d','%e','%d','%e','(FM) Ismete is frakcijos'", LogPlayerId(playerid), LogPlayerName(playerid), workerid, GetNameBySql(workerid), GetFactionName(factionid, false), FactionInfo[factionid][fId]);
-						log_push();
+						log_commit();
 					}
 				}
 			}
@@ -18632,7 +18705,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_factions");
 				log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`FactionId`,`FactionName`,`ActionText`,`ExtraString`");
 				log_set_values("'%d','%e','%d','%e','%d','%e','(FM) Pakeite ranga','%e'", LogPlayerId(playerid), LogPlayerName(playerid), workerid, GetNameBySql(workerid), GetFactionName(factionid, false), FactionInfo[factionid][fId], FactionRankNames[factionid][rankid-1]);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
 		}
@@ -18667,7 +18740,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_factions");
 				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`");
 				log_set_values("'%d','%e','%d','%e','%d','%e','(FM) Pervadino ranga','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GetFactionName(factionid, false), FactionInfo[factionid][fId], tmpSelected[playerid]+1, inputtext);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_FM_RANKS_AND_USERS, 1, 1, "");
 		}
@@ -18867,7 +18940,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_factions");
 				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','%d','%e','(FM) Nupirko automobili','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GetFactionName(factionid, false), FactionInfo[factionid][fId], model, price);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 1, "");
 		}
@@ -18972,7 +19045,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_factions");
 						log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`");
 						log_set_values("'%d','%e','%d','%e','(FM) Atnaujino automobilio pozicija','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), VehicleInfo[newvehicleid][vId]);
-						log_push();
+						log_commit();
 					}
 				}
 				else if(listitem == 4)
@@ -19003,7 +19076,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_factions");
 						log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`Amount`");
 						log_set_values("'%d','%e','%d','%e','(FM) Pardave automobili','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), VehicleInfo[vehicleid][vId], money);
-						log_push();
+						log_commit();
 
 						if(money < 0) money = 0;
 						mysql_format(chandler, string, sizeof string, "DELETE FROM `vehicles_server` WHERE id = '%d'", VehicleInfo[vehicleid][vId]);
@@ -19037,7 +19110,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_factions");
 				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','%d','%e','Perdaze automobili','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), VehicleInfo[vehicleid][vId], col1);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
 		}
@@ -19058,7 +19131,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_factions");
 				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`Amount`");
 				log_set_values("'%d','%e','%d','%e','Pakeite automobilio ranga','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), VehicleInfo[vehicleid][vId], listitem+1);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
 		}
@@ -19083,7 +19156,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							log_set_table("logs_factions");
 							log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`");
 							log_set_values("'%d','%e','%d','%e','(FM) Pasalino automobilio unit','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vUnitText]);
-							log_push();
+							log_commit();
 
 							format(VehicleInfo[vehicleid][vUnitText], 1, "");
 							MsgSuccess(playerid, "FRAKCIJA", "Sëkmingai paðalinote ekipaþo pavadinimà.");
@@ -19115,7 +19188,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_factions");
 						log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`");
 						log_set_values("'%d','%e','%d','%e','(FM) Pakeite automobilio unit','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), VehicleInfo[vehicleid][vId], inputtext);
-						log_push();
+						log_commit();
 
 						new string[256];
 						mysql_format(chandler, string, sizeof string, "UPDATE `vehicles_server` SET Unit = '%e' WHERE id = '%d'", inputtext, VehicleInfo[vehicleid][vId]);
@@ -19165,7 +19238,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_factions");
 				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`Amount`");
 				log_set_values("'%d','%e','%d','%e','(FM) Padejo i frakcijos biudzeta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), amount);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 0, "");
 		}
@@ -19185,7 +19258,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_factions");
 				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`Amount`");
 				log_set_values("'%d','%e','%d','%e','(FM) Paeme is frakcijos biudzeto','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), amount);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 0, "");
 		}
@@ -19866,7 +19939,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								log_set_values("'%d','%e','%d','Pardave balda','%d'", LogPlayerId(playerid), LogPlayerName(playerid), gFurnitureInfo[tmpSelected[playerid]][gfOwner], price);
 							}
 						}
-						log_push();
+						log_commit();
 						SendFormat(playerid, 0xBABABAFF, "Baldas \"%s\" sëkmingai parduotas. Gavote $%d", name, price);
 						NullFurnitureItem(tmpType_Salon[playerid], tmpSelected[playerid]);
 						pc_cmd_furniture(playerid, "");
@@ -20502,7 +20575,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						log_set_table("logs_phones");
 						log_set_keys("`OwnerId`,`OwnerName`,`ReceiverName`,`ActionText`");
 						log_set_values("'%d','%e','%e','Istryne kontakta'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerContacts[playerid][selected][contactName]);
-						log_push();
+						log_commit();
 
 						PlayerContacts[playerid][selected] = __reset_Contact;
 						SortEnumArray(PlayerContacts[playerid], 0, MAX_PLAYER_CONTACTS, [contactNumber], 0, E_CONTACTS_DATA, FALSE);
@@ -20526,7 +20599,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_phones");
 				log_set_keys("`OwnerId`,`OwnerName`,`ReceiverName`,`ActionText`,`ExtraString`");
 				log_set_values("'%d','%e','%e','Atnaujino kontakto varda','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerContacts[playerid][selected][contactName], inputtext);
-				log_push();
+				log_commit();
 
 				format(PlayerContacts[playerid][selected][contactName], 24, name);
 				OnDialogResponse(playerid, DIALOG_PHONE_CONTACTS_MAIN, 1, 0, "");
@@ -20550,7 +20623,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_table("logs_phones");
 				log_set_keys("`OwnerId`,`OwnerName`,`ReceiverName`,`ActionText`,`ExtraId`");
 				log_set_values("'%d','%e','%e','Atnaujino kontakto numeri','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerContacts[playerid][selected][contactName], number);
-				log_push();
+				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_PHONE_CONTACTS_ALL, 1, tmpSelected[playerid], "");
 		}
@@ -20641,7 +20714,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					log_set_table("logs_phones");
 					log_set_keys("`OwnerId`,`OwnerName`,`ReceiverName`,`ActionText`,`ExtraId`");
 					log_set_values("'%d','%e','%e','Pridejo kontakta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), name, tmpDubStart_Price[playerid]);
-					log_push();
+					log_commit();
 				}
 				else ShowPlayerPhoneContacts(playerid);
 			}
@@ -20968,7 +21041,7 @@ public PlayerFactionAddLoad(playerid)
 		log_set_table("logs_factions");
 		log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ReceiverId`,`ReceiverName`");
 		log_set_values("'%d','%e','%d','%e','(FM) Prieme i frakcija','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), id, name);
-		log_push();
+		log_commit();
 	}
 	return 1;
 }
@@ -22854,7 +22927,7 @@ stock PlayerPhonePickup(playerid)
 			log_set_table("logs_phones");
 			log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 			log_set_values("'%d','%e','%d','%e','Atsiliepe'", LogPlayerId(callerid), LogPlayerName(callerid), LogPlayerId(playerid), LogPlayerName(playerid));
-			log_push();
+			log_commit();
 			return true;
 		}
 	}
@@ -24016,7 +24089,7 @@ public OnPlayerGiveInventoryItem(playerid, slotid)
 		log_set_table("logs_inventory");
 		log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
 		log_set_values("'%d','%e','%d','%e','Perdave daikta','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), itemid, amount, extra);
-		log_push();
+		log_commit();
 	}
 	else SendWarning(playerid, "Nëra vietos þaidëjo inventoriuje.");
 	return 1;
@@ -24099,7 +24172,7 @@ public OnPlayerUseInventoryItem(playerid, slotid)
 		log_set_table("logs_inventory");
 		log_set_keys("`OwnerId`,`OwnerName`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
 		log_set_values("'%d','%e','Issitrauke ginkla','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), itemid, amount, extra);
-		log_push();
+		log_commit();
 	}
 	else
 	{
@@ -24217,7 +24290,7 @@ public OnPlayerUseInventoryItem(playerid, slotid)
 			log_set_table("logs_inventory");
 			log_set_keys("`OwnerId`,`OwnerName`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
 			log_set_values("'%d','%e','Panaudojo narkotika','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), itemid, amount, extra);
-			log_push();
+			log_commit();
 		}
 		else
 		{
@@ -24225,7 +24298,7 @@ public OnPlayerUseInventoryItem(playerid, slotid)
 			log_set_table("logs_inventory");
 			log_set_keys("`OwnerId`,`OwnerName`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
 			log_set_values("'%d','%e','Panaudojo daikta','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), itemid, amount, extra);
-			log_push();
+			log_commit();
 			switch(itemid)
 			{
 				case ITEM_PHONE:
@@ -25470,7 +25543,7 @@ stock PayDay(playerid)
 	log_set_table("logs_money");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 	log_set_values("'%d','%e','Gavo alga','%d'", LogPlayerId(playerid), LogPlayerName(playerid), payday);
-	log_push();
+	log_commit();
 	SaveAccount(playerid);
 	return 1;
 }
@@ -28127,7 +28200,7 @@ public AccountLoad(playerid)
 		log_set_table("logs_connections");
 		log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`IP`");
 		log_set_values("'%d','%e','Uzkrautas veikejas','%s'", LogPlayerId(playerid), LogPlayerName(playerid), GetPlayerIpEx(playerid));
-		log_push();
+		log_commit();
 
 		SpawnPlayerEx(playerid, 1, .set = true);
 		TogglePlayerSpectating(playerid, false);
@@ -29409,7 +29482,7 @@ stock BuyVehicle(playerid, model, name[], price, color1, color2, lock, salon, do
 	log_set_table("logs_vehicles");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`,`ExtraId`");
 	log_set_values("'%d','%e','Nusipirko automobili','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), price, model);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -29529,7 +29602,7 @@ public FurnitureBought(playerid, type, owner, price, model, name[], category[], 
 		}
 	}
 	tmpSelected[playerid] = id;
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -31384,7 +31457,7 @@ public VehicleGet(playerid, textdraw_index)
 		log_set_table("logs_vehicles");
 		log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ExtraString`,`ActionText`");
 		log_set_values("'%d','%e','%d','%e','%e','Isparkavo tr. priemone'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vNumbers]);
-		log_push();
+		log_commit();
 	}
 	else
 	{
@@ -31922,7 +31995,7 @@ CMD:blockpm(playerid, params[])
 	log_set_table("logs_players");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
 	log_set_values("'%d','%e','%s PM nuo zaidejo','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), MuteListPM[playerid][blockid] == 1 ? ("Isjunge") : ("Ijunge"), LogPlayerId(blockid), LogPlayerName(blockid));
-	log_push();
+	log_commit();
 	return 1;
 }
 CMD:towup(playerid, params[])
@@ -31976,7 +32049,7 @@ CMD:togglepm(playerid, params[])
 		log_set_table("logs_players");
 		log_set_keys("`PlayerId`,`PlayerName`,`ActionText`");
 		log_set_values("'%d','%e','%s visas PM'", LogPlayerId(playerid), LogPlayerName(playerid), DisabledPM[playerid] ? ("Isjunge") : ("Ijunge"));
-		log_push();
+		log_commit();
 	}
 	else InfoBox(playerid, IB_NOT_DONATOR);
 	return 1;
@@ -31999,7 +32072,7 @@ CMD:pm(playerid, params[])
 	log_set_table("logs_messages");
 	log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%d','%e','Issiunte PM','%e'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), text);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -32110,7 +32183,7 @@ CMD:o(playerid, params[])
 	log_set_table("logs_messages");
 	log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','-1','/o','OOC global chat','%e'", LogPlayerId(playerid), LogPlayerName(playerid), text);
-	log_push();
+	log_commit();
 	return 1;
 }
 CMD:setchannel(playerid, params[])
@@ -32154,7 +32227,7 @@ CMD:r(playerid, params[])
 	log_set_table("logs_radiochat");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`,`ExtraId`");
 	log_set_values("'%d','%e','/r','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), text, channel);
-	log_push();
+	log_commit();
 	format(string, sizeof string, "%s sako (á racijà): %s", GetPlayerNameEx(playerid, true, false), text);
 	ProxDetector(IsPlayerInAnyVehicle(playerid) ? 6.0 : 10.0, playerid, string, 0xE9E9E9FF, 0xDADADAFF, 0xC7C7C7FF, 0xABABABFF, 0x929292FF);
 	return 1;
@@ -32191,7 +32264,7 @@ CMD:b(playerid, params[])
 	log_set_values("'%d','%e','/b','%e'", LogPlayerId(playerid), LogPlayerName(playerid), text);
 	format(text, sizeof text, "(({%s}%s{C7C7C7}[ID: %d] sako: %s))", PlayerInfo[playerid][pAdminDuty] > 0 ? ("FFCD00") : ("DADADA"), GetPlayerNameEx(playerid, .roleplay = false), playerid, text);
 	ProxDetector(10.0, playerid, text, 0xC7C7C7FF, 0xC7C7C7FF, 0xC7C7C7FF, 0xC7C7C7FF, 0xC7C7C7FF);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -32653,7 +32726,7 @@ CMD:rfc(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','RFC','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GetFactionName(factionid, false));
-	log_push();
+	log_commit();
 
 	if(mysql < 0)
 	{
@@ -32675,7 +32748,7 @@ CMD:rtc(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 	log_set_values("'%d','%e','RTC','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId]);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -32704,7 +32777,7 @@ CMD:rjc(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','RJC','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GetJobName(jobid, false));
-	log_push();
+	log_commit();
 	SendFormatToAll(0xF7F7F7FF, "%s {EEEEEE}atstatë visas darbo {F7F7F7}\"%s\"{EEEEEE} tr. priemones", GetPlayerNameEx(playerid, false), GetJobName(jobid, false));
 	return 1;
 }
@@ -33018,7 +33091,7 @@ CMD:makedonator(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ReceiverId`,`ReceiverName`,`Amount`");
 	log_set_values("'%d','%e','Dave donator','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[receiverid][pUserId], GetUserNameById(PlayerInfo[receiverid][pUserId]), type);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -33037,7 +33110,7 @@ CMD:setnamechanges(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ReceiverId`,`ReceiverName`,`Amount`");
 	log_set_values("'%d','%e','Dave name changes','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[receiverid][pUserId], GetUserNameById(PlayerInfo[receiverid][pUserId]), amount);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -33056,7 +33129,7 @@ CMD:setnumberchanges(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ReceiverId`,`ReceiverName`,`Amount`");
 	log_set_values("'%d','%e','Dave telnr changes','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[receiverid][pUserId], GetUserNameById(PlayerInfo[receiverid][pUserId]), amount);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -33075,7 +33148,7 @@ CMD:setplatechanges(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ReceiverId`,`ReceiverName`,`Amount`");
 	log_set_values("'%d','%e','Dave plate changes','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[receiverid][pUserId], GetUserNameById(PlayerInfo[receiverid][pUserId]), amount);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -33571,7 +33644,7 @@ CMD:giveweapon(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Dave ginkla','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), weaponid, ammo);
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:givemoney(CMD_TYPE_ADMIN);
@@ -33588,7 +33661,7 @@ CMD:givemoney(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Dave pinigu','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), amount);
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:giveitem(CMD_TYPE_ADMIN);
@@ -33631,7 +33704,7 @@ CMD:giveitem(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`,`ExtraString`");
 	log_set_values("'%d','%e','%d','%e','Dave daikta','%d','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), itemid, amount, string);
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:lockacc(CMD_TYPE_ADMIN);
@@ -33675,7 +33748,7 @@ CMD:ban(playerid, params[])
 		log_set_table("logs_admins");
 		log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`ExtraString`");
 		log_set_values("'%d','%e','%d','%e','Uzblokavo','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), time, reason);
-		log_push();
+		log_commit();
 	}
 	else
 	{
@@ -33694,7 +33767,7 @@ CMD:jail(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`ExtraString`");
 	log_set_values("'%d','%e','%d','%e','Uzjailino','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), time, reason);
-	log_push();
+	log_commit();
 	return 1;
 }
 stock JailPlayer(playerid, adminname[], reason[], time = 0, type = 3)
@@ -33733,7 +33806,7 @@ stock JailPlayer(playerid, adminname[], reason[], time = 0, type = 3)
 	log_set_table("logs_players");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`,`ExtraString`");
 	log_set_values("'%d','%e','%e','%d','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string, type, time, reason);
-	log_push();
+	log_commit();
 	if(type == 3)
 	{
 		SendACMessage(0xFF6347AA, false, "[AdmCmd] Administratorius %s pasodino %s á kalëjimà (%d minutëm).", adminname, GetPlayerNameEx(playerid), time);
@@ -33774,7 +33847,7 @@ stock BanPlayer(playerid, adminname[], reason[], time = -1) // time = minutem
 	log_set_table("logs_players");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`,`ExtraString`");
 	log_set_values("'%d','%e','%e','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string, time, reason);
-	log_push();
+	log_commit();
 	KickEx(playerid);
 	return 1;
 }
@@ -33791,7 +33864,7 @@ stock WarnPlayer(playerid, adminname[], reason[])
 	log_set_table("logs_players");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%e','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string, reason);
-	log_push();
+	log_commit();
 	PlayerInfo[playerid][pWarns]++;
 	if(PlayerInfo[playerid][pWarns] >= WARNS_TO_BAN)
 	{
@@ -33819,7 +33892,7 @@ stock LockAccount(playerid, adminname[], reason[])
 	log_set_table("logs_players");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%e','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string, reason);
-	log_push();
+	log_commit();
 	KickEx(playerid);
 	return 1;
 }
@@ -33836,7 +33909,7 @@ stock KickPlayer(playerid, adminname[], reason[])
 	log_set_table("logs_players");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%e','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string, reason);
-	log_push();
+	log_commit();
 
 	KickEx(playerid);
 	return 1;
@@ -33883,7 +33956,7 @@ CMD:spec(playerid, params[])
 		log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 		log_set_values("'%d','%e','%d','%e','Pradejo stebeti zaideja'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
 	}
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:sethp(CMD_TYPE_ADMIN);
@@ -33897,7 +33970,7 @@ CMD:sethp(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Pakeite HP','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), hp);
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:setarmour(CMD_TYPE_ADMIN);
@@ -33911,7 +33984,7 @@ CMD:setarmour(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Pakeite armour','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), armour);
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:slap(CMD_TYPE_ADMIN);
@@ -33927,7 +34000,7 @@ CMD:slap(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Slap zaideja'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:unfreeze(CMD_TYPE_ADMIN);
@@ -33941,7 +34014,7 @@ CMD:unfreeze(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Uzfreezino zaideja'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:freeze(CMD_TYPE_ADMIN);
@@ -33955,7 +34028,7 @@ CMD:freeze(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Uzfreezino zaideja'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 thread(PlayerJailed);
@@ -33986,7 +34059,7 @@ CMD:mute(playerid, params[])
 		SendFormat(playerid, 0xFFDE6EFF, "Uþdraudëte kalbëti þaidëjui %s %d minutëm (naudokite /mute dar kartà).", GetPlayerNameEx(receiverid, false), time);
 		SendFormat(receiverid, 0xFFDE6EFF, "%s uþdraudë Jums kalbëti %d minuèiø.", GetPlayerNameEx(playerid, false), time);
 	}
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:goto(CMD_TYPE_ADMIN);
@@ -34013,7 +34086,7 @@ CMD:goto(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Goto'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -34048,7 +34121,7 @@ CMD:gethere(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Gethere'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 CMD:oldcar(playerid, params[])
@@ -34110,7 +34183,7 @@ CMD:kick(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%d','%e','Ismete zaideja','%e'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), reason);
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:ado(CMD_TYPE_ADMIN);
@@ -34225,7 +34298,7 @@ CMD:setstat(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`ExtraId`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Pakeite stats','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), code, amount);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -34266,7 +34339,7 @@ CMD:setstatcar(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ActionText`,`ExtraId`,`Amount`");
 	log_set_values("'%d','%e','%d','Pakeite car stats','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], code, amount);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -34345,7 +34418,7 @@ CMD:aheal(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Pagyde'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:ao(CMD_TYPE_ADMIN);
@@ -34392,7 +34465,7 @@ CMD:afriskproperty(playerid, params[])
 			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(HouseInventory[itter][i][invId]), HouseInventory[itter][i][invAmount], HouseInventory[itter][i][invExtraId]);
 		}
 		log_set_values("'%d','%e','Apieskojo nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[itter][hId]);
-		log_push();
+		log_commit();
 		return 1;
 	}
 	else if((itter = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
@@ -34404,7 +34477,7 @@ CMD:afriskproperty(playerid, params[])
 			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(BusinessInventory[itter][i][invId]), BusinessInventory[itter][i][invAmount], BusinessInventory[itter][i][invExtraId]);
 		}
 		log_set_values("'%d','%e','Apieskojo versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[itter][bId]);
-		log_push();
+		log_commit();
 		return 1;
 	}
 	else if((itter = GetClosestDealerHouse(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
@@ -34416,7 +34489,7 @@ CMD:afriskproperty(playerid, params[])
 			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(DealerHouseInventory[itter][i][invId]), DealerHouseInventory[itter][i][invAmount], DealerHouseInventory[itter][i][invExtraId]);
 		}
 		log_set_values("'%d','%e','Apieskojo dealer house','%d'", LogPlayerId(playerid), LogPlayerName(playerid), DealerHouseInfo[itter][dealerHouseId]);
-		log_push();
+		log_commit();
 		return 1;
 	}
 	SendError(playerid, "Nesate name arba versle.");
@@ -34444,7 +34517,7 @@ CMD:friskproperty(playerid, params[])
 			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(HouseInventory[itter][i][invId]), HouseInventory[itter][i][invAmount], HouseInventory[itter][i][invExtraId]);
 		}
 		log_set_values("'%d','%e','%d','%e','Apieskojo nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), HouseInfo[itter][hId]);
-		log_push();
+		log_commit();
 		rp_me(playerid, _, "padaro namo kratà.");
 		return 1;
 	}
@@ -34458,7 +34531,7 @@ CMD:friskproperty(playerid, params[])
 		}
 		rp_me(playerid, _, "padaro verslo kratà.");
 		log_set_values("'%d','%e','%d','%e','Apieskojo versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), BusinessInfo[itter][bId]);
-		log_push();
+		log_commit();
 		return 1;
 	}
 	else if((itter = GetClosestDealerHouse(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
@@ -34471,7 +34544,7 @@ CMD:friskproperty(playerid, params[])
 		}
 		rp_me(playerid, _, "padaro namo kratà.");
 		log_set_values("'%d','%e','%d','%e','Apieskojo dealer house','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), DealerHouseInfo[itter][dealerHouseId]);
-		log_push();
+		log_commit();
 		return 1;
 	}
 
@@ -34611,7 +34684,7 @@ CMD:afrisk(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Apieskojo zaideja'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -34710,7 +34783,7 @@ CMD:apark(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 	log_set_values("'%d','%e','apark','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId]);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -34766,7 +34839,7 @@ CMD:aproperty(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Patikrino zaidejo turta'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -35012,7 +35085,7 @@ CMD:heal(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Pagyde zaideja'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 CMD:givebadge(playerid, params[])
@@ -35037,7 +35110,7 @@ CMD:givebadge(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`FactionId`,`FactionName`,`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%d','%e','Suteike zenkleli','%e'", FactionInfo[factionid][fId], GetFactionName(factionid, false), LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -35073,7 +35146,7 @@ CMD:respawncars(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`FactionId`,`FactionName`,`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%d','%e','Atstate masinas'", FactionInfo[factionid][fId], GetFactionName(factionid, false), LogPlayerId(playerid), LogPlayerName(playerid));
-	log_push();
+	log_commit();
 
 	return 1;
 }
@@ -35100,7 +35173,7 @@ CMD:payticket(playerid, params[])
 			log_set_table("logs_players");
 			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
 			log_set_values("'%d','%e','Sumokejo bauda','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vTicket]);
-			log_push();
+			log_commit();
 
 			VehicleInfo[vehicleid][vTicket] = 0;
 			SaveVehicleIntEx(vehicleid, "Ticket", 0);
@@ -35131,7 +35204,7 @@ CMD:ticket(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Israse bauda automobiliui','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), VehicleInfo[vehicleid][vId], amount);
-	log_push();
+	log_commit();
 	return 1;
 }
 thread(VehicleTicketAdd);
@@ -35158,7 +35231,7 @@ CMD:fine(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Israse bauda zaidejui','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), LogPlayerId(receiverid), LogPlayerName(receiverid), amount);
-	log_push();
+	log_commit();
 	return 1;
 }
 CMD:takelic(playerid, params[])
@@ -35205,7 +35278,7 @@ CMD:takelic(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Ateme licencija','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), LogPlayerId(receiverid), LogPlayerName(receiverid), type);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -35228,7 +35301,7 @@ CMD:takeweapons(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`");
 	log_set_values("'%d','%e','%d','%e','Ateme ginklus','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -35269,7 +35342,7 @@ CMD:atakeweapons(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ReceiverId`,`ReceiverName`");
 	log_set_values("'%d','%e','Ateme ginklus','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:atakedrugs(CMD_TYPE_ADMIN);
@@ -35293,7 +35366,7 @@ CMD:atakedrugs(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ReceiverId`,`ReceiverName`");
 	log_set_values("'%d','%e','Ateme narkotikus','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -35317,7 +35390,7 @@ CMD:takebadge(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`FactionId`,`FactionName`,`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 	log_set_values("'%d','%e','%d','%e','Suteike zenkleli','%e'", FactionInfo[factionid][fId], GetFactionName(factionid, false), LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerName(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -35352,7 +35425,7 @@ CMD:megaphone(playerid, params[])
 		log_set_table("logs_chat");
 		log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Text`,`ExtraId`,`ExtraString`");
 		log_set_values("'%d','%e','/megaphone','%e','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string, VehicleInfo[vehicleid][vId], GetFactionName(factionid, false));
-		log_push();
+		log_commit();
 		switch(FactionInfo[v_factionid][fType])
 		{
 			case FACTION_TYPE_POLICE:
@@ -35873,7 +35946,7 @@ CMD:checkbusiness(playerid, params[])
 		log_set_table("logs_factions");
 		log_set_keys("`FactionId`,`FactionName`,`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 		log_set_values("'%d','%e','%d','%e','Patikrino versla','%d'", GetFactionName(factionid, false), FactionInfo[factionid][fId], LogPlayerName(playerid), LogPlayerId(playerid), BusinessInfo[businessid][bId]);
-		log_push();
+		log_commit();
 	}
 	return 1;
 }
@@ -35907,7 +35980,7 @@ CMD:arrest(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`FactionId`,`FactionName`,`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Pasodino i arestine','%d','%e','%d'", GetFactionName(factionid, false), FactionInfo[factionid][fId], LogPlayerName(playerid), LogPlayerId(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), time);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -35940,7 +36013,7 @@ CMD:prison(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`FactionId`,`FactionName`,`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Pasodino i kalejima','%d','%e','%d'", GetFactionName(factionid, false), FactionInfo[factionid][fId], LogPlayerName(playerid), LogPlayerId(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), time);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -35964,7 +36037,7 @@ CMD:delarrestcar(playerid, params[])
 		log_set_table("logs_factions");
 		log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`");
 		log_set_values("'%d','%e','%d','%e','Pasalino arestuota automobili','%d'", LogPlayerName(playerid), LogPlayerId(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), sql);
-		log_push();
+		log_commit();
 	}
 	else
 	{
@@ -35999,7 +36072,7 @@ CMD:arrestcar(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`");
 	log_set_values("'%d','%e','%d','%e','Arestavo automobili','%d'", LogPlayerName(playerid), LogPlayerId(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), VehicleInfo[vehicleid][vId]);
-	log_push();
+	log_commit();
 
 	new Float:x, Float:y, Float:z;
 	GetPlayerPos(playerid, x, y, z);
@@ -36092,7 +36165,7 @@ CMD:bk(playerid, params[])
 			}
 		}
 	}
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -36151,7 +36224,7 @@ CMD:vest(playerid, params[])
 		RemovePlayerAttachedObject(playerid, 9);
 		log_set_values("'%d','%e','%d','%e','Nusieme liemene'", LogPlayerName(playerid), LogPlayerId(playerid), GetFactionName(factionid, false), FactionInfo[factionid][fId]);
 	}
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -36262,7 +36335,7 @@ CMD:roadblock(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`");
 	log_set_values("'%d','%e','%d','%e','Pastate blokada','%d'", LogPlayerName(playerid), LogPlayerId(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), type);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -36279,7 +36352,7 @@ CMD:removeroadblock(playerid, params[])
 	log_set_table("logs_factions");
 	log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`");
 	log_set_values("'%d','%e','%d','%e','Pasalino blokada'", LogPlayerName(playerid), LogPlayerId(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false));
-	log_push();
+	log_commit();
 	return 1;
 }
 // San News komandos
@@ -36591,7 +36664,7 @@ CMD:f(playerid, params[])
 		log_set_table("logs_chat");
 		log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Text`,`ExtraString`");
 		log_set_values("'%d','%e','/f','%e','%e'", LogPlayerName(playerid), LogPlayerId(playerid), string, GetFactionName(factionid, false));
-		log_push();
+		log_commit();
 
 		format(string, sizeof string, "(( %s %s: %s ))", FactionRankNames[factionid][PlayerInfo[playerid][pJobLevel]-1], GetPlayerNameEx(playerid), string);
 		SendFactionMessage(PlayerInfo[playerid][pFaction], 0x4CF0F3FF, false, string);
@@ -36663,7 +36736,7 @@ CMD:setunit(playerid, params[])
 				log_set_table("logs_factions");
 				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`");
 				log_set_values("'%d','%e','%d','%e','(FM) Pasalino automobilio unit','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vUnitText]);
-				log_push();
+				log_commit();
 
 				format(VehicleInfo[vehicleid][vUnitText], 1, "");
 				MsgSuccess(playerid, "FRAKCIJA", "Sëkmingai paðalinote ekipaþo pavadinimà.");
@@ -36693,7 +36766,7 @@ CMD:setunit(playerid, params[])
 			log_set_table("logs_factions");
 			log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`");
 			log_set_values("'%d','%e','%d','%e','(FM) Pakeite automobilio unit','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), VehicleInfo[vehicleid][vId], params);
-			log_push();
+			log_commit();
 
 			new string[256];
 			mysql_format(chandler, string, sizeof string, "UPDATE `vehicles_server` SET Unit = '%e' WHERE id = '%d'", params, VehicleInfo[vehicleid][vId]);
@@ -36927,7 +37000,7 @@ CMD:invweapon(playerid, params[])
 			log_set_table("logs_inventory");
 			log_set_keys("`OwnerId`,`OwnerName`,`ReceiverId`,`ActionText`,`ItemId`,`ItemAmount`,`ItemExtra`");
 			log_set_values("'%d','%e','-1','Padejo ginkla i inventoriu','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), weaponid, ammo, ret_GetSlotWeaponUniqueId(playerid, wepslot));
-			log_push();
+			log_commit();
 
 			RemovePlayerWeaponInSlot(playerid, wepslot);
 			SendFormat(playerid, 0xBABABAFF, "Ginklas padëtas á inventoriø.");
@@ -37162,7 +37235,7 @@ CMD:takejob(playerid, params[])
 			log_set_table("logs_jobs");
 			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 			log_set_values("'%d','%e','Isidarbino','%e'", LogPlayerId(playerid), LogPlayerName(playerid), Jobs[i][jobName]);
-			log_push();
+			log_commit();
 			SaveAccountIntEx(playerid, "Job", PlayerInfo[playerid][pJob]);
 			return 1;
 		}
@@ -37244,7 +37317,7 @@ CMD:ddo(playerid, params[])
 		log_set_table("logs_do");
 		log_set_keys("`PlayerId`,`PlayerName`,`Text`,`ExtraString`");
 		log_set_values("'%d','%e','%e','I duris'", LogPlayerId(playerid), LogPlayerName(playerid), text);
-		log_push();
+		log_commit();
 	}
 	return 1;
 }
@@ -37277,7 +37350,7 @@ CMD:s(playerid, params[])
 	log_set_table("logs_chat");
 	log_set_keys("`PlayerId`,`PlayerName`,`Text`,`ActionText`");
 	log_set_values("'%d','%e','%e','/shout'", LogPlayerId(playerid), LogPlayerName(playerid), text);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -37307,7 +37380,7 @@ CMD:low(playerid, params[])
 	log_set_table("logs_chat");
 	log_set_keys("`PlayerId`,`PlayerName`,`Text`,`ActionText`");
 	log_set_values("'%d','%e','%e','/low'", LogPlayerId(playerid), LogPlayerName(playerid), text);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -37329,7 +37402,7 @@ CMD:whisper(playerid, params[])
 	log_set_table("logs_chat");
 	log_set_keys("`PlayerId`,`PlayerName`,`Text`,`ActionText`,`ExtraString`,`ExtraId`");
 	log_set_values("'%d','%e','%e','/low','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), text, LogPlayerName(receiverid), LogPlayerId(receiverid));
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -37355,7 +37428,7 @@ CMD:pay(playerid, params[])
 	log_set_table("logs_money");
 	log_set_keys("`PlayerId`,`PlayerName`,`ExtraId`,`ExtraString`,`ActionText`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Perdave pinigus','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), amount);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -37379,7 +37452,7 @@ CMD:cw(playerid, params[])
 	log_set_table("logs_chat");
 	log_set_keys("`PlayerId`,`PlayerName`,`Text`,`ActionText`");
 	log_set_values("'%d','%e','%e','/cw'", LogPlayerId(playerid), LogPlayerName(playerid), text);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -37463,7 +37536,7 @@ CMD:ds(playerid, params[])
 		log_set_table("logs_chat");
 		log_set_keys("`PlayerId`,`PlayerName`,`Text`,`ActionText`");
 		log_set_values("'%d','%e','%e','/dshout'", LogPlayerId(playerid), LogPlayerName(playerid), text);
-		log_push();
+		log_commit();
 	}
 	return 1;
 }
@@ -37558,7 +37631,7 @@ CMD:me(playerid, params[])
 	log_set_table("logs_me");
 	log_set_keys("`PlayerId`,`PlayerName`,`Text`");
 	log_set_values("'%d','%e','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string);
-	log_push();
+	log_commit();
 	return 1;
 }
 flags:try(CMD_TYPE_ALLOW_NEWBIE);
@@ -37597,7 +37670,7 @@ CMD:ame(playerid, params[])
 	log_set_table("logs_ame");
 	log_set_keys("`PlayerId`,`PlayerName`,`Text`");
 	log_set_values("'%d','%e','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -37619,7 +37692,7 @@ CMD:do(playerid, params[])
 	log_set_table("logs_do");
 	log_set_keys("`PlayerId`,`PlayerName`,`Text`");
 	log_set_values("'%d','%e','%e'", LogPlayerId(playerid), LogPlayerName(playerid), string);
-	log_push();
+	log_commit();
 	return 1;
 }
 
@@ -38899,7 +38972,7 @@ CMD:duty(playerid, params[])
 			SendFormat(playerid, 0xA2C5EDFF, "Baigëte darbà.");
 			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`");
 			log_set_values("'%d','%e','Baige darba %s'", LogPlayerId(playerid), LogPlayerName(playerid), job != 0 ? (GetJobName(job)) : (GetFactionName(faction)));
-			log_push();
+			log_commit();
 			return 1;
 		}
 		else
@@ -38999,7 +39072,7 @@ CMD:duty(playerid, params[])
 			}
 			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`");
 			log_set_values("'%d','%e','Pradejo darba %e'", LogPlayerId(playerid), LogPlayerName(playerid), job != 0 ? (GetJobName(job)) : (GetFactionName(faction)));
-			log_push();
+			log_commit();
 		}
 	}
 	else return InfoBox(playerid, IB_NO_JOB);
@@ -39027,7 +39100,7 @@ CMD:eat(playerid, params[])
 			log_set_table("logs_houses");
 			log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`");
 			log_set_values("'%d','%e','%d','Pavalge name'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[itter][hId]);
-			log_push();
+			log_commit();
 		}
 		else
 		{
@@ -39044,7 +39117,7 @@ CMD:eat(playerid, params[])
 			log_set_table("logs_business");
 			log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`");
 			log_set_values("'%d','%e','%d','Pavalge versle'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[itter][bId]);
-			log_push();
+			log_commit();
 		}
 		else
 		{
@@ -39106,7 +39179,7 @@ CMD:buydealerhouse(playerid, params[])
 					log_set_table("logs_dealer_houses");
 					log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','%d','Nusipirko konspiracini nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), DealerHouseInfo[houseid][dealerHouseId], DealerHouseInfo[houseid][dealerHousePrice]);
-					log_push();
+					log_commit();
 					return 1;
 				}
 			}
@@ -39134,7 +39207,7 @@ CMD:rentcancel(playerid, params[])
 		log_set_table("logs_houses");
 		log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`");
 		log_set_values("'%d','%e','%d','Baige nuomotis nama'", LogPlayerId(playerid), LogPlayerName(playerid), houseid);
-		log_push();
+		log_commit();
 	}
 	else SendWarning(playerid, "Nenuomojate jokio namo.");
 	if(cache_is_valid(result)) cache_delete(result);
@@ -39189,7 +39262,7 @@ CMD:renthouse(playerid, params[])
 					log_set_table("logs_houses");
 					log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 					log_set_values("'%d','%e','%d','Issinuomavo nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[houseid][hId], HouseInfo[houseid][hRentPrice]);
-					log_push();
+					log_commit();
 				}
 			}
 		}
@@ -39244,7 +39317,7 @@ CMD:buyhouse(playerid, params[])
 			log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
 			log_set_values("'%d','%e','%d','Nusipirko nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[houseid][hId], HouseInfo[houseid][hPrice]);
 		}
-		log_push();
+		log_commit();
 		HouseInfo[houseid][hSale] = 0;
 		HouseInfo[houseid][hOwner] = PlayerInfo[playerid][pId];
 		SaveHouseIntEx(houseid, "Owner", PlayerInfo[playerid][pId]);
@@ -39313,7 +39386,7 @@ CMD:buybusiness(playerid, params[])
 			log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`Amount`");
 			log_set_values("'%d','%e','%d','Nusipirko versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[businessid][bId], BusinessInfo[businessid][bPrice]);
 		}
-		log_push();
+		log_commit();
 		BusinessInfo[businessid][bSale] = 0;
 		BusinessInfo[businessid][bOwner] = PlayerInfo[playerid][pId];
 		SaveBusinessIntEx(businessid, "Owner", PlayerInfo[playerid][pId]);
@@ -39370,7 +39443,7 @@ CMD:buygarage(playerid, params[])
 			log_set_keys("`PlayerId`,`PlayerName`,`GarageId`,`ActionText`,`Amount`");
 			log_set_values("'%d','%e','%d','Nusipirko garaza','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[garageid][gId], GarageInfo[garageid][gPrice]);
 		}
-		log_push();
+		log_commit();
 		GarageInfo[garageid][gSale] = 0;
 		GarageInfo[garageid][gOwner] = PlayerInfo[playerid][pId];
 		SaveGarageIntEx(garageid, "Owner", PlayerInfo[playerid][pId]);
@@ -39639,7 +39712,7 @@ CMD:bslogan(playerid, params[])
 			log_set_table("logs_business");
 			log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`");
 			log_set_values("'%d','%e','%d','/bslogan: %s'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpIter[playerid]], string);
-			log_push();
+			log_commit();
 
 		}
 		else return InfoBox(playerid, IB_NO_BUSINESS_KEYS);
@@ -39782,7 +39855,7 @@ stock PayForFuel(playerid, businessid)
 	log_set_table("logs_money");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`PlaceType`,`PlaceId`,`Amount`");
 	log_set_values("'%d','%e','Sumokejo uz degalus','%d','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PLACE_TYPE_BUSINESS, BusinessInfo[businessid][bId], PlayerExtra[playerid][peFilling]);
-	log_push();
+	log_commit();
 	return 1;
 }
 forward FillUp(playerid, vehicleid);
@@ -39903,7 +39976,7 @@ CMD:v(playerid, params[])
 		log_set_table("logs_vehicles");
 		log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`");
 		log_set_values("'%d','%e','%d','%e','Pasalino visus dubkey'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)));
-		log_push();
+		log_commit();
 		return 1;
 	}
 	else if(strfind(input, "takedubkey", true) == 0) // /v takedubkey
@@ -39932,7 +40005,7 @@ CMD:v(playerid, params[])
 				log_set_table("logs_vehicles");
 				log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`ExtraId`");
 				log_set_values("'%d','%e','%d','%e','Ateme dubkey','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), PlayerInfo[receiverid][pId]);
-				log_push();
+				log_commit();
 			}
 			cache_delete(result);
 		}
@@ -39982,7 +40055,7 @@ CMD:v(playerid, params[])
 					log_set_table("logs_vehicles");
 					log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`ExtraId`,`Amount`");
 					log_set_values("'%d','%e','%d','%e','Nupirko zaidejo tr. priemone','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[Offer[playerid][2]][vId], GetModelName(GetVehicleModel(Offer[playerid][2])), PlayerInfo[owner][pId], Offer[playerid][3]);
-					log_push();
+					log_commit();
 
 					ParkVehicle(Offer[playerid][2]);
 				}
@@ -40045,7 +40118,7 @@ CMD:v(playerid, params[])
 				log_set_table("logs_vehicles");
 				log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`ExtraId`");
 				log_set_values("'%d','%e','%d','%e','Dave dubkey','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), PlayerInfo[receiverid][pId]);
-				log_push();
+				log_commit();
 			}
 			cache_delete(result);
 		}
@@ -40074,7 +40147,7 @@ CMD:v(playerid, params[])
 		log_set_table("logs_vehicles");
 		log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Amount`,`ExtraString`");
 		log_set_values("'%d','%e','%d','%e','Priregistravo tr. priemone','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), VEHICLE_REGISTER_PRICE, VehicleInfo[vehicleid][vNumbers]);
-		log_push();
+		log_commit();
 		SendFormat(playerid, 0xBABABAFF, "Tr. priemonë sëkmingai priregistruota, numeriai atsiras ið naujo priparkavus.");
 		GivePlayerMoney(playerid, -VEHICLE_REGISTER_PRICE);
 		return 1;
@@ -40125,7 +40198,7 @@ CMD:v(playerid, params[])
 			log_set_table("logs_vehicles");
 			log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Amount`,`ExtraId`");
 			log_set_values("'%d','%e','%d','%e','Nupirko tr. priemones uzrakta','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), level*150, VehicleInfo[vehicleid][vLock]);
-			log_push();
+			log_commit();
 		}
 		return 1;
 	}
@@ -40187,7 +40260,7 @@ CMD:v(playerid, params[])
 				log_set_table("logs_vehicles");
 				log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`,`Amount`,`ExtraId`");
 				log_set_values("'%d','%e','%d','%e','Nupirko draudima tr. priemonei','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)), price, VehicleInfo[vehicleid][vInsurance]);
-				log_push();
+				log_commit();
 				return 1;
 			}
 			else
@@ -40227,7 +40300,7 @@ CMD:v(playerid, params[])
 			log_set_table("logs_vehicles");
 			log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`");
 			log_set_values("'%d','%e','%d','%e','Nupirko parkavimo vieta'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)));
-			log_push();
+			log_commit();
 
 			SaveVehicleFloatEx(vehicleid, "X", x);
 			SaveVehicleFloatEx(vehicleid, "Y", y);
@@ -40267,7 +40340,7 @@ CMD:v(playerid, params[])
 			log_set_table("logs_vehicles");
 			log_set_keys("`PlayerId`,`PlayerName`,`VehicleId`,`VehicleName`,`ActionText`");
 			log_set_values("'%d','%e','%d','%e','Priparkavo tr. priemone'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], GetModelName(GetVehicleModel(vehicleid)));
-			log_push();
+			log_commit();
 
 			if(VehicleInfo[vehicleid][vSpawnedBy] == PlayerInfo[playerid][pId])
 			{
@@ -40377,20 +40450,6 @@ public GroupsPermissionsListLoad(playerid, id, page)
 
 thread(InteriorDeleted);
 
-forward NewGroupPermissionListLoad(playerid, groupid);
-public NewGroupPermissionListLoad(playerid, groupid)
-{
-	new permission_name[30],
-		string[126];
-	for(new i = 0, rows = cache_num_rows(); i < rows; i++)
-	{
-		cache_get_value_name(0, "Permission", permission_name);
-		mysql_format(chandler, string, sizeof string, "INSERT INTO `groups_permissions` (`GroupId`,`Permission`) VALUES ('%d','%s')", groupid, permission_name);
-		mysql_fquery(chandler, string, "GroupAdded");
-	}
-	return 1;
-}
-
 forward InteriorsSelectedLoad(playerid, type);
 public InteriorsSelectedLoad(playerid, type)
 {
@@ -40420,7 +40479,7 @@ public InteriorsSelectedLoad(playerid, type)
 		log_set_table("logs_admins");
 		log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 		log_set_values("'%d','%e','Istryne interjera','%e'", LogPlayerId(playerid), LogPlayerName(playerid), name);
-		log_push();
+		log_commit();
 		ShowPlayerAdminMenu(playerid);
 	}
 	return 1;
@@ -40510,7 +40569,7 @@ Dialog:Dialog_Am_InteriorAdd(playerid, response, listitem, inputtext[])
 		log_set_table("logs_admins");
 		log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
 		log_set_values("'%d','%e','(AM) Pridejo nauja interjera','%e'", LogPlayerId(playerid), LogPlayerName(playerid), name);
-		log_push();
+		log_commit();
 	}
 	else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 13, "");
 	return 1;

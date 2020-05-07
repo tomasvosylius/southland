@@ -20,7 +20,7 @@ hook OnGameModeInit()
 	tmpobjid = CreateDynamicObject(19479,1472.635,-1247.204,15.373,-90.100,-0.000,179.999,-1,-1,-1,400.000,400.000);
 	SetDynamicObjectMaterialText(tmpobjid, 0, "____________", 130, "Quartz MS", 45, 0, 0xFFFFFFFF, 0x00000000, 0);
 	tmpobjid = CreateDynamicObject(19479,1468.726,-1280.422,17.936,0.000,0.000,179.999,-1,-1,-1,400.000,400.000);
-	SetDynamicObjectMaterialText(tmpobjid, 0, "MAZE", 90, "Quartz MS", 45, 0, 0xFFFFFFFF, 0x00000000, 0);
+	SetDynamicObjectMaterialText(tmpobjid, 0, "LS", 90, "Quartz MS", 45, 0, 0xFFFFFFFF, 0x00000000, 0);
 	tmpobjid = CreateDynamicObject(19479,1468.746,-1283.982,17.936,0.000,0.000,179.999,-1,-1,-1,400.000,400.000);
 	//SetDynamicObjectMaterialText(tmpobjid, 0, "A", 90, "Quartz", 45, 0, 0xFF6dc800, 0x00000000, 0);
 	//tmpobjid = CreateDynamicObject(19479,1468.726,-1284.123,17.936,0.000,0.000,179.999,-1,-1,-1,400.000,400.000);

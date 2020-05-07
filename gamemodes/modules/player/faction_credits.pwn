@@ -399,7 +399,7 @@ CMD:givefactioncredits(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Dave frakcijos kreditu','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), amount);
-	log_push();
+	log_commit();
     return 1;
 }
 
