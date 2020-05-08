@@ -815,10 +815,10 @@ stock FAC_Reset(playerid)
 		#if defined FAC_OnDialogResponse
 			return FAC_OnDialogResponse(playerid, dialogid, response, listitem, inputtext);
 		#else
-			return 1;
+			return 0;
 		#endif
 	#else 
-		return 1;
+		return 0;
 	#endif 
 }
 

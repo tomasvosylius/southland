@@ -149,9 +149,9 @@ HOOK__ OnPlayerDisconnect(playerid, reason)
 HOOK__ OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	// Apparently there's a hack to alter this.
-	dialogid = YSI_g_sPlayerDialog[playerid];
+	// dialogid = YSI_g_sPlayerDialog[playerid];
 	P:1("Dialog_OnDialogResponse called: %d %d %d %d %s", playerid, dialogid, response, listitem, inputtext);
-	if (dialogid == YSI_DIALOG_ID)
+	if (YSI_g_sPlayerDialog[playerid] == YSI_DIALOG_ID)
 	{
 		if (YSI_g_sPlayerMaster[playerid])
 		{

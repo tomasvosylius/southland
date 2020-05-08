@@ -20,13 +20,11 @@ stock UI_LoadBar_Start(playerid, type[], text[], time)
 
     if(!player_BarShowed[playerid])
     {
-        printf("Create called");
         _UI_LoadBar_Create(playerid, text);
 
         PlayerTextDrawTextSize(playerid, TD_Core[playerid][idx_Core_Value], 0.0, 3.0);
         for(new td = 0; td < sizeof TD_Core[]; td++)
         {
-            printf("Show %d called", td);
             PlayerTextDrawShow(playerid, TD_Core[playerid][td]);
         }
     }

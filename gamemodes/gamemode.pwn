@@ -6721,6 +6721,7 @@ stock Register_ShowDiscordInput(playerid)
 	dialog_AddLine("{f1f1f1}Norëdami þaisti ðiame serveryje, turite sujungti savo vartotojà su Discord.");
 	dialog_AddLine("{f1f1f1}1. Prisijunkite prie mûsø Discord serverio: {FAD831}invite.gg/southland");
 	dialog_AddLine("{f1f1f1}2. Ásitikinkite, jog esate patvirtines Discord vartotojo tel. numerá.");
+	dialog_AddLine("{949494}    Jûsø tel. numerio matyti mes negalime - galite bûti ramûs.");
 	dialog_AddLine("{f1f1f1}3. Discord kanale paraðykite {FAD831}!verify %s", GetPlayerNameEx(playerid));
 	dialog_SkipLine();
 	dialog_AddLine("{f1f1f1}4. Áveskite {FA9231}gautà kodà:");
@@ -19739,9 +19740,6 @@ thread(DealerDrugAdded);
 thread(DealerSaved);
 thread(ParkingUpdated);
 thread(ParkingDeleted);
-thread(MapIconAdd);
-thread(MapIconDeleted);
-thread(MapIconUpdated);
 thread(SalonVehicleAdd);
 thread(SalonVehicleDeleted);
 thread(BankLogAdd);
@@ -19757,10 +19755,6 @@ thread(GarageUpdated);
 thread(GarageDeleted);
 thread(PlayerAddedToFaction);
 thread(FactionVehiclePosUpdate);
-thread(EnterExitPosChange);
-thread(EnterExitDeleted);
-thread(ATMDeleted);
-thread(ATMUpdate);
 thread(PayPhoneUpdate);
 thread(PayPhoneDeleted);
 
