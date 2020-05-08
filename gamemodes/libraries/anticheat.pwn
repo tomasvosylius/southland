@@ -2152,7 +2152,8 @@ stock FAC_CheckWeaponCheat(playerid, id, bool:byslot)
 		new 
 			l_data[2];
 		GetPlayerWeaponData(playerid, slot, l_data[0], l_data[1]);
-		if((ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] != l_data[0] && l_data[0] != 0 && l_data[1] > 0) || (ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] < l_data[1] && l_data[1] > 0 && l_data[0] > 0))
+		if(	(ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] != l_data[0] && l_data[0] != 0 && l_data[1] > 0) || 
+			(ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] < l_data[1] && l_data[1] > 0 && l_data[0] > 0))
 		{
 			printf("CHEAT: cln[%d]:[%d] 	  srv[%d]:[%d]", l_data[0], l_data[1], ac__PlayerWeapons[playerid][slot][e_ac_WeaponId], ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo]);
 			ac__IgnoreWeapons[playerid] = 3;
@@ -2175,7 +2176,8 @@ stock FAC_ResetPlayerWeaponSlotData(playerid, slot)
 
 stock FAC_ResetPlayerWeapons(playerid)
 {
-	result = ResetPlayerWeapons(playerid);
+	new 
+		result = ResetPlayerWeapons(playerid);
 
 	for(new slot = 0; slot < 13; slot++)
 	{
@@ -2218,8 +2220,16 @@ stock RemovePlayerWeaponInSlot(playerid, remove)
 	*/
 
 	new 	
-		data[13][2];
-	for(new slot = 0; slot < 13; slot++)
+		data[2];
+
+	GetPlayerWeaponData(playerid, remove, data[0], data[1]);
+	if(data[0] != 0)
+	{
+		return FAC_SetPlayerAmmo(playerid, data[0], 0);
+	}
+	return false;
+	
+/*	for(new slot = 0; slot < 13; slot++)
 	{
 		if(slot != remove) GetPlayerWeaponData(playerid, slot, data[slot][0], data[slot][1]);
 	}
@@ -2230,7 +2240,7 @@ stock RemovePlayerWeaponInSlot(playerid, remove)
 	{
 		if(slot != remove) FAC_GivePlayerWeapon(playerid, data[slot][0], data[slot][1]);
 	}
-	return 1;
+	return 1;*/
 }
 
 stock FAC_GetWeaponSlot(weaponid)
@@ -2257,6 +2267,7 @@ stock FAC_GetWeaponSlot(weaponid)
 stock FAC_SetPlayerAmmo(playerid, weaponid, ammo)
 {
 	new 
+		result = SetPlayerAmmo(playerid, weaponid, ammo),
 		slot;
 	if((slot = FAC_GetWeaponSlot(weaponid)) != 0xFFFF)
 	{
@@ -2270,7 +2281,7 @@ stock FAC_SetPlayerAmmo(playerid, weaponid, ammo)
 			ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] += ammo;
 		}
 	}
-	return SetPlayerAmmo(playerid, weaponid, ammo);
+	return result;
 }
 
 stock FAC_GivePlayerWeapon(playerid, weaponid, ammo)

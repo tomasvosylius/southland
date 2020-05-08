@@ -8994,6 +8994,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new
 						bool:found_any_permission,
 						bool:found_any_permission_ic;
+
+					if(PlayerHasWeaponInSlot(playerid, FAC_GetWeaponSlot(VehicleWeaponsInventory[vehicleid][listitem][ftwWeaponId])))
+					{
+						return SendError(playerid, "Ðiame slote ginklà jau turi.");
+					}
+					
 					for(new perm = 0; perm < 3; perm++)
 					{
 						if(VehicleWeaponsInventory[vehicleid][listitem][ftwPermission][perm] != 0)
