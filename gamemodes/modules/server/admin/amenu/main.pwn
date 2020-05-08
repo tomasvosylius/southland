@@ -36,11 +36,11 @@ stock AMenu_Main(playerid)
             dialog_Row("Serverio áëjimai/iðëjimai")            return AMenu_Enters_Main(playerid);
             dialog_Row("Bankomatai")                           return AMenu_ATM_Main(playerid);
             dialog_Row("Ikonos þemëlapyje")                    return AMenu_Icons_Main(playerid);
+            dialog_Row("Transporto priemonës")                 return AMenu_Vehicles_Main(playerid);
             // dialog_Row("Namai")                                return AMenu_Houses_Main(playerid);
             // dialog_Row("Verslai")                              return AMenu_Business_Main(playerid);
             // dialog_Row("Garaþai")                              return AMenu_Garages_Main(playerid);
             // dialog_Row("Tr. priemoniø salonai")                return AMenu_CarShop_Main(playerid);
-            // dialog_Row("Transporto priemonës")                 return AMenu_Vehicles_Main(playerid);
             // dialog_Row("Frakcijos")                            return AMenu_Factions_Main(playerid);
             // dialog_Row("Parduodamos tr. priemonës frakcijoms") return AMenu_FacCars_Main(playerid);
             // dialog_Row("Aikðtelës")                            return AMenu_Parkings_Main(playerid);

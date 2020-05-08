@@ -359,7 +359,7 @@ native gpci(playerid, serial[], len);
 #define DIALOG_HM_DUBKEYS_ALL 			141
 #define DIALOG_HM_DUBKEY_EDIT_MAIN 		142
 #define DIALOG_HM_UPDATES_MAIN 			143
-#define DIALOG_AM_VEHICLES_MAIN 		144
+
 #define DIALOG_AFURNITURE_MAIN 			145
 #define DIALOG_HM_SAFE_MAIN  			146
 #define DIALOG_HM_SAFE_DEPOSIT 			147
@@ -379,17 +379,13 @@ native gpci(playerid, serial[], len);
 #define DIALOG_AM_BUSINESS_EDIT_LEVEL 	161
 #define DIALOG_BM_WARES_ORDER 			162
 #define DIALOG_BM_WARES_ORDER_TYPE 		163
-#define DIALOG_AM_VEHICLE_ADD 			164
-#define DIALOG_AM_VEHICLE_EDIT_MODEL 	165
-#define DIALOG_AM_VEHICLE_EDIT_COLOR 	166
-#define DIALOG_AM_VEHICLE_EDIT_FACTION 	167
-#define DIALOG_AM_VEHICLE_EDIT_JOB 		168
+
 #define DIALOG_BM_BUDGET_MAIN 			169
 #define DIALOG_BM_BUDGET_DEPOSIT 		170
 #define DIALOG_BM_BUDGET_WITHDRAW 		171
 #define DIALOG_AM_BUSINESS_LEVELS_MAIN 	172
 #define DIALOG_AM_BUSINESS_LEVEL_EDIT 	173
-#define DIALOG_AM_VEHICLE_RANK			174
+
 #define DIALOG_AM_FACTION_MAIN 			176
 #define DIALOG_AM_INTERIOR_ADD 			177
 #define DIALOG_AM_INTERIOR_EDIT 		178
@@ -2221,6 +2217,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\server\admin\amenu/enters.pwn"
 #include "modules\server\admin\amenu/atm.pwn"
 #include "modules\server\admin\amenu/icons.pwn"
+#include "modules\server\admin\amenu/vehicles.pwn"
 
 // Jobs
 #include "modules\server\jobs/thief.pwn"
@@ -3649,7 +3646,10 @@ public OnVehicleSpawn(vehicleid)
 	}
 	if(IsVehicleServer(vehicleid))
 	{
+		Vehicle_ResetTrunkWeapons(vehicleid);
 		PutFactionWeaponsInVehicle(vehicleid);
+		Vehicle_SetServerNumberPlate(vehicleid);
+
 		VehicleInfo[vehicleid][vFuel] = VehicleFuelCapacityList[model-400];
 
 		IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]) && DestroyDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]);
@@ -15109,381 +15109,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			else ShowPlayerAdminMenu(playerid);
 		}
-		case DIALOG_AM_VEHICLE_ADD:
-		{
-			if(response)
-			{
-				new model;
-				if(sscanf(inputtext,"d",model) || model < 400 || model > 612) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 0, "");
-				new Float:x, Float:a, Float:z, Float:y;
-				GetPlayerPos(playerid, x, y, z);
-				GetPlayerFacingAngle(playerid, a);
-				new vehicleid = AddServerVehicle(model, -1, -1, playerid, x, y, z, a, 1, 1, 0, 0, -1, .added_by_admin = true, .add_to_mysql = true);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Sukure automobili','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], model);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-		}
-		case DIALOG_AM_VEHICLE_EDIT_MODEL:
-		{
-			if(response)
-			{
-				new model,
-					oldvehicleid = tmpIter[playerid],
-					vehicleid = INVALID_VEHICLE_ID;
-				if(sscanf(inputtext,"d",model) || model < 400 || model > 612) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 2, "");
-				
-				new Float:x, Float:y, Float:z, Float:a,
-					col1, col2;
-
-				GetVehiclePos(oldvehicleid, x, y, z);
-				GetVehicleZAngle(oldvehicleid, a);
-				GetVehicleColor(oldvehicleid, col1, col2);
-
-
-				vehicleid = CreateVehicle(model, x, y, z, a, col1, col2, VehicleInfo[oldvehicleid][vRespawnTime], VehicleInfo[oldvehicleid][vAddSiren]);
-
-				VehicleInfo[vehicleid] = VehicleInfo[oldvehicleid];
-				SaveServerVehicleIntEx(vehicleid, "Model", model);
-
-				DestroyVehicle(oldvehicleid);
-				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-				
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite automobilio modeli','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], model);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-		}
-		case DIALOG_AM_VEHICLE_EDIT_COLOR:
-		{
-			if(response)
-			{
-				new color1, color2, vehicleid = tmpIter[playerid];
-				if(sscanf(inputtext,"dd",color1,color2)) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 3, "");
-				ChangeVehicleColor(vehicleid, color1, color2);
-				if(VehicleInfo[vehicleid][vOwner] <= 0)
-				{
-					SaveServerVehicleIntEx(vehicleid, "Color1", color1);
-					SaveServerVehicleIntEx(vehicleid, "Color2", color2);
-				}
-				else
-				{
-					SaveVehicleIntEx(vehicleid, "Color1", color1);
-					SaveVehicleIntEx(vehicleid, "Color2", color2);
-				}
-				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite automobilio spalva','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], color1);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-		}
-		case DIALOG_AM_VEHICLE_EDIT_JOB:
-		{
-			if(response)
-			{
-				new jobid, vehicleid = tmpIter[playerid], numbers[17];
-				if(sscanf(inputtext,"d",jobid)) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 5, "");
-				VehicleInfo[vehicleid][vRequiredLevel] = 0;
-				VehicleInfo[vehicleid][vJob] = jobid;
-				VehicleInfo[vehicleid][vOwner] = 0;
-				VehicleInfo[vehicleid][vFaction] = 0;
-				format(numbers, sizeof numbers, ""#DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vJob], VehicleInfo[vehicleid][vId]);
-				format(VehicleInfo[vehicleid][vNumbers], 10, numbers);
-				SetVehicleNumberPlate(vehicleid, numbers);
-				SaveServerVehicleIntEx(vehicleid, "JobId", jobid);
-				MsgSuccess(playerid, "TRANSPORTAS", "Tr. priemonë priskirta darbui, kurio ID: %d.", jobid);
-				SetVehicleToRespawn(vehicleid);
-				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite automobilio darba','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vJob]);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-		}
-		case DIALOG_AM_VEHICLE_EDIT_FACTION:
-		{
-			if(response)
-			{
-				new factionid, vehicleid = tmpIter[playerid], numbers[17];
-				if(sscanf(inputtext,"d",factionid)) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 4, "");
-				
-				// Reset faction
-				VehicleInfo[vehicleid][vRequiredLevel] = VehicleInfo[vehicleid][vJob] = VehicleInfo[vehicleid][vOwner] = 0;
-				VehicleInfo[vehicleid][vFaction] = factionid;
-
-				SendFormat(playerid, -1, "%d %d", factionid, vehicleid);
-				format(numbers, sizeof numbers, ""#DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX"%d%d",
-					VehicleInfo[vehicleid][vFaction], VehicleInfo[vehicleid][vId]);
-
-				format(VehicleInfo[vehicleid][vNumbers], 10, numbers);
-				SetVehicleNumberPlate(vehicleid, numbers);
-				SaveServerVehicleIntEx(vehicleid, "FactionId", factionid);
-			
-				MsgSuccess(playerid, "TRANSPORTAS", "Tr. priemonë priskirta frakcijai, kurios MySQL numeris: %d.", factionid);
-				
-				Vehicle_ResetTrunkWeapons(playerid);
-
-				SetVehicleToRespawn(vehicleid);
-				// OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite automobilio frakcija','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vFaction]);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-		}
-		case DIALOG_AM_VEHICLE_RANK:
-		{
-			if(response)
-			{
-				new rank,
-					vehicleid = tmpIter[playerid];
-				if(sscanf(inputtext,"d",rank)) return OnDialogResponse(playerid, DIALOG_AM_VEHICLES_MAIN, 1, 6, "");
-				VehicleInfo[vehicleid][vRequiredLevel] = rank;
-				SaveServerVehicleIntEx(vehicleid, "RequiredLevel", rank);
-				MsgSuccess(playerid, "TRANSPORTAS", "Reikalingas lygis sëkmingai iðsaugotas.");
-				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite automobilio ranka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId], rank);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-		}
-		case DIALOG_AM_VEHICLES_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// prideti nauja
-						if(HaveAdminPermission(playerid, "CreateNewVehicle"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_VEHICLE_ADD, DIALOG_STYLE_INPUT, "Tr. priemonës", "{FFFFFF}Áveskite tr. priemonës modelá.\n{BABABA}(wiki.sa-mp.com/wiki/Vehicle_Model_ID_List)", "Tæsti", "Atðaukti");
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-					}
-					case 2:
-					{
-						// keisti modeli
-						if(HaveAdminPermission(playerid, "EditVehicleModel"))
-						{
-							new vehicleid;
-							if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID || (IsPlayerInAnyVehicle(playerid) && (vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID))
-							{
-								SendFormat(playerid, -1, "%d vehicleid", vehicleid);
-								tmpIter[playerid] = vehicleid;
-								ShowPlayerDialog(playerid, DIALOG_AM_VEHICLE_EDIT_MODEL, DIALOG_STYLE_INPUT, "Tr. priemonës redagavimas", "{FFFFFF}Áveskite naujà tr. priemonës modelá.\n{BABABA}(wiki.sa-mp.com/wiki/Vehicle_Model_ID_List)", "Tæsti", "Atðaukti");
-							}
-							else
-							{
-								InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
-								return OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-							}
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 3:
-					{
-						// keisti spalva
-						if(HaveAdminPermission(playerid, "EditVehicleColor"))
-						{
-							new vehicleid;
-							if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID || (IsPlayerInAnyVehicle(playerid) && (vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID))
-							{
-								tmpIter[playerid] = vehicleid;
-								ShowPlayerDialog(playerid, DIALOG_AM_VEHICLE_EDIT_COLOR, DIALOG_STYLE_INPUT, "Tr. priemonës redagavimas", "{FFFFFF}Áveskite naujas tr. priemonës spalvas (pvz. 0 51)", "Tæsti", "Atðaukti");
-							}
-							else
-							{
-								InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
-								return OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-							}
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 4:
-					{
-						// frakcija
-						if(HaveAdminPermission(playerid, "EditVehicleFaction"))
-						{
-							new vehicleid;
-							if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID || (IsPlayerInAnyVehicle(playerid) && (vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID))
-							{
-								tmpIter[playerid] = vehicleid;
-								new string[512];
-								format(string, sizeof string, "%s{FFFFFF}Frakcijø sàraðas su numeriais:\n{0083EF}- -2. Nuoma\n- -1. Vairavimo mokykla\n- 0. Jokia\n");
-								foreach(new factionid : Faction)
-								{
-									format(string, sizeof string, "%s- %d. %s\n", string, FactionInfo[factionid][fId], FactionInfo[factionid][fName]);
-								}
-								strcat(string, "{BABABA}Áveskite norimos frakcijos nurodytà numerá.\nNorëdami paðalinti tr. priemonës frakcijà, áveskite 0\nPriskiriant tr. priemonæ frakcijai, ji bus paðalinta ið darbo.");
-								ShowPlayerDialog(playerid, DIALOG_AM_VEHICLE_EDIT_FACTION, DIALOG_STYLE_INPUT, "Tr. priemonës redagavimas", string, "Tæsti", "Atðaukti");
-							}
-							else
-							{
-								InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
-								return OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-							}
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 5:
-					{
-						// darbas
-						if(HaveAdminPermission(playerid, "EditVehicleJob"))
-						{
-							new vehicleid;
-							if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID || (IsPlayerInAnyVehicle(playerid) && (vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID))
-							{
-								tmpIter[playerid] = vehicleid;
-								new string[512];
-								format(string, sizeof string, "%s{FFFFFF}Darbø sàraðas su numeriais:\n{0083EF}- 0. Joks\n");
-								for(new i = 0; i < sizeof Jobs; i++)
-								{
-									format(string, sizeof string, "%s- %d. %s\n", string, Jobs[i][jobId], Jobs[i][jobName]);
-								}
-								strcat(string, "{BABABA}Áveskite norimo darbo nurodytà numerá.\nNorëdami paðalinti tr. priemonës darbà, áveskite 0\nPriskiriant tr. priemonæ darbui, ji bus paðalinta ið frakcijos.");
-								ShowPlayerDialog(playerid, DIALOG_AM_VEHICLE_EDIT_JOB, DIALOG_STYLE_INPUT, "Tr. priemonës redagavimas", string, "Tæsti", "Atðaukti");
-							}
-							else
-							{
-								InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
-								return OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-							}
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 6:
-					{
-						// minimalus rangas/lygis frakcijos
-						if(HaveAdminPermission(playerid, "EditVehicleJob") || HaveAdminPermission(playerid, "EditVehicleFaction"))
-						{
-							new vehicleid;
-							if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID || (IsPlayerInAnyVehicle(playerid) && (vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID))
-							{
-								tmpIter[playerid] = vehicleid;
-								if(VehicleInfo[vehicleid][vJob] == 0 && VehicleInfo[vehicleid][vFaction] == 0)
-								{
-									// nenustatytas darbas, neleidziam.
-									SendWarning(playerid, "Tr. priemonë neturi nustatyto darbo arba frakcijos.");
-									OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-								}
-								else
-								{
-									ShowPlayerDialog(playerid, DIALOG_AM_VEHICLE_RANK, DIALOG_STYLE_INPUT, "Tr. priemonës redagavimas", "{FFFFFF}Áveskite minimalø reikalingà darbo lygá arba frakcijos rangà.", "Keisti", "Atðaukti");
-								}
-							}
-							else
-							{
-								InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
-								return OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-							}
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 7:
-					{
-						// save position
-						if(HaveAdminPermission(playerid, "ChangeVehiclePosition"))
-						{
-							new vehicleid;
-							if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID || (IsPlayerInAnyVehicle(playerid) && (vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID))
-							{
-								tmpIter[playerid] = vehicleid;
-								new Float:x, Float:y, Float:z, Float:a, model,
-									newvehicleid,
-									col1, col2;
-
-								model = GetVehicleModel(vehicleid);
-								GetVehiclePos(vehicleid, x, y, z);
-								GetVehicleZAngle(vehicleid, a);
-								GetVehicleColor(vehicleid, col1, col2);
-
-								SaveServerVehicleFloatEx(vehicleid, "X", x);
-								SaveServerVehicleFloatEx(vehicleid, "Y", y);
-								SaveServerVehicleFloatEx(vehicleid, "Z", z);
-								SaveServerVehicleFloatEx(vehicleid, "A", a);
-								
-								newvehicleid = CreateVehicle(model, x, y, z, a, col1, col2, VehicleInfo[vehicleid][vRespawnTime], VehicleInfo[vehicleid][vAddSiren]);
-								VehicleInfo[newvehicleid] = VehicleInfo[vehicleid];
-
-								DestroyVehicle(vehicleid);
-								MsgSuccess(playerid, "TRANSPORTAS", "Vieta sëkmingai iðsaugota.");
-
-								log_init(true);
-								log_set_table("logs_admins");
-								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-								log_set_values("'%d','%e','(AM) Pakeite automobilio vieta','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId]);
-								log_commit();
-							}
-							else
-							{
-								InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
-								return OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-							}
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 8:
-					{
-						// istrinti
-						if(HaveAdminPermission(playerid, "DeleteVehicle"))
-						{
-							new vehicleid;
-							if((vehicleid = GetClosestVehicle(playerid, 5.0)) != INVALID_VEHICLE_ID || (IsPlayerInAnyVehicle(playerid) && (vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID))
-							{
-								if(VehicleInfo[vehicleid][vOwner] > 0)
-								{
-									SendWarning(playerid, "Tr. priemonë yra privati.");
-									return ShowPlayerAdminMenu(playerid);
-								}
-								tmpIter[playerid] = vehicleid;
-								new string[126];
-								mysql_format(chandler, string, sizeof string, "DELETE IGNORE FROM `vehicles_server` WHERE id = '%d'", VehicleInfo[vehicleid][vId]);
-								mysql_fquery(chandler, string, "VehicleDeletedEx");
-								DestroyVehicle(vehicleid);
-								OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-								MsgSuccess(playerid, "TRANSPORTAS", "Sëkmingai iðtrynëte tr. priemonæ.");
-								ShowPlayerAdminMenu(playerid);
-								log_init(true);
-								log_set_table("logs_admins");
-								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-								log_set_values("'%d','%e','(AM) Istryne automobili','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[vehicleid][vId]);
-								log_commit();
-							}
-							else
-							{
-								InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
-								return OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 7, "");
-							}
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
+		
 		case DIALOG_AM_PAYPHONE_EDIT:
 		{
 			if(response)
@@ -15655,14 +15281,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// tr. priemoniu salonai
 						ShowPlayerDialog(playerid, DIALOG_AM_SALONS_MAIN, DIALOG_STYLE_LIST, "Tr. priemoniø salonai", "Kurti naujà\nPerþiûrëti visus", "Tæsti", "Atðaukti");
 					}
-					case 7:
-					{
-						// tr. priemones
-						new string[512];
-						strcat(string, "Pridëti naujà\n{EDEDED}[Artimiausio automobilio redagavimas]:\n{FFFFFF}Keisti modelá\nKeisti spalvà\nNustatyti frakcijà\nNustatyti darbà\nNustatyti minimalø darbo/frakcijos lygá\n");
-						strcat(string, "Iðsaugoti pozicijà\n{C60000}Iðtrinti");
-						ShowPlayerDialog(playerid, DIALOG_AM_VEHICLES_MAIN, DIALOG_STYLE_LIST, "Tr. priemonës", string, "Tæsti", "Atðaukti");
-					}
+					
 					case 8:
 					{
 						// frakcijos
@@ -17720,9 +17339,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							VehicleInfo[newvehicleid][vUnitLabel] = CreateDynamic3DTextLabel(string, 0xFFFFFFFF, 0.425*mx, (-0.45*my), (-0.1*mz), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
 						}
 
-						format(string, 12, ""#DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vFaction], VehicleInfo[vehicleid][vId]);
-						format(VehicleInfo[vehicleid][vNumbers], 10, string);
-						SetVehicleNumberPlate(vehicleid, string);
+						Vehicle_SetServerNumberPlate(vehicleid);
 
 						mysql_format(chandler, string, sizeof string, "UPDATE `vehicles_server` SET X='%f',Y='%f',Z='%f',A='%f' WHERE id = '%d'", x, y, z, a, VehicleInfo[newvehicleid][vId]);
 						mysql_fquery(chandler, string, "FactionVehiclePosUpdate");
@@ -22369,8 +21986,8 @@ stock AddServerVehicle(model, factionid, jobid, addedby, Float:x, Float:y, Float
 	{
 		if(FactionInfo[factionid][fType] == FACTION_TYPE_POLICE) addsiren = 1;
 	}
-	new vehicleid = CreateVehicle(model, x, y, z, a, color1, color2, respawntime, addsiren),
-		string[256];
+	new vehicleid = CreateVehicle(model, x, y, z, a, color1, color2, respawntime, addsiren);
+
 	if(factionid != -1) VehicleInfo[vehicleid][vFaction] = FactionInfo[factionid][fId];
 	if(jobid != -1) VehicleInfo[vehicleid][vJob] = Jobs[jobid][jobId];
 	VehicleInfo[vehicleid][vFuel] = float(VehicleFuelCapacityList[model-400]);
@@ -22381,32 +21998,32 @@ stock AddServerVehicle(model, factionid, jobid, addedby, Float:x, Float:y, Float
 	PutFactionWeaponsInVehicle(vehicleid);
 	if(add_to_mysql)
 	{
-		mysql_format(chandler, string, sizeof string, "INSERT INTO `vehicles_server` (`FactionId`, `JobId`, `Added`, `AddedType`, `Model`, `Price`, `X`, `Y`, `Z`, `A`, `Color1`, `Color2`, `AddSiren`) VALUES ('%d','%d','%d','%d','%d','%d','%f','%f','%f','%f','%d','%d','%d')", factionid == -1 ? 0 : FactionInfo[factionid][fId], jobid == -1 ? 0 : Jobs[jobid][jobId], PlayerInfo[addedby][pId], _:added_by_admin, model, price, x, y, z, a, color1, color2, addsiren);
-		mysql_tquery(chandler, string, "FactionVehicleAdd", "d", vehicleid);
+		inline insertCar()
+		{
+			#if SERVER_DEBUG_LEVEL >= 3
+				printf("[debug] FactionVehicleAdd(%d)", cache_insert_id());
+			#endif
+			
+			VehicleInfo[vehicleid][vId] = cache_insert_id();
+			Vehicle_SetServerNumberPlate(vehicleid);
+		}
+
+		mysql_tquery_inline(chandler, using inline insertCar, "\
+			INSERT INTO `vehicles_server` \
+			(`FactionId`, `JobId`, `Added`, `AddedType`, `Model`, `Price`, `X`, `Y`, `Z`, `A`, `Color1`, `Color2`, `AddSiren`) \
+			VALUES \
+			('%d','%d','%d','%d','%d','%d','%f','%f','%f','%f','%d','%d','%d')",
+			factionid == -1 ? 0 : FactionInfo[factionid][fId], jobid == -1 ? 0 : Jobs[jobid][jobId],
+			PlayerInfo[addedby][pId],
+			_:added_by_admin,
+			model,
+			price,
+			x, y, z, a,
+			color1, color2,
+			addsiren
+		);
 	}
 	return vehicleid;
-}
-forward FactionVehicleAdd(vehicleid);
-public FactionVehicleAdd(vehicleid)
-{
-	#if SERVER_DEBUG_LEVEL >= 3
-		printf("[debug] FactionVehicleAdd(%d)", cache_insert_id());
-	#endif
-	new numbers[12];
-	VehicleInfo[vehicleid][vId] = cache_insert_id();
-	if(VehicleInfo[vehicleid][vFaction] != 0)
-	{
-		format(numbers, sizeof numbers, ""#DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vFaction], VehicleInfo[vehicleid][vId]);
-		format(VehicleInfo[vehicleid][vNumbers], 10, numbers);
-	}
-	else if(VehicleInfo[vehicleid][vJob] != 0)
-	{
-		format(numbers, sizeof numbers, ""#DEFAULT_JOB_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vFaction], VehicleInfo[vehicleid][vId]);
-		format(VehicleInfo[vehicleid][vNumbers], 10, numbers);
-	}
-
-	SetVehicleNumberPlate(vehicleid, numbers);
-	return 1;
 }
 
 stock ShowPlayerMechTune(playerid)
@@ -26599,22 +26216,28 @@ public ServerVehiclesLoad()
 		VehicleInfo[vehicleid][vEngineStatus] =
 		VehicleInfo[vehicleid][vBatteryStatus] = 100.0;
 		
-		new numbers[10];
-		if(VehicleInfo[vehicleid][vJob] != 0)
-		{
-			format(numbers, sizeof numbers, ""#DEFAULT_JOB_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vJob], VehicleInfo[vehicleid][vId]);
-		}
-		else if(VehicleInfo[vehicleid][vFaction] != 0)
-		{
-			if(VehicleInfo[vehicleid][vFaction] == -2) format(numbers, sizeof numbers, "RENT");
-			else if(VehicleInfo[vehicleid][vFaction] == -1) format(numbers, sizeof numbers, "DMV");
-
-			else format(numbers, sizeof numbers, ""#DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vFaction], VehicleInfo[vehicleid][vId]);
-		}
-		format(VehicleInfo[vehicleid][vNumbers], 10, numbers);
-		SetVehicleNumberPlate(vehicleid, numbers);
+		Vehicle_SetServerNumberPlate(vehicleid);
 	}
 	printf("[load] %d serverio tr. priemoniu", rows);
+	return 1;
+}
+
+stock Vehicle_SetServerNumberPlate(vehicleid)
+{
+	new numbers[10];
+	if(VehicleInfo[vehicleid][vJob] != 0)
+	{
+		format(numbers, sizeof numbers, ""#DEFAULT_JOB_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vJob], VehicleInfo[vehicleid][vId]);
+	}
+	else if(VehicleInfo[vehicleid][vFaction] != 0)
+	{
+		if(VehicleInfo[vehicleid][vFaction] == -2) format(numbers, sizeof numbers, "RENT");
+		else if(VehicleInfo[vehicleid][vFaction] == -1) format(numbers, sizeof numbers, "DMV");
+
+		else format(numbers, sizeof numbers, ""#DEFAULT_FACTION_VEHICLE_NUMBER_PREFIX"%d%d", VehicleInfo[vehicleid][vFaction], VehicleInfo[vehicleid][vId]);
+	}
+	format(VehicleInfo[vehicleid][vNumbers], 10, numbers);		
+	SetVehicleNumberPlate(vehicleid, numbers);
 	return 1;
 }
 
@@ -27503,6 +27126,7 @@ stock GetClosestVehicle(playerid, Float:distance = 5.0)
 		last_vehicle = INVALID_VEHICLE_ID;
 
 	GetPlayerPos(playerid, x, y, z);
+	if(IsPlayerInAnyVehicle(playerid)) return GetPlayerVehicleID(playerid);
 
 	foreach(new vehicleid : Vehicle)
 	{
