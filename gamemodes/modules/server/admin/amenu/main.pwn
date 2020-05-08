@@ -44,9 +44,9 @@ stock AMenu_Main(playerid)
             // dialog_Row("Frakcijos")                            return AMenu_Factions_Main(playerid);
             // dialog_Row("Parduodamos tr. priemonës frakcijoms") return AMenu_FacCars_Main(playerid);
             // dialog_Row("Aikðtelës")                            return AMenu_Parkings_Main(playerid);
-            // dialog_Row("Grupës")                               return AMenu_Groups_Main(playerid);
+            dialog_Row("Grupës")                               return AMenu_Groups_Main(playerid);
             // dialog_Row("Interjerø meniu")                      return AMenu_Interiors_Main(playerid);
-            // dialog_Row("Taksofonai")                           return AMenu_Taxophones_Main(playerid);
+            dialog_Row("Taksofonai")                           return AMenu_Payphones_Main(playerid);
             // dialog_Row("Juodoji rinka")                        return AMenu_BlackMarket_Main(playerid);
         }
     }

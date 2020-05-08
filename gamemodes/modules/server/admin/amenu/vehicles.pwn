@@ -195,7 +195,10 @@ static _Vehicles_ChangeFaction(playerid, vehicleid, error[] = "")
     }
 
     dialog_Clear();
-    dialog_AddLine("{FFFFFF}Frakcijø sàraðas su numeriais:\n{0083EF}- -2. Nuoma\n- -1. Vairavimo mokykla\n- 0. Jokia\n");
+    dialog_AddLine("{FFFFFF}Frakcijø sàraðas su numeriais:");
+    dialog_AddLine("{0083EF}- -2. Nuoma");
+    dialog_AddLine("- -1. Vairavimo mokykla");
+    dialog_AddLine("- 0. Jokia");
 
     foreach(new factionid : Faction)
     {

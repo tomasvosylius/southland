@@ -389,13 +389,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_AM_FACTION_MAIN 			176
 #define DIALOG_AM_INTERIOR_ADD 			177
 #define DIALOG_AM_INTERIOR_EDIT 		178
-#define DIALOG_AM_GROUPS_MAIN 			179
-#define DIALOG_AM_GROUP_ADD 			180
-#define DIALOG_AM_GROUPS_ALL 			181
-#define DIALOG_AM_GROUP_EDIT_MAIN 		182
-#define DIALOG_AM_GROUP_EDIT_PRIVILEGES 183
-#define DIALOG_AM_GROUP_EDIT_COMMANDS 	184
-#define DIALOG_AM_GROUP_EDIT_NAME 		185
 #define DIALOG_AM_ICONS_MAIN 			186
 #define DIALOG_AM_ICONS_ALL 			187
 #define DIALOG_AM_ICON_EDIT_MAIN 		188
@@ -411,9 +404,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_AM_FACTION_RANK_EDIT_SALARY 	198
 #define DIALOG_AM_FACTION_RANK_ADD 			199
 #define DIALOG_AM_SIGNAL_MAIN 				200
-#define DIALOG_AM_PAYPHONE_MAIN 			201
-#define DIALOG_AM_PAYPHONES_ALL 			202
-#define DIALOG_AM_PAYPHONE_EDIT 			203
 #define DIALOG_AM_FACTION_RANK_EDIT_MAIN 	204
 #define DIALOG_AM_FACTION_EDIT_TYPE 		205
 #define DIALOG_PHONE_CONTACTS_MAIN 			206
@@ -2218,6 +2208,8 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\server\admin\amenu/atm.pwn"
 #include "modules\server\admin\amenu/icons.pwn"
 #include "modules\server\admin\amenu/vehicles.pwn"
+#include "modules\server\admin\amenu/payphones.pwn"
+#include "modules\server\admin\amenu/groups.pwn"
 
 // Jobs
 #include "modules\server\jobs/thief.pwn"
@@ -5217,27 +5209,6 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	{
 		switch(tmpEditing_Component_DMV[playerid])
 		{
-			case EDITING_TYPE_DYNAMIC_PAYPHONE:
-			{
-				new pp = tmpSelected[playerid];
-				if(IsValidDynamicObject(PayPhoneInfo[pp][payPhoneObject]))
-				{
-					SetDynamicObjectPos(PayPhoneInfo[pp][payPhoneObject], x, y, z);
-					SetDynamicObjectRot(PayPhoneInfo[pp][payPhoneObject], rx, ry, rz);
-					PayPhoneInfo[pp][payPhoneX] = x;
-					PayPhoneInfo[pp][payPhoneY] = y;
-					PayPhoneInfo[pp][payPhoneZ] = z;
-					PayPhoneInfo[pp][payPhoneRX] = rx;
-					PayPhoneInfo[pp][payPhoneRY] = ry;
-					PayPhoneInfo[pp][payPhoneRZ] = rz;
-					tmpEditing_Component_DMV[playerid] = 0;
-					new string[186];
-					mysql_format(chandler, string, sizeof string, "UPDATE `payphones_data` SET `X` = '%0.3f', `Y` = '%0.3f', `Z` = '%0.3f', `RX` = '%0.3f', `RY` = '%0.3f', `RZ` = '%0.3f' WHERE `id` = '%d'", x, y, z, rx, ry, rz, PayPhoneInfo[pp][payPhoneId]);
-					mysql_fquery(chandler, string, "PayPhoneUpdate");
-					FixPayPhoneLabel(pp);
-					ShowPlayerAdminMenu(playerid);
-				}
-			}
 			case EDITING_TYPE_DYNAMIC_FURNITURE:
 			{
 				// furniture
@@ -5337,9 +5308,8 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	{
 		SetDynamicObjectPos(objectid, oldx, oldy, oldz);
 		SetDynamicObjectRot(objectid, oldrx, oldry, oldrz);
-		if(tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_PAYPHONE) OnDialogResponse(playerid, DIALOG_AM_PAYPHONE_MAIN, 1, 0, "");
+
 		if(tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_FURNITURE) OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-		if(tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_ATM) ShowPlayerAdminMenu(playerid);
 		tmpEditing_Component_DMV[playerid] = 0;
 	}
 	return 1;
@@ -15116,151 +15086,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			else ShowPlayerAdminMenu(playerid);
 		}
 		
-		case DIALOG_AM_PAYPHONE_EDIT:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						if(HaveAdminPermission(playerid, "ChangePayPhonePosition"))
-						{
-							// vieta
-							new selected = tmpSelected[playerid],
-								Float:x, Float:y, Float:z;
-							GetPlayerPos(playerid, x, y, z);
-							SetDynamicObjectPos(PayPhoneInfo[selected][payPhoneObject], x+1, y+1, z);
-							Streamer_Update(playerid);
-							PayPhoneInfo[selected][payPhoneX] = x+1,
-							PayPhoneInfo[selected][payPhoneY] = y+1,
-							PayPhoneInfo[selected][payPhoneZ] = z;
-							FixPayPhoneLabel(selected);
-							tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_PAYPHONE;
-							EditDynamicObject(playerid, PayPhoneInfo[selected][payPhoneObject]);
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						// teleport
-						new selected = tmpSelected[playerid];
-						SetPlayerPos(playerid, PayPhoneInfo[selected][payPhoneX], PayPhoneInfo[selected][payPhoneY], PayPhoneInfo[selected][payPhoneZ]);
-						OnDialogResponse(playerid, DIALOG_AM_PAYPHONE_MAIN, 1, 0, "");
-					}
-					case 2:
-					{
-						if(HaveAdminPermission(playerid, "DeletePayPhone"))
-						{
-							// istrinti
-							new selected = tmpSelected[playerid],
-								__reset_PayPhone[E_PAYPHONE_DATA],
-								string[126];
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Istryne taksofona','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PayPhoneInfo[selected][payPhoneId]);
-							log_commit();
-							mysql_format(chandler, string, sizeof string, "DELETE FROM `payphones_data` WHERE id = '%d'", PayPhoneInfo[selected][payPhoneId]);
-							mysql_fquery(chandler, string, "PayPhoneDeleted");
-							if(IsValidDynamicObject(PayPhoneInfo[selected][payPhoneObject])) DestroyDynamicObject(PayPhoneInfo[selected][payPhoneObject], "payphone", "admin_delete");
-							if(IsValidDynamic3DTextLabel(PayPhoneInfo[selected][payPhoneLabel])) DestroyDynamic3DTextLabel(PayPhoneInfo[selected][payPhoneLabel]);
-							PayPhoneInfo[selected] = __reset_PayPhone;
-							PayPhoneInfo[selected][payPhoneLabel] = INVALID_3DTEXT_ID;
-							PayPhoneInfo[selected][payPhoneObject] = INVALID_OBJECT_ID;
-							Iter_Remove(PayPhone, selected);
-							MsgSuccess(playerid, "TAKSOFONAI", "Taksofonas iðtrintas.");
-							OnDialogResponse(playerid, DIALOG_AM_PAYPHONE_MAIN, 1, 0, "");
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_PAYPHONE_MAIN, 1, 0, "");
-		}
-		case DIALOG_AM_PAYPHONES_ALL:
-		{
-			if(response)
-			{
-				new selected;
-				GetSortedAsForeach(PayPhone, listitem, selected, PayPhoneInfo[loopindex][payPhoneId] != 0);
-				tmpSelected[playerid] = selected;
-				ShowPlayerDialog(playerid, DIALOG_AM_PAYPHONE_EDIT, DIALOG_STYLE_LIST, "Taksofonai", "Keisti pozicijà\nTeleportuotis prie taksofono\n{C60000}Iðtrinti", "Tæsti", "Atðaukti");
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 14, "");
-		}
-		case DIALOG_AM_PAYPHONE_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// visi
-						if(HaveAdminPermission(playerid, "EditPayPhones"))
-						{
-							new string[512] = "{BABABA}Nr.\t{BABABA}MySQL ID\t{BABABA}Vieta\n",
-								line[64],
-								i,
-								zone[28];
-							foreach(new pp : PayPhone)
-							{
-								if(PayPhoneInfo[pp][payPhoneId] != 0)
-								{
-									i++;
-									GetCoords2DZone(zone, 28, PayPhoneInfo[pp][payPhoneX], PayPhoneInfo[pp][payPhoneY]);
-									format(line, sizeof line, "%d.\t%d\t%s\n", i, PayPhoneInfo[pp][payPhoneId], zone);
-									strcat(string, line);
-								}
-							}
-							if(i == 0) return ShowPlayerAdminMenu(playerid) , SendWarning(playerid, "Nëra taksofonø.");
-							ShowPlayerDialog(playerid, DIALOG_AM_PAYPHONES_ALL, DIALOG_STYLE_TABLIST_HEADERS, "Taksofonai", string, "Tæsti", "Atðaukti");
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						// prideti
-						if(HaveAdminPermission(playerid, "CreateNewPayPhone"))
-						{
-							new itter = Iter_Free(PayPhone);
-							if(itter != MAX_PAYPHONES-1)
-							{
-								new string[256],
-									Float:x,
-									Float:y,
-									Float:z;
-								GetPlayerPos(playerid, x, y, z);
-								mysql_format(chandler, string, sizeof string, "INSERT INTO `payphones_data` (`X`,`Y`,`Z`,`Added`) VALUES ('%f','%f','%f','%d')", x, y, z, PlayerInfo[playerid][pId]);
-								new Cache:result = mysql_query(chandler, string, true);
-								cache_set_active(result);
-								PayPhoneInfo[itter][payPhoneId] = cache_insert_id();
-								cache_delete(result);
-								PayPhoneInfo[itter][payPhoneX] = x+1,
-								PayPhoneInfo[itter][payPhoneY] = y+1,
-								PayPhoneInfo[itter][payPhoneY] = z+1;
-								PayPhoneInfo[itter][payPhoneObject] = CreateDynamicObject(1216, x+1, y+1, z+1, 0.0, 0.0, 0.0, .called = "payphone", .extra = "create");
-								FixPayPhoneLabel(itter);
-								Streamer_Update(playerid);
-								tmpSelected[playerid] = itter;
-								tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_PAYPHONE;
-								EditDynamicObject(playerid, PayPhoneInfo[itter][payPhoneObject]);
-								Iter_Add(PayPhone, itter);
-								MsgSuccess(playerid, "TAKSOFONAI", "Sëkmingai sukûrëte taksofonà, kurio ID: %d.", PayPhoneInfo[itter][payPhoneId]);
-								log_init(true);
-								log_set_table("logs_admins");
-								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-								log_set_values("'%d','%e','(AM) Sukure nauja taksofona','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PayPhoneInfo[itter][payPhoneId]);
-								log_commit();
-							}
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
 		case DIALOG_AM_MAIN:
 		{
 			if(response)
@@ -15303,20 +15128,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// tr. priemoniu aiksteles
 						ShowPlayerDialog(playerid, DIALOG_AM_PARKING_MAIN, DIALOG_STYLE_LIST, "Aikðtelës", "Perþiûrëti visas\nPridëti", "Tæsti", "Atðaukti");
 					}
-					case 11:
-					{
-						// grupes
-						ShowPlayerDialog(playerid, DIALOG_AM_GROUPS_MAIN, DIALOG_STYLE_LIST, "Grupës", "Perþiûrëti visas\nPridëti", "Tæsti", "Atðaukti");
-					}
 					case 13:
 					{
 						// interjeru meniu
 						mysql_tquery(chandler, "SELECT * FROM `interiors` LIMIT 50 OFFSET 0", "InteriorsMenuLoad", "dd", playerid, 0);
-					}
-					case 14:
-					{
-						// taksofonai
-						ShowPlayerDialog(playerid, DIALOG_AM_PAYPHONE_MAIN, DIALOG_STYLE_LIST, "Taksofonai", "Perþiûrëti visus\nPridëti", "Tæsti", "Atðaukti");
 					}
 					case 15:
 					{
@@ -15600,370 +15415,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				tmpSelected[playerid] = listitem;
 				mysql_format(chandler, string, sizeof string, "SELECT * FROM `sell_vehicles_factions` WHERE FactionType = '%d'", listitem);
 				mysql_tquery(chandler, string, "FactionSalonVehiclesLoad", "d", playerid);
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_GROUP_EDIT_PRIVILEGES:
-		{
-			if(response)
-			{
-				if(listitem >= tmpTexture_MarkStart_CP[playerid])
-				{
-					// atgal arba pirmyn
-					new groupid = tmpIter[playerid];
-					if(listitem == tmpTexture_MarkStart_CP[playerid] && tmpPage_Object[playerid] > 0)
-					{
-						// atgal
-						new query[289];
-						mysql_format(chandler, query, sizeof query, "\
-							SELECT `list`.*,(CASE WHEN (SELECT COUNT(*) FROM `groups_permissions` `group` WHERE `group`.`Permission` = `list`.`Permission` AND `group`.`GroupId` = '%d') > 0 THEN 1 ELSE 0 END) as `HavePermission` FROM `groups_permissions_list` `list` LIMIT %d OFFSET %d",
-							GroupsInfo[groupid][groupId],
-							ADMIN_PERMISSIONS_PER_PAGE+1,
-							(tmpPage_Object[playerid]-1)*ADMIN_PERMISSIONS_PER_PAGE);
-						mysql_tquery(chandler, query, "GroupsPermissionsListLoad", "ddd", playerid, GroupsInfo[groupid][groupId], tmpPage_Object[playerid]-1);
-					}
-					else
-					{
-						// kitas 15
-						new query[289];
-						mysql_format(chandler, query, sizeof query, "\
-							SELECT `list`.*,(CASE WHEN (SELECT COUNT(*) FROM `groups_permissions` `group` WHERE `group`.`Permission` = `list`.`Permission` AND `group`.`GroupId` = '%d') > 0 THEN 1 ELSE 0 END) as `HavePermission` FROM `groups_permissions_list` `list` LIMIT %d OFFSET %d",
-							GroupsInfo[groupid][groupId],
-							ADMIN_PERMISSIONS_PER_PAGE+1,
-							(tmpPage_Object[playerid]+1)*ADMIN_PERMISSIONS_PER_PAGE);
-						mysql_tquery(chandler, query, "GroupsPermissionsListLoad", "ddd", playerid, GroupsInfo[groupid][groupId], tmpPage_Object[playerid]+1);
-					}
-				}
-				else
-				{
-					// pasirinko kazkuria
-					new string[96],
-						insert[126],
-						groupid = tmpIter[playerid],
-						permission_name[30];
-					mysql_format(chandler, string, sizeof string, "SELECT `Permission` FROM `groups_permissions_list` LIMIT 1 OFFSET %d", tmpPage_Object[playerid]*ADMIN_PERMISSIONS_PER_PAGE+listitem);
-					new Cache:result = mysql_query(chandler, string, true);
-					cache_set_active(result);
-					cache_get_value_name(0, "Permission", permission_name);
-					cache_delete(result);
-					// tikrinam ar egzistuoja
-					mysql_format(chandler, insert, sizeof insert, "SELECT NULL FROM `groups_permissions` WHERE GroupId = '%d' AND Permission = '%e'", GroupsInfo[groupid][groupId], permission_name);
-					result = mysql_query(chandler, insert, true);
-					cache_set_active(result);
-					if(cache_num_rows())
-					{
-						// then delete
-						mysql_format(chandler, insert, sizeof insert, "DELETE FROM `groups_permissions` WHERE GroupId = '%d' AND Permission = '%e'", GroupsInfo[groupid][groupId], permission_name);
-						mysql_query(chandler, insert, false);
-					}
-					else
-					{
-						// then insert
-						mysql_format(chandler, insert, sizeof insert, "INSERT INTO `groups_permissions` (`GroupId`,`Permission`) VALUES ('%d','%e')", GroupsInfo[groupid][groupId], permission_name);
-						mysql_query(chandler, insert, false); // nedarom threaded, kad nerodytu senos data.
-					}
-					cache_delete(result);
-					// show everything again
-					OnDialogResponse(playerid, DIALOG_AM_GROUP_EDIT_MAIN, 1, 1, "");
-				}
-			}
-			else
-			{
-				tmpTexture_MarkStart_CP[playerid] =
-				tmpPage_Object[playerid] = 0;
-				OnDialogResponse(playerid, DIALOG_AM_GROUPS_ALL, 1, tmpSelected[playerid], "");
-			}
-		}
-		case DIALOG_AM_GROUP_EDIT_NAME:
-		{
-			if(response)
-			{
-				new name[30],
-					string[126],
-					groupid = tmpIter[playerid];
-				if(sscanf(inputtext,"s[30]",name) || strlen(name) > 30) return OnDialogResponse(playerid, DIALOG_AM_GROUP_EDIT_MAIN, 1, 0, "");
-				format(GroupsInfo[groupid][groupName], 30, name);
-				mysql_format(chandler, string, sizeof string, "UPDATE `groups_data` SET Name = '%e' WHERE id = '%d'", name, GroupsInfo[groupid][groupId]);
-				mysql_fquery(chandler, string, "GroupSaved");
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_GROUPS_ALL, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_AM_GROUP_EDIT_COMMANDS:
-		{
-			if(response)
-			{
-				// komanda pasirinko
-				new	name[24],
-					query[116],
-					real,
-					Cache:result,
-					groupid = GroupsInfo[tmpIter[playerid]][groupId],
-					CmdArray:array = PC_GetCommandArray();
-				for(new i = 0, size = PC_GetArraySize(array); i < size; i++)
-				{
-					PC_GetCommandName(array, i, name, sizeof name);
-					if(PC_GetFlags(name) & CMD_TYPE_ADMIN)
-					{
-						if(real == listitem) { break; }
-						real++;
-					}
-				}
-				mysql_format(chandler, query, sizeof query, "SELECT NULL FROM `groups_commands` WHERE GroupId = '%d' AND Command = '%e'", groupid, name);
-				SendFormat(playerid, -1, query);
-				result = mysql_query(chandler, query, true);
-				cache_set_active(result);
-				if(cache_num_rows())
-				{
-					// delete
-					mysql_format(chandler, query, sizeof query, "DELETE FROM `groups_commands` WHERE GroupId = '%d' AND Command = '%e'", groupid, name);
-					mysql_query(chandler, query, false);
-					SendFormat(playerid, -1, query);
-				}
-				else
-				{
-					// insert
-					mysql_format(chandler, query, sizeof query, "INSERT INTO `groups_commands` (`GroupId`,`Command`) VALUES ('%d','%e')", groupid, name);
-					mysql_query(chandler, query, false);
-					SendFormat(playerid, -1, query);
-				}
-				cache_delete(result);
-				OnDialogResponse(playerid, DIALOG_AM_GROUP_EDIT_MAIN, 1, 2, "");
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_GROUPS_ALL, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_AM_GROUP_EDIT_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// pavadinimas
-						ShowPlayerDialog(playerid, DIALOG_AM_GROUP_EDIT_NAME, DIALOG_STYLE_INPUT, "Grupës", "{FFFFFF}Áveskite naujà grupës pavadinimà. (maks. 30 simboliø)", "Tæsti", "Atðaukti");
-					}
-					case 1:
-					{
-						// teises
-						new string[86],
-							Cache:result,
-							groupid = tmpIter[playerid];
-						mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `groups_data` WHERE id = '%d' AND Super = '1'", GroupsInfo[groupid][groupId]);
-						result = mysql_query(chandler, string, true);
-						if(cache_num_rows())
-						{
-							cache_delete(result);
-							SendError(playerid, "Ðios grupës teisiø redaguoti negalima.");
-							return OnDialogResponse(playerid, DIALOG_AM_GROUPS_ALL, 1, tmpSelected[playerid], "");
-						}
-						else
-						{
-							cache_delete(result);
-							if(HaveAdminPermission(playerid, "EditGroupPermissions"))
-							{
-								new query[289];
-								mysql_format(chandler, query, sizeof query, "\
-									SELECT `list`.*,(CASE WHEN (SELECT COUNT(*) FROM `groups_permissions` `group` WHERE `group`.`Permission` = `list`.`Permission` AND `group`.`GroupId` = '%d') > 0 THEN 1 ELSE 0 END) as `HavePermission` FROM `groups_permissions_list` `list` LIMIT %d OFFSET %d",
-									GroupsInfo[groupid][groupId],
-									ADMIN_PERMISSIONS_PER_PAGE+1,
-									tmpPage_Object[playerid]*ADMIN_PERMISSIONS_PER_PAGE);
-								mysql_tquery(chandler, query, "GroupsPermissionsListLoad", "ddd", playerid, GroupsInfo[groupid][groupId], tmpPage_Object[playerid]);
-							}
-							else InfoBox(playerid, IB_NO_PRIVILEGE);
-						}
-					}
-					case 2:
-					{
-						// komandos
-						new check[86],
-							Cache:result;
-						mysql_format(chandler, check, sizeof check, "SELECT NULL FROM `groups_data` WHERE id = '%d' AND Super = '1'", tmpArray[playerid][tmpSelected[playerid]]);
-						result = mysql_query(chandler, check, true);
-						if(cache_num_rows())
-						{
-							cache_delete(result);
-							SendError(playerid, "Ðios grupës komandø redaguoti negalima.");
-							return OnDialogResponse(playerid, DIALOG_AM_GROUPS_ALL, 1, tmpSelected[playerid], "");
-						}
-						else
-						{
-							cache_delete(result);
-							if(HaveAdminPermission(playerid, "EditGroupCommands"))
-							{
-								new string[2565] = "{BABABA}Komanda\t{BABABA}Turi teisæ\n",
-									line[56],
-									name[24],
-									query[116],
-									groupid = tmpIter[playerid],
-									CmdArray:array = PC_GetCommandArray();
-								for(new i = 0, size = PC_GetArraySize(array); i < size; i++)
-								{
-									PC_GetCommandName(array, i, name, sizeof name);
-									if(PC_GetFlags(name) & CMD_TYPE_ADMIN)
-									{
-										mysql_format(chandler, query, sizeof query, "SELECT NULL FROM `groups_commands` WHERE GroupId = '%d' AND Command = '%e'", GroupsInfo[groupid][groupId], name);
-										result = mysql_query(chandler, query, true);
-										format(line, sizeof line, "/%s\t%s\n", name, (cache_num_rows() ? ("+") : (" ")));
-										cache_delete(result);
-										strcat(string, line);
-									}
-								}
-								ShowPlayerDialog(playerid, DIALOG_AM_GROUP_EDIT_COMMANDS, DIALOG_STYLE_TABLIST_HEADERS, "Grupës", string, "Keisti", "Atðaukti");
-							}
-							else return InfoBox(playerid, IB_NO_PRIVILEGE);
-						}
-					}
-
-					case 3:
-					{
-						// istrinti
-						if(HaveAdminPermission(playerid, "DeleteGroup"))
-						{
-							new groupid = tmpIter[playerid],
-								string[500];
-							mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `groups_data` WHERE id = '%d' AND Super = '1'", GroupsInfo[groupid][groupId]);
-							new Cache:result = mysql_query(chandler, string, true);
-							cache_set_active(result);
-							if(cache_num_rows())
-							{
-								cache_delete(result);
-								SendError(playerid, "Ðios grupës iðtrinti negalima.");
-								return OnDialogResponse(playerid, DIALOG_AM_GROUPS_ALL, 1, tmpSelected[playerid], "");
-							}
-							else
-							{
-								log_init(true);
-								log_set_table("logs_admins");
-								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-								log_set_values("'%d','%e','(AM) Istryne grupe','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GroupsInfo[groupid][groupId], GroupsInfo[groupid][groupName]);
-								log_commit();
-
-								new groupSql = GroupsInfo[groupid][groupId];
-
-								
-								mysql_format(chandler, string, sizeof string, "DELETE FROM `groups_data` WHERE id = '%d'", groupSql);
-								mysql_fquery(chandler, string, "GroupDeleted");
-								mysql_format(chandler, string, sizeof string, "DELETE FROM `groups_permissions` WHERE GroupId = '%d'", groupSql);
-								mysql_fquery(chandler, string, "GroupDeleted");
-								mysql_format(chandler, string, sizeof string, "DELETE FROM `groups_commands` WHERE GroupId = '%d'", groupSql);
-								mysql_fquery(chandler, string, "GroupDeleted");
-								mysql_format(chandler, string, sizeof string, "UPDATE `users_data` SET Group1 = '0' WHERE Group1 = '%d'", groupSql);
-								mysql_fquery(chandler, string, "GroupDeleted");
-								mysql_format(chandler, string, sizeof string, "UPDATE `users_data` SET Group2 = '0' WHERE Group2 = '%d'", groupSql);
-								mysql_fquery(chandler, string, "GroupDeleted");
-								mysql_format(chandler, string, sizeof string, "UPDATE `users_data` SET Group3 = '0' WHERE Group3 = '%d'", groupSql);
-								mysql_fquery(chandler, string, "GroupDeleted");
-
-								MsgSuccess(playerid, "GRUPËS", "Grupë sëkmingai iðtrinta.");
-								reset(AdminGroup, GroupsInfo[groupid], E_GROUP_DATA);
-								Iter_Remove(AdminGroup, groupid);
-							}
-							cache_delete(result);
-						}
-						else return InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_GROUPS_MAIN, 1, 0, "");
-		}
-		case DIALOG_AM_GROUPS_ALL:
-		{
-			if(response)
-			{
-				tmpSelected[playerid] = listitem;
-				new groupid; // itter
-				GetSortedAsForeach(AdminGroup, listitem, groupid, EMPTY_STATEMENT);
-				tmpIter[playerid] = groupid;
-				tmpTexture_MarkStart_CP[playerid] =
-				tmpPage_Object[playerid] = 0;
-				ShowPlayerDialog(playerid, DIALOG_AM_GROUP_EDIT_MAIN, DIALOG_STYLE_LIST, "Grupës", "Keisti pavadinimà\nKeisti teises\nKeisti komandø teises\n{C60000}Iðtrinti", "Tæsti", "Atðaukti");
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 11, "");
-		}
-		case DIALOG_AM_GROUP_ADD:
-		{
-			if(response)
-			{
-				new name[30];
-
-				if(sscanf(inputtext,"s[30]",name) || !strlen(name)) return OnDialogResponse(playerid, DIALOG_AM_GROUPS_MAIN, 1, 1, "");
-				
-				inline createNewGroup()
-				{
-					new iter = Iter_Free(AdminGroup);
-					if(iter == ITER_NONE) return SendWarning(playerid, "Pasiektas grupiø limitas.");
-
-					new group_sql = GroupsInfo[iter][groupId] = cache_insert_id();
-
-					MsgSuccess(playerid, "GRUPËS", "Grupë sëkmingai sukurta.");
-					ShowPlayerAdminMenu(playerid);
-
-					format(GroupsInfo[iter][groupName], 30, name);
-					Iter_Add(AdminGroup, iter);
-
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-					log_set_values("'%d','%e','(AM) Sukure nauja grupe','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GroupsInfo[iter][groupId], inputtext);
-					log_commit();
-
-					inline getPermissions()
-					{
-						new permission_name[30];
-						for(new i = 0, rows = cache_num_rows(); i < rows; i++)
-						{
-							cache_get_value_name(0, "Permission", permission_name);
-
-							inline insertPermission() return 1;
-							mysql_tquery_inline(chandler, using inline insertPermission, "\
-								INSERT INTO `groups_permissions` (`GroupId`,`Permission`) VALUES ('%d','%s')", group_sql, permission_name
-							);
-						}
-					}
-
-					mysql_tquery_inline(chandler, using inline getPermissions, "SELECT `Permission` FROM `groups_permissions_list` WHERE DefaultValue > '0'");
-					return 1;
-				}
-				mysql_tquery_inline(chandler, using inline createNewGroup, "\
-					INSERT INTO `groups_data` (`Name`,`Super`,`Added`) VALUES ('%e','0','%d')", 
-					name, PlayerInfo[playerid][pId]
-				);
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 11, "");
-		}
-		case DIALOG_AM_GROUPS_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// visas
-						if(HaveAdminPermission(playerid, "EditGroups"))
-						{
-							new line[56],
-								i,
-								string[512] = "{BABABA}Nr.\t{BABABA}Pavadinimas\n";
-							foreach(new groupid : AdminGroup)
-							{
-								i++;
-								format(line, sizeof line, "%d.\t%s (MySQL ID: %d)\n", i, GetGroupName(groupid, false), GroupsInfo[groupid][groupId]);
-								strcat(string, line);
-							}
-							ShowPlayerDialog(playerid, DIALOG_AM_GROUPS_ALL, DIALOG_STYLE_TABLIST_HEADERS, "Grupës", string, "Tæsti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						if(HaveAdminPermission(playerid, "CreateNewGroup"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_GROUP_ADD, DIALOG_STYLE_INPUT, "Grupës", "{FFFFFF}Áveskite naujà grupës pavadinimà.", "Kurti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
 			}
 			else ShowPlayerAdminMenu(playerid);
 		}
@@ -19385,8 +18836,6 @@ thread(GarageUpdated);
 thread(GarageDeleted);
 thread(PlayerAddedToFaction);
 thread(FactionVehiclePosUpdate);
-thread(PayPhoneUpdate);
-thread(PayPhoneDeleted);
 
 forward RoomersLoad(playerid);
 public RoomersLoad(playerid)
@@ -19974,9 +19423,6 @@ public FurniturePreviewTimer(playerid, i)
 
 thread(FurnitureColorSave);
 thread(FurnitureTextureSave);
-thread(GroupDeleted);
-thread(GroupAdded);
-thread(GroupSaved);
 /*
 
 oooooooooooo ooooo     ooo ooooo      ooo   .oooooo.   ooooooooooooo ooooo   .oooooo.   ooooo      ooo  .oooooo..o
@@ -38744,37 +38190,6 @@ public BusinessWorkersLoad(playerid, businessid)
 }
 
 
-forward GroupsPermissionsListLoad(playerid, id, page);
-public GroupsPermissionsListLoad(playerid, id, page)
-{
-	new exists,
-		string[6000] = "{BABABA}Pavadinimas\t{BABABA}Apraðymas\t{BABABA}Turi teisæ\n",
-		line[90],
-		permission_name[30],
-		comment[50],
-		rows = cache_num_rows();
-	for(new i = 0; i < rows; i++)
-	{
-		if(i >= ADMIN_PERMISSIONS_PER_PAGE) // kadangi ADMIN_PERMISSIONS_PER_PAGE+1 traukiam
-		{
-			break;
-		}
-		else
-		{
-			cache_get_value_name(i, "Permission", permission_name);
-			cache_get_value_name(i, "Comment", comment);
-			cache_get_value_name_int(i, "HavePermission", exists);
-			format(line, sizeof line, "%s\t%s\t%s\n", permission_name, comment, (exists > 0 ? ("+") : (" ")));
-			strcat(string, line);
-		}
-	}
-	tmpTexture_MarkStart_CP[playerid] = (rows >= ADMIN_PERMISSIONS_PER_PAGE ? (ADMIN_PERMISSIONS_PER_PAGE) : (rows));
-	tmpPage_Object[playerid] = page;
-	if(page > 0) strcat(string, "{D28989}<<<");
-	if(rows > ADMIN_PERMISSIONS_PER_PAGE) strcat(string, "\n{B0DCA8}>>>"); // kadangi tikrinom ADMIN_PERMISSIONS_PER_PAGE+1, gali but 1 daugiau
-	ShowPlayerDialog(playerid, DIALOG_AM_GROUP_EDIT_PRIVILEGES, DIALOG_STYLE_TABLIST_HEADERS, "Teisës", string, "Tæsti", "Atðaukti");
-	return 1;
-}
 
 
 thread(InteriorDeleted);
