@@ -37,7 +37,7 @@ static _Interiors_ShowList(playerid, page = 0)
                 dialog_Row("<<< ATGAL")                     return _Interiors_ShowList(playerid, page - 1);
                 dialog_Row(">>> KITAS")                     return _Interiors_ShowList(playerid, page + 1);
 
-                _Interiors_ShowDetails(playerid, .offset = (page * MAX_INTS_PER_PAGE) + listitem);
+                _Interiors_ShowDetails(playerid, .offset = (page * MAX_INTS_PER_PAGE) + (listitem - 1));
                 return 1;
             }
             else AMenu_Main(playerid);
@@ -112,14 +112,16 @@ static _Interiors_ShowDetails(playerid, offset)
                 {
                     dialog_Row("Teleportuotis")
                     {
-
+                        MsgSuccess(playerid, "Interjerai", "Nuteleportuotas á %s.", name);
+                        SetPlayerInterior(playerid, int);
+                        SetPlayerPos(playerid, x, y, z);
                         return 1;
                     }
                     dialog_Row("Iðtrinti")
                     {
                         inline delete()
                         {
-                            MsgSuccess(playerid, "Interjerai", "Istrinta.");
+                            MsgSuccess(playerid, "Interjerai", "%s iðtrintas.", name);
                             _Interiors_ShowList(playerid);
                             return 1;
                         }
