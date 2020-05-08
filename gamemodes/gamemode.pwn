@@ -2110,12 +2110,13 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "other\map\willowfield_garage.pwn"
 // #include "other\map\idlewood_pizza_corner.pwn"
 // #include "other\map\prison.pwn"
-// #include "other\map\mechanics.pwn"
 // #include "other\map\government.pwn"
 // #include "other\map\ls_dump.pwn"
 // #include "other\map\ls_logistics.pwn"
 // #include "other\map\bank.pwn"
+#include "other\map\mechanics2.pwn"
 
+// #include "other\map\mechanics.pwn"
 // #include "other\map\interiors.pwn"
 // #include "other\map\china_town.pwn"
 
