@@ -661,7 +661,9 @@ static _FAC_CheatDetected(playerid, code, extra_id_1 = 0, extra_id_2 = 0)
 			}
 		}
 	#endif
+	
 	FAC_Reset(playerid);
+
 	#if !defined _INC_y_hooks
 		#if defined FAC_OnPlayerConnect
 			return FAC_OnPlayerConnect(playerid);
@@ -2173,13 +2175,16 @@ stock FAC_ResetPlayerWeaponSlotData(playerid, slot)
 
 stock FAC_ResetPlayerWeapons(playerid)
 {
+	result = ResetPlayerWeapons(playerid);
+
 	for(new slot = 0; slot < 13; slot++)
 	{
-		ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] = 0;
+		ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] = 
 		ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] = 0;
 	}
 	ac__LastWeapon[playerid] = 0;
-	return ResetPlayerWeapons(playerid);
+
+	return result;
 }
 
 stock RemovePlayerWeapon(playerid, weapon)
@@ -2207,13 +2212,20 @@ stock PlayerHasWeaponInSlot(playerid, slot)
 
 stock RemovePlayerWeaponInSlot(playerid, remove)
 {
+	/**
+		Removing su SetPlayerAmmo,
+		o veliau timeryje tikrint, jei ammo = 0, bet weaponid > 0, nustatyti WeaponId=0.
+	*/
+
 	new 	
 		data[13][2];
 	for(new slot = 0; slot < 13; slot++)
 	{
 		if(slot != remove) GetPlayerWeaponData(playerid, slot, data[slot][0], data[slot][1]);
 	}
+
 	FAC_ResetPlayerWeapons(playerid);
+
 	for(new slot = 0; slot < 13; slot++)
 	{
 		if(slot != remove) FAC_GivePlayerWeapon(playerid, data[slot][0], data[slot][1]);

@@ -15281,7 +15281,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// tr. priemoniu salonai
 						ShowPlayerDialog(playerid, DIALOG_AM_SALONS_MAIN, DIALOG_STYLE_LIST, "Tr. priemoniø salonai", "Kurti naujà\nPerþiûrëti visus", "Tæsti", "Atðaukti");
 					}
-					
+
 					case 8:
 					{
 						// frakcijos
@@ -34105,14 +34105,16 @@ CMD:trunkweapon(playerid, params[])
 	if(weaponid != 0)
 	{
 		new wepslot = FAC_GetWeaponSlot(weaponid);
+		
 		if(ret_GetSlotWeaponGiveType(playerid, wepslot) != WEAPON_GIVE_TYPE_NO_INVENTORY)
 		{
 			SendWarning(playerid, "Ðis ginklas nëra ið frakcijos tr. priemonës");
 			return 1;
 		}
-		new model = GetVehicleModel(vehicleid);
-		GetPlayerWeaponData(playerid, wepslot, ammo, ammo);
 
+		new model = GetVehicleModel(vehicleid);
+
+		GetPlayerWeaponData(playerid, wepslot, ammo, ammo);
 		for(new l = 0; l < sizeof FactionWeaponsInTrunk; l++)
 		{
 			if(FactionWeaponsInTrunk[l][ftwListWeaponId] == weaponid)
@@ -34161,6 +34163,7 @@ CMD:trunkweapon(playerid, params[])
 						}
 					}
 				}
+				break;
 			}
 		}
 		SendWarning(playerid, "Ðio ginklo Jums padëti á ðià tr. priemonæ negalima.");
