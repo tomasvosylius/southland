@@ -37272,13 +37272,19 @@ CMD:duty(playerid, params[])
 			else if(faction != 0)
 			{
 				new factionid = GetFactionArrayIndexById(faction);
-				if(PlayerInfo[playerid][pAdminDuty] <= 0) SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
+				if(PlayerInfo[playerid][pAdminDuty] <= 0)
+				{
+					SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
+				}
+
+				// Baige darba frakcijoje
 				if(factionid != -1)
 				{
 					switch(FactionInfo[factionid][fType])
 					{
 						default:
 						{
+							SetPlayerArmour(playerid, 0.0);
 							ResetServerSidedWeapons(playerid);
 						}
 					}
