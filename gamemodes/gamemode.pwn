@@ -65,7 +65,6 @@ native gpci(playerid, serial[], len);
 #define CODE_VERSION_P 		1147
 #define SERVER_DEBUG_LEVEL 	3 		// [0:nieko] [1:errorai, gm klaidos] [2:visi callbackai] [3:funkcijos]
 //#define BETA_TEST_MODE 	// galima /reportbug naudot
-#define ENABLE_GPS 	 	// leidziam /gps komanda
 
 // Svarbiausi defines, iskart po incldue butini
 #if defined INVALID_3DTEXT_ID   
@@ -2208,6 +2207,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player/cheats.pwn"
 #include "modules\player/afk.pwn"
 #include "modules\player/faction_credits.pwn"
+#include "modules\player/gps.pwn"
 
 #include <YSI_Coding\y_hooks>
 
@@ -5625,10 +5625,6 @@ public OnPlayerSpawn(playerid)
 			mysql_tquery(chandler, string, "PlayerWeaponsLoad", "d", playerid);
 
 			call OnPlayerRequestDataLoad(playerid);
-
-			#if defined ENABLE_GPS
-				//SendFormat(playerid, 0xFF7300FF, "* {FFAD69}Dël maþesnës apkrovos administratoriams, serverio startavimo metu naudokitës komanda /gps");
-			#endif
 		}
 
 		SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
@@ -8883,55 +8879,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 			}
 		}
-		#if defined ENABLE_GPS
-			case DIALOG_GPS:
-			{
-				if(response)
-				{
-					switch(listitem)
-					{
-						case 0:
-						{
-							for(new i = 0; i < sizeof Jobs; i++)
-							{
-								if(Jobs[i][jobId] == JOB_MECHANIC)
-								{
-									SetPlayerCheckpointEx(playerid, 0, Jobs[i][jobX], Jobs[i][jobY], Jobs[i][jobZ], 4.0);
-									break;
-								}
-							}
-						}
-						case 1:
-						{
-							for(new i = 0; i < sizeof Jobs; i++)
-							{
-								if(Jobs[i][jobId] == JOB_TRUCKER)
-								{
-									SetPlayerCheckpointEx(playerid, 0, Jobs[i][jobX], Jobs[i][jobY], Jobs[i][jobZ], 4.0);
-									break;
-								}
-							}
-						}
-						case 2:
-						{
-							SetPlayerCheckpointEx(playerid, 0, 2864.02, -1966.27, 11.11, 4.0);
-						}
-						case 3:
-						{
-							SetPlayerCheckpointEx(playerid, 0, 1899.68, -1638.62, 13.55, 4.0);
-						}
-						case 4:
-						{
-							SetPlayerCheckpointEx(playerid, 0, 2132.10, -1147.88, 24.44);
-						}
-						case 5:
-						{
-							SetPlayerCheckpointEx(playerid, 0, 1459.83, -1266.29, 13.55);
-						}
-					}
-				}
-			}
-		#endif
+
 		case DIALOG_WEAPON_TRUNK:
 		{
 			if(response)
@@ -28587,13 +28535,6 @@ CMD:admins(playerid, params[])
 	}
 	return 1;
 }
-#if defined ENABLE_GPS
-	CMD:gps(playerid, params[])
-	{
-		ShowPlayerDialog(playerid, DIALOG_GPS, DIALOG_STYLE_LIST, "Svarbiausios vietos", "Mechanikai\nKroviniø iðveþiotojai\nÞvejybos vieta\nVairavimo mokykla\nTr. priemoniø parduotuvë\nBankas", "Paþymëti", "Atðaukti");
-		return 1;
-	}
-#endif
 alias:ask("askq");
 CMD:ask(playerid, params[])
 {
