@@ -304,20 +304,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_ATM_DEPOSIT 				83
 #define DIALOG_ATM_MONEY 				84
 
-#define DIALOG_AM_GARAGES_MAIN 			87
-#define DIALOG_AM_GARAGES_ALL 			88
-#define DIALOG_AM_GARAGE_EDIT_MAIN 		89
-#define DIALOG_AM_GARAGE_EDIT_PRICE 	90
-#define DIALOG_AM_GARAGE_EDIT_OWNER 	91
-#define DIALOG_AM_HOUSES_MAIN 			92
-#define DIALOG_AM_HOUSES_ALL 			93
-#define DIALOG_AM_HOUSE_EDIT_MAIN 		94
-#define DIALOG_AM_HOUSE_EDIT_PRICE 		95
-#define DIALOG_AM_HOUSE_EDIT_OWNER 		96
-#define DIALOG_AM_HOUSE_INV 			97
-#define DIALOG_AM_HOUSE_INV_EDIT 		98
-#define DIALOG_AM_HOUSE_INV_ITEM 		99
-#define DIALOG_AM_HOUSE_INV_AMOUNT 		100
 
 #define DIALOG_AM_BUSINESS_MAIN 		101
 #define DIALOG_AM_BUSINESS_ALL 			102
@@ -393,18 +379,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_AM_BUSINESS_LEVELS_MAIN 	172
 #define DIALOG_AM_BUSINESS_LEVEL_EDIT 	173
 
-#define DIALOG_AM_FACTION_MAIN 			176
-#define DIALOG_AM_FACTIONS_ALL 			192
-#define DIALOG_AM_FACTION_EDIT_MAIN 	193
-#define DIALOG_AM_FACTION_ADD 			194
-#define DIALOG_AM_FACTION_EDIT_NAME 	195
-#define DIALOG_AM_FACTION_RANKS_ALL 	196
-#define DIALOG_AM_FACTION_RANK_EDIT_NAME 	197
-#define DIALOG_AM_FACTION_RANK_EDIT_SALARY 	198
-#define DIALOG_AM_FACTION_RANK_ADD 			199
-
-#define DIALOG_AM_FACTION_RANK_EDIT_MAIN 	204
-#define DIALOG_AM_FACTION_EDIT_TYPE 		205
 
 #define DIALOG_PHONE_CONTACTS_MAIN 			206
 #define DIALOG_PHONE_CONTACTS_ADD_NAME 		207
@@ -1940,49 +1914,44 @@ new OriginsList[][16] = {
 new Float:DmvCheckpoints[][][3] = {
 	//  **** PASKUTINES KORDINATES TURI BUTI PRIDEDAMOS KAIP 0.0, 0.0, 0.0 ****
 	{ 	// Lengvosioms
-
-		{1930.7992,-1638.6317,13.1999},
-		{1937.9879,-1611.4352,13.0355},
-		{1836.3776,-1609.6211,13.0354},
-		{1834.4135,-1548.9049,13.0338},
-		{1852.4215,-1478.6656,13.0376},
-		{1852.9990,-1393.8049,13.0424},
-		{1862.9935,-1343.3025,13.0330},
-		{1942.1957,-1343.3407,19.3062},
-		{1984.2191,-1368.3409,23.3849},
-		{1983.5696,-1447.0491,13.0512},
-		{2011.9474,-1466.3555,13.0416},
-		{2098.8193,-1467.0085,23.4811},
-		{2110.0237,-1501.3751,23.4434},
-		{2110.8174,-1622.0165,22.0513},
-		{2094.4983,-1739.1187,13.0453},
-		{2053.1230,-1749.3527,13.0419},
-		{1961.6761,-1750.3905,13.0386},
-		{1944.0215,-1701.1182,13.0377},
-		{1934.5166,-1640.9060,13.2062},
-		{0.0, 0.0, 0.0}
+		{2073.1060,-1909.0024,13.3113},
+		{1978.4601,-1929.4705,13.1479},
+		{1800.2181,-1830.7008,13.1593},
+		{1692.5883,-1755.0598,13.1532},
+		{1551.2230,-1729.7689,13.1519},
+		{1447.0895,-1729.7352,13.1493},
+		{1386.6952,-1853.5469,13.1519},
+		{1527.7433,-1954.4320,19.6174},
+		{1598.5283,-2143.3054,28.4211},
+		{1807.4418,-2168.8176,13.1497},
+		{1963.0435,-2128.2527,13.1519},
+		{1964.2823,-1970.0278,13.1968},
+		{2058.3884,-1940.4419,13.1198},
+		{0.0,0.0,0.0},
+		{0.0,0.0,0.0},
+		{0.0,0.0,0.0},
+		{0.0,0.0,0.0},
+		{0.0,0.0,0.0}
 	},
 	{ 	// Motociklo
-		{1930.7992,-1638.6317,13.1999},
-		{1937.9879,-1611.4352,13.0355},
-		{1836.3776,-1609.6211,13.0354},
-		{1834.4135,-1548.9049,13.0338},
-		{1852.4215,-1478.6656,13.0376},
-		{1852.9990,-1393.8049,13.0424},
-		{1862.9935,-1343.3025,13.0330},
-		{1942.1957,-1343.3407,19.3062},
-		{1984.2191,-1368.3409,23.3849},
-		{1983.5696,-1447.0491,13.0512},
-		{2011.9474,-1466.3555,13.0416},
-		{2098.8193,-1467.0085,23.4811},
-		{2110.0237,-1501.3751,23.4434},
-		{2110.8174,-1622.0165,22.0513},
-		{2094.4983,-1739.1187,13.0453},
-		{2053.1230,-1749.3527,13.0419},
-		{1961.6761,-1750.3905,13.0386},
-		{1944.0215,-1701.1182,13.0377},
-		{1934.5166,-1640.9060,13.2062},
-		{0.0, 0.0, 0.0}
+		{2073.1060,-1909.0024,13.3113},
+		{1978.4601,-1929.4705,13.1479},
+		{1800.2181,-1830.7008,13.1593},
+		{1692.5883,-1755.0598,13.1532},
+		{1551.2230,-1729.7689,13.1519},
+		{1447.0895,-1729.7352,13.1493},
+		{1386.6952,-1853.5469,13.1519},
+		{1527.7433,-1954.4320,19.6174},
+		{1598.5283,-2143.3054,28.4211},
+		{1807.4418,-2168.8176,13.1497},
+		{1963.0435,-2128.2527,13.1519},
+		{1964.2823,-1970.0278,13.1968},
+		{2058.3884,-1940.4419,13.1198},
+		{0.0,0.0,0.0},
+		{0.0,0.0,0.0},
+		{0.0,0.0,0.0},
+		{0.0,0.0,0.0},
+		{0.0,0.0,0.0}
 	},
 	{
 		// Laivo
@@ -2003,9 +1972,7 @@ new Float:DmvCheckpoints[][][3] = {
 		{639.8370,475.0995,-0.3594},
 		{490.2572,372.2319,-0.4830},
 		{372.0720,264.6819,-0.4918},
-		{245.3479,155.0784,-0.5516},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0}
+		{245.3479,155.0784,-0.5516}
 	},
 	{
 		// Skraidymo
@@ -2018,8 +1985,6 @@ new Float:DmvCheckpoints[][][3] = {
 		{762.4283,-201.5176,138.3542},
 		{513.5833,-247.6004,19.8391},
 		{261.2383,-31.5230,82.8357},
-		{0.0, 0.0, 0.0},
-		{0.0, 0.0, 0.0},
 		{0.0, 0.0, 0.0},
 		{0.0, 0.0, 0.0},
 		{0.0, 0.0, 0.0},
@@ -2222,6 +2187,9 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\server\admin\amenu/payphones.pwn"
 #include "modules\server\admin\amenu/groups.pwn"
 #include "modules\server\admin\amenu/interiors.pwn"
+#include "modules\server\admin\amenu/garages.pwn"
+#include "modules\server\admin\amenu/houses.pwn"
+#include "modules\server\admin\amenu/factions.pwn"
 
 // Jobs
 #include "modules\server\jobs/thief.pwn"
@@ -2931,7 +2899,7 @@ public SecondTimer()
 					}
 
 				}
-				SetPlayerDrunkLevel(playerid, 2100);
+				
 				if(!DrugTextdrawShowed) // sitas tam, kad efektai visi prisidetu per loop, bet rodytu tik 1 textdraw
 				{
 					if(changeEffect)
@@ -12740,934 +12708,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_BM_MAIN, 1, 0, "");
 		}
-
 		
-		case DIALOG_AM_GARAGE_EDIT_PRICE:
-		{
-			if(response)
-			{
-				new amount;
-				if(sscanf(inputtext,"d",amount) || amount < 0) return SendError(playerid, "Blogai ávestas skaièius.") , OnDialogResponse(playerid, DIALOG_AM_GARAGE_EDIT_MAIN, 1, 0, "");
-				if(0 < amount)
-				{
-					GarageInfo[tmpSelected[playerid]][gPrice] = amount;
-					MsgSuccess(playerid, "GARAÞAS", "Pakeitëte garaþo kainà á $%d", amount);
-					new string[126];
-					mysql_format(chandler, string, sizeof string, "UPDATE `garages_data` SET Price = '%d' WHERE id = '%d'", amount, GarageInfo[tmpSelected[playerid]][gId]);
-					mysql_fquery(chandler, string, "GarageUpdated");
-					FixGarageLabels(tmpSelected[playerid]);
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-					log_set_values("'%d','%e','(AM) Pakeite garazo kaina','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[tmpSelected[playerid]][gId]);
-					log_commit();
-				}
-			}
-		}
-		case DIALOG_AM_GARAGE_EDIT_OWNER:
-		{
-			if(response)
-			{
-				if(!strlen(inputtext)) return SendError(playerid, "Blogai ávestas ID arba vardas.") , OnDialogResponse(playerid, DIALOG_AM_GARAGE_EDIT_MAIN, 1, 1, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				if(IsNumeric(inputtext))
-				{
-					if(strval(inputtext) == 0)
-					{
-						new string[126];
-						GarageInfo[tmpSelected[playerid]][gOwner] = 0;
-						mysql_format(chandler, string, sizeof string, "UPDATE `garages_data` SET Owner = '0' WHERE id = '%d'", GarageInfo[tmpSelected[playerid]][gId]);
-						mysql_fquery(chandler, string, "GarageUpdated");
-						MsgSuccess(playerid, "GARAÞAS", "Paðalinote garaþo savininkà.");
-						OnDialogResponse(playerid, DIALOG_AM_GARAGES_MAIN, 1, 1, "");
-						FixGarageLabels(tmpSelected[playerid]);
-					}
-					else
-					{
-						new string[126];
-						mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `players_data` WHERE id = '%d'", strval(inputtext));
-						new Cache:result = mysql_query(chandler, string, true);
-						cache_set_active(result);
-						if(cache_num_rows() || strval(inputtext) == 0)
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_data` SET Owner = '%d' WHERE id = '%d'", strval(inputtext), GarageInfo[tmpSelected[playerid]][gId]);
-							mysql_fquery(chandler, string, "GarageUpdated");
-							GarageInfo[tmpSelected[playerid]][gOwner] = strval(inputtext);
-							MsgSuccess(playerid, "GARAÞAS", "Pakeitëte garaþo savininkà.");
-							OnDialogResponse(playerid, DIALOG_AM_GARAGES_MAIN, 1, 1, "");
-							FixGarageLabels(tmpSelected[playerid]);
-							log_set_values("'%d','%e','(AM) Pakeite garazo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[tmpSelected[playerid]][gId], strval(inputtext));
-						}
-						else
-						{
-							SendError(playerid, "Þaidëjas tokiu ID (%d) duomenø bazëje nerastas.", strval(inputtext));
-						}
-						cache_delete(result);
-					}
-				}
-				else
-				{
-					new string[126];
-					mysql_format(chandler, string, sizeof string, "SELECT id FROM `players_data` WHERE Name = '%e'", inputtext);
-					new Cache:result = mysql_query(chandler, string, true);
-					cache_set_active(result);
-					if(cache_num_rows())
-					{
-						new id;
-						cache_get_value_name_int(0, "id", id);
-						mysql_format(chandler, string, sizeof string, "UPDATE `garages_data` SET Owner = '%d' WHERE id = '%d'", id, GarageInfo[tmpSelected[playerid]][gId]);
-						mysql_fquery(chandler, string, "GarageUpdated");
-						GarageInfo[tmpSelected[playerid]][gOwner] = id;
-						MsgSuccess(playerid, "GARAÞAS", "Pakeitëte garaþo savininkà.");
-						OnDialogResponse(playerid, DIALOG_AM_GARAGES_MAIN, 1, 1, "");
-						FixGarageLabels(tmpSelected[playerid]);
-						log_set_values("'%d','%e','(AM) Pakeite garazo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[tmpSelected[playerid]][gId], id);
-					}
-					else
-					{
-						SendError(playerid, "Þaidëjas tokiu vardu (%s) duomenø bazëje nerastas.", inputtext);
-					}
-					cache_delete(result);
-				}
-				log_commit();
-				OnDialogResponse(playerid, DIALOG_AM_GARAGES_MAIN, 1, 1, "");
-			}
-			ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_GARAGE_EDIT_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						if(HaveAdminPermission(playerid, "EditGaragePrice"))
-						{
-							// kaina
-							ShowPlayerDialog(playerid, DIALOG_AM_GARAGE_EDIT_PRICE, DIALOG_STYLE_INPUT, "Garaþo redagavimas", "{FFFFFF}Áveskite naujà garaþo kainà.", "Keisti", "Atðaukti");
-						}
-					}
-					case 1:
-					{
-						if(HaveAdminPermission(playerid, "EditGarageOwner"))
-						{
-							// savininkas
-							ShowPlayerDialog(playerid, DIALOG_AM_GARAGE_EDIT_OWNER, DIALOG_STYLE_INPUT, "Garaþo redagavimas", "{FFFFFF}Áveskite naujà garaþo savininko MySQL numerá arba pilnà vardà.\n{BABABA}Norëdami savininkà paðalinti, áraðykite 0", "Keisti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-
-					}
-					case 2:
-					{
-						if(HaveAdminPermission(playerid, "ChangeGarageEnter"))
-						{
-							// keisti iejimo vieta
-							new selected = tmpSelected[playerid];
-							MsgSuccess(playerid, "GARAÞAS", "Sëkmingai pakeista áëjimo vieta.");
-							new Float:x, Float:y, Float:z;
-							GetPlayerPos(playerid, x, y, z);
-							GarageInfo[selected][gOutVW] = GetPlayerVirtualWorld(playerid),
-							GarageInfo[selected][gExterior] = GetPlayerInterior(playerid),
-							GarageInfo[selected][gEnterX] = x,
-							GarageInfo[selected][gEnterY] = y,
-							GarageInfo[selected][gEnterZ] = z;
-							FixGarageLabels(selected);
-							new string[186];
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_data` SET EnterX = '%f', EnterY = '%f', EnterZ = '%f', OutVW = '%d', Exterior = '%d' WHERE id = '%d'", x, y, z, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), GarageInfo[selected][gId]);
-							mysql_fquery(chandler, string, "GarageUpdated");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Pakeite garazo iejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 3:
-					{
-						if(HaveAdminPermission(playerid, "ChangeGarageExit"))
-						{
-							// keisti isejimo vieta
-							new selected = tmpSelected[playerid];
-							MsgSuccess(playerid, "GARAÞAS", "Sëkmingai pakeista iðëjimo vieta.");
-							new Float:x, Float:y, Float:z;
-							GetPlayerPos(playerid, x, y, z);
-							GarageInfo[selected][gInterior] = GetPlayerInterior(playerid),
-							GarageInfo[selected][gExitX] = x,
-							GarageInfo[selected][gExitY] = y,
-							GarageInfo[selected][gExitZ] = z;
-							FixGarageLabels(selected);
-							new string[186];
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_data` SET ExitX = '%f', ExitY = '%f', ExitZ = '%f', Interior = '%d' WHERE id = '%d'", x, y, z, GetPlayerInterior(playerid), GarageInfo[selected][gId]);
-							mysql_fquery(chandler, string, "GarageUpdated");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Pakeite garazo isejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 4:
-					{
-						if(HaveAdminPermission(playerid, "ChangeGarageEnter"))
-						{
-							// keisti masinos isvaziavus lauke
-							new selected = tmpSelected[playerid];
-							if(GetPlayerInterior(playerid) != GarageInfo[selected][gExterior])
-							{
-								MsgError(playerid, "GARAÞAS", "Nesate tame paèiame interjere, kuriame yra áëjimas á garaþà.");
-								return 1;
-							}
-							MsgSuccess(playerid, "GARAÞAS", "Tr. priemonë iðvaþiuojant ið garaþo á laukà atsiras jûsø nustatytoje vietoje.");
-							new Float:x, Float:y, Float:z, Float:a, string[156];
-							GetPlayerPos(playerid, x, y, z),
-							GetPlayerFacingAngle(playerid, a);
-							GarageInfo[selected][gCarEnterX] = x,
-							GarageInfo[selected][gCarEnterY] = y,
-							GarageInfo[selected][gCarEnterZ] = z,
-							GarageInfo[selected][gCarEnterA] = a;
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_data` SET CarEnterX = '%f', CarEnterY = '%f', CarEnterZ = '%f', CarEnterA = '%f' WHERE id = '%d'", x, y, z, a, GarageInfo[selected][gId]);
-							mysql_fquery(chandler, string, "GarageUpdated");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Pakeite garazo lauko vieta masinai','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 5:
-					{
-						if(HaveAdminPermission(playerid, "ChangeGarageExit"))
-						{
-							// keisti masinos ivaziavus is lauko
-							new selected = tmpSelected[playerid];
-							if(GetPlayerInterior(playerid) != GarageInfo[selected][gInterior])
-							{
-								MsgError(playerid, "GARAÞAS", "Nesate tame paèiame interjere, kuriame yra iðëjimas ið garaþo.");
-								return 1;
-							}
-							MsgSuccess(playerid, "GARAÞAS", "Tr. priemonë ávaþiuojant á garaþà ið lauko atsiras jûsø nustatytoje vietoje.");
-							new Float:x, Float:y, Float:z, Float:a, string[156];
-							GetPlayerPos(playerid, x, y, z);
-							GetPlayerFacingAngle(playerid, a);
-							GarageInfo[selected][gCarExitX] = x,
-							GarageInfo[selected][gCarExitY] = y,
-							GarageInfo[selected][gCarExitZ] = z,
-							GarageInfo[selected][gCarExitA] = a;
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_data` SET CarExitX = '%f', CarExitY = '%f', CarExitZ = '%f', CarExitA = '%f' WHERE id = '%d'", x, y, z, a, GarageInfo[selected][gId]);
-							mysql_fquery(chandler, string, "GarageUpdated");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Pakeite garazo vidaus vieta masinai','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 6:
-					{
-						if(HaveAdminPermission(playerid, "DeleteGarageFurniture"))
-						{
-							// isvalyti furniture
-							new selected = tmpSelected[playerid],
-								count_deleted,
-								last_itter = -1,
-								string[86],
-								__reset_GFurniture[E_GARAGE_FURNITURE_DATA];
-
-							foreach(new furnitureid : GFurniture)
-							{
-								if(gFurnitureInfo[furnitureid][gfOwner] == GarageInfo[selected][gId])
-								{
-									if(IsValidDynamicObject(gFurnitureInfo[furnitureid][gfObject])) DestroyDynamicObject(gFurnitureInfo[furnitureid][gfObject], "furniture", "admin_delete_garage_furniture");
-									gFurnitureInfo[furnitureid] = __reset_GFurniture;
-									gFurnitureInfo[furnitureid][gfObject] = INVALID_OBJECT_ID;
-									if(last_itter != -1 && last_itter != furnitureid)
-									{
-										Iter_Remove(GFurniture, last_itter);
-										count_deleted++;
-									}
-									last_itter = furnitureid;
-								}
-							}
-							if(last_itter != -1) Iter_Remove(GFurniture, last_itter);
-							mysql_format(chandler, string, sizeof string, "DELETE FROM `garages_furniture` WHERE GarageId = '%d'", GarageInfo[selected][gId]);
-							mysql_fquery(chandler, string, "FurnitureDeleted");
-							MsgSuccess(playerid, "GARAÞAS", "Sëkmingai iðtrynëte %d garaþo baldø.", count_deleted);
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-							log_set_values("'%d','%e','(AM) Isvale garazo furniture','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId], count_deleted);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 7:
-					{
-						if(HaveAdminPermission(playerid, "ChangeGarageEnter"))
-						{
-							// teleport i lauka
-							new selected = tmpSelected[playerid];
-							SetPlayerPos(playerid, GarageInfo[selected][gEnterX], GarageInfo[selected][gEnterY], GarageInfo[selected][gEnterZ]);
-							SetPlayerInterior(playerid, GarageInfo[selected][gExterior]);
-							SetPlayerVirtualWorld(playerid, GarageInfo[selected][gOutVW]);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 8:
-					{
-						if(HaveAdminPermission(playerid, "ChangeGarageExit"))
-						{
-							// teleport i vidu
-							new selected = tmpSelected[playerid];
-							SetPlayerPos(playerid, GarageInfo[selected][gExitX], GarageInfo[selected][gExitY], GarageInfo[selected][gExitZ]);
-							SetPlayerInterior(playerid, GarageInfo[selected][gInterior]);
-							SetPlayerVirtualWorld(playerid, GarageInfo[selected][gVW]);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 9:
-					{
-						if(HaveAdminPermission(playerid, "DeleteGarage"))
-						{
-							// istrinti
-							new selected = tmpSelected[playerid],
-								string[156],
-								__reset_Garage[E_GARAGE_DATA],
-								__reset_GFurniture[E_GARAGE_FURNITURE_DATA],
-								last_itter = -1;
-							// istrinam ir furniture
-							foreach(new furnitureid : GFurniture)
-							{
-								if(gFurnitureInfo[furnitureid][gfOwner] == GarageInfo[selected][gOwner])
-								{
-									if(IsValidDynamicObject(gFurnitureInfo[furnitureid][gfObject])) DestroyDynamicObject(gFurnitureInfo[furnitureid][gfObject], "furniture", "admin_delete_garage");
-									gFurnitureInfo[furnitureid] = __reset_GFurniture;
-									gFurnitureInfo[furnitureid][gfObject] = INVALID_OBJECT_ID;
-									if(last_itter != -1 && last_itter != furnitureid)
-									{
-										Iter_Remove(GFurniture, last_itter);
-									}
-									last_itter = furnitureid;
-								}
-							}
-							if(last_itter != -1) Iter_Remove(GFurniture, last_itter);
-							if(IsValidDynamic3DTextLabel(GarageInfo[selected][gLabel])) DestroyDynamic3DTextLabel(GarageInfo[selected][gLabel]);
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Istryne garaza','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[selected][gId]);
-							log_commit();
-							mysql_format(chandler, string, sizeof string, "DELETE FROM `garages_data` WHERE id = '%d'; DELETE FROM `garages_furniture` WHERE GarageId = '%d'", GarageInfo[selected][gId], GarageInfo[selected][gId]);
-							mysql_fquery(chandler, string, "GarageDeleted");
-							GarageInfo[selected] = __reset_Garage;
-							GarageInfo[selected][gLabel] = INVALID_3DTEXT_ID;
-							Iter_Remove(Garage, selected);
-							MsgSuccess(playerid, "GARAÞAS", "Sëkmingai iðtrynëte garaþà.");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_GARAGES_MAIN, 1, 1, "");
-		}
-		case DIALOG_AM_GARAGES_ALL:
-		{
-			if(response)
-			{
-				if(HaveAdminPermission(playerid, "EditGarages"))
-				{
-					new selected;
-					GetSortedAsForeach(Garage, listitem, selected, GarageInfo[loopindex][gId] != 0);
-					/*new array[MAX_GARAGES], real_itter;
-					foreach(new garage : Garage) if(GarageInfo[garage][gId] != 0) array[real_itter] = garage, real_itter++;
-					new selected = tmpSelected[playerid] = array[listitem];*/
-					tmpSelected[playerid] = selected;
-					new string[356];
-					format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\nKaina\t$%d\nSavininkas\t%s\nKeisti áëjimo vietà\nKeisti iðëjimo vietà\nVieta, kur atsiranda tr. priemonë iðvaþiavus\nVieta, kur atsiranda tr. priemonë ávaþiavus\nIðvalyti baldus\nTeleportuotis á garaþo laukà\nTeleportuotis á garaþo vidø\n{C60000}Iðtrinti", GarageInfo[selected][gPrice], GetNameBySql(GarageInfo[selected][gOwner]));
-					ShowPlayerDialog(playerid, DIALOG_AM_GARAGE_EDIT_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Garaþo redagavimas", string, "Tæsti", "Atðaukti");
-				}
-				else InfoBox(playerid, IB_NO_PRIVILEGE);
-			}
-			else
-			{
-				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 3, "");
-			}
-		}
-		case DIALOG_AM_GARAGES_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						if(HaveAdminPermission(playerid, "CreateNewGarage"))
-						{
-							// kurti nauja garaza
-							new __reset_Garage[E_GARAGE_DATA],
-								string[256],
-								Float:x,
-								Float:y,
-								Float:z,
-								garage = Iter_Free(Garage),
-								int = GetPlayerInterior(playerid),
-								vw = GetPlayerVirtualWorld(playerid);
-							GetPlayerPos(playerid, x, y, z);
-							mysql_format(chandler, string, sizeof string, "INSERT INTO `garages_data` (`Added`,`EnterX`,`EnterY`,`EnterZ`,`CarEnterX`,`CarEnterY`,`CarEnterZ`,`Exterior`,`OutVW`) VALUES ('%d','%f','%f','%f','%f','%f','%f','%d','%d')", PlayerInfo[playerid][pId], x, y, z, x, y, z, int, vw);
-							new Cache:result = mysql_query(chandler, string, true);
-							if(mysql_errno() == 0)
-							{
-								if(int != 0 || vw != 0)
-								{
-									SendWarning(playerid, "Jûs nesate lauke (interior: %d, world: %d), todël sukurto namo bus neámanoma parodyti þemëlapyje.", int, vw);
-								}
-								cache_set_active(result);
-								GarageInfo[garage] = __reset_Garage;
-								GarageInfo[garage][gId] = cache_insert_id();
-								GarageInfo[garage][gOutVW] = vw;
-								GarageInfo[garage][gExterior] = int;
-								GarageInfo[garage][gEnterX] = x,
-								GarageInfo[garage][gEnterY] = y,
-								GarageInfo[garage][gEnterZ] = z,
-								GarageInfo[garage][gCarEnterX] = x,
-								GarageInfo[garage][gCarEnterY] = y,
-								GarageInfo[garage][gCarEnterZ] = z;
-								GarageInfo[garage][gVW] = GarageInfo[garage][gId]+GARAGE_VIRTUAL_WORLD;
-								Iter_Add(Garage, garage);
-								MsgSuccess(playerid, "SERVERIS", "Sëkmingai sukûrëte garaþà, kurio ID: %d", GarageInfo[garage][gId]);
-								FixGarageLabels(garage);
-								log_init(true);
-								log_set_table("logs_admins");
-								log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-								log_set_values("'%d','%e','(AM) Sukure nauja garaza','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GarageInfo[garage][gId]);
-								log_commit();
-							}
-							else
-							{
-								SendError(playerid, "Siøsta uþklausa nepavyko [%d]", mysql_errno());
-							}
-							if(cache_is_valid(result)) cache_delete(result);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						// perziureti visus garazus visi garazai
-						new string[2048] = "Nr.\tMySQL ID (numeris)\tSavininkas\n",
-							real_itter,
-							name[24],
-							line[86];
-						foreach(new garage : Garage)
-						{
-							if(GarageInfo[garage][gId] != 0)
-							{
-								if(GarageInfo[garage][gOwner] == 0) format(name, 10, "joks");
-								else format(name, sizeof name, GetNameBySql(GarageInfo[garage][gOwner]));
-								real_itter++;
-								format(line, sizeof line, "%d.\t%d\t%.19s%s\n", real_itter, GarageInfo[garage][gId], name);
-								strcat(string, line);
-							}
-						}
-						if(real_itter == 0) return ShowPlayerAdminMenu(playerid) , SendWarning(playerid, "Nëra garaþø.");
-						ShowPlayerDialog(playerid, DIALOG_AM_GARAGES_ALL, DIALOG_STYLE_TABLIST_HEADERS, "Garaþai", string, "Tæsti", "Atðaukti");
-					}
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_HOUSE_INV_ITEM:
-		{
-			if(response)
-			{
-				new item,
-					selected = tmpSelected[playerid],
-					slot = tmpIter[playerid];
-				if(sscanf(inputtext,"d",item)) return OnDialogResponse(playerid, DIALOG_AM_HOUSE_INV_EDIT, 1, 0, "");
-				if(!IsHouseInventorySlotClear(selected, slot))
-				{
-					HouseInventory[selected][slot][invAmount] = 1;
-				}
-				HouseInventory[selected][slot][invId] = item;
-				MsgSuccess(playerid, "NAMAS", "Daikto ID pakeistas.");
-				SaveHouseInventory(selected);
-				OnDialogResponse(playerid, DIALOG_AM_HOUSE_INV, 1, selected, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`ExtraString`");
-				log_set_values("'%d','%e','(AM) Pakeite namo inventoriaus daikta','%d','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId], slot, GetInventoryItemName(item));
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_HOUSE_INV, 1, tmpIter[playerid], "");
-		}
-		case DIALOG_AM_HOUSE_INV_AMOUNT:
-		{
-			if(response)
-			{
-				new amount,
-					selected = tmpSelected[playerid],
-					slot = tmpIter[playerid];
-				if(sscanf(inputtext,"d",amount)) return OnDialogResponse(playerid, DIALOG_AM_HOUSE_INV_EDIT, 1, 1, "");
-				if(!IsHouseInventorySlotClear(selected, slot))
-				{
-					OnDialogResponse(playerid, DIALOG_AM_HOUSE_INV, 1, slot, "");
-					MsgError(playerid, "NAMAS", "Slot tuðèias.");
-					return 1;
-				}
-				HouseInventory[selected][slot][invAmount] = amount;
-				MsgSuccess(playerid, "NAMAS", "Daikto kiekis pakeistas.");
-				SaveHouseInventory(selected);
-				ShowPlayerAdminMenu(playerid);
-				OnDialogResponse(playerid, DIALOG_AM_HOUSE_INV, 1, selected, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`ExtraString`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite namo inventoriaus kieki','%d','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId], slot, GetInventoryItemName(HouseInventory[selected][slot][invId]), amount);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_HOUSE_INV, 1, tmpIter[playerid], "");
-		}
-		case DIALOG_AM_HOUSE_INV_EDIT:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_INV_ITEM, DIALOG_STYLE_INPUT, "Namo inventorius", "{FFFFFF}Áveskite naujà daikto ID.", "Tæsti", "Atðaukti");
-					}
-					case 1:
-					{
-						ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_INV_AMOUNT, DIALOG_STYLE_INPUT, "Namo inventorius", "{FFFFFF}Áveskite naujà daikto kieká.", "Tæsti", "Atðaukti");
-					}
-					case 2:
-					{
-						// ismesti
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`,`ExtraString`");
-						log_set_values("'%d','%e','(AM) Istryne namo inventoriaus daikta','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpSelected[playerid]][hId], tmpIter[playerid], GetInventoryItemName(HouseInventory[tmpSelected[playerid]][tmpIter[playerid]][invId]));
-						log_commit();
-						ClearHouseInventorySlot(tmpSelected[playerid], tmpIter[playerid]);
-						MsgSuccess(playerid, "NAMAS", "Iðtrynëte daiktà ið %d sloto.", tmpIter[playerid]+1);
-						SaveHouseInventory(tmpSelected[playerid]);
-						ShowPlayerAdminMenu(playerid);
-					}
-				}
-			}
-			//else ShowHouseInventory(playerid, tmpSelected[playerid], true);
-		}
-		case DIALOG_AM_HOUSE_INV:
-		{
-			if(response)
-			{
-				if(HaveAdminPermission(playerid, "EditHouseInventory"))
-				{
-					tmpIter[playerid] = listitem;
-					ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_INV_EDIT, DIALOG_STYLE_LIST, "Namo inventorius", "Keisti daiktà\nKeisti kieká\n{C60000}Iðtrinti", "Tæsti", "Atðaukti");
-				}
-				else return InfoBox(playerid, IB_NO_PRIVILEGE);
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 4, "");
-		}
-		case DIALOG_AM_HOUSE_EDIT_PRICE:
-		{
-			if(response)
-			{
-				new amount;
-				if(sscanf(inputtext,"d",amount) || amount < 0) return SendError(playerid, "Blogai ávestas skaièius.") , OnDialogResponse(playerid, DIALOG_AM_HOUSE_EDIT_MAIN, 1, 0, "");
-				if(0 < amount)
-				{
-					HouseInfo[tmpSelected[playerid]][hPrice] = amount;
-					MsgSuccess(playerid, "NAMAS", "Pakeitëte namo kainà á $%d", amount);
-					new string[126];
-					mysql_format(chandler, string, sizeof string, "UPDATE `houses_data` SET Price = '%d' WHERE id = '%d'", amount, HouseInfo[tmpSelected[playerid]][hId]);
-					mysql_fquery(chandler, string, "HouseUpdated");
-					House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels"));
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-					log_set_values("'%d','%e','(AM) Pakeite namo kaina','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), amount);
-					log_commit();
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_HOUSES_MAIN, 1, 4, "");
-		}
-		case DIALOG_AM_HOUSE_EDIT_OWNER:
-		{
-			if(response)
-			{
-				if(!strlen(inputtext)) return SendError(playerid, "Blogai ávestas ID arba vardas.") , OnDialogResponse(playerid, DIALOG_AM_HOUSE_EDIT_MAIN, 1, 1, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				if(IsNumeric(inputtext))
-				{
-					if(strval(inputtext) == 0)
-					{
-						new string[126];
-						HouseInfo[tmpSelected[playerid]][hOwner] = 0;
-						mysql_format(chandler, string, sizeof string, "UPDATE `houses_data` SET Owner = '0' WHERE id = '%d'", HouseInfo[tmpSelected[playerid]][hId]);
-						mysql_fquery(chandler, string, "HouseUpdated");
-						MsgSuccess(playerid, "NAMAS", "Paðalinote namo savininkà.");
-						OnDialogResponse(playerid, DIALOG_AM_HOUSES_MAIN, 1, 1, "");
-						House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels"));
-						
-						
-						House_CreatePickup(tmpSelected[playerid]);
-					}
-					else
-					{
-						new string[126];
-						mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `players_data` WHERE id = '%d'", strval(inputtext));
-						new Cache:result = mysql_query(chandler, string, true);
-						cache_set_active(result);
-						if(cache_num_rows())
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_data` SET Owner = '%d' WHERE id = '%d'", strval(inputtext), HouseInfo[tmpSelected[playerid]][hId]);
-							mysql_fquery(chandler, string, "HouseUpdated");
-							HouseInfo[tmpSelected[playerid]][hOwner] = strval(inputtext);
-							MsgSuccess(playerid, "NAMAS", "Pakeitëte namo savininkà.");
-							House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels"));
-							
-							House_CreatePickup(tmpSelected[playerid]);
-							log_set_values("'%d','%e','(AM) Pakeite namo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpSelected[playerid]][hOwner], strval(inputtext));
-						}
-						else
-						{
-							SendError(playerid, "Þaidëjas tokiu ID (%d) duomenø bazëje nerastas.", strval(inputtext));
-						}
-						cache_delete(result);
-					}
-				}
-				else
-				{
-					new string[126];
-					mysql_format(chandler, string, sizeof string, "SELECT id FROM `players_data` WHERE Name = '%e'", inputtext);
-					new Cache:result = mysql_query(chandler, string, true);
-					cache_set_active(result);
-					if(cache_num_rows())
-					{
-						new id;
-						cache_get_value_name_int(0, "id", id);
-						mysql_format(chandler, string, sizeof string, "UPDATE `houses_data` SET Owner = '%d' WHERE id = '%d'", id, HouseInfo[tmpSelected[playerid]][hId]);
-						mysql_fquery(chandler, string, "HouseUpdated");
-						HouseInfo[tmpSelected[playerid]][hOwner] = id;
-						MsgSuccess(playerid, "NAMAS", "Pakeitëte namo savininkà.");
-						House_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledHouseLabels"));
-						
-						House_CreatePickup(tmpSelected[playerid]);
-						log_set_values("'%d','%e','(AM) Pakeite namo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[tmpSelected[playerid]][hOwner], id);
-					}
-					else
-					{
-						SendError(playerid, "Þaidëjas tokiu vardu (%s) duomenø bazëje nerastas.", inputtext);
-					}
-					cache_delete(result);
-				}
-				log_commit();
-				OnDialogResponse(playerid, DIALOG_AM_HOUSES_MAIN, 1, 1, "");
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_HOUSE_EDIT_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// kaina
-						if(HaveAdminPermission(playerid, "EditHousePrice"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_EDIT_PRICE, DIALOG_STYLE_INPUT, "Namo redagavimas", "{FFFFFF}Áveskite naujà namo kainà.", "Keisti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						// savininkas
-						if(HaveAdminPermission(playerid, "EditHouseOwner"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_EDIT_OWNER, DIALOG_STYLE_INPUT, "Namo redagavimas", "{FFFFFF}Áveskite naujà namo savininko MySQL numerá arba pilnà vardà.\n{BABABA}Norëdami savininkà paðalinti, áraðykite 0", "Keisti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 2:
-					{
-						// keisti iejimo vieta
-						if(HaveAdminPermission(playerid, "ChangeHouseEnter"))
-						{
-							new selected = tmpSelected[playerid];
-							MsgSuccess(playerid, "NAMAS", "Sëkmingai pakeista áëjimo vieta.");
-							new Float:x, Float:y, Float:z;
-							GetPlayerPos(playerid, x, y, z);
-							HouseInfo[selected][hOutVW] = GetPlayerVirtualWorld(playerid),
-							HouseInfo[selected][hExterior] = GetPlayerInterior(playerid),
-							HouseInfo[selected][hEnterX] = x,
-							HouseInfo[selected][hEnterY] = y,
-							HouseInfo[selected][hEnterZ] = z;
-							new string[186];
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_data` SET EnterX = '%f', EnterY = '%f', EnterZ = '%f', OutVW = '%d', Exterior = '%d' WHERE id = '%d'", x, y, z, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), HouseInfo[selected][hId]);
-							mysql_fquery(chandler, string, "HouseUpdated");
-							
-							House_CreatePickup(selected);
-							House_FixLabels(selected, GetGVarInt("EnabledHouseLabels"));
-
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','Pakeite namo iejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId]);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 3:
-					{
-						// keisti isejimo vieta
-						if(HaveAdminPermission(playerid, "ChangeHouseExit"))
-						{
-							new selected = tmpSelected[playerid];
-							MsgSuccess(playerid, "NAMAS", "Sëkmingai pakeista iðëjimo vieta.");
-							new Float:x, Float:y, Float:z;
-							GetPlayerPos(playerid, x, y, z);
-							HouseInfo[selected][hInterior] = GetPlayerInterior(playerid),
-							HouseInfo[selected][hExitX] = x,
-							HouseInfo[selected][hExitY] = y,
-							HouseInfo[selected][hExitZ] = z;
-							new string[186];
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_data` SET ExitX = '%f', ExitY = '%f', ExitZ = '%f', Interior = '%d' WHERE id = '%d'", x, y, z, GetPlayerInterior(playerid), HouseInfo[selected][hId]);
-							mysql_fquery(chandler, string, "HouseUpdated");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','Pakeite namo isejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId]);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 4:
-					{
-						if(HaveAdminPermission(playerid, "DeleteHouseFurniture"))
-						{
-							// furniture isvalymas
-							new selected = tmpSelected[playerid],
-								count_deleted,
-								last_itter = -1,
-								string[86],
-								__reset_HFurniture[E_HOUSE_FURNITURE_DATA];
-
-							foreach(new furnitureid : HFurniture)
-							{
-								if(hFurnitureInfo[furnitureid][hfOwner] == HouseInfo[selected][hId])
-								{
-									if(IsValidDynamicObject(hFurnitureInfo[furnitureid][hfObject])) DestroyDynamicObject(hFurnitureInfo[furnitureid][hfObject], "furniture", "admin_delete_house_furniture");
-									hFurnitureInfo[furnitureid] = __reset_HFurniture;
-									hFurnitureInfo[furnitureid][hfObject] = INVALID_OBJECT_ID;
-									if(last_itter != -1 && last_itter != furnitureid)
-									{
-										Iter_Remove(HFurniture, last_itter);
-										count_deleted++;
-									}
-									last_itter = furnitureid;
-								}
-							}
-							mysql_format(chandler, string, sizeof string, "DELETE FROM `houses_furniture` WHERE HouseId = '%d'", HouseInfo[selected][hId]);
-							mysql_tquery(chandler, string, "FurnitureDeleted");
-							if(last_itter != -1) Iter_Remove(HFurniture, last_itter);
-							MsgSuccess(playerid, "NAMAS", "Sëkmingai iðtrynëte %d namo baldø.", count_deleted);
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-							log_set_values("'%d','%e','Isvale namo furniture','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId], count_deleted);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 5:
-					{
-						// tikrinti inventoriu
-						if(HaveAdminPermission(playerid, "ViewHouseInventory"))
-						{
-							SendWarning(playerid, "Neveikia.");
-							//ShowHouseInventory(playerid, tmpSelected[playerid], true);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 6:
-					{
-						// teleportuotis prie iejimo
-						if(HaveAdminPermission(playerid, "ChangeHouseEnter"))
-						{
-							new selected = tmpSelected[playerid];
-							SetPlayerInterior(playerid, HouseInfo[selected][hExterior]);
-							SetPlayerVirtualWorld(playerid, HouseInfo[selected][hOutVW]);
-							SetPlayerPos(playerid, HouseInfo[selected][hEnterX], HouseInfo[selected][hEnterY], HouseInfo[selected][hEnterZ]);
-						}
-					}
-					case 7:
-					{
-						if(HaveAdminPermission(playerid, "ChangeHouseExit"))
-						{
-							// teleportuotis prie isejimo
-							new selected = tmpSelected[playerid];
-							SetPlayerInterior(playerid, HouseInfo[selected][hInterior]);
-							SetPlayerVirtualWorld(playerid, HouseInfo[selected][hVW]);
-							SetPlayerPos(playerid, HouseInfo[selected][hExitX], HouseInfo[selected][hExitY], HouseInfo[selected][hExitZ]);
-						}
-					}
-					case 8:
-					{
-						if(HaveAdminPermission(playerid, "DeleteHouse"))
-						{
-							// istrinti
-							new selected = tmpSelected[playerid],
-								string[356],
-								__reset_House[E_HOUSE_DATA],
-								__reset_HFurniture[E_HOUSE_FURNITURE_DATA],
-								last_itter = -1;
-							// istrinam ir furniture
-							foreach(new furnitureid : HFurniture)
-							{
-								if(hFurnitureInfo[furnitureid][hfOwner] == HouseInfo[selected][hOwner])
-								{
-									if(IsValidDynamicObject(hFurnitureInfo[furnitureid][hfObject])) DestroyDynamicObject(hFurnitureInfo[furnitureid][hfObject], "furniture", "admin_delete_house");
-									hFurnitureInfo[furnitureid] = __reset_HFurniture;
-									hFurnitureInfo[furnitureid][hfObject] = INVALID_OBJECT_ID;
-									if(last_itter != -1 && last_itter != furnitureid)
-									{
-										Iter_Remove(HFurniture, last_itter);
-									}
-									last_itter = furnitureid;
-								}
-							}
-							if(last_itter != -1) Iter_Remove(HFurniture, last_itter);
-							
-							if(IsValidDynamic3DTextLabel(HouseInfo[selected][hLabel])) DestroyDynamic3DTextLabel(HouseInfo[selected][hLabel]);
-							sd_DestroyDynamicPickup(HouseInfo[selected][hPickup]);
-
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Istryne nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[selected][hId]);
-							log_commit();
-							mysql_format(chandler, string, sizeof string, "DELETE FROM `houses_data` WHERE id = '%d'; DELETE FROM `houses_inventory` WHERE HouseId = '%d'; DELETE FROM `houses_furniture` WHERE HouseId = '%d'; DELETE FROM `houses_dubkeys` WHERE HouseId = '%d'", HouseInfo[selected][hId], HouseInfo[selected][hId], HouseInfo[selected][hId], HouseInfo[selected][hId]);
-							mysql_fquery(chandler, string, "HouseDeleted");
-							HouseInfo[selected] = __reset_House;
-							HouseInfo[selected][hLabel] = INVALID_3DTEXT_ID;
-							Iter_Remove(House, selected);
-							MsgSuccess(playerid, "NAMAS", "Sëkmingai iðtrynëte namà.");
-						}
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_HOUSES_MAIN, 1, 1, "");
-		}
-		case DIALOG_AM_HOUSES_ALL:
-		{
-			if(response)
-			{
-				if(tmpAmenuIter[playerid] != 0)
-				{
-					if(listitem == tmpAmenuIter[playerid] && tmpAmenuNextPage[playerid]) AM_ShowAllHouses(playerid, tmpAmenuCurPage[playerid] + 1); 
-					else if(((listitem == tmpAmenuIter[playerid] && !tmpAmenuNextPage[playerid]) || (listitem == tmpAmenuIter[playerid] + 1 && tmpAmenuNextPage[playerid])) && tmpAmenuCurPage[playerid] > 0) AM_ShowAllHouses(playerid, tmpAmenuCurPage[playerid] - 1);
-					else if(HaveAdminPermission(playerid, "EditHouses"))
-					{
-						new 
-							real_iter,
-							count_on_this_page;
-						foreach(new houseid : House)
-						{
-							if(HouseInfo[houseid][hId] != 0)
-							{
-								if(real_iter >= MAX_HOUSES_PER_PAGE*tmpAmenuCurPage[playerid])
-								{
-									if(count_on_this_page == listitem)
-									{
-										new 
-											string[256];
-										format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\nKaina\t$%d\nSavininkas\t%s\nKeisti áëjimo vietà\nKeisti iðëjimo vietà\nIðvalyti baldus\nRedaguoti inventoriø\nTeleportuotis prie namo áëjimo\nTeleportuotis prie namo iðëjimo\n{C60000}Iðtrinti", HouseInfo[houseid][hPrice], GetNameBySql(HouseInfo[houseid][hOwner]));
-										ShowPlayerDialog(playerid, DIALOG_AM_HOUSE_EDIT_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Namo redagavimas", string, "Tæsti", "Atðaukti");
-										tmpSelected[playerid] = houseid;
-										return 1;
-									}
-									count_on_this_page ++ ;
-								}
-								real_iter ++ ;
-							}
-						}
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 4, "");
-		}
-		case DIALOG_AM_HOUSES_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// kurti nauja nama
-						if(HaveAdminPermission(playerid, "CreateNewHouse"))
-						{
-							new __reset_House[E_HOUSE_DATA],
-								string[256],
-								Float:x,
-								Float:y,
-								Float:z,
-								houseid = Iter_Free(House),
-								int = GetPlayerInterior(playerid),
-								vw = GetPlayerVirtualWorld(playerid);
-							GetPlayerPos(playerid, x, y, z);
-							mysql_format(chandler, string, sizeof string, "INSERT INTO `houses_data` (`Added`,`EnterX`,`EnterY`,`EnterZ`,`Exterior`,`OutVW`) VALUES ('%d','%f','%f','%f','%d','%d')", PlayerInfo[playerid][pId], x, y, z, int, vw);
-							new Cache:result = mysql_query(chandler, string, true);
-							if(mysql_errno() == 0)
-							{
-								if(int != 0 || vw != 0)
-								{
-									SendWarning(playerid, "Jûs nesate lauke (interior: %d, world: %d), todël sukurto namo bus neámanoma parodyti þemëlapyje.", int, vw);
-								}
-								cache_set_active(result);
-								HouseInfo[houseid] = __reset_House;
-								HouseInfo[houseid][hId] = cache_insert_id();
-								HouseInfo[houseid][hOutVW] = vw;
-								HouseInfo[houseid][hExterior] = int;
-								HouseInfo[houseid][hEnterX] = x,
-								HouseInfo[houseid][hEnterY] = y,
-								HouseInfo[houseid][hEnterZ] = z;
-								HouseInfo[houseid][hVW] = HouseInfo[houseid][hId]+HOUSE_VIRTUAL_WORLD;
-								Iter_Add(House, houseid);
-								MsgSuccess(playerid, "NAMAI", "Sëkmingai sukûrëte namà, kurio ID: %d", HouseInfo[houseid][hId]);
-
-								House_FixLabels(houseid, GetGVarInt("EnabledHouseLabels"));
-								House_CreatePickup(houseid);
-							}
-							else
-							{
-								SendError(playerid, "Siøsta uþklausa nepavyko [%d]", mysql_errno());
-							}
-							if(cache_is_valid(result)) cache_delete(result);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						// perziureti visus namus visi namai
-						AM_ShowAllHouses(playerid, 0);
-					}
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
 		case DIALOG_AM_BUSINESS_INV_ITEM:
 		{
 			if(response)
@@ -15104,16 +14145,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 				{
-					case 3:
-					{
-						// garazai
-						ShowPlayerDialog(playerid, DIALOG_AM_GARAGES_MAIN, DIALOG_STYLE_LIST, "Garaþai", "Kurti naujà\nPerþiûrëti visus", "Tæsti", "Atðaukti");
-					}
-					case 4:
-					{
-						// namai
-						ShowPlayerDialog(playerid, DIALOG_AM_HOUSES_MAIN, DIALOG_STYLE_LIST, "Namai", "Kurti naujà\nPerþiûrëti visus", "Tæsti", "Atðaukti");
-					}
 					case 5:
 					{
 						// verslai
@@ -15123,12 +14154,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						// tr. priemoniu salonai
 						ShowPlayerDialog(playerid, DIALOG_AM_SALONS_MAIN, DIALOG_STYLE_LIST, "Tr. priemoniø salonai", "Kurti naujà\nPerþiûrëti visus", "Tæsti", "Atðaukti");
-					}
-
-					case 8:
-					{
-						// frakcijos
-						ShowPlayerDialog(playerid, DIALOG_AM_FACTION_MAIN, DIALOG_STYLE_LIST, "Frakcijos", "Perþiûrëti visas\nPridëti", "Tæsti", "Atðaukti");
 					}
 					case 9:
 					{
@@ -15424,379 +14449,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				mysql_tquery(chandler, string, "FactionSalonVehiclesLoad", "d", playerid);
 			}
 			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_FACTION_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// visas
-						if(HaveAdminPermission(playerid, "EditFactions"))
-						{
-							new line[56],
-								i,
-								type[16],
-								string[2024] = "{BABABA}Nr.\t{BABABA}Pavadinimas\t{BABABA}Tipas\n";
-							foreach(new factionid : Faction)
-							{
-								if(FactionInfo[factionid][fId] == 0) { continue; }
-								i++;
-								switch(FactionInfo[factionid][fType])
-								{
-									case FACTION_TYPE_POLICE: format(type, sizeof type, "PD");
-									case FACTION_TYPE_FIRE: format(type, sizeof type, "FD/MD");
-									case FACTION_TYPE_GOVERNMENT: format(type, sizeof type, "Savivaldybë");
-									case FACTION_TYPE_LEGAL: format(type, sizeof type, "Legali fr.");
-									case FACTION_TYPE_ILLEGAL: format(type, sizeof type, "Nelegali fr.");
-									case FACTION_TYPE_NONE: format(type, sizeof type, "Paprasta");
-									case FACTION_TYPE_SAN_NEWS: format(type, sizeof type, "San News");
-									default: format(type, sizeof type, "Neþinoma");
-								}
-								format(line, sizeof line, "%d.\t%0.30s (MySQL ID: %d)\t%s\n", i, FactionInfo[factionid][fName], FactionInfo[factionid][fId], type);
-								strcat(string, line);
-							}
-							ShowPlayerDialog(playerid, DIALOG_AM_FACTIONS_ALL, DIALOG_STYLE_TABLIST_HEADERS, "Frakcijos", string, "Tæsti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						if(HaveAdminPermission(playerid, "CreateNewFaction"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_FACTION_ADD, DIALOG_STYLE_INPUT, "Frakcijos", "{FFFFFF}Áveskite naujos frakcijos pavadinimà.", "Kurti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_FACTIONS_ALL:
-		{
-			if(response)
-			{
-				new selected;
-				GetSortedAsForeach(Faction, listitem, selected, FactionInfo[loopindex][fId] != 0);
-				tmpSelected[playerid] = selected;
-				ShowPlayerDialog(playerid, DIALOG_AM_FACTION_EDIT_MAIN, DIALOG_STYLE_LIST, "Frakcijos", "Keisti pavadinimà\nRedaguoti rankus\nKeisti spawn vietà\nKeisti tipà\nSuteikti/atimti frakcijos chat\n{C60000}Iðtrinti", "Tæsti", "Atðaukti");
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 8, "");
-		}
-		case DIALOG_AM_FACTION_EDIT_NAME:
-		{
-			if(response)
-			{
-				new selected = tmpSelected[playerid],
-					name[48];
-				if(sscanf(inputtext,"s[48]",name)) return OnDialogResponse(playerid, DIALOG_AM_FACTION_EDIT_MAIN, 1, 0, "");
-				format(FactionInfo[selected][fName], 48, name);
-				SaveFactionEx(selected, "Name", name);
-				MsgSuccess(playerid, "FRAKCIJOS", "Pavadinimas sëkmingai pakeistas á %s", name);
-				ShowPlayerAdminMenu(playerid);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-				log_set_values("'%d','%e','(AM) Pakeite frakcijos pavadinima','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], inputtext);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 8, "");
-		}
-		case DIALOG_AM_FACTION_RANK_EDIT_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// pavadinimas
-						ShowPlayerDialog(playerid, DIALOG_AM_FACTION_RANK_EDIT_NAME, DIALOG_STYLE_INPUT, "Frakcijos rankai", "{FFFFFF}Áveskite naujà ranko pavadinimà.", "Tæsti", "Atðaukti");
-					}
-					case 1:
-					{
-						// alga
-						ShowPlayerDialog(playerid, DIALOG_AM_FACTION_RANK_EDIT_SALARY, DIALOG_STYLE_INPUT, "Frakcijos rankai", "{FFFFFF}Áveskite naujà ranko algà.", "Tæsti", "Atðaukti");
-					}
-					case 2:
-					{
-						// trinti
-						new factionid = tmpSelected[playerid],
-							selected = tmpIter[playerid];
-						FactionRankIds[factionid][selected] =
-						FactionRankSalaries[factionid][selected] = 0;
-						format(FactionRankNames[factionid][selected], 2, " ");
-						new string[156];
-						mysql_format(chandler, string, sizeof string, "DELETE FROM `factions_ranks` WHERE id = '%d'; UPDATE `factions_ranks` SET `Rank` = `Rank`-1 WHERE `Rank` > '%d'", FactionRankIds[factionid][selected], selected+1);
-						mysql_fquery(chandler, string, "FactionSaved");
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`ReceiverId`");
-						log_set_values("'%d','%e','(AM) Istryne frakcijos ranka','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], FactionRankNames[factionid][selected], selected+1);
-						log_commit();
-						for(new i = selected; i < MAX_FACTION_RANKS; i++)
-						{
-							if(i != MAX_FACTION_RANKS-1)
-							{
-								FactionRankIds[factionid][i] = FactionRankIds[factionid][i+1];
-								FactionRankSalaries[factionid][i] = FactionRankSalaries[factionid][i+1];
-								strmid(FactionRankNames[factionid][i], FactionRankNames[factionid][i+1], 0, 84);
-							}
-						}
-						ShowPlayerAdminMenu(playerid);
-						MsgSuccess(playerid, "FRAKCIJOS", "Rankas sëkmingai iðtrintas");
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_FACTION_EDIT_MAIN, 1, 1, "");
-		}
-		case DIALOG_AM_FACTION_RANK_EDIT_NAME:
-		{
-			if(response)
-			{
-				new name[84];
-				if(sscanf(inputtext,"s[84]",name)) return OnDialogResponse(playerid, DIALOG_AM_FACTION_RANK_EDIT_MAIN, 1, 0, "");
-				new factionid = tmpSelected[playerid],
-					selected = tmpIter[playerid],
-					string[256];
-				format(FactionRankNames[factionid][selected], 84, name);
-				mysql_format(chandler, string, sizeof string, "UPDATE `factions_ranks` SET Name = '%e' WHERE id = '%d'", name, FactionRankIds[factionid][selected]);
-				mysql_fquery(chandler, string, "FactionSaved");
-				MsgSuccess(playerid, "FRAKCIJOS", "Ranko pavadinimas sëkmingai pakeistas.");
-				OnDialogResponse(playerid, DIALOG_AM_FACTION_RANKS_ALL, 1, tmpIter[playerid], "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`ReceiverId`");
-				log_set_values("'%d','%e','(AM) Pakeite frakcijos ranko pavadinima','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], name, selected+1);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_FACTION_RANKS_ALL, 1, tmpIter[playerid], "");
-		}
-		case DIALOG_AM_FACTION_RANK_EDIT_SALARY:
-		{
-			if(response)
-			{
-				new salary;
-				if(sscanf(inputtext,"d",salary) || salary < 0) return OnDialogResponse(playerid, DIALOG_AM_FACTION_RANK_EDIT_MAIN, 1, 1, "");
-				new factionid = tmpSelected[playerid],
-					selected = tmpIter[playerid],
-					string[126];
-				FactionRankSalaries[factionid][selected] = salary;
-				mysql_format(chandler, string, sizeof string, "UPDATE `factions_ranks` SET Salary = '%d' WHERE id = '%d'", salary, FactionRankIds[factionid][selected]);
-				mysql_fquery(chandler, string, "FactionSaved");
-				MsgSuccess(playerid, "FRAKCIJOS", "Ranko alga sëkmingai pakeista.");
-				OnDialogResponse(playerid, DIALOG_AM_FACTION_RANKS_ALL, 1, tmpIter[playerid], "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`ReceiverId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite frakcijos ranko alga','%d','%e','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], FactionRankNames[factionid][selected], selected+1, salary);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_FACTION_RANKS_ALL, 1, tmpIter[playerid], "");
-		}
-		case DIALOG_AM_FACTION_RANKS_ALL:
-		{
-			if(response)
-			{
-				new factionid = tmpSelected[playerid];
-				tmpIter[playerid] = listitem;
-				if(FactionRankIds[factionid][listitem] != 0)
-				{
-					// edit
-					new string[256];
-					format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\nPavadinimas\t%s\nAlga\t$%d%s", FactionRankNames[factionid][listitem], FactionRankSalaries[factionid][listitem], listitem != 0 ? ("\n{C60000}Iðtrinti") : (""));
-					ShowPlayerDialog(playerid, DIALOG_AM_FACTION_RANK_EDIT_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Frakcijos rankai", string, "Tæsti", "Atðaukti");
-				}
-				else
-				{
-					// add
-					ShowPlayerDialog(playerid, DIALOG_AM_FACTION_RANK_ADD, DIALOG_STYLE_INPUT, "Frakcijos rankai", "{FFFFFF}Áveskite naujo ranko pavadinimà.", "Tæsti", "Atðaukti");
-				}
-			}
-		}
-		case DIALOG_AM_FACTION_RANK_ADD:
-		{
-			if(response)
-			{
-				new name[24],
-					selected = tmpSelected[playerid],
-					string[256];
-				if(sscanf(inputtext,"s[24]",name)) return OnDialogResponse(playerid, DIALOG_AM_FACTION_RANKS_ALL, 1, tmpIter[playerid], "");
-				mysql_format(chandler, string, sizeof string, "INSERT INTO `factions_ranks` (`FactionId`,`Name`,`Added`,`Salary`,`Rank`) (SELECT '%d','%e','%d','0',MAX(Rank)+1 FROM `factions_ranks` WHERE FactionId = '%d')", FactionInfo[selected][fId], name, PlayerInfo[playerid][pId], FactionInfo[selected][fId]);
-				new rank = tmpIter[playerid],
-					Cache:result = mysql_query(chandler, string, true);
-				cache_set_active(result);
-				FactionRankIds[selected][rank] = cache_insert_id();
-				cache_delete(result);
-				format(FactionRankNames[selected][rank], 84, name);
-				FactionRankSalaries[selected][rank] = 0;
-				OnDialogResponse(playerid, DIALOG_AM_FACTION_EDIT_MAIN, 1, 1, "");
-				MsgSuccess(playerid, "FRAKCIJOS", "Sëkmingai pridëjote rankà.");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`,`ReceiverId`");
-				log_set_values("'%d','%e','(AM) Pridejo frakcijos ranka','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], name, selected+1);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_FACTION_EDIT_MAIN, 1, 1, "");
-		}
-		case DIALOG_AM_FACTION_EDIT_TYPE:
-		{
-			if(response)
-			{
-				new selected = tmpSelected[playerid];
-				FactionInfo[selected][fType] = listitem;
-				MsgSuccess(playerid, "FRAKCIJOS", "Tipas sëkmingai pakeistas.");
-				SaveFactionIntEx(selected, "Type", listitem);
-				ShowPlayerAdminMenu(playerid);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite frakcijos tipa','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], listitem);
-				log_commit();
-			}
-		}
-		case DIALOG_AM_FACTION_EDIT_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// pavadinimas
-						ShowPlayerDialog(playerid, DIALOG_AM_FACTION_EDIT_NAME, DIALOG_STYLE_INPUT, "Frakcijos", "{FFFFFF}Áveskite naujà frakcijos pavadinimà.", "Tæsti", "Atðaukti");
-					}
-					case 1:
-					{
-						// rankai
-						new selected = tmpSelected[playerid],
-							string[512] = "{BABABA}Nr.\t{BABABA}Pavadinimas\t{BABABA}Alga\n";
-						for(new i = 0; i < MAX_FACTION_RANKS; i++)
-						{
-							if(strlen(FactionRankNames[selected][i]) > 0)
-							{
-								format(string, sizeof string, "%s%d\t%s\t$%d\n", string, i+1, FactionRankNames[selected][i], FactionRankSalaries[selected][i]);
-							}
-							else
-							{
-								strcat(string, "{82C84D}Pridëti");
-								break;
-							}
-						}
-						ShowPlayerDialog(playerid, DIALOG_AM_FACTION_RANKS_ALL, DIALOG_STYLE_TABLIST_HEADERS, "Frakcijos rankai", string, "Tæsti", "Atðaukti");
-					}
-					case 2:
-					{
-						// spawn vieta
-						if(GetPlayerInterior(playerid) != 0 || GetPlayerVirtualWorld(playerid) != 0)
-						{
-							SendError(playerid, "Turite bûti lauke");
-							ShowPlayerAdminMenu(playerid);
-							return 1;
-						}
-						new selected = tmpSelected[playerid],
-							Float:x,
-							Float:y,
-							Float:z;
-						GetPlayerPos(playerid, x, y, z);
-						FactionInfo[selected][fSpawnX] = x,
-						FactionInfo[selected][fSpawnY] = y,
-						FactionInfo[selected][fSpawnZ] = z;
-						SaveFactionFloatEx(selected, "SpawnX", FactionInfo[selected][fSpawnX]);
-						SaveFactionFloatEx(selected, "SpawnY", FactionInfo[selected][fSpawnY]);
-						SaveFactionFloatEx(selected, "SpawnZ", FactionInfo[selected][fSpawnZ]);
-						MsgSuccess(playerid, "FRAKCIJOS", "SPAWN vieta sëkmingai pakeista.");
-						ShowPlayerAdminMenu(playerid);
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-						log_set_values("'%d','%e','(AM) Pakeite frakcijos spawn','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId]);
-						log_commit();
-					}
-					case 3:
-					{
-						// tipas
-						ShowPlayerDialog(playerid, DIALOG_AM_FACTION_EDIT_TYPE, DIALOG_STYLE_LIST, "Frakcijos", "Paprasta frakcija\nPolicijos departamentas\nUgniagesiai/medicinos departmentas\nSavivaldybë\nNelegali frakcija\nLegali frakcija\nSan News", "Tæsti", "Atðaukti");
-					}
-					case 4:
-					{
-						// atimti/leisti frakcijos chat
-						new selected = tmpSelected[playerid];
-						FactionInfo[selected][fHasChat] = !FactionInfo[selected][fHasChat];
-						SaveFactionIntEx(selected, "HasChat", FactionInfo[selected][fHasChat]);
-						MsgSuccess(playerid, "FRAKCIJOS", "Frakcijos %s pokalbiø kanalas buvo %s.", FactionInfo[selected][fName], (FactionInfo[selected][fHasChat] > 0 ? ("sukurtas") : ("iðtrintas")));
-						ShowPlayerAdminMenu(playerid);
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-						log_set_values("'%d','%e','(AM) Pakeite frakcijos chat turejima','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], FactionInfo[selected][fHasChat]);
-						log_commit();
-					}
-					case 5:
-					{
-						// istrinti
-						new selected = tmpSelected[playerid],
-							__reset_Faction[E_FACTION_DATA],
-							string[256];
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-						log_set_values("'%d','%e','(AM) Istryne frakcija','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[selected][fId], FactionInfo[selected][fName]);
-						log_commit();
-						mysql_format(chandler, string, sizeof string, "DELETE FROM `factions_data` WHERE id = '%d'; DELETE FROM `factions_ranks` WHERE FactionId = '%d'; UPDATE `players_data` SET Faction = '0' AND JobLevel = '0' WHERE Faction = '%d'", FactionInfo[selected][fId], FactionInfo[selected][fId], FactionInfo[selected][fId]);
-						mysql_fquery(chandler, string, "FactionDeleted");
-						foreach(new receiverid : Player)
-						{
-							if(PlayerInfo[receiverid][pFaction] == FactionInfo[selected][fId])
-							{
-								PlayerInfo[receiverid][pFaction] =
-								PlayerInfo[receiverid][pFactionLeader] =
-								PlayerInfo[receiverid][pJobLevel] = 0;
-								MsgError(receiverid, "INFORMACIJA", "Frakcija, kurioje dirbote, buvo iðtrinta.");
-								continue;
-							}
-						}
-						for(new i = 0; i < MAX_FACTION_RANKS; i++)
-						{
-							format(FactionRankNames[selected][i], 2, " ");
-							FactionRankSalaries[selected][i] = 0;
-						}
-						FactionInfo[selected] = __reset_Faction;
-						Iter_Remove(Faction, selected);
-						MsgSuccess(playerid, "FRAKCIJOS", "Frakcija sëkmingai iðtrinta.");
-						ShowPlayerAdminMenu(playerid);
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 8, "");
-		}
-		case DIALOG_AM_FACTION_ADD:
-		{
-			if(response)
-			{
-				new name[48],
-					string[126];
-				if(sscanf(inputtext,"s[48]",name) || !strlen(name)) return OnDialogResponse(playerid, DIALOG_AM_FACTION_MAIN, 1, 1, "");
-				mysql_format(chandler, string, sizeof string, "INSERT INTO `factions_data` (`Name`,`Added`) VALUES ('%e','%d')", name, PlayerInfo[playerid][pId]);
-				new Cache:result = mysql_query(chandler, string, true);
-				cache_set_active(result);
-				new itter = Iter_Free(Faction);
-				FactionInfo[itter][fId] = cache_insert_id();
-				format(FactionInfo[itter][fName], 48, name);
-				Iter_Add(Faction, itter);
-				cache_delete(result);
-				MsgSuccess(playerid, "FRAKCIJOS", "Frakcija sëkmingai sukurta.");
-				ShowPlayerAdminMenu(playerid);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-				log_set_values("'%d','%e','(AM) Sukure nauja frakcija','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[itter][fId], FactionInfo[itter][fName]);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 8, "");
 		}
 		case DIALOG_CLOTHES_MAIN:
 		{
@@ -18839,8 +17491,6 @@ thread(HouseDeleted);
 thread(HouseUpdated);
 thread(DealerHouseDeleted);
 thread(DealerHouseUpdated);
-thread(GarageUpdated);
-thread(GarageDeleted);
 thread(PlayerAddedToFaction);
 thread(FactionVehiclePosUpdate);
 
@@ -22031,7 +20681,7 @@ public OnPlayerUseInventoryItem(playerid, slotid)
 				PlayerDrugs[playerid][drug_type][drugLastDoze] += amount;
 				PlayerDrugs[playerid][drug_type][drugUsedLastTime] = gettime();
 				//SendFormat(playerid, -1, "Doze pakankama: %s -- %d reikalinga, %d vartojate.", PlayerDrugs[playerid][drug_type][drugLastDoze] >= DrugsDozeToEffect[drug_type][level] ? ("taip") : ("ne"), DrugsDozeToEffect[drug_type][level], PlayerDrugs[playerid][drug_type][drugLastDoze]);
-				SendFormat(playerid, 0x92E9CCFF, "%s: suvartojote %d gramø%s.", GetInventoryItemName(itemid), amount, PlayerDrugs[playerid][drug_type][drugLastDoze] >= DrugsDozeToEffect[drug_type][level] ? ("") : (", taèiau dozë nepakankama"));
+				SendFormat(playerid, 0x92E9CCFF, "%s: suvartojai %dg%s.", GetInventoryItemName(itemid), amount, PlayerDrugs[playerid][drug_type][drugLastDoze] >= DrugsDozeToEffect[drug_type][level] ? ("") : (", taèiau dozë nepakankama"));
 				switch(drug_type)
 				{
 					case DRUG_HEROINE:
@@ -23500,52 +22150,6 @@ stock GetXYInFrontOfPlayer(playerid, &Float:x, &Float:y, Float:distance)
 	y += (distance * floatcos(-a, degrees));
 }
 
-stock AM_ShowAllHouses(playerid, page)
-{
-	tmpAmenuCurPage[playerid] = page;
-	tmpAmenuIter[playerid] = 0;
-	tmpAmenuNextPage[playerid] = false;
-
-	new string[7000] = "{BABABA}Nr.\t{BABABA}MySQL ID (numeris)\t{BABABA}Savininkas\n{FFFFFF}",
-		real_iter = 0,
-		count_on_this_page = 0,
-		name[24],
-		line[86];
-	foreach(new house : House)
-	{
-		if(HouseInfo[house][hId] != 0)
-		{
-			if(real_iter >= MAX_HOUSES_PER_PAGE * tmpAmenuCurPage[playerid])
-			{
-				if(count_on_this_page >= MAX_HOUSES_PER_PAGE)
-				{
-					if(Iter_Last(House) != house)
-					{
-						tmpAmenuNextPage[playerid] = true;
-						strcat(string, "Kitas >>\n");
-						break;
-					}
-				}
-				else
-				{
-					if(HouseInfo[house][hOwner] == 0) format(name, 10, "-");
-					else format(name, sizeof name, GetNameBySql(HouseInfo[house][hOwner]));
-
-					format(line, sizeof line, "%d.\t%d\t%s\n", real_iter + 1, HouseInfo[house][hId], name);
-					strcat(string, line);
-				}
-				count_on_this_page++;
-			}
-			real_iter++;
-		}
-	}
-	tmpAmenuIter[playerid] = count_on_this_page;
-	if(real_iter == 0) return ShowPlayerAdminMenu(playerid) , SendWarning(playerid, "Nëra namø.");
-	if(tmpAmenuCurPage[playerid] > 0) strcat(string, "<< Atgal");
-	ShowPlayerDialog(playerid, DIALOG_AM_HOUSES_ALL, DIALOG_STYLE_TABLIST_HEADERS, "Namai", string, "Tæsti", "Atðaukti");
-	return 1;
-}
-
 stock AM_ShowAllBusiness(playerid, page)
 {
 	tmpAmenuCurPage[playerid] = page;
@@ -24097,15 +22701,24 @@ stock GetUserNameById(sqlid)
 	cache_set_active(memory);
 	return name;
 }
+
 stock GetNewCharNameBySql(sqlid) {
 	new name[MAX_PLAYER_NAME+1];
 	format(name, MAX_PLAYER_NAME+1, GetStringBySqlId(sqlid, "Name", "players_new"));
 	return name;
 }
+
 stock GetNameBySql(sqlid) {
 	new name[MAX_PLAYER_NAME+1];
 	format(name, MAX_PLAYER_NAME+1, GetStringBySqlId(sqlid, "Name", "players_data"));
 	return name;
+}
+
+stock GetPlayerSqlByName(name[])
+{
+	new id = NONE;
+	
+	return id;
 }
 stock GetStringBySqlId(sqlid, row[], table[])
 {
@@ -24390,14 +23003,15 @@ stock Business_CreatePickup(businessid)
 
 
 
-stock Business_FixLabels(i, enabled_labels)
+stock Business_FixLabels(i, enabled_labels = 1)
 {
 	if(IsValidDynamic3DTextLabel(BusinessInfo[i][bLabel]))
 	{
 		DestroyDynamic3DTextLabel(BusinessInfo[i][bLabel]);
 	}
 	BusinessInfo[i][bLabel] = INVALID_3DTEXT_ID;
-	if(enabled_labels >= 1)
+
+	if(GetGVarInt("EnabledBusinessLabels") >= 1)
 	{
 		new string[256],
 			pay[24];
@@ -24797,7 +23411,7 @@ stock House_CreatePickup(house)
 	return 1;
 }
 
-stock House_FixLabels(i, enabled_labels)
+stock House_FixLabels(i, enabled_labels = 1)
 {
 	new string[156];
 	if(IsValidDynamic3DTextLabel(HouseInfo[i][hLabel]))
@@ -24805,7 +23419,8 @@ stock House_FixLabels(i, enabled_labels)
 		DestroyDynamic3DTextLabel(HouseInfo[i][hLabel]);
 	}
 	HouseInfo[i][hLabel] = INVALID_3DTEXT_ID;
-	if(enabled_labels >= 1)
+	
+	if(GetGVarInt("EnabledHouseLabels") >= 1)
 	{
 		if(HouseInfo[i][hOwner] == 0) format(string, sizeof string, "{FFFFFF}Namas parduodamas!\nKaina: $%d (/buyhouse){DADADA}\n\n", HouseInfo[i][hPrice]);
 		else if(HouseInfo[i][hSale] > 0) format(string, sizeof string, "{FFFFFF}Namas parduodamas!\nKaina: $%d (/buyhouse){DADADA}\n\n", HouseInfo[i][hSale]);
@@ -24955,6 +23570,36 @@ public PayPhonesLoad()
 	return 1;
 }
 
+stock House_DeleteFurniture(house)
+{
+	new 
+		last_iter = -1,
+		__reset_HFurniture[E_HOUSE_FURNITURE_DATA];
+
+	foreach(new furnitureid : HFurniture)
+	{
+		if(hFurnitureInfo[furnitureid][hfOwner] == HouseInfo[house][hId])
+		{
+			IsValidDynamicObject(hFurnitureInfo[furnitureid][hfObject]) && DestroyDynamicObject(hFurnitureInfo[furnitureid][hfObject], "furniture", "admin_delete_house_furniture");
+			hFurnitureInfo[furnitureid] = __reset_HFurniture;
+			hFurnitureInfo[furnitureid][hfObject] = INVALID_OBJECT_ID;
+			if(last_iter != -1 && last_iter != furnitureid)
+			{
+				Iter_Remove(HFurniture, last_iter);
+			}
+			last_iter = furnitureid;
+		}
+	}
+	if(last_iter != -1) Iter_Remove(HFurniture, last_iter);
+	
+	inline updateHouse()
+	{
+		return 1;
+	}
+	mysql_tquery_inline(chandler, using inline updateHouse, "DELETE FROM `houses_furniture` WHERE HouseId = '%d'", HouseInfo[house][hId]);
+	return 1;
+}
+
 stock LoadHouseFurniture(bool:restart = false)
 {
 	/*
@@ -25048,6 +23693,32 @@ public HouseFurnitureLoad()
 		Iter_Add(HFurniture, i);
 	}
 	printf("[load] %d namu baldu", rows);
+	return 1;
+}
+
+stock Garage_DeleteFurniture(garage)
+{
+	// istrinam ir furniture
+	new __reset_GFurniture[E_GARAGE_FURNITURE_DATA],
+		last_iter = -1;
+    foreach(new furnitureid : GFurniture)
+    {
+        if(gFurnitureInfo[furnitureid][gfOwner] == GarageInfo[garage][gOwner])
+        {
+            IsValidDynamicObject(gFurnitureInfo[furnitureid][gfObject]) && DestroyDynamicObject(gFurnitureInfo[furnitureid][gfObject], "furniture", "admin_delete_garage");
+            gFurnitureInfo[furnitureid] = __reset_GFurniture;
+            gFurnitureInfo[furnitureid][gfObject] = INVALID_OBJECT_ID;
+
+            if(last_iter != -1 && last_iter != furnitureid)
+            {
+                Iter_Remove(GFurniture, last_iter);
+            }
+            last_iter = furnitureid;
+        }
+    }
+    (last_iter != -1) && Iter_Remove(GFurniture, last_iter);
+	inline deleteFurniture() return 1;
+	mysql_tquery_inline(chandler, using inline deleteFurniture, "DELETE FROM `garages_furniture` WHERE GarageId = '%d'", GarageInfo[garage][gId]);
 	return 1;
 }
 
@@ -29898,7 +28569,7 @@ flags:hideadmins(CMD_TYPE_ADMIN);
 CMD:hideadmins(playerid, params[])
 {
 	PlayerExtra[playerid][peHideAdmin] = !PlayerExtra[playerid][peHideAdmin];
-	SendFormat(playerid, -1, "Dabar jus %s /admins sàraðe.", PlayerExtra[playerid][peHideAdmin] > 0 ? ("nerodys") : ("rodys"));
+	SendFormat(playerid, -1, "Dabar %s /admins sàraðe.", PlayerExtra[playerid][peHideAdmin] > 0 ? ("tavæs nerodys") : ("tave rodys"));
 	return 1;
 }
 
@@ -37173,7 +35844,7 @@ CMD:buybusiness(playerid, params[])
 		BusinessInfo[businessid][bOwner] = PlayerInfo[playerid][pId];
 		SaveBusinessIntEx(businessid, "Owner", PlayerInfo[playerid][pId]);
 		
-		Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels"));
+		Business_FixLabels(businessid);
 		Business_CreatePickup(businessid);
 	}
 	else SendWarning(playerid, "Ásitikinkite, kad esate lauke prie verslo.");
