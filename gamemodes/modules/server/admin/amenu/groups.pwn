@@ -3,6 +3,7 @@
 /** External */
 stock AMenu_Groups_Main(playerid)
 {
+    _Groups_Main(playerid);
     return 1;
 }
 
@@ -50,9 +51,6 @@ static _Groups_ShowList(playerid)
         {
             new groupid;
             GetSortedAsForeach(AdminGroup, listitem, groupid, EMPTY_STATEMENT);
-            
-            tmpTexture_MarkStart_CP[playerid] =
-            tmpPage_Object[playerid] = 0;
 
             _Groups_ShowDetails(playerid, groupid);
         }
@@ -77,7 +75,7 @@ static _Groups_ShowDetails(playerid, groupid)
             dialog_Row("Keisti pavadinimà")     return _Groups_ChangeName(playerid, groupid);
             dialog_Row("Keisti teises")         return _Groups_ChangePermissions(playerid, groupid);
             dialog_Row("Keisti komandø teises") return _Groups_ChangeCommands(playerid, groupid);
-            dialog_Row("{C60000}Iðtrinti")      return _Groups_Delete(playerid, groupid);
+            dialog_Row("Iðtrinti")              return _Groups_Delete(playerid, groupid);
         }
         else _Groups_ShowList(playerid);
     }
@@ -169,8 +167,10 @@ static _Groups_ChangePermissions(playerid, groupid, page = 0)
 
             inline permsList(response, listitem)
             {
-                dialog_Row("<<<") _Groups_ChangePermissions(playerid, .groupid = groupid, .page = page - 1);
-                dialog_Row(">>>") _Groups_ChangePermissions(playerid, .groupid = groupid, .page = page + 1);
+                if(!response) return _Groups_ShowDetails(playerid, groupid);
+
+                dialog_Row("<<<") return _Groups_ChangePermissions(playerid, .groupid = groupid, .page = page - 1);
+                dialog_Row(">>>") return _Groups_ChangePermissions(playerid, .groupid = groupid, .page = page + 1);
 
 
                 inline getPermName()
@@ -219,7 +219,6 @@ static _Groups_ChangePermissions(playerid, groupid, page = 0)
             GroupsInfo[groupid][groupId],
             ADMIN_PERMISSIONS_PER_PAGE + 1,
             page * ADMIN_PERMISSIONS_PER_PAGE);
-        // mysql_tquery(chandler, query, "GroupsPermissionsListLoad", "ddd", playerid, GroupsInfo[groupid][groupId], tmpPage_Object[playerid]);
     
     }
     mysql_tquery_inline(chandler, using inline isSuper, "SELECT NULL FROM `groups_data` WHERE id = '%d' AND Super = '1'",
@@ -270,56 +269,54 @@ static _Groups_ChangeCommands(playerid, groupid)
         
         inline cmdList(response, listitem)
         {
-            if(response)
-			{
-				// komanda pasirinko
-				new real;
-				for(new c = 0, size = PC_GetArraySize(array); c < size; c++)
-				{
-                    PC_GetCommandName(array, c, command, sizeof command);
-					if(PC_GetFlags(command) & CMD_TYPE_ADMIN)
-					{
-						if(real == listitem) { 
-                            break; 
-                        }
-						real++;
-					}
-				}
-
-
-                inline checkCurrentSet()
+            if(!response) return _Groups_ShowDetails(playerid, groupid);
+        
+            // komanda pasirinko
+            new real;
+            for(new c = 0, size = PC_GetArraySize(array); c < size; c++)
+            {
+                PC_GetCommandName(array, c, command, sizeof command);
+                if(PC_GetFlags(command) & CMD_TYPE_ADMIN)
                 {
-                    new changeQuery[256], bool:existed = false;
-                    if(cache_num_rows())
-                    {
-                        // delete
-                        existed = true;
-                        mysql_format(chandler, changeQuery, sizeof changeQuery, "DELETE FROM `groups_commands` WHERE GroupId = '%d' AND Command = '%e'", GroupsInfo[groupid][groupId], command);
+                    if(real == listitem) { 
+                        break; 
                     }
-                    else
-                    {
-                        // insert
-                        existed = false;
-                        mysql_format(chandler, changeQuery, sizeof changeQuery, "INSERT INTO `groups_commands` (`GroupId`,`Command`) VALUES ('%d','%e')", GroupsInfo[groupid][groupId], command);
-                    }
+                    real++;
+                }
+            }
 
-                    inline changePerm()
-                    {
-                        /**
-                            Pakeite komandos permissionus.
-                        */
-                        printf("[debug] %s pakeite grupes %d komanda %s: %d", ret_GetPlayerName(playerid), GroupsInfo[groupid][groupId], command, !existed);
-                        MsgSuccess(playerid, "Grupes", "Komandos nustatymas pakeistas");
 
-                        _Groups_ChangeCommands(playerid, groupid);
-                        return 1;
-                    }
-                    mysql_tquery_inline(chandler, using inline changePerm, changeQuery);
+            inline checkCurrentSet()
+            {
+                new changeQuery[256], bool:existed = false;
+                if(cache_num_rows())
+                {
+                    // delete
+                    existed = true;
+                    mysql_format(chandler, changeQuery, sizeof changeQuery, "DELETE FROM `groups_commands` WHERE GroupId = '%d' AND Command = '%e'", GroupsInfo[groupid][groupId], command);
+                }
+                else
+                {
+                    // insert
+                    existed = false;
+                    mysql_format(chandler, changeQuery, sizeof changeQuery, "INSERT INTO `groups_commands` (`GroupId`,`Command`) VALUES ('%d','%e')", GroupsInfo[groupid][groupId], command);
+                }
+
+                inline changePerm()
+                {
+                    /**
+                        Pakeite komandos permissionus.
+                    */
+                    printf("[debug] %s pakeite grupes %d komanda %s: %d", ret_GetPlayerName(playerid), GroupsInfo[groupid][groupId], command, !existed);
+                    MsgSuccess(playerid, "Grupes", "Komandos nustatymas pakeistas");
+
+                    _Groups_ChangeCommands(playerid, groupid);
                     return 1;
                 }
-				mysql_tquery_inline(chandler, using inline checkCurrentSet, "SELECT NULL FROM `groups_commands` WHERE GroupId = '%d' AND Command = '%e'", GroupsInfo[groupid][groupId], command);
-			}
-            else _Groups_ShowDetails(playerid, groupid);
+                mysql_tquery_inline(chandler, using inline changePerm, changeQuery);
+                return 1;
+            }
+            mysql_tquery_inline(chandler, using inline checkCurrentSet, "SELECT NULL FROM `groups_commands` WHERE GroupId = '%d' AND Command = '%e'", GroupsInfo[groupid][groupId], command);
         }
         
         dialog_Show(playerid, using inline cmdList, DIALOG_STYLE_TABLIST_HEADERS, "Grupës", "Keisti", "Atðaukti");
@@ -389,55 +386,54 @@ static _Groups_CreateNew(playerid, error[] = "")
 
     inline input(response, listitem)
     {
-        if(response)
+        if(!response) return _Groups_Main(playerid);
+
+        new name[30];
+        if(sscanf(dialog_Input(),"s[30]",name) || !strlen(name))
+            return _Groups_CreateNew(playerid, .error = "Neivestas pavadinimas.");
+
+        inline createNewGroup()
         {
-            new name[30];
-            if(sscanf(dialog_Input(),"s[30]",name) || !strlen(name))
-                return _Groups_CreateNew(playerid, .error = "Neivestas pavadinimas.");
+            new iter = Iter_Free(AdminGroup);
+            if(iter == ITER_NONE) return SendWarning(playerid, "Pasiektas grupiø limitas.");
 
-            inline createNewGroup()
+            new group_sql = GroupsInfo[iter][groupId] = cache_insert_id();
+
+            MsgSuccess(playerid, "GRUPËS", "Grupë sëkmingai sukurta.");
+
+            format(GroupsInfo[iter][groupName], 30, name);
+            Iter_Add(AdminGroup, iter);
+
+            log_init(true);
+            log_set_table("logs_admins");
+            log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
+            log_set_values("'%d','%e','(AM) Sukure nauja grupe','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GroupsInfo[iter][groupId], name);
+            log_commit();
+
+            inline getPermissions()
             {
-                new iter = Iter_Free(AdminGroup);
-                if(iter == ITER_NONE) return SendWarning(playerid, "Pasiektas grupiø limitas.");
-
-                new group_sql = GroupsInfo[iter][groupId] = cache_insert_id();
-
-                MsgSuccess(playerid, "GRUPËS", "Grupë sëkmingai sukurta.");
-
-                format(GroupsInfo[iter][groupName], 30, name);
-                Iter_Add(AdminGroup, iter);
-
-                log_init(true);
-                log_set_table("logs_admins");
-                log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-                log_set_values("'%d','%e','(AM) Sukure nauja grupe','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GroupsInfo[iter][groupId], name);
-                log_commit();
-
-                inline getPermissions()
+                new permission_name[30];
+                for(new r = 0, rows = cache_num_rows(); r < rows; r++)
                 {
-                    new permission_name[30];
-                    for(new r = 0, rows = cache_num_rows(); r < rows; r++)
-                    {
-                        cache_get_value_name(r, "Permission", permission_name);
+                    cache_get_value_name(r, "Permission", permission_name);
 
-                        inline insertPermission() return 1;
-                        mysql_tquery_inline(chandler, using inline insertPermission, "\
-                            INSERT INTO `groups_permissions` (`GroupId`,`Permission`) VALUES ('%d','%s')", group_sql, permission_name
-                        );
-                    }
-                    _Groups_ShowList(playerid);
+                    inline insertPermission() return 1;
+                    mysql_tquery_inline(chandler, using inline insertPermission, "\
+                        INSERT INTO `groups_permissions` (`GroupId`,`Permission`) VALUES ('%d','%s')", group_sql, permission_name
+                    );
                 }
-
-                mysql_tquery_inline(chandler, using inline getPermissions, "SELECT `Permission` FROM `groups_permissions_list` WHERE DefaultValue > '0'");
-                return 1;
+                _Groups_ShowList(playerid);
             }
-            mysql_tquery_inline(chandler, using inline createNewGroup, "\
-                INSERT INTO `groups_data` (`Name`,`Super`,`Added`) VALUES ('%e','0','%d')", 
-                name, PlayerInfo[playerid][pId]
-            );
+
+            mysql_tquery_inline(chandler, using inline getPermissions, "SELECT `Permission` FROM `groups_permissions_list` WHERE DefaultValue > '0'");
             return 1;
         }
-        else _Groups_Main(playerid);
+        mysql_tquery_inline(chandler, using inline createNewGroup, "\
+            INSERT INTO `groups_data` (`Name`,`Super`,`Added`) VALUES ('%e','0','%d')", 
+            name, PlayerInfo[playerid][pId]
+        );
+
+        return 1;
     }
     dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Grupës", "Kurti", "Atðaukti");
     return 1;
