@@ -16,13 +16,14 @@ static _Interiors_ShowList(playerid, page = 0)
         dialog_AddLine("{11ff99}>> Iðsaugoti naujà interjerà dabartinëje vietoje");
 
         new name[24],
-            i = 0, rows = cache_num_rows();
-        for(new r = 0; r < rows; r++)
-        {
-            i = (page*MAX_INTS_PER_PAGE) + r + 1;
-            cache_get_value_name(i, "Name", name, 24);
+            rows = cache_num_rows();
 
-            dialog_AddLine("%d. %s", i, name);
+        for(new r = 0; r < (rows > MAX_INTS_PER_PAGE ? MAX_INTS_PER_PAGE : rows); r++)
+        {
+            cache_get_value_name(r, "Name", name, 24);
+            
+            new nr = (page*MAX_INTS_PER_PAGE) + r + 1;
+            dialog_AddLine("%d. %s", nr, name);
         }
 
         if(page > 0) dialog_AddLine("{BABABA}<<< ATGAL\n");
@@ -30,11 +31,16 @@ static _Interiors_ShowList(playerid, page = 0)
 
         inline select(response, listitem)
         {
-            dialog_Row(">> Iðsaugoti naujà interjerà")  return _Interiors_CreateNew(playerid);
-            dialog_Row("<<< ATGAL")                     return _Interiors_ShowList(playerid, page - 1);
-            dialog_Row(">>> KITAS")                     return _Interiors_ShowList(playerid, page + 1);
+            if(response)
+            {
+                dialog_Row(">> Iðsaugoti naujà interjerà")  return _Interiors_CreateNew(playerid);
+                dialog_Row("<<< ATGAL")                     return _Interiors_ShowList(playerid, page - 1);
+                dialog_Row(">>> KITAS")                     return _Interiors_ShowList(playerid, page + 1);
 
-            _Interiors_ShowDetails(playerid, .offset = (page * MAX_INTS_PER_PAGE) + listitem);
+                _Interiors_ShowDetails(playerid, .offset = (page * MAX_INTS_PER_PAGE) + listitem);
+                return 1;
+            }
+            else AMenu_Main(playerid);
         }
         dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, "Interjerai", "Tæsti", "Atðaukti");
     }
