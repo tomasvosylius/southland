@@ -2225,6 +2225,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\server\admin\amenu/vehicles.pwn"
 #include "modules\server\admin\amenu/payphones.pwn"
 #include "modules\server\admin\amenu/groups.pwn"
+#include "modules\server\admin\amenu/interiors.pwn"
 
 // Jobs
 #include "modules\server\jobs/thief.pwn"
@@ -15142,11 +15143,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						// tr. priemoniu aiksteles
 						ShowPlayerDialog(playerid, DIALOG_AM_PARKING_MAIN, DIALOG_STYLE_LIST, "Aikðtelës", "Perþiûrëti visas\nPridëti", "Tæsti", "Atðaukti");
-					}
-					case 13:
-					{
-						// interjeru meniu
-						mysql_tquery(chandler, "SELECT * FROM `interiors` LIMIT 50 OFFSET 0", "InteriorsMenuLoad", "dd", playerid, 0);
 					}
 					case 15:
 					{
@@ -29338,10 +29334,10 @@ thread(VehicleInventoryCreate);
 REMOTE
 */
 thread(FactionAdded);
-thread(InteriorAdded);
+/*
 thread(PrivilegeAdd);
 thread(PrivilegeDelete);
-/*
+
 forward deletepermission(string[]);
 public deletepermission(string[])
 {
