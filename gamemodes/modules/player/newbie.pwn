@@ -24,11 +24,10 @@ static
             {2118.7241,-1774.8286,13.3920}
         },
         {
-            "~w~Cia igysi vairavimo ~y~teises. ~w~Uz sio pastato rasi ~b~~h~San_News~w~, \
-            kuriame gali deti skelbimus su ~r~/ad",
-            5.5,
-            {1823.0577,-1739.1483,20.7241},
-            {1823.0577,-1739.1483,20.7241}
+            "~w~Cia igysi vairavimo ~y~teises.",
+            3.5,
+            {2085.1387,-1947.1952,18.6166},
+            {2058.8369,-1906.4808,16.0266}
         },
         {
             "~w~Noredamas pilti degalus, degalineje naudok komanda ~y~/fill~w~",

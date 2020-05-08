@@ -3191,12 +3191,14 @@ ALTER TABLE `players_data`
 --
 ALTER TABLE `players_drugs`
  ADD PRIMARY KEY (`id`);
+alter table `players_drugs` add foreign key (PlayerId) REFERENCES players_data(id) on update cascade on delete cascade;
 
 --
 -- Indexes for table `players_inventory`
 --
 ALTER TABLE `players_inventory`
  ADD PRIMARY KEY (`id`);
+alter table `players_inventory` add foreign key (PlayerId) REFERENCES players_data(id) on update cascade on delete cascade;
 
 --
 -- Indexes for table `players_jails`
@@ -3233,6 +3235,7 @@ ALTER TABLE `players_reports`
 --
 ALTER TABLE `players_settings`
  ADD PRIMARY KEY (`id`);
+alter table `players_settings` add foreign key (PlayerId) REFERENCES players_data(id) on update cascade on delete cascade;
 
 --
 -- Indexes for table `players_sms`
@@ -3257,6 +3260,7 @@ ALTER TABLE `players_warns`
 --
 ALTER TABLE `players_weapons`
  ADD PRIMARY KEY (`id`);
+alter table `players_weapons` add foreign key (PlayerId) REFERENCES players_data(id) on update cascade on delete cascade;
 
 --
 -- Indexes for table `san_news_sms`
