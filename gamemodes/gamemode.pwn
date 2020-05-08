@@ -2220,6 +2220,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\server\admin\amenu/options.pwn"
 #include "modules\server\admin\amenu/enters.pwn"
 #include "modules\server\admin\amenu/atm.pwn"
+#include "modules\server\admin\amenu/icons.pwn"
 
 // Jobs
 #include "modules\server\jobs/thief.pwn"

@@ -10,6 +10,12 @@ stock AMenu_ATM_Main(playerid)
 /** Internals */
 static _ATM_Main(playerid)
 {
+    if(!HaveAdminPermission(playerid, "CreateNewATM"))
+    {
+        InfoBox(playerid, IB_NO_PRIVILEGE);
+        return _ATM_Main(playerid);
+    }
+
     // bankomatai
     dialog_Clear();
     dialog_AddLine("{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë");
@@ -35,6 +41,55 @@ static _ATM_Main(playerid)
         dialog_Row("Iðtrinti")                  return _ATM_Delete(playerid, atmid);
     }
     dialog_Show(playerid, using inline select, DIALOG_STYLE_TABLIST_HEADERS, "Bankomatai", "Tæsti", "Atðaukti");
+    return 1;
+}
+
+static _ATM_CreateNew(playerid)
+{
+    new atmid = Iter_Free(ATM),
+        Float:x, Float:y, Float:z;
+
+    if(atmid == ITER_NONE) return SendWarning(playerid, "Pasiektas maks. ATM skaicius");
+
+    GetPlayerPos(playerid, x, y, z);
+    inline insertNew()
+    {
+        if(mysql_errno() == 0)
+        {
+            ATMs[atmid][atmId] = cache_insert_id();
+            ATMs[atmid][atmObject] = CreateDynamicObject(2942, x+1, y+1, z-1, 0.0, 0.0, 0.0, .called = "atm", .extra = "create");
+            ATMs[atmid][atmX] = x;
+            ATMs[atmid][atmY] = y;
+            ATMs[atmid][atmZ] = z;
+            ATMs[atmid][atmCanDeposit] = 0;
+            ATMs[atmid][atmWithdrawLimit] = 0;
+            ATMs[atmid][atmInt] = GetPlayerInterior(playerid);
+            ATMs[atmid][atmVW] = GetPlayerVirtualWorld(playerid);
+            
+            EditDynamicObject(playerid, ATMs[atmid][atmObject]);
+
+            tmpSelected[playerid] = atmid;
+            tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_ATM;
+
+            MsgSuccess(playerid, "BANKOMATAI", "Sëkmingai sukûrëte bankomatà, kurio ID: %d.", ATMs[atmid][atmId]);
+            Iter_Add(ATM, atmid);
+            log_init(true);
+            log_set_table("logs_admins");
+            log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
+            log_set_values("'%d','%e','(AM) Sukure nauja bankomata (ATM)','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId]);
+            log_commit();
+        }
+        else
+        {
+            SendError(playerid, "Siøsta uþklausa nepavyko [%d]", mysql_errno());
+        }
+    }
+    mysql_tquery_inline(chandler, using inline insertNew, "\
+        INSERT INTO `atms` (`X`,`Y`,`Z`,`CanDeposit`,`WithdrawLimit`,`Int`,`VW`,`Added`) \
+        VALUES \
+        ('%f','%f','%f','0','0','%d','%d','%d')", 
+        x, y, z, GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid), PlayerInfo[playerid][pId]
+    );
     return 1;
 }
 
@@ -203,60 +258,7 @@ static _ATM_DIALOG_ConcatDetails(atmid)
     return 1;
 }
 
-static _ATM_CreateNew(playerid)
-{
-    if(!HaveAdminPermission(playerid, "CreateNewATM"))
-    {
-        InfoBox(playerid, IB_NO_PRIVILEGE);
-        return _ATM_Main(playerid);
-    }
 
-    new atmid = Iter_Free(ATM),
-        Float:x, Float:y, Float:z;
-
-    if(atmid == ITER_NONE) return SendWarning(playerid, "Pasiektas maks. ATM skaicius");
-
-    GetPlayerPos(playerid, x, y, z);
-    inline insertNew()
-    {
-        if(mysql_errno() == 0)
-        {
-            ATMs[atmid][atmId] = cache_insert_id();
-            ATMs[atmid][atmObject] = CreateDynamicObject(2942, x+1, y+1, z-1, 0.0, 0.0, 0.0, .called = "atm", .extra = "create");
-            ATMs[atmid][atmX] = x;
-            ATMs[atmid][atmY] = y;
-            ATMs[atmid][atmZ] = z;
-            ATMs[atmid][atmCanDeposit] = 0;
-            ATMs[atmid][atmWithdrawLimit] = 0;
-            ATMs[atmid][atmInt] = GetPlayerInterior(playerid);
-            ATMs[atmid][atmVW] = GetPlayerVirtualWorld(playerid);
-            
-            EditDynamicObject(playerid, ATMs[atmid][atmObject]);
-
-            tmpSelected[playerid] = atmid;
-            tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_ATM;
-
-            MsgSuccess(playerid, "BANKOMATAI", "Sëkmingai sukûrëte bankomatà, kurio ID: %d.", ATMs[atmid][atmId]);
-            Iter_Add(ATM, atmid);
-            log_init(true);
-            log_set_table("logs_admins");
-            log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-            log_set_values("'%d','%e','(AM) Sukure nauja bankomata (ATM)','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ATMs[atmid][atmId]);
-            log_commit();
-        }
-        else
-        {
-            SendError(playerid, "Siøsta uþklausa nepavyko [%d]", mysql_errno());
-        }
-    }
-    mysql_tquery_inline(chandler, using inline insertNew, "\
-        INSERT INTO `atms` (`X`,`Y`,`Z`,`CanDeposit`,`WithdrawLimit`,`Int`,`VW`,`Added`) \
-        VALUES \
-        ('%f','%f','%f','0','0','%d','%d','%d')", 
-        x, y, z, GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid), PlayerInfo[playerid][pId]
-    );
-    return 1;
-}
 
 hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
 {
