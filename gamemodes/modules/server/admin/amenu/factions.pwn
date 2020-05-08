@@ -323,7 +323,7 @@ static _Factions_Ranks_ChangeSalary(playerid, faction, rank)
         if(response)
         {
             new salary;
-            if(sscanf(dialog_Input(),"d",salary) || (0 < salary <= 9999999))
+            if(sscanf(dialog_Input(),"d",salary) || !(0 < salary <= 9999999))
                 return _Factions_Ranks_ChangeSalary(playerid, faction, rank);
 
             FactionRankSalaries[faction][rank] = salary;
