@@ -16942,10 +16942,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 								}
 								PlayerExtra[receiverid][pePoliceBadgeText] = INVALID_3DTEXT_ID;
 							}
+
+									
 							PlayerInfo[receiverid][pFaction] = 0;
 							PlayerInfo[receiverid][pFactionLeader] = 0;
 							PlayerInfo[receiverid][pJobLevel] = 0;
 							PlayerInfo[receiverid][pPoliceBadge] = 0;
+						
+							IsValidDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]) && DestroyDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]);
+							PlayerExtra[playerid][pePoliceBadgeText] = INVALID_3DTEXT_ID;
+
 							new channel = PlayerInfo[receiverid][pRadioChannel];
 							if((900 <= channel < 950) || (950 <= channel < 1000) || (1000 <= channel < 1050)) PlayerInfo[receiverid][pRadioChannel] = 0;
 							SaveAccountIntEx(receiverid, "Faction", 0);
@@ -16953,7 +16959,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							SaveAccountIntEx(receiverid, "JobLevel", 0);
 							SaveAccountIntEx(receiverid, "PoliceBadge", 0);
 						
-							ResetPlayerWeapons(receiverid);
+							SetPlayerArmour(playerid, 0.0);
+							ResetServerSidedWeapons(playerid);
 
 							PlayerExtra[receiverid][peTazer] = 0;
 						}

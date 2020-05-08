@@ -20,12 +20,13 @@ static
     dealer_WeaponsList[][E_DEALER_WEAPONS] = {
         // [Weapon]             [Ammo]  [Base, random] Price, Credits price  [Chance(susideda visi ir pasidalina)]
         {WEAPON_DEAGLE,         30,     5000,  2000,          2,  15},
-        {WEAPON_COLT45,         40,     3000,  1200,          1,  20},
+        {WEAPON_COLT45,         40,     3000,  1200,          1,  30},
         {WEAPON_SHOTGUN,        30,     8000,  2000,          2,  15},
-        {WEAPON_BRASSKNUCKLE,   1,      500,   100,           0,  5},
-        {WEAPON_AK47,           90,     12000, 3000,          3,  10},
-        {WEAPON_MP5,            100,    10000, 2000,          2,  15},
-        {WEAPON_TEC9,           120,    9000,  2000,          2,  20}
+        {WEAPON_BRASSKNUCKLE,   1,      500,   100,           0,  10},
+        {WEAPON_KNIFE,          1,      9000,  2000,          2,  10},
+        {WEAPON_AK47,           90,     12000, 3000,          3,  0},//10},
+        {WEAPON_MP5,            100,    10000, 2000,          2,  5},
+        {WEAPON_TEC9,           120,    9000,  2000,          2,  10}
 };
 
 static  dealer_WeaponsSelected[MAX_WEAPONS_PER_WEEK],
