@@ -317,6 +317,8 @@ stock BlindfoldTD_Create_Global()
 
 hook OnPlayerConnect(playerid)
 {
+	player_SpamBar_Showed[playerid] = false;
+
 	TaxometerTD[playerid] = CreatePlayerTextDraw(playerid, 45.047412, 326.106597, "Taksometras:_0.00$");
 	PlayerTextDrawLetterSize(playerid, TaxometerTD[playerid], 0.172952, 0.998400);
 	PlayerTextDrawTextSize(playerid, TaxometerTD[playerid], 128.000000, 0.000000);
@@ -3064,8 +3066,13 @@ stock PhoneTD_Create_Player(playerid)
 	return 1;
 }
 
+static 
+	bool:player_SpamBar_Showed[MAX_PLAYERS];
+
 stock SpamBarTD_Show(playerid)
 {
+	player_SpamBar_Showed[playerid] = true;
+
 	TextDrawShowForPlayer(playerid, SpamBarTD_Base);
 	TextDrawShowForPlayer(playerid, SpamBarTD_LoadBase);
 	PlayerTextDrawShow(playerid, SpamBarTD_Load[playerid]);
@@ -3075,12 +3082,17 @@ stock SpamBarTD_Show(playerid)
 
 stock SpamBarTD_Hide(playerid)
 {
+	player_SpamBar_Showed[playerid] = false;
+
 	TextDrawHideForPlayer(playerid, SpamBarTD_Base);
 	TextDrawHideForPlayer(playerid, SpamBarTD_LoadBase);
 	PlayerTextDrawHide(playerid, SpamBarTD_Load[playerid]);
 	PlayerTextDrawHide(playerid, SpamBarTD_Value[playerid]);
 	return 1;
 }
+
+stock SpamBarTD_IsShowed(playerid) return player_SpamBar_Showed[playerid];
+
 
 stock JobGuiTD_Create_Global()
 {

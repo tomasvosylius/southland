@@ -4136,7 +4136,7 @@ stock JobGUI_Update(playerid, toptext[] = "", bottext[] = "")
 
 stock SpamBarTD_Update(playerid, value = -1)
 {
-	if(value != -1)
+	if(value != -1 && SpamBarTD_IsShowed(playerid))
 	{
 		new string[6];
 		format(string, sizeof string, "%d%%", value);
@@ -22505,7 +22505,10 @@ public UpdateSpamBar(playerid, type)
 			{
 				LastSpamBarPressed[playerid]++;
 				new currentpercent = PlayerInfo[playerid][pJobDestination];
-				if(LastSpamBarPressed[playerid] >= 4) PlayerInfo[playerid][pJobDestination] -= (currentpercent >= 10 ? 10 : currentpercent); // senai paspaude SPACE, del to nuimam daxuja.
+				if(LastSpamBarPressed[playerid] >= 4)
+				{
+					PlayerInfo[playerid][pJobDestination] -= (currentpercent >= 10 ? 10 : currentpercent); // senai paspaude SPACE, del to nuimam daxuja.
+				}
 				else PlayerInfo[playerid][pJobDestination]--;
 				SpamBarTD_Update(playerid, PlayerInfo[playerid][pJobDestination]);
 			}
@@ -26583,6 +26586,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			PlayerInfo[playerid][pJobDestination] += 2;
 			LastSpamBarPressed[playerid] = 0;
 			SpamBarTD_Update(playerid, PlayerInfo[playerid][pJobDestination]);
+
 			if(PlayerInfo[playerid][pJobDestination] >= 100)
 			{
 				new jobvehicleid = PlayerInfo[playerid][pJobVehicle];
@@ -28246,6 +28250,8 @@ CMD:stop(playerid, params[])
 				PlayerInfo[playerid][pJobVehicle] = INVALID_VEHICLE_ID;
 				TogglePlayerControllable(playerid, 1);
 				ClearAnimations(playerid);
+
+				KillTimer(PlayerInfo[playerid][pJobTimer]);
 				SpamBarTD_Hide(playerid);
 			}
 			case JOB_ACTION_REPAINT_VEHICLE:
@@ -33619,8 +33625,8 @@ CMD:takejob(playerid, params[])
 			PlayerInfo[playerid][pJob] = Jobs[i][jobId];
 			PlayerInfo[playerid][pJobLevel] = 1;
 			PlayerInfo[playerid][pJobXP] = 1;
-			SendFormat(playerid, 0xA7CE9EFF, "\
-				Sëkmingai ásidarbinote á {66D94D}%s{A7CE9E}. Informacijà rasite {66D94D}/help{A7CE9E}. Darbà pradëti gali su {66D94D}/duty", Jobs[i][jobName]);
+			MsgSuccess(playerid, "Darbas", "\
+				Ásidarbinote á \"%s\". Informacijà rasite /help. Darbà pradëti gali su /duty", Jobs[i][jobName]);
 			log_init(true);
 			log_set_table("logs_jobs");
 			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
