@@ -9,14 +9,14 @@ hook OnGameModeInit()
 {
     new tmpobjid;
     // pagrindas
-    tmpobjid = CreateObject(8661, 2135.87207, -1874.51343, 12.54000,   0.00000, 0.00000, 0.00000);
+    tmpobjid = CreateObject(8661, 2135.87207, -1874.51343, 12.54000,   0.00000, 0.00000, 0.00000, 400.0);
     SetObjectMaterial(tmpobjid, 0, 16640, "a51", "plaintarmac1", 0xffffffff);
-    tmpobjid = CreateObject(8661, 2135.87207, -1873.71338, 12.49000,   0.00000, 0.00000, 0.00000);
+    tmpobjid = CreateObject(8661, 2135.87207, -1873.71338, 12.49000,   0.00000, 0.00000, 0.00000, 400.0);
     SetObjectMaterial(tmpobjid, 0, 16640, "a51", "plaintarmac1", 0xffffffff);
 
-    tmpobjid = CreateObject(8661, 2175.78809, -1874.51685, 12.54300,   0.00000, 0.00000, 0.00000);
+    tmpobjid = CreateObject(8661, 2175.78809, -1874.51685, 12.54300,   0.00000, 0.00000, 0.00000, 400.0);
     SetObjectMaterial(tmpobjid, 0, 16640, "a51", "plaintarmac1", 0xffffffff);
-    tmpobjid = CreateObject(8661, 2175.78809, -1873.22278, 12.52100,   0.00000, 0.00000, 0.00000);
+    tmpobjid = CreateObject(8661, 2175.78809, -1873.22278, 12.52100,   0.00000, 0.00000, 0.00000, 400.0);
     SetObjectMaterial(tmpobjid, 0, 16640, "a51", "plaintarmac1", 0xffffffff);
     // kavine
     tmpobjid = CreateObject(18240, 2141.63965, -1879.44226, 12.47510,   0.00000, 0.00000, 0.00000);

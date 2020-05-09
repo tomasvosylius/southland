@@ -856,6 +856,7 @@ static _Business_Wares_ShowDetails(playerid, ware)
             dialog_Row("Minimali kaina")    return _Business_Wares_ChangeMinPrice(playerid, ware);
             dialog_Row("Maksimali kaina")   return _Business_Wares_ChangeMaxPrice(playerid, ware);
             dialog_Row("Iðtrinti")          return _Business_Wares_Delete(playerid, ware);
+            return _Business_ShowDetails(playerid, ware);
         }
         else _Business_Wares_Main(playerid);
     }

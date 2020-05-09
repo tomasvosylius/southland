@@ -819,13 +819,6 @@ native gpci(playerid, serial[], len);
 	#define MYSQL_LOG_DATABASE "southland_logs"
 #endif
 
-
-// ==============================================================================
-// Libraries
-#include "libraries/samp.pwn"
-#include "libraries/macros.pwn"
-#include "libraries/als.pwn"
-
 #define AC_ENABLE_WEAPONS			true
 #define AC_ENABLE_MONEY				true
 #define AC_ENABLE_AIRBREAK			true
@@ -2044,8 +2037,14 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 //#include "core\map\newbie.pwn"
 //#include "core\map\alhambra_replacement.pwn"
 // #include "core\map\empty_houses.pwn"
-// #include "other\map\vm.pwn"
-// #include "other\map\detailings.pwn"
+
+#include "other\map\vm.pwn"
+#include "other\map\vm_corner.pwn"
+#include "other\map\corona247.pwn"
+#include "other\map\mechanics2.pwn"
+#include "other\map\detailings.pwn"
+#include "other\map\misc.pwn"
+
 // #include "other\map\interiors.pwn"
 // #include "other\map\school.pwn"
 // #include "other\map\docks.pwn"
@@ -2056,9 +2055,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "other\map\ls_dump.pwn"
 // #include "other\map\ls_logistics.pwn"
 // #include "other\map\bank.pwn"
-// #include "other\map\misc.pwn"
-// #include "other\map\corona247.pwn"
-// #include "other\map\mechanics2.pwn"
+
 // #include "other\map\mechanics.pwn"
 // #include "other\map\interiors.pwn"
 // #include "other\map\china_town.pwn"
@@ -2093,6 +2090,11 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other/body_parts.pwn"
 
 /** Libraries */
+#include "libraries/samp.pwn"
+#include "libraries/macros.pwn"
+#include "libraries/chat.pwn"
+#include "libraries/als.pwn"
+
 #include "libraries/dialog.pwn"
 #include "libraries/anticheat.pwn"
 
@@ -3129,8 +3131,7 @@ task T_MinuteTimer[60000]()
 						format(varname, sizeof varname, "BusinessPayLevel%d", BusinessInfo[businessid][bLevel]);
 						new 
 							pay = GetGVarInt(varname);
-						if(GetOnlinePlayers() >= 35) pay = floatround(pay * 1.1);
-						else if(GetOnlinePlayers() >= 50) pay = floatround(pay * 1.2);
+
 						BusinessInfo[businessid][bBudget] += pay;
 
 						SendFormat(ownerid, 0xBA42EDFF, "Ið verslo \"%s\" gavote valandiná pelnà: $%d", BusinessInfo[businessid][bName], pay);
@@ -19495,7 +19496,7 @@ public OnPlayerUseInventoryItem(playerid, slotid)
 					case DRUG_COCAINE:
 					{
 						rp_me(playerid, _, "áðniurkðèia kokainà keliais átraukimais, kuris greitai patenka á kraujà.");
-						rp_do(playerid, "ið karto pajauèia padidëjusià kûno temperatûrà ir energijos pliûpsná");
+						rp_do(playerid, "ið karto pajauèia padidëjusià kûno temperatûrà ir energijos pliûpsná.");
 					}
 					case DRUG_MDMA, DRUG_XANAX:
 					{
@@ -19503,7 +19504,7 @@ public OnPlayerUseInventoryItem(playerid, slotid)
 					}
 					case DRUG_MARIJUANA:
 					{
-						rp_me(playerid, _, "susuka þolæ á suktiná su popierëliu, uþlenkia vienà galà, uþdega já þiebtuvëliu ir giliai átraukia dûmà.");
+						rp_me(playerid, _, "susuka þolæ á suktinæ su popierëliu, uþlenkia vienà galà, uþdega já þiebtuvëliu.");
 						SetPlayerSpecialAction(playerid, SPECIAL_ACTION_SMOKE_CIGGY);
 					}
 				}
@@ -34231,11 +34232,15 @@ CMD:duty(playerid, params[])
 					}
 					case JOB_MECHANIC:
 					{
-						if(!IsPlayerInRangeOfPoint(playerid, 50.0, Jobs[jobid][jobX], Jobs[jobid][jobY], Jobs[jobid][jobZ])) return InfoBox(playerid, IB_NOT_IN_MECHANICS);
-						PlayerInfo[playerid][pSkin] = GetPlayerSkin(playerid);
+						if(!IsPlayerInRangeOfPoint(playerid, 50.0, Jobs[jobid][jobX], Jobs[jobid][jobY], Jobs[jobid][jobZ]))
+							return InfoBox(playerid, IB_NOT_IN_MECHANICS);
+						
+						new skinPrev = GetPlayerSkin(playerid);
 						SetPlayerSkin(playerid, 50);
-						SendFormat(playerid, 0xBABABAFF, "Pradëjote darbà, komandas rasite /help job.");
+						PlayerInfo[playerid][pSkin] = skinPrev;
 						PlayerInfo[playerid][pJobDuty] = 1;
+
+						SendFormat(playerid, 0xBABABAFF, "Pradëjote darbà, komandas rasite /help job.");
 					}
 				}
 			}
