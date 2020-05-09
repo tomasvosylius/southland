@@ -17,7 +17,7 @@ static _Icons_Main(playerid)
         if(!response) return AMenu_Main(playerid);
 
         dialog_Row("Perþiûrëti visas")  return _Icons_ShowList(playerid);
-        dialog_Row("Pridëti")           return _Icons_Add(playerid);
+        dialog_Row("Pridëti")           return _Icons_CreateNew(playerid);
     }
     dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, "Map ikonos", "Tæsti", "Atðaukti");
     return 1;
@@ -327,12 +327,72 @@ static _Icons_Delete(playerid, icon)
     return 1;
 }
 
-static _Icons_Add(playerid)
+static _Icons_CreateNew(playerid)
 {
     if(!HaveAdminPermission(playerid, "CreateNewIcon"))
     {
         InfoBox(playerid, IB_NO_PRIVILEGE);
         return _Icons_Main(playerid);
     }
+
+    dialog_Clear();
+    dialog_AddLine("{FFFFFF}Áveskite ikonos ID.");
+    dialog_AddLine("{BABABA}(wiki.sa-mp.com/wiki/MapIcons)");
+    inline input(response, listitem)
+    {
+        if(response)
+        {
+            new icon,
+                iter = -1;
+            if(sscanf(inputtext,"d",icon) || icon < 0 || icon > 63)
+                return _Icons_CreateNew(playerid);
+
+            for(new i = 0; i < MAX_MAP_ICONS; i++)
+            {
+                if(MapIconInfo[i][mapIconId] <= 0)
+                {
+                    iter = i;
+                    break;
+                }
+            }
+
+            if(iter != -1)
+            {
+                GetPlayerPos(playerid, MapIconInfo[iter][mapIconX], MapIconInfo[iter][mapIconY], MapIconInfo[iter][mapIconZ]);
+                MapIconInfo[iter][mapIconVW] = GetPlayerVirtualWorld(playerid);
+                MapIconInfo[iter][mapIconInterior] = GetPlayerInterior(playerid);
+                MapIconInfo[iter][mapIconType] = icon;
+                MapIconInfo[iter][mapIconColor] = 0xFFFFFFFF;
+                MapIconInfo[iter][mapIconStreamDistance] = 300.0;
+                format(MapIconInfo[iter][mapIconName], 14, "Be pavadinimo");
+
+                MapIconInfo[iter][mapIconIcon] = CreateDynamicMapIcon(MapIconInfo[iter][mapIconX], MapIconInfo[iter][mapIconY], MapIconInfo[iter][mapIconZ], MapIconInfo[iter][mapIconType], MapIconInfo[iter][mapIconColor], MapIconInfo[iter][mapIconVW], MapIconInfo[iter][mapIconInterior], .streamdistance = MapIconInfo[iter][mapIconStreamDistance], .style = MAPICON_GLOBAL);
+
+                inline addNew()
+                {
+                    if(mysql_errno() == 0)
+                    {
+                        MapIconInfo[iter][mapIconId] = cache_insert_id();
+                        _Icons_ShowDetails(playerid, iter);
+                    }
+                    else
+                    {
+                        SendError(playerid, "Siøsta uþklausa nepavyko [%d]", mysql_errno());
+                    }
+                    return 1;
+                }               
+                mysql_tquery_inline(chandler, using inline addNew, "\
+                    INSERT INTO `map_icons` (`Name`,`X`,`Y`,`Z`,`Type`,`StreamDistance`,`Color`,`VW`,`Interior`) \
+                    VALUES \
+                    ('Be pavadinimo','%f','%f','%f','%d','300.0','0xFFFFFFFF','%d','%d')",
+                    MapIconInfo[iter][mapIconX], MapIconInfo[iter][mapIconY], MapIconInfo[iter][mapIconZ],
+                    MapIconInfo[iter][mapIconType], MapIconInfo[iter][mapIconVW], MapIconInfo[iter][mapIconInterior]
+                );
+            }
+        }
+        else _Icons_Main(playerid);
+    }
+    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Map ikonos", "Tæsti", "Atðaukti");
+
     return 1;
 }
