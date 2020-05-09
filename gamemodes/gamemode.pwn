@@ -3,7 +3,8 @@
 	Ðià SA-MP þaidimo modifikacijà sukûrë Tomas "f0cus" Vosylius.
 	Kûrimo data: pradþia 2016 vasaris.
 
-	Modifikacija skirta County Roleplay projektui (CRP.lt); (Vëliau ir Southland.lt(2017-2018) bei Southland.lt(2020) projektams)
+	Modifikacija skirta County Roleplay projektui (CRP.lt);
+	(Vëliau naudota ir AmericanRP.lt, CommunityRP.lt(2020), Southland.lt(2017-2018, 2020-) projektuose)
 	Modifikacijà galima naudoti su sàlyga, jei paliekami kreditai kûrëjui;
 
 	Ðie programiniai kodai ir failai yra kuriami atsakingai, stengiantis sukurti
@@ -768,7 +769,7 @@ native gpci(playerid, serial[], len);
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-// #define USING_VIRTUAL_PRIVATE_SERVER
+#define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -2031,20 +2032,21 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other\map\mechanics2.pwn"
 #include "other\map\detailings.pwn"
 #include "other\map\misc.pwn"
-
-// #include "other\map\interiors.pwn"
-// #include "other\map\school.pwn"
-// #include "other\map\docks.pwn"
-// #include "other\map\willowfield_garage.pwn"
-// #include "other\map\idlewood_pizza_corner.pwn"
-// #include "other\map\prison.pwn"
-// #include "other\map\government.pwn"
-// #include "other\map\ls_dump.pwn"
-// #include "other\map\ls_logistics.pwn"
-// #include "other\map\bank.pwn"
+#include "other\map\interiors.pwn"
+#include "other\map\school.pwn"
+#include "other\map\docks.pwn"
+#include "other\map\willowfield_garage.pwn"
+#include "other\map\idlewood_pizza_corner.pwn"
+#include "other\map\prison.pwn"
+#include "other\map\government.pwn"
+#include "other\map\ls_dump.pwn"
+#include "other\map\ls_logistics.pwn"
+#include "other\map\bank.pwn"
+#include "other\map\train_ganton.pwn"
+#include "other\map\train_jefferson.pwn"
+#include "other\map\pier.pwn"
 
 // #include "other\map\mechanics.pwn"
-// #include "other\map\interiors.pwn"
 // #include "other\map\china_town.pwn"
 
 // #include "other\map\central_hotel.pwn"
@@ -2052,9 +2054,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\ganton_basketball.pwn"
 // #include "core\map\idlewood_basket.pwn"
 // #include "core\map\china.pwn"
-// #include "core\map\train_ganton.pwn"
-// #include "core\map\train_jefferson.pwn"
-// #include "core\map\pier.pwn"
 // #include "core\map\ls_bus_station.pwn"
 // #include "core\map\taxi.pwn"
 // #include "core\map\corona_small.pwn"
@@ -3487,6 +3486,12 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 
 	PlayerExtra[playerid][peAcceptedBk] = INVALID_PLAYER_ID;
 
+	if(Checkpoint[playerid] == CHECKPOINT_TYPE_DMV && tmpType_Salon[playerid] > 0 && tmpEditing_Component_DMV[playerid] == 1)
+	{
+		new vehicleid = OldVehicle[playerid];
+		SetVehicleToRespawn(vehicleid);
+	}
+
 	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK) SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 	
 	KillTimer(PlayerInfo[playerid][pJobTimer]);
@@ -3891,6 +3896,14 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		if(VehicleRadio[GetPlayerVehicleID(playerid)][vehicleRadioPlay] <= 0)
 		{
 			StopPlayerRadio(playerid);
+		}
+
+		if(	Checkpoint[playerid] == CHECKPOINT_TYPE_DMV &&
+			tmpType_Salon[playerid] > 0 && tmpEditing_Component_DMV[playerid] == 1)
+		{
+			new vehicleid = OldVehicle[playerid];
+			SetVehicleToRespawn(vehicleid);
+			DisablePlayerCheckpointEx(playerid);
 		}
 	}
 	if(oldstate == PLAYER_STATE_DRIVER && newstate != PLAYER_STATE_DRIVER)
@@ -25446,6 +25459,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 					SetVehicleToRespawn(GetPlayerVehicleID(playerid));
 					return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_DMV_PRICE);
 				}
+				
 				SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_DMV, DmvCheckpoints[type][0][0], DmvCheckpoints[type][0][1], DmvCheckpoints[type][0][2], 2.3);
 				SendFormat(playerid, 0xFFC1C1FF, "Linkime sëkmës laikant {DF7878}praktikos egzaminà {FFC1C1}(naudokite /maxspeed 60).");
 
