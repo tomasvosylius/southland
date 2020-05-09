@@ -18,14 +18,14 @@ static _Houses_Main(playerid)
     {
         if(!response) return AMenu_Main(playerid);
 
-        dialog_Row("Kurti naujà")       return _Houses_Add(playerid);
+        dialog_Row("Kurti naujà")       return _Houses_CreateNew(playerid);
         dialog_Row("Perþiûrëti visus")  return _Houses_ShowList(playerid);
     }
     dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, "Namai", "Tæsti", "Atðaukti");
     return 1;
 }
 
-static _Houses_Add(playerid)
+static _Houses_CreateNew(playerid)
 {
     if(!HaveAdminPermission(playerid, "CreateNewHouse"))
     {

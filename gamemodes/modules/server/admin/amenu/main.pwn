@@ -20,12 +20,12 @@ stock AMenu_Main(playerid)
     dialog_AddLine("Bendrieji serverio nustatymai");
     dialog_AddLine("Bankomatai");
     dialog_AddLine("Tr. priemoniø salonai");
-    dialog_AddLine("Parduodamos tr. priemonës frakcijoms");
-    dialog_AddLine("Aikðtelës");
     dialog_AddLine("Ikonos þemëlapyje");
     dialog_AddLine("Taksofonai");
     dialog_AddLine("Interjerø meniu");
     dialog_AddLine("Grupës");
+    // dialog_AddLine("Parduodamos tr. priemonës frakcijoms");
+    // dialog_AddLine("Aikðtelës");
     // dialog_AddLine("Juodoji rinka");
 
     inline mainMenu(response, listitem)
@@ -40,13 +40,13 @@ stock AMenu_Main(playerid)
             dialog_Row("Namai")                                return AMenu_Houses_Main(playerid);
             dialog_Row("Verslai")                              return AMenu_Business_Main(playerid);
             dialog_Row("Garaþai")                              return AMenu_Garages_Main(playerid);
-            // dialog_Row("Tr. priemoniø salonai")                return AMenu_CarShop_Main(playerid);
+            dialog_Row("Tr. priemoniø salonai")                return AMenu_CarShops_Main(playerid);
             dialog_Row("Frakcijos")                            return AMenu_Factions_Main(playerid);
-            // dialog_Row("Parduodamos tr. priemonës frakcijoms") return AMenu_FacCars_Main(playerid);
-            // dialog_Row("Aikðtelës")                            return AMenu_Parkings_Main(playerid);
             dialog_Row("Grupës")                               return AMenu_Groups_Main(playerid);
             dialog_Row("Interjerø meniu")                      return AMenu_Interiors_Main(playerid);
             dialog_Row("Taksofonai")                           return AMenu_Payphones_Main(playerid);
+            // dialog_Row("Parduodamos tr. priemonës frakcijoms") return AMenu_FacCars_Main(playerid);
+            // dialog_Row("Aikðtelës")                            return AMenu_Parkings_Main(playerid);
             // dialog_Row("Juodoji rinka")                        return AMenu_BlackMarket_Main(playerid);
         }
     }
