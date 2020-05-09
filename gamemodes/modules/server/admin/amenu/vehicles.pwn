@@ -22,8 +22,7 @@ static _Vehicles_Main(playerid)
     inline select(response, listitem)
     {
         if(response)
-        {
-            
+        {   
             new vehicleid = GetClosestVehicle(playerid, 5.0);
             dialog_Row("Pridëti naujà")                            return _Vehicles_CreateNew(playerid);
             dialog_Row("{FFFFFF}Keisti modelá")                    return _Vehicles_ChangeModel(playerid, vehicleid); 
@@ -105,6 +104,11 @@ static _Vehicles_ChangeModel(playerid, vehicleid, error[] = "")
         InfoBox(playerid, IB_NO_PRIVILEGE);
         return _Vehicles_Main(playerid);
     }
+    if(!IsValidVehicle(vehicleid))
+    {
+        InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
+        return _Vehicles_Main(playerid);
+    }
     dialog_Clear();
     dialog_AddLine("{FFFFFF}Áveskite tr. priemonës modelá.");
     dialog_AddLine("{BABABA}(wiki.sa-mp.com/wiki/Vehicle_Model_ID_List)");
@@ -150,6 +154,11 @@ static _Vehicles_ChangeColor(playerid, vehicleid, error[] = "")
         InfoBox(playerid, IB_NO_PRIVILEGE);
         return _Vehicles_Main(playerid);
     }
+    if(!IsValidVehicle(vehicleid))
+    {
+        InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
+        return _Vehicles_Main(playerid);
+    }
     
     dialog_Clear();
     dialog_AddLine("Áveskite naujas spalvas, pvz: 5 5");
@@ -191,6 +200,11 @@ static _Vehicles_ChangeFaction(playerid, vehicleid, error[] = "")
     if(!HaveAdminPermission(playerid, "EditVehicleFaction"))
     {
         InfoBox(playerid, IB_NO_PRIVILEGE);
+        return _Vehicles_Main(playerid);
+    }
+    if(!IsValidVehicle(vehicleid))
+    {
+        InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
         return _Vehicles_Main(playerid);
     }
 
@@ -243,6 +257,11 @@ static _Vehicles_ChangeJob(playerid, vehicleid, error[] = "")
         InfoBox(playerid, IB_NO_PRIVILEGE);
         return _Vehicles_Main(playerid);
     }
+    if(!IsValidVehicle(vehicleid))
+    {
+        InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
+        return _Vehicles_Main(playerid);
+    }
     
     dialog_Clear();
     dialog_AddLine("{FFFFFF}Darbø sàraðas su numeriais:\n{0083EF}- 0. Joks");
@@ -290,6 +309,11 @@ static _Vehicles_ChangeLevel(playerid, vehicleid, error[] = "")
         InfoBox(playerid, IB_NO_PRIVILEGE);
         return _Vehicles_Main(playerid);
     }
+    if(!IsValidVehicle(vehicleid))
+    {
+        InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
+        return _Vehicles_Main(playerid);
+    }
 
     if(VehicleInfo[vehicleid][vJob] == 0 && VehicleInfo[vehicleid][vFaction] == 0)
     {
@@ -331,7 +355,11 @@ static _Vehicles_SavePosition(playerid, vehicleid)
         InfoBox(playerid, IB_NO_PRIVILEGE);
         return _Vehicles_Main(playerid);
     }
-    if(!IsValidVehicle(vehicleid)) return 1;
+    if(!IsValidVehicle(vehicleid))
+    {
+        InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
+        return _Vehicles_Main(playerid);
+    }
 
     new Float:x, Float:y, Float:z, Float:a, model,
         newvehicleid,
@@ -370,7 +398,11 @@ static _Vehicles_Delete(playerid, vehicleid)
         InfoBox(playerid, IB_NO_PRIVILEGE);
         return _Vehicles_Main(playerid);
     }
-    if(!IsValidVehicle(vehicleid)) return 1;
+    if(!IsValidVehicle(vehicleid))
+    {
+        InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
+        return _Vehicles_Main(playerid);
+    }
 
     if(VehicleInfo[vehicleid][vOwner] > 0)
     {

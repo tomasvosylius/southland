@@ -344,7 +344,7 @@ static _Icons_CreateNew(playerid)
         {
             new icon,
                 iter = -1;
-            if(sscanf(inputtext,"d",icon) || icon < 0 || icon > 63)
+            if(sscanf(dialog_Input(),"d",icon) || icon < 0 || icon > 63)
                 return _Icons_CreateNew(playerid);
 
             for(new i = 0; i < MAX_MAP_ICONS; i++)

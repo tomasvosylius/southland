@@ -79,7 +79,7 @@ static _Groups_ShowDetails(playerid, groupid)
         }
         else _Groups_ShowList(playerid);
     }
-    dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, "Grupës", "Tæsti", "Atðaukti");
+    dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, va_return("Grupë - %s", GroupsInfo[groupid][groupName]), "Tæsti", "Atðaukti");
     return 1;
 }
 
