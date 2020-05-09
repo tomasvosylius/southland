@@ -23262,8 +23262,6 @@ public EntersExitsLoad()
 	new rows = cache_num_rows();
 	for(new i = 0; i < rows; i++)
 	{
-		printf("i: %d", i);
-
 		cache_get_value_name_int(i, "id", EntersExits[i][eeId]);
 		cache_get_value_name_int(i, "PickupType", EntersExits[i][eeEnterPickupType]);
 		cache_get_value_name_int(i, "EnterInt", EntersExits[i][eeEnterInt]);
