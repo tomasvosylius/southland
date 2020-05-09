@@ -254,7 +254,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_FURNITURE_CHANGE_RY_M	19
 #define DIALOG_FURNITURE_CHANGE_RZ_M	20
 #define DIALOG_CARGO_LIST				21
-#define DIALOG_FARMER_SELECT_JOB		22
 #define DIALOG_MECHANIC_SELECT_COLORS	23
 #define DIALOG_INVENTORY				24
 #define DIALOG_INVENTORY_ITEM			25
@@ -303,25 +302,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_ATM_DEPOSIT 				83
 #define DIALOG_ATM_MONEY 				84
 
-
-#define DIALOG_AM_BUSINESS_MAIN 		101
-#define DIALOG_AM_BUSINESS_ALL 			102
-#define DIALOG_AM_BUSINESS_EDIT_MAIN 	103
-#define DIALOG_AM_BUSINESS_EDIT_PRICE 	104
-#define DIALOG_AM_BUSINESS_EDIT_OWNER 	105
-#define DIALOG_AM_BUSINESS_INV 			106
-#define DIALOG_AM_BUSINESS_INV_MAIN 	107
-#define DIALOG_AM_BUSINESS_INV_AMOUNT 	108
-#define DIALOG_AM_BUSINESS_INV_EDIT 	109
-#define DIALOG_AM_BUSINESS_INV_ITEM 	110
-#define DIALOG_AM_BUSINESS_EDIT_TYPE 	111
-#define DIALOG_AM_BUSINESS_EDIT_NAME 	112
-#define DIALOG_AM_BUSINESS_WARES_ALL 	113
-#define DIALOG_AM_BUSINESS_WARE 	 	114
-#define DIALOG_AM_BUSINESS_WARE_ITEM  	115
-#define DIALOG_AM_BUSINESS_WARE_AMOUNT 	116
-#define DIALOG_AM_BUSINESS_NEW_WARE 	117
-
 #define DIALOG_AM_SALONS_MAIN 			118
 #define DIALOG_AM_SALON_CREATE 			119
 #define DIALOG_AM_SALON_EDIT 			120
@@ -367,7 +347,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_BM_WARE_PRICE 			159
 #define DIALOG_BM_WARE_EDIT 			160
 
-#define DIALOG_AM_BUSINESS_EDIT_LEVEL 	161
 
 #define DIALOG_BM_WARES_ORDER 			162
 #define DIALOG_BM_WARES_ORDER_TYPE 		163
@@ -375,9 +354,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_BM_BUDGET_MAIN 			169
 #define DIALOG_BM_BUDGET_DEPOSIT 		170
 #define DIALOG_BM_BUDGET_WITHDRAW 		171
-#define DIALOG_AM_BUSINESS_LEVELS_MAIN 	172
-#define DIALOG_AM_BUSINESS_LEVEL_EDIT 	173
-
 
 #define DIALOG_PHONE_CONTACTS_MAIN 			206
 #define DIALOG_PHONE_CONTACTS_ADD_NAME 		207
@@ -479,10 +455,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_DM_DRUGS_SELECT_DELIVERY 	297
 #define DIALOG_BUY_MAIN 					298
 
-#define DIALOG_AM_BUSINESS_WARE_EDIT_AMOUNT 299
-#define DIALOG_AM_BUSINESS_WARE_EDIT_MIN_PRICE 	300
-#define DIALOG_AM_BUSINESS_WARE_EDIT_MAX_PRICE 	301
-
 #define DIALOG_AM_BM_DEALER_DRUG_SPAWNS 	302
 #define DIALOG_AM_BM_DEALER_DRUG_SPAWN_EDIT 303
 #define DIALOG_AM_BM_DEALER_GUN_SPAWNS 		304
@@ -497,9 +469,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_PAY_FINE_TYPE 				312
 #define DIALOG_WEAPON_TRUNK 				316
 #define DIALOG_FM_USER_PRIVILEGES 			317
-#define DIALOG_AM_OTHER_POLICE_WEAPONS 		318
-#define DIALOG_AM_OTHER_POLICE_SKINS 		319
-#define DIALOG_AM_OTHER_POLICE_SPECIAL 		320
 #define DIALOG_GPS 							321
 #define DIALOG_VEHICLE_SCRAP 				322
 #define DIALOG_BUY_WEAPONS_MAIN 			323
@@ -515,7 +484,6 @@ native gpci(playerid, serial[], len);
 // Darbai
 #define JOB_MECHANIC					1
 #define JOB_TRUCKER 					2
-#define JOB_FARMER 						3
 #define SIDE_JOB_THIEF 					1
 // XP
 #define DEFAULT_JOB_TRUCKER_XP_TO_LVL2 	16
@@ -759,9 +727,6 @@ native gpci(playerid, serial[], len);
 #define CHECKPOINT_TYPE_CARGO_UNLOAD 		4
 #define CHECKPOINT_TYPE_CARGO_CRATES_TAKE 	5
 #define CHECKPOINT_TYPE_CARGO_CRATES_PUT 	6
-#define CHECKPOINT_TYPE_FARMER_SPOT			7
-#define CHECKPOINT_TYPE_FARMER_TAKE_BAG		8
-#define CHECKPOINT_TYPE_FARMER_PUT_BAG		9
 #define CHECKPOINT_TYPE_TAKE_REPAINT		10
 #define CHECKPOINT_TYPE_REPAINT_VEHICLE 	11
 #define CHECKPOINT_TYPE_TAKE_REPAIR 		12
@@ -2047,35 +2012,11 @@ new FactionWeaponsInTrunk[][E_FACTION_TRUNK_WEAPONS_LIST] = {
 	{FACTION_TYPE_FIRE, 	WEAPON_CHAINSAW, 			3, 		false, 	{0, 0, 0}, 		{407, 544}}
 };
 
-new Float:FarmerSpots[][3] = {
-	{-223.7046,-43.1177,4.0943},
-	{-164.6523,-44.3136,4.0925},
-	{-142.1807,24.0439,4.0959},
-	{-125.0997,97.3774,4.0954},
-	{-146.6357,144.3641,5.0003},
-	{-182.4717,157.0773,7.5272},
-	{-224.0443,99.9124,3.1554},
-	{-234.9558,38.4246,3.6411},
-	{-207.9014,-8.3712,4.0891},
-	{-185.5600,-62.8584,4.0918},
-	{-261.4223,-66.5027,4.0935},
-	{-201.4415,13.2645,4.0926},
-	{-157.2450,61.0051,4.0942},
-	{-134.5654,97.1869,4.0947},
-	{-152.6908,132.6075,4.6813},
-	{-178.3495,129.0434,4.9153},
-	{-189.8432,86.3550,4.0951}
-};
-
-new Float:FarmerBagSpots[][3] = {
-	{-105.08, 18.24, 3.11},
-	{-111.56, -2.52, 3.12}
-};
 
 new Float:MechanicPartSpots[][3] = {
-	{2167.0132,-1876.3346,13.5430},
-	{2166.7612,-1873.3693,13.5430},
-	{2166.5947,-1867.6635,13.5430}
+	{2167.0132,-1876.3346,13.0430},
+	{2166.7612,-1873.3693,13.0430},
+	{2166.5947,-1867.6635,13.0430}
 };
 
 #define BASE_PAYDAY_NO_JOB		200
@@ -2115,10 +2056,9 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "other\map\ls_dump.pwn"
 // #include "other\map\ls_logistics.pwn"
 // #include "other\map\bank.pwn"
-#include "other\map\misc.pwn"
-#include "other\map\corona247.pwn"
-#include "other\map\mechanics2.pwn"
-
+// #include "other\map\misc.pwn"
+// #include "other\map\corona247.pwn"
+// #include "other\map\mechanics2.pwn"
 // #include "other\map\mechanics.pwn"
 // #include "other\map\interiors.pwn"
 // #include "other\map\china_town.pwn"
@@ -2193,6 +2133,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\server\admin\amenu/garages.pwn"
 #include "modules\server\admin\amenu/houses.pwn"
 #include "modules\server\admin\amenu/factions.pwn"
+#include "modules\server\admin\amenu/business.pwn"
 
 // Jobs
 #include "modules\server\jobs/thief.pwn"
@@ -2947,30 +2888,7 @@ public OnPlayerJobTimeExpired(playerid, jobid, actionid, type)
 		ResetPlayerJobTask(playerid, false);
 		return 1;
 	}
-	else if(jobid == JOB_FARMER)
-	{
-		if(PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_TAKE_COMBAIN)
-		{
-			SendFormat(playerid, 0xFF6666FF, "Nespëjote atsisësti á kombainà per nustatytà laikà.");
-			PlayerInfo[playerid][pJobDuty] = 0;
-			ResetPlayerJobTask(playerid);
-		}
-		if(PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_COLLECT_COMBAIN)
-		{
-			SendFormat(playerid, 0xFF6666FF, "Nespëjote nuvaþiuoti á darbo vietà per nustatytà laikà.");
-			PlayerInfo[playerid][pJobDuty] = 0;
-			RemovePlayerFromVehicle(playerid);
-			SetVehicleToRespawn(PlayerInfo[playerid][pJobVehicle]);
-			ResetPlayerJobTask(playerid);
-		}
-		if(PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_TAKE_BAG || PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_PUT_BAG)
-		{
-			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-			RemovePlayerAttachedObject(playerid, 9);
-			SendFormat(playerid, 0xFF6666FF, "Nespëjote suneðti maiðø per nustatytà laikà.");
-			ResetPlayerJobTask(playerid);
-		}
-	}
+	
 	else if(jobid == JOB_MECHANIC)
 	{
 		SendFormat(playerid, 0xFF6666FF, "Nespëjote atlikti darbo per nustatytà laikà.");
@@ -3788,9 +3706,6 @@ public OnVehicleDeath(vehicleid, killerid)
 						CHECKPOINT_TYPE_TAKE_REPAIR,
 						CHECKPOINT_TYPE_TAKE_REPAINT,
 						CHECKPOINT_TYPE_TAKE_WHEELS,
-						CHECKPOINT_TYPE_FARMER_TAKE_BAG,
-						CHECKPOINT_TYPE_FARMER_PUT_BAG,
-						CHECKPOINT_TYPE_FARMER_SPOT,
 						CHECKPOINT_TYPE_CARGO_CRATES_TAKE,
 						CHECKPOINT_TYPE_CARGO_UNLOAD,
 						CHECKPOINT_TYPE_CARGO_LOAD,
@@ -3955,17 +3870,6 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			format(string, sizeof string, "RIDA: %0.1fKM", VehicleInfo[vehicleid][vKM]);
 			Speedo_Update(playerid, .km_string = string, .fuel_level = "DEGALAI:");
 			Speedo_Show(playerid);
-
-			if(VehicleInfo[vehicleid][vJob] == JOB_FARMER && PlayerInfo[playerid][pJob] == JOB_FARMER && PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_TAKE_COMBAIN)
-			{
-				PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_COLLECT_COMBAIN;
-				PlayerInfo[playerid][pJobActionTime] = 30;
-				PlayerInfo[playerid][pJobVehicle] = vehicleid;
-				new index = random(sizeof FarmerSpots);
-				PlayerInfo[playerid][pJobDestination] = index;
-				SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_FARMER_SPOT, FarmerSpots[index][0], FarmerSpots[index][1], FarmerSpots[index][2], 2.3);
-				SendFormat(playerid, 0xACE656FF, "Vaþiuokite á paþymëtus taðkus þemëlapyje.");
-			}
 		}
 		else
 		{
@@ -4180,14 +4084,7 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 							JOB_ACTION_CARGO_CRATES_TAKE,
 							JOB_ACTION_CARGO_CRATES_TAKE,
 							JOB_ACTION_CARGO_LEAVE_CAR)
-				) 
-				||
-    			(
-					PlayerInfo[playerid][pJob] == JOB_FARMER && 
-					!InArray(PlayerInfo[playerid][pJobCurrentAction], 
-							JOB_ACTION_COLLECT_COMBAIN)
-				)
-			)
+			))
     		{
 	    		PlayerInfo[playerid][pJobVehicle] = INVALID_VEHICLE_ID;
 	    	}
@@ -4794,7 +4691,7 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			new Float:x, Float:y, Float:z;
 			PlayerInfo[playerid][pJobCurrentAction] = (PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_TAKE_ENGINE ? JOB_ACTION_PUT_ENGINE : JOB_ACTION_PUT_ENGINE_REPAIR);
-			PlayerInfo[playerid][pJobActionTime] = 30;
+			PlayerInfo[playerid][pJobActionTime] = 60;
 			GetPosFrontVehicle(PlayerInfo[playerid][pJobVehicle], x, y, z, 1.0);
 			SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_PUT_ENGINE_VEHICLE, x, y, z, 2.3);
 			ApplyAnimation(playerid, "CARRY", "liftup", 4.0, 0, 1, 0, 0, 0);
@@ -4813,7 +4710,7 @@ public OnPlayerEnterCheckpoint(playerid)
 			}
 			new Float:x, Float:y, Float:z;
 			PlayerInfo[playerid][pJobCurrentAction] = (PlayerInfo[playerid][pJobCurrentAction] == JOB_ACTION_TAKE_BATTERY ? JOB_ACTION_PUT_BATTERY : JOB_ACTION_PUT_BATTERY_REPAIR);
-			PlayerInfo[playerid][pJobActionTime] = 30;
+			PlayerInfo[playerid][pJobActionTime] = 60;
 			GetPosFrontVehicle(PlayerInfo[playerid][pJobVehicle], x, y, z, 1.0);
 			SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_PUT_BATTERY_VEHICLE, x, y, z, 2.3);
 			ApplyAnimation(playerid, "CARRY", "liftup", 4.0, 0, 1, 0, 0, 0);
@@ -4951,7 +4848,7 @@ public OnPlayerEnterCheckpoint(playerid)
 				GivePlayerMoney(playerid, -tmpDubStart_Price[playerid]);
 			}
 			PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_PUT_WHEELS_VEHICLE;
-			PlayerInfo[playerid][pJobActionTime] = 30;
+			PlayerInfo[playerid][pJobActionTime] = 60;
 			GetPosFrontVehicle(PlayerInfo[playerid][pJobVehicle], x, y, z, 1.0);
 			SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_PUT_WHEELS, x, y, z, 2.3);
 			ApplyAnimation(playerid, "CARRY", "liftup", 4.0, 0, 1, 0, 0, 0);
@@ -5036,98 +4933,12 @@ public OnPlayerEnterCheckpoint(playerid)
 			new Float:x, Float:y, Float:z,
 				objects[3] = {1090, 1135, 1148}; // 19917 variklis;
 			PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_PUT_PARTS_VEHICLE;
-			PlayerInfo[playerid][pJobActionTime] = 30;
+			PlayerInfo[playerid][pJobActionTime] = 60;
 			GetPosFrontVehicle(PlayerInfo[playerid][pJobVehicle], x, y, z, 1.0);
 			SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_PUT_PARTS_VEHICLE, x, y, z, 2.3);
 			ApplyAnimation(playerid, "CARRY", "liftup", 4.0, 0, 1, 0, 0, 0);
 			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_CARRY);
 			SetPlayerAttachedObject(playerid, 9, objects[PlayerInfo[playerid][pJobActionIndex]], 1, -0.05, 0.62, 0.0, 0.000000, 90.0, 90.000000, 1.000000, 1.00);
-		}
-		case CHECKPOINT_TYPE_FARMER_SPOT:
-		{
-			if(GetPlayerVehicleID(playerid) == PlayerInfo[playerid][pJobVehicle] && VehicleInfo[GetPlayerVehicleID(playerid)][vJob] == JOB_FARMER)
-			{
-				new jobid = GetJobArrayIndexById(JOB_FARMER);
-				if(PlayerInfo[playerid][pPayCheck]+Jobs[jobid][jobPayDay] >= Jobs[jobid][jobMaxPayout])
-				{
-					// pasieke limita ismokejimo, tegu vel pranesam.
-					SendFormat(playerid, 0xEB7C6EFF, "Jûs jau pasiekæs uþdarbio limità, todël atlygis uþ darbà nebus priskaièiuojamas.");
-				}
-				else
-				{
-					SetVehicleVelocity(GetPlayerVehicleID(playerid), 0.0, 0.0, 0.0);
-					FreezePlayer(playerid, 2);
-					PlayerInfo[playerid][pPayCheck] += Jobs[jobid][jobBonusCash];
-					SaveAccountIntEx(playerid, "PayCheck", PlayerInfo[playerid][pPayCheck]);
-					SendFormat(playerid, 0x93E162FF, "Prie jûsø algos pridëta $%d", Jobs[jobid][jobBonusCash]);
-					if(PlayerInfo[playerid][pPayCheck]+Jobs[jobid][jobPayDay] >= Jobs[jobid][jobMaxPayout])
-					{
-						// siuo vezimu pasieke limita.
-						SendFormat(playerid, 0xEB7C6EFF, "Pasiekëte uþdarbio limità, Jums nebebus priskaièiuojamas atlygis.");
-					}
-				}
-				PlayerInfo[playerid][pJobActionTime] = 30;
-				new index = random(sizeof FarmerSpots), loop;
-				while(index == PlayerInfo[playerid][pJobDestination] && sizeof FarmerSpots > 1)
-				{
-					loop++;
-					index = random(sizeof FarmerSpots);
-					if(loop > 20) { break; }
-				}
-				PlayerInfo[playerid][pJobDestination] = index;
-				SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_FARMER_SPOT, FarmerSpots[index][0], FarmerSpots[index][1], FarmerSpots[index][2], 2.3);
-			}
-			else SendWarning(playerid, "Turite sedëti darbo tr. priemonëje");
-			return 1;
-		}
-		case CHECKPOINT_TYPE_FARMER_TAKE_BAG:
-		{
-			if(IsPlayerInAnyVehicle(playerid)) return SendWarning(playerid, "Iðlipkite ið tr. priemonës.");
-			new index = random(sizeof FarmerBagSpots), loop;
-			while(index == PlayerInfo[playerid][pJobDestination] && sizeof FarmerBagSpots > 1)
-			{
-				loop++;
-				index = random(sizeof FarmerBagSpots);
-				if(loop > 20) { break; }
-			}
-			PlayerInfo[playerid][pJobDestination] = index;
-			PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_PUT_BAG;
-			PlayerInfo[playerid][pJobActionTime] = 30;
-			SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_FARMER_PUT_BAG, FarmerBagSpots[index][0], FarmerBagSpots[index][1], FarmerBagSpots[index][2], 2.3);
-			ApplyAnimation(playerid, "CARRY", "liftup", 4.0, 0, 1, 0, 0, 0);
-			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_CARRY);
-			SetPlayerAttachedObject(playerid, 9, 2060, 1, -0.38, 0.85, 0.0, 0.000000, 84.217391, 0.000000, 1.000000, 1.00);
-		}
-		case CHECKPOINT_TYPE_FARMER_PUT_BAG:
-		{
-			new jobid = GetJobArrayIndexById(JOB_FARMER);
-			if(PlayerInfo[playerid][pPayCheck]+Jobs[jobid][jobPayDay] >= Jobs[jobid][jobMaxPayout])
-			{
-				// pasieke limita ismokejimo, tegu vel pranesam.
-				SendFormat(playerid, 0xEB7C6EFF, "Jûs jau pasiekæs uþdarbio limità, todël atlygis uþ darbà nebus priskaièiuojamas.");
-			}
-			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-			ApplyAnimation(playerid,"CARRY","putdwn", 4.0, 0, 1, 0, 0, 0);
-			RemovePlayerAttachedObject(playerid, 9);
-			PlayerInfo[playerid][pPayCheck] += Jobs[jobid][jobBonusCash];
-			SaveAccountIntEx(playerid, "PayCheck", PlayerInfo[playerid][pPayCheck]);
-			SendFormat(playerid, 0x93E162FF, "Prie jûsø algos pridëta $%d", Jobs[jobid][jobBonusCash]);
-			if(PlayerInfo[playerid][pPayCheck]+Jobs[jobid][jobPayDay] >= Jobs[jobid][jobMaxPayout])
-			{
-				// siuo vezimu pasieke limita.
-				SendFormat(playerid, 0xEB7C6EFF, "Pasiekëte uþdarbio limità, Jums nebebus priskaièiuojamas atlygis.");
-			}
-			new index = random(sizeof FarmerBagSpots), loop;
-			while(index == PlayerInfo[playerid][pJobDestination] && sizeof FarmerBagSpots > 1)
-			{
-				loop++;
-				index = random(sizeof FarmerBagSpots);
-				if(loop > 20) { break; }
-			}
-			PlayerInfo[playerid][pJobDestination] = index;
-			PlayerInfo[playerid][pJobActionTime] = 30;
-			PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_BAG;
-			SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_FARMER_TAKE_BAG, FarmerBagSpots[index][0], FarmerBagSpots[index][1], FarmerBagSpots[index][2], 2.3);
 		}
 		default: DisablePlayerCheckpointEx(playerid);
 	}
@@ -12661,921 +12472,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			else OnDialogResponse(playerid, DIALOG_AM_BM_MAIN, 1, 0, "");
 		}
 		
-		case DIALOG_AM_BUSINESS_INV_ITEM:
-		{
-			if(response)
-			{
-				new item,
-					selected = tmpSelected[playerid],
-					slot = tmpIter[playerid];
-				if(sscanf(inputtext,"d",item)) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_INV_EDIT, 1, 0, "");
-				if(!IsBusinessInventorySlotClear(selected, slot))
-				{
-					BusinessInventory[selected][slot][invAmount] = 1;
-				}
-				BusinessInventory[selected][slot][invId] = item;
-				MsgSuccess(playerid, "VERSLAS", "Daikto ID pakeistas.");
-				SaveBusinessInventory(selected);
-				ShowPlayerAdminMenu(playerid);
-				OnDialogResponse(playerid, DIALOG_AM_BUSINESS_INV, 1, selected, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`ExtraString`");
-				log_set_values("'%d','%e','(AM) Pakeite verslo inventoriaus daikta','%d','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], slot, GetInventoryItemName(item));
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_INV, 1, tmpIter[playerid], "");
-		}
-		case DIALOG_AM_BUSINESS_INV_AMOUNT:
-		{
-			if(response)
-			{
-				new amount,
-					selected = tmpSelected[playerid],
-					slot = tmpIter[playerid];
-				if(sscanf(inputtext,"d",amount)) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_INV_EDIT, 1, 1, "");
-				if(!IsBusinessInventorySlotClear(selected, slot))
-				{
-					OnDialogResponse(playerid, DIALOG_AM_BUSINESS_INV, 1, slot, "");
-					MsgError(playerid, "VERSLAS", "Slot tuðèias.");
-					return 1;
-				}
-				BusinessInventory[selected][slot][invAmount] = amount;
-				MsgSuccess(playerid, "VERSLAS", "Daikto kiekis pakeistas.");
-				SaveBusinessInventory(selected);
-				ShowPlayerAdminMenu(playerid);
-				OnDialogResponse(playerid, DIALOG_AM_BUSINESS_INV, 1, selected, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ReceiverId`,`ExtraString`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite verslo inventoriaus kieki','%d','%d','%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], slot, GetInventoryItemName(BusinessInventory[selected][slot][invId]), amount);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_INV, 1, tmpIter[playerid], "");
-		}
-		case DIALOG_AM_BUSINESS_INV_EDIT:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_INV_ITEM, DIALOG_STYLE_INPUT, "Verslo inventorius", "{FFFFFF}Áveskite naujà daikto ID.", "Tæsti", "Atðaukti");
-					}
-					case 1:
-					{
-						ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_INV_AMOUNT, DIALOG_STYLE_INPUT, "Verslo inventorius", "{FFFFFF}Áveskite naujà daikto kieká.", "Tæsti", "Atðaukti");
-					}
-					case 2:
-					{
-						// imesti
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`,`ExtraString`");
-						log_set_values("'%d','%e','(AM) Istryne verslo inventoriaus daikta','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], tmpIter[playerid], GetInventoryItemName(BusinessInventory[tmpSelected[playerid]][tmpIter[playerid]][invId]));
-						log_commit();
-						ClearBusinessInventorySlot(tmpSelected[playerid], tmpIter[playerid]);
-						MsgSuccess(playerid, "VERSLAS", "Iðtrynëte daiktà ið %d sloto.", tmpIter[playerid]+1);
-						SaveBusinessInventory(tmpSelected[playerid]);
-						ShowPlayerAdminMenu(playerid);
-					}
-				}
-			}
-			//else ShowHouseInventory(playerid, tmpSelected[playerid], true);
-		}
-		case DIALOG_AM_BUSINESS_INV:
-		{
-			if(response)
-			{
-				if(HaveAdminPermission(playerid, "EditBusinessInventory"))
-				{
-					tmpIter[playerid] = listitem;
-					ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_INV_EDIT, DIALOG_STYLE_LIST, "Verslo inventorius", "Keisti daiktà\nKeisti kieká\n{C60000}Iðtrinti", "Tæsti", "Atðaukti");
-				}
-				else return InfoBox(playerid, IB_NO_PRIVILEGE);
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 4, "");
-		}
-		case DIALOG_AM_BUSINESS_EDIT_PRICE:
-		{
-			if(response)
-			{
-				new amount;
-				if(sscanf(inputtext,"d",amount) || amount < 0) return SendError(playerid, "Blogai ávestas skaièius.") , OnDialogResponse(playerid, DIALOG_AM_BUSINESS_EDIT_MAIN, 1, 1, "");
-				if(0 < amount)
-				{
-					BusinessInfo[tmpSelected[playerid]][bPrice] = amount;
-					MsgSuccess(playerid, "VERSLAS", "Pakeitëte verslo kainà á $%d", amount);
-					new string[126];
-					mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET Price = '%d' WHERE id = '%d'", amount, BusinessInfo[tmpSelected[playerid]][bId]);
-					mysql_fquery(chandler, string, "BusinessUpdated");
-					Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels"));
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-					log_set_values("'%d','%e','Pakeite namo kaina','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], amount);
-					log_commit();
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 4, "");
-		}
-		case DIALOG_AM_BUSINESS_EDIT_OWNER:
-		{
-			if(response)
-			{
-				if(!strlen(inputtext)) return SendError(playerid, "Blogai ávestas ID arba vardas.") , OnDialogResponse(playerid, DIALOG_AM_BUSINESS_EDIT_MAIN, 1, 2, "");
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				if(IsNumeric(inputtext))
-				{
-					if(strval(inputtext) == 0)
-					{
-						new string[126];
-						BusinessInfo[tmpSelected[playerid]][bOwner] = 0;
-						mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET Owner = '0' WHERE id = '%d'", BusinessInfo[tmpSelected[playerid]][bId]);
-						mysql_fquery(chandler, string, "BusinessUpdated");
-						MsgSuccess(playerid, "VERSLAS", "Paðalinote verslo savininkà.");
-						OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
-
-						Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels"));
-						Business_CreatePickup(tmpSelected[playerid]);
-					}
-					else
-					{
-						new string[126];
-						mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `players_data` WHERE id = '%d'", strval(inputtext));
-						new Cache:result = mysql_query(chandler, string, true);
-						cache_set_active(result);
-						if(cache_num_rows())
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET Owner = '%d' WHERE id = '%d'", strval(inputtext), BusinessInfo[tmpSelected[playerid]][bId]);
-							mysql_fquery(chandler, string, "BusinessUpdated");
-							BusinessInfo[tmpSelected[playerid]][bOwner] = strval(inputtext);
-							MsgSuccess(playerid, "VERSLAS", "Pakeitëte verslo savininkà.");
-							OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
-							
-							Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels"));
-							Business_CreatePickup(tmpSelected[playerid]);
-
-							log_set_values("'%d','%e','(AM) Pakeite verslo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], strval(inputtext));
-						}
-						else
-						{
-							SendError(playerid, "Þaidëjas tokiu ID (%d) duomenø bazëje nerastas.", strval(inputtext));
-						}
-						cache_delete(result);
-					}
-				}
-				else
-				{
-					new string[126];
-					mysql_format(chandler, string, sizeof string, "SELECT id FROM `players_data` WHERE Name = '%e'", inputtext);
-					new Cache:result = mysql_query(chandler, string, true);
-					cache_set_active(result);
-					if(cache_num_rows())
-					{
-						new id;
-						cache_get_value_name_int(0, "id", id);
-						mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET Owner = '%d' WHERE id = '%d'", id, BusinessInfo[tmpSelected[playerid]][bId]);
-						mysql_fquery(chandler, string, "BusinessUpdated");
-						BusinessInfo[tmpSelected[playerid]][bOwner] = id;
-						MsgSuccess(playerid, "VERSLAS", "Pakeitëte verslo savininkà.");
-						OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
-						
-						Business_FixLabels(tmpSelected[playerid], GetGVarInt("EnabledBusinessLabels"));
-						Business_CreatePickup(tmpSelected[playerid]);
-
-						log_set_values("'%d','%e','(AM) Pakeite verslo savininka','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId], id);
-					}
-					else
-					{
-						SendError(playerid, "Þaidëjas tokiu vardu (%s) duomenø bazëje nerastas.", inputtext);
-					}
-					cache_delete(result);
-				}
-				log_commit();
-				OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 1, "");
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_BUSINESS_EDIT_NAME:
-		{
-			if(response)
-			{
-				new selected = tmpSelected[playerid];
-				if(strlen(inputtext) <= 3 || strlen(inputtext) > 24) return SendError(playerid, "Blogai ávestas pavadinimas (3-24 simboliai).") , OnDialogResponse(playerid, DIALOG_AM_BUSINESS_EDIT_MAIN, 1, 0, "");
-				new string[256];
-				mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET Name = '%e' WHERE id = '%d'", inputtext, BusinessInfo[selected][bId]);
-				mysql_fquery(chandler, string, "BusinessUpdated");
-				format(BusinessInfo[selected][bName], 24, inputtext);
-				MsgSuccess(playerid, "VERSLAS", "Verslo pavadinimas pakeistas.");
-				Business_FixLabels(selected, GetGVarInt("EnabledBusinessLabels"));
-				ShowPlayerAdminMenu(playerid);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`ExtraString`");
-				log_set_values("'%d','%e','(AM) Pakeite verslo pavadinima','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], inputtext);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_ALL, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_AM_BUSINESS_EDIT_TYPE:
-		{
-			if(response)
-			{
-				new selected = tmpSelected[playerid],
-					string[126];
-				BusinessInfo[selected][bType] = listitem;
-				mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET Type = '%d' WHERE id = '%d'", listitem, BusinessInfo[selected][bId]);
-				mysql_fquery(chandler, string, "BusinessUpdated");
-				MsgSuccess(playerid, "VERSLAS", "Verslo tipas sëkmingai pakeistas. %s", (listitem == BUSINESS_TYPE_FUEL ? ("Nustatykite papildomas koordinates, kur galima naudoti /fill") : ("")));
-				if(listitem == BUSINESS_TYPE_FUEL)
-				{
-					BusinessInfo[selected][bFuel] = GetGVarInt("BusinessFuelCapacity");
-					BusinessInfo[selected][bFuelPrice] = 3;
-				}
-				ShowPlayerAdminMenu(playerid);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite verslo tipa','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], listitem);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_ALL, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_AM_BUSINESS_EDIT_LEVEL:
-		{
-			if(response)
-			{
-				new selected = tmpSelected[playerid];
-				BusinessInfo[selected][bLevel] = listitem;
-				MsgSuccess(playerid, "VERSLAS", "Verslo lygis sëkmingai pakeistas á %d.", listitem);
-				ShowPlayerAdminMenu(playerid);
-				SaveBusinessIntEx(selected, "Level", listitem);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Pakeite verslo lygi','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], listitem);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_ALL, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_AM_BUSINESS_EDIT_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// pavadinimas
-						if(HaveAdminPermission(playerid, "EditBusinessName"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_EDIT_NAME, DIALOG_STYLE_INPUT, "Verslo redagavimas", "{FFFFFF}Áveskite naujà verslo pavadinimà.", "Keisti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 1:
-					{
-						// kaina
-						if(HaveAdminPermission(playerid, "EditBusinessPrice"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_EDIT_PRICE, DIALOG_STYLE_INPUT, "Verslo redagavimas", "{FFFFFF}Áveskite naujà verslo kainà.", "Keisti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 2:
-					{
-						// savininkas
-						if(HaveAdminPermission(playerid, "EditBusinessOwner"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_EDIT_OWNER, DIALOG_STYLE_INPUT, "Verslo redagavimas", "{FFFFFF}Áveskite naujà verslo savininko MySQL numerá arba pilnà vardà.\n{BABABA}Norëdami savininkà paðalinti, áraðykite 0", "Keisti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 3:
-					{
-						// keisti iejimo vieta
-						if(HaveAdminPermission(playerid, "ChangeBusinessEnter"))
-						{
-							new selected = tmpSelected[playerid];
-							MsgSuccess(playerid, "VERSLAS", "Sëkmingai pakeista áëjimo vieta.");
-							new Float:x, Float:y, Float:z;
-							GetPlayerPos(playerid, x, y, z);
-							BusinessInfo[selected][bOutVW] = GetPlayerVirtualWorld(playerid);
-							BusinessInfo[selected][bExterior] = GetPlayerInterior(playerid);
-							BusinessInfo[selected][bEnterX] = x,
-							BusinessInfo[selected][bEnterY] = y,
-							BusinessInfo[selected][bEnterZ] = z;
-							new string[186];
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET EnterX = '%f', EnterY = '%f', EnterZ = '%f', OutVW = '%d', Exterior = '%d' WHERE id = '%d'", x, y, z, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), BusinessInfo[selected][bId]);
-							mysql_fquery(chandler, string, "BusinessUpdated");
-							
-							Business_FixLabels(selected, GetGVarInt("EnabledBusinessLabels"));
-							Business_CreatePickup(selected);
-
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Pakeite verslo iejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 4:
-					{
-						// keisti isejimo vieta
-						if(HaveAdminPermission(playerid, "ChangeBusinessExit"))
-						{
-							new selected = tmpSelected[playerid];
-							MsgSuccess(playerid, "VERSLAS", "Sëkmingai pakeista iðëjimo vieta.");
-							new Float:x, Float:y, Float:z;
-							GetPlayerPos(playerid, x, y, z);
-							BusinessInfo[selected][bInterior] = GetPlayerInterior(playerid),
-							BusinessInfo[selected][bExitX] = x,
-							BusinessInfo[selected][bExitY] = y,
-							BusinessInfo[selected][bExitZ] = z;
-							new string[186];
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET ExitX = '%f', ExitY = '%f', ExitZ = '%f', Interior = '%d' WHERE id = '%d'", x, y, z, GetPlayerInterior(playerid), BusinessInfo[selected][bId]);
-							mysql_fquery(chandler, string, "BusinessUpdated");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Pakeite verslo isejimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_commit();
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 5:
-					{
-						// isvalyti furniture
-						if(HaveAdminPermission(playerid, "DeleteBusinessFurniture"))
-						{
-							new selected = tmpSelected[playerid],
-								count_deleted,
-								last_itter = -1,
-								string[86],
-								__reset_BFurniture[E_BUSINESS_FURNITURE_DATA];
-
-							foreach(new furnitureid : BFurniture)
-							{
-								if(bFurnitureInfo[furnitureid][bfOwner] == BusinessInfo[selected][bId])
-								{
-									if(IsValidDynamicObject(bFurnitureInfo[furnitureid][bfObject])) DestroyDynamicObject(bFurnitureInfo[furnitureid][bfObject], "furniture", "admin_delete_business_furniture");
-									bFurnitureInfo[furnitureid] = __reset_BFurniture;
-									bFurnitureInfo[furnitureid][bfObject] = INVALID_OBJECT_ID;
-									if(last_itter != -1 && last_itter != furnitureid)
-									{
-										Iter_Remove(BFurniture, last_itter);
-										count_deleted++;
-									}
-									last_itter = furnitureid;
-								}
-							}
-							mysql_format(chandler, string, sizeof string, "DELETE FROM `business_furniture` WHERE BusinessId = '%d'", BusinessInfo[selected][bId]);
-							mysql_fquery(chandler, string, "FurnitureDeleted");
-							if(last_itter != -1) Iter_Remove(BFurniture, last_itter);
-							MsgSuccess(playerid, "VERSLAS", "Sëkmingai iðtrynëte %d verslo baldø.", count_deleted);
-							OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 5, "");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-							log_set_values("'%d','%e','(AM) Isvale verslo furniture','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId], count_deleted);
-							log_commit();
-						}
-					}
-					case 6:
-					{
-						// redaguoti inventoriu
-						if(HaveAdminPermission(playerid, "ViewBusinessInventory"))
-						{
-							SendWarning(playerid, "Neveikia.");
-							//ShowBusinessInventory(playerid, tmpSelected[playerid], true);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 7:
-					{
-						// nustatyti verslo tipa
-						if(HaveAdminPermission(playerid, "EditBusinessType"))
-						{
-							ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_EDIT_TYPE, DIALOG_STYLE_LIST, "Verslo redagavimas", "0. Joks\n1. Degalinë\n2. Maitinimo ástaiga\n3. 24/7 parduotuvë\n4. Drabuþiø parduotuvë\n5. Ginklø parduotuvë", "Tæsti", "Atðaukti");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 8:
-					{
-						// papildomos koordinates, pvz degalines tipui degalu pilimo vieta???
-						if(HaveAdminPermission(playerid, "ChangeBusinessExtra"))
-						{
-							new Float:x, Float:y, Float:z, string[126];
-							GetPlayerPos(playerid, x, y, z);
-							BusinessInfo[tmpSelected[playerid]][bExtraX] = x,
-							BusinessInfo[tmpSelected[playerid]][bExtraY] = y,
-							BusinessInfo[tmpSelected[playerid]][bExtraZ] = z;
-							MsgSuccess(playerid, "VERSLAS", "Papildomos koordinatës nustatytos á jûsø dabartinæ pozicijà.");
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET ExtraX = '%f', ExtraY = '%f', ExtraZ = '%f' WHERE id = '%d'", x, y, z, BusinessInfo[tmpSelected[playerid]][bId]);
-							mysql_fquery(chandler, string, "BusinessUpdated");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Pakeite verslo papildomas koord.','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[tmpSelected[playerid]][bId]);
-							log_commit();
-
-							// * Ideja: sukurti nauja table `business_coordinates` ir ten glaima kelt unlimited koordinates su tipais.
-							// * verslo id  	x 	y 	z 		type
-							// * 1			0.0, 0.0, 0.0   fill_fuel
-							// * 1			0.0, 0.0, 0.0   unload_wares
-
-							switch(BusinessInfo[tmpSelected[playerid]][bType])
-							{
-								case BUSINESS_TYPE_FUEL: MsgInfo(playerid, "VERSLAS", "Ðiose koordinatëse bus leidþiama pilti degalus.");
-								default: MsgInfo(playerid, "VERSLAS", "Papildomos koordinatës ðiam verslo tipui (%d) neturi reikðmës.", BusinessInfo[tmpSelected[playerid]][bType]);
-							}
-							OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 5, "");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 9:
-					{
-						// prie iejimo
-						if(HaveAdminPermission(playerid, "ChangeBusinessEnter"))
-						{
-							new selected = tmpSelected[playerid];
-							SetPlayerPos(playerid, BusinessInfo[selected][bEnterX], BusinessInfo[selected][bEnterY], BusinessInfo[selected][bEnterZ]);
-							SetPlayerInterior(playerid, BusinessInfo[selected][bExterior]);
-							SetPlayerVirtualWorld(playerid, BusinessInfo[selected][bOutVW]);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 10:
-					{
-
-						// prie isejimo
-						if(HaveAdminPermission(playerid, "ChangeBusinessExit"))
-						{
-							new selected = tmpSelected[playerid];
-							SetPlayerPos(playerid, BusinessInfo[selected][bExitX], BusinessInfo[selected][bExitY], BusinessInfo[selected][bExitZ]);
-							SetPlayerInterior(playerid, BusinessInfo[selected][bInterior]);
-							SetPlayerVirtualWorld(playerid, BusinessInfo[selected][bVW]);
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-					case 11:
-					{
-						// keisti verslo lygi
-						if(HaveAdminPermission(playerid, "EditBusinessLevel"))
-						{
-							new string[512] = "{BABABA}Lygis\t{BABABA}Iðmoka verslui per payday\n",
-								varname[24];
-							for(new i = 0, j = GetGVarInt("BusinessPayMaxLevels"); i <= j; i++)
-							{
-								format(varname, sizeof varname, "BusinessPayLevel%d", i);
-								format(string, sizeof string, "%s%d\t$%d\n", string, i, GetGVarInt(varname));
-							}
-							ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_EDIT_LEVEL, DIALOG_STYLE_TABLIST_HEADERS, "Verslo redagavimas", string, "Tæsti", "Atðaukti");
-						}
-					}
-					case 12:
-					{
-						if(HaveAdminPermission(playerid, "ChangeBusinessExtra"))
-						{
-							new selected = tmpSelected[playerid];
-							MsgSuccess(playerid, "VERSLAS", "Sëkmingai pakeista prekiø iðkrovimo vieta.");
-							new Float:x, Float:y, Float:z;
-							GetPlayerPos(playerid, x, y, z);
-							BusinessInfo[selected][bWaresX] = x,
-							BusinessInfo[selected][bWaresY] = y,
-							BusinessInfo[selected][bWaresZ] = z;
-							new string[186];
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET WaresX = '%f', WaresY = '%f', WaresZ = '%f' WHERE id = '%d'", x, y, z, BusinessInfo[selected][bId]);
-							mysql_fquery(chandler, string, "BusinessUpdated");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Pakeite verslo iskrovimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_commit();
-						}
-					}
-					case 13:
-					{
-						if(HaveAdminPermission(playerid, "ChangeBusinessExtra"))
-						{
-							new selected = tmpSelected[playerid];
-							MsgSuccess(playerid, "VERSLAS", "Sëkmingai pakeista prekiø nuneðimo vieta.");
-							new Float:x, Float:y, Float:z;
-							GetPlayerPos(playerid, x, y, z);
-							BusinessInfo[selected][bCratesX] = x,
-							BusinessInfo[selected][bCratesY] = y,
-							BusinessInfo[selected][bCratesZ] = z;
-							new string[186];
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_data` SET CratesX = '%f', CratesY = '%f', CratesZ = '%f' WHERE id = '%d'", x, y, z, BusinessInfo[selected][bId]);
-							mysql_fquery(chandler, string, "BusinessUpdated");
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Pakeite verslo nunesimo vieta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_commit();
-						}
-					}
-					case 14:
-					{
-						// istrinti
-						if(HaveAdminPermission(playerid, "DeleteBusiness"))
-						{
-							// istrinti
-							new selected = tmpSelected[playerid],
-								string[512],
-								__reset_Business[E_BUSINESS_DATA],
-								__reset_BFurniture[E_BUSINESS_FURNITURE_DATA],
-								last_itter = -1;
-							// istrinam ir furniture
-							foreach(new furnitureid : BFurniture)
-							{
-								if(bFurnitureInfo[furnitureid][bfOwner] == BusinessInfo[selected][bOwner])
-								{
-									if(IsValidDynamicObject(bFurnitureInfo[furnitureid][bfObject])) DestroyDynamicObject(bFurnitureInfo[furnitureid][bfObject], "furniture", "admin_delete_business");
-									bFurnitureInfo[furnitureid] = __reset_BFurniture;
-									bFurnitureInfo[furnitureid][bfObject] = INVALID_OBJECT_ID;
-									if(last_itter != -1 && last_itter != furnitureid)
-									{
-										Iter_Remove(BFurniture, last_itter);
-									}
-									last_itter = furnitureid;
-								}
-							}
-							if(last_itter != -1) Iter_Remove(BFurniture, last_itter);
-							if(IsValidDynamic3DTextLabel(BusinessInfo[selected][bLabel])) DestroyDynamic3DTextLabel(BusinessInfo[selected][bLabel]);
-							sd_DestroyDynamicPickup(BusinessInfo[selected][bPickup]);
-
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Istryne versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[selected][bId]);
-							log_commit();
-
-							mysql_format(chandler, string, sizeof string, "DELETE FROM `business_data` WHERE id = '%d';DELETE FROM `business_wares` WHERE BusinessId = '%d'; DELETE FROM `business_furniture` WHERE BusinessId = '%d';", BusinessInfo[selected][bId], BusinessInfo[selected][bId], BusinessInfo[selected][bId]);
-							mysql_format(chandler, string, sizeof string, "%sDELETE FROM `business_dubkeys` WHERE BusinessId = '%d'; DELETE FROM `business_inventory` WHERE BusinessId = '%d'; DELETE FROM `business_orders` WHERE BusinessId = '%d';DELETE FROM `business_orders_fuel` WHERE BusinessId = '%d'", string, BusinessInfo[selected][bId], BusinessInfo[selected][bId], BusinessInfo[selected][bId], BusinessInfo[selected][bId]);
-							mysql_fquery(chandler, string, "BusinessDeleted");
-							foreach(new receiver : Player)
-							{
-								if(PlayerInfo[playerid][pJobDestination] == selected && PlayerInfo[playerid][pJobCurrentType] == 1)
-								{
-									MsgError(playerid, "DARBAS", "Verslas, á kurá veþëte uþsakymà buvo iðtrintas administratoriaus.");
-									JobGUI_Hide(playerid);
-									PlayerInfo[playerid][pJobCurrentAction] =
-									PlayerInfo[playerid][pJobDuty] =
-									PlayerInfo[playerid][pJobDestination] = 0;
-								}
-							}
-							BusinessInfo[selected] = __reset_Business;
-							BusinessInfo[selected][bLabel] = INVALID_3DTEXT_ID;
-							Iter_Remove(Business, selected);
-							MsgSuccess(playerid, "VERSLAS", "Sëkmingai iðtrynëte verslà.");
-						}
-						else InfoBox(playerid, IB_NO_PRIVILEGE);
-					}
-				}
-			}
-		}
-		case DIALOG_AM_BUSINESS_ALL:
-		{
-			if(response)
-			{
-				if(tmpAmenuIter[playerid] != 0)
-				{
-					if(listitem == tmpAmenuIter[playerid] && tmpAmenuNextPage[playerid]) AM_ShowAllBusiness(playerid, tmpAmenuCurPage[playerid] + 1); 
-					else if(((listitem == tmpAmenuIter[playerid] && !tmpAmenuNextPage[playerid]) || (listitem == tmpAmenuIter[playerid] + 1 && tmpAmenuNextPage[playerid])) && tmpAmenuCurPage[playerid] > 0) AM_ShowAllBusiness(playerid, tmpAmenuCurPage[playerid] - 1);
-					else if(HaveAdminPermission(playerid, "EditBusiness"))
-					{
-						new 
-							real_iter,
-							count_on_this_page;
-						foreach(new bus : Business)
-						{
-							if(BusinessInfo[bus][bId] != 0)
-							{
-								if(real_iter >= MAX_BUSINESS_PER_PAGE*tmpAmenuCurPage[playerid])
-								{
-									if(count_on_this_page == listitem)
-									{
-										new string[512];
-										format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\nPavadinimas\t%.14s%s\n", BusinessInfo[bus][bName], strlen(BusinessInfo[bus][bName]) > 14 ? ("...") : (""));
-										format(string, sizeof string, "%sKaina\t$%d\nSavininkas\t%s\nKeisti áëjimo vietà\nKeisti iðëjimo vietà\nIðvalyti baldus\nRedaguoti inventoriø\nNustatyti verslo tipà\nPapildomos koordinatës\nTeleportuotis prie verslo áëjimo\nTeleportuotis prie verslo iðëjimo\nKeisti verslo lygá\t%d\nKeisti prekiø pristatymo vietà (maðinai)\nKeisti dëþiø pristatymo vietà (þmogui)\n{C60000}Iðtrinti", string, BusinessInfo[bus][bPrice], GetNameBySql(BusinessInfo[bus][bOwner]), BusinessInfo[bus][bLevel]);
-										ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_EDIT_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Verslo redagavimas", string, "Tæsti", "Atðaukti");
-										tmpSelected[playerid] = bus;
-										return 1;
-									}
-									count_on_this_page ++ ;
-								}
-								real_iter ++ ;
-							}
-						}
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 5, "");
-		}
-		case DIALOG_AM_BUSINESS_MAIN:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					// kurti nauja versla
-					if(HaveAdminPermission(playerid, "CreateNewBusiness"))
-					{
-						new businessid = Iter_Free(Business),
-							__reset_Business[E_BUSINESS_DATA],
-							string[186],
-							Float:x,
-							Float:y,
-							Float:z,
-							int = GetPlayerInterior(playerid),
-							vw = GetPlayerVirtualWorld(playerid);
-
-						GetPlayerPos(playerid, x, y, z);
-						mysql_format(chandler, string, sizeof string, "INSERT INTO `business_data` (`Added`,`Name`,`EnterX`,`EnterY`,`EnterZ`,`OutVW`,`Exterior`) VALUES ('%d','Be pavadinimo','%f','%f','%f','%d','%d')", PlayerInfo[playerid][pId], x, y, z, vw, int);
-						new Cache:result = mysql_query(chandler, string, true);
-						if(mysql_errno() == 0)
-						{
-							if(int != 0 || vw != 0)
-							{
-								SendWarning(playerid, "Jûs nesate lauke (interior: %d, world: %d), todël sukurto verslo bus neámanoma parodyti þemëlapyje.", int, vw);
-							}
-							cache_set_active(result);
-							BusinessInfo[businessid] = __reset_Business;
-							format(BusinessInfo[businessid][bName], 14, "Be pavadinimo");
-							BusinessInfo[businessid][bId] = cache_insert_id();
-							BusinessInfo[businessid][bEnterX] = x,
-							BusinessInfo[businessid][bEnterY] = y,
-							BusinessInfo[businessid][bEnterZ] = z;
-							BusinessInfo[businessid][bOutVW] = vw;
-							BusinessInfo[businessid][bExterior] = int;
-							BusinessInfo[businessid][bVW] = BUSINESS_VIRTUAL_WORLD+BusinessInfo[businessid][bId];
-							Iter_Add(Business, businessid);
-							
-							Business_FixLabels(businessid, GetGVarInt("EnabledBusinessLabels"));
-							Business_CreatePickup(businessid);
-							
-							MsgSuccess(playerid, "VERSLAI", "Sëkmingai sukûrëte verslà, kurio ID: %d", BusinessInfo[businessid][bId]);
-							
-							log_init(true);
-							log_set_table("logs_admins");
-							log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-							log_set_values("'%d','%e','(AM) Sukure nauja versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[businessid][bId]);
-							log_commit();
-						}
-						else
-						{
-							SendError(playerid, "Siøsta uþklausa nepavyko [%d]", mysql_errno());
-						}
-						if(cache_is_valid(result)) cache_delete(result);
-					}
-					else return InfoBox(playerid, IB_NO_PRIVILEGE);
-				}
-				else if(listitem == 1)
-				{
-					// perziureti visus visi verslai
-					AM_ShowAllBusiness(playerid, 0);
-				}
-				else if(listitem == 2)
-				{
-					// galimos prekes
-					new string[2024] = "{BABABA}Nr.\t{BABABA}Daiktas\t{BABABA}Min-max galima kaina\t{BABABA}Kiekis á inventoriø\n";
-					for(new i = 0; i < MAX_AVAILABLE_WARES; i++)
-					{
-						if(AvailableWares[i][awItem] != 0) format(string, sizeof string, "%s%d.\t%s\t$%d-$%d\t%d\n", string, i+1, GetInventoryItemName(AvailableWares[i][awItem]), AvailableWares[i][awMinPrice], AvailableWares[i][awMaxPrice], AvailableWares[i][awAmount]);
-						else
-						{
-							strcat(string, "Pridëti");
-							break;
-						}
-					}
-					ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_WARES_ALL, DIALOG_STYLE_TABLIST_HEADERS, "Verslo galimos prekës", string, "Tæsti", "Atðaukti");
-				}
-				else if(listitem == 3)
-				{
-					// lygiai
-					new string[2024] = "{BABABA}Lygis\t{BABABA}Iðmoka\n",
-						line[56],
-						varname[22];
-					for(new i = 0, j = GetGVarInt("BusinessPayMaxLevels"); i <= j; i++)
-					{
-						format(varname, sizeof varname, "BusinessPayLevel%d", i);
-						format(line, sizeof line, "%d\t$%d\n", i, GetGVarInt(varname));
-						strcat(string, line);
-					}
-					ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_LEVELS_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Verslo lygiai", string, "Tæsti", "Atðaukti");
-				}
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_BUSINESS_LEVELS_MAIN:
-		{
-			if(response)
-			{
-				new string[126];
-				tmpSelected[playerid] = listitem;
-				format(string, sizeof string, "{FFFFFF}Áveskite iðmokà, kurià gaus visi verslai, turintys {C2EBA1}%d{FFFFFF} lygá.", listitem);
-				ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_LEVEL_EDIT, DIALOG_STYLE_INPUT, "Verslo lygiai", string, "Keisti", "Atðaukti");
-			}
-			else ShowPlayerAdminMenu(playerid);
-		}
-		case DIALOG_AM_BUSINESS_LEVEL_EDIT:
-		{
-			if(response)
-			{
-				new amount,
-					varname[22];
-				if(sscanf(inputtext,"d",amount) || amount < 0) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_LEVELS_MAIN, 1, tmpSelected[playerid], "");
-				format(varname, sizeof varname, "BusinessPayLevel%d", tmpSelected[playerid]);
-				SetGVarInt(varname, amount);
-				OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 3, "");
-				SaveServerIntEx(varname, amount);
-				log_init(true);
-				log_set_table("logs_admins");
-				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','(AM) Nustate verslo lygio gaunama suma','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), tmpSelected[playerid], amount);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 3, "");
-		}
-		case DIALOG_AM_BUSINESS_WARES_ALL:
-		{
-			if(response)
-			{
-				if(AvailableWares[listitem][awItem] != 0)
-				{
-					tmpSelected[playerid] = listitem;
-					new string[256];
-					format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\nDaiktas\t%s\nPridedamas kiekis á inventoriø po pirkimo\t%d\nMinimali kaina\t$%d\nMaksimali kaina\t$%d\n{C60000}Iðtrinti", GetInventoryItemName(AvailableWares[listitem][awItem]), AvailableWares[listitem][awAmount], AvailableWares[listitem][awMinPrice], AvailableWares[listitem][awMaxPrice]);
-					ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_WARE, DIALOG_STYLE_TABLIST_HEADERS, "Verslo galimos prekës", string, "Keisti", "Atðaukti");
-				}
-				else
-				{
-					// prideti preke
-					ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_NEW_WARE, DIALOG_STYLE_INPUT, "Verslo galimos prekës", "{FFFFFF}Áveskite daikto ID, kurá norite pridëti", "Tæsti", "Atðaukti");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 5, "");
-		}
-		case DIALOG_AM_BUSINESS_NEW_WARE:
-		{
-			if(response)
-			{
-				new itemid;
-				if(sscanf(inputtext,"d",itemid)) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARES_ALL, 1, 99999, "");
-				new bool:found = false;
-				for(new i = 0; i < MAX_AVAILABLE_WARES; i++)
-				{
-					if(AvailableWares[i][awItem] == 0)
-					{
-						AvailableWares[i][awItem] = itemid;
-						AvailableWares[i][awMinPrice] = 5;
-						AvailableWares[i][awMaxPrice] = 50;
-						AvailableWares[i][awAmount] = 1;
-						found = true;
-						break;
-					}
-				}
-				if(found)
-				{
-					log_init(true);
-					log_set_table("logs_admins");
-					log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
-					log_set_values("'%d','%e','(AM) Pridejo preke i galimas verslams','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GetInventoryItemName(itemid));
-					log_commit();
-					SendFormat(playerid, -1, "Prekë pridëta á saraðà. Praðome jà suredaguoti.");
-				}
-				else return SendWarning(playerid, "Galimø prekiø limitas iðnaudotas ("#MAX_AVAILABLE_WARES")");
-				SaveAvailableWares();
-				OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 5, "");
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 3, "");
-		}
-		case DIALOG_AM_BUSINESS_WARE:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// item keitimas
-						OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARES_ALL, 1, tmpSelected[playerid], "");
-					}
-					case 1:
-					{
-						// duodamas kiekis
-						ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_WARE_EDIT_AMOUNT, DIALOG_STYLE_INPUT, "Verslo galimos prekës", "{FFFFFF}Áveskite prekës kieká, kuris bus duodamas þaidëjui á inventoriø\npo pirkimo", "Tæsti", "Atðaukti");
-					}
-					case 2:
-					{
-						// minimali
-						ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_WARE_EDIT_MIN_PRICE, DIALOG_STYLE_INPUT, "Verslo galimos prekës", "{FFFFFF}Áveskite minimalià kainà, kurià gali nustatyti verslas ðiai prekei.", "Tæsti", "Atðaukti");
-					}
-					case 3:
-					{
-						// maksimali
-						ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_WARE_EDIT_MAX_PRICE, DIALOG_STYLE_INPUT, "Verslo galimos prekës", "{FFFFFF}Áveskite maksimalià kainà, kurià gali nustatyti verslas ðiai prekei.", "Tæsti", "Atðaukti");
-					}
-					case 4:
-					{
-						// istrinti
-						// sort array
-						new selected = tmpSelected[playerid],
-							__reset_AvailableWare[E_AVAILABLE_WARES_DATA],
-							string[126];
-						MsgSuccess(playerid, "VERSLO PREKËS", "Sëkmingai paðalinote %s ið galimø prekiø sàraðo.", GetInventoryItemName(AvailableWares[selected][awItem]));
-						mysql_format(chandler, string, sizeof string, "DELETE FROM `wares_available` WHERE ItemId = '%d'", AvailableWares[selected][awItem]);
-						mysql_fquery(chandler, string, "BusinessUpdated");
-
-						log_init(true);
-						log_set_table("logs_admins");
-						log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`");
-						log_set_values("'%d','%e','(AM) Pasalino preke is galimu verslams','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GetInventoryItemName(AvailableWares[selected][awItem]));
-						log_commit();
-
-						AvailableWares[selected] = __reset_AvailableWare;
-						/*for(new i = 0; i < MAX_AVAILABLE_WARES; i++)
-						{
-							if(AvailableWares[i][awItem] == 0)
-							{
-								for(new x = i+1; x < MAX_AVAILABLE_WARES; x++)
-								{
-									if(AvailableWares[x][awItem] != 0)
-									{
-										AvailableWares[i][awItem] = AvailableWares[x][awItem];
-										AvailableWares[i][awAmount] = AvailableWares[x][awAmount];
-										AvailableWares[i][awMinPrice] = AvailableWares[x][awMinPrice];
-										AvailableWares[i][awMaxPrice] = AvailableWares[x][awMaxPrice];
-										AvailableWares[x] = __reset_AvailableWare;
-										break;
-									}
-								}
-							}
-						}*/
-						SortEnumArray(AvailableWares, 0, MAX_AVAILABLE_WARES, [awItem], 0, E_AVAILABLE_WARES_DATA, FALSE);
-						SaveAvailableWares();
-						OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 5, "");
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_MAIN, 1, 2, "");
-		}
-		case DIALOG_AM_BUSINESS_WARE_EDIT_AMOUNT:
-		{
-			if(response)
-			{
-				new amount;
-				if(sscanf(inputtext,"d",amount) || amount <= 0) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARE, 1, 1, "");
-				new selected = tmpSelected[playerid];
-				AvailableWares[selected][awAmount] = amount;
-				MsgSuccess(playerid, "VERSLO PREKËS", "Kiekis pakeistas.");
-				OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARES_ALL, 1, tmpSelected[playerid], "");
-				SaveAvailableWares(selected, AvailableWares[selected][awItem]);
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARES_ALL, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_AM_BUSINESS_WARE_EDIT_MIN_PRICE:
-		{
-			if(response)
-			{
-				new price;
-				if(sscanf(inputtext,"d",price) || price <= 0) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARE, 1, 2, "");
-				new selected = tmpSelected[playerid];
-				AvailableWares[selected][awMinPrice] = price;
-				MsgSuccess(playerid, "VERSLO PREKËS", "Minimali kaina pakeista.");
-				if(AvailableWares[selected][awMinPrice] > AvailableWares[selected][awMaxPrice])
-				{
-					IntegerSwitch(AvailableWares[selected][awMinPrice], AvailableWares[selected][awMaxPrice]);
-				}
-				OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARES_ALL, 1, tmpSelected[playerid], "");
-				SaveAvailableWares(selected, AvailableWares[selected][awItem]);
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARES_ALL, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_AM_BUSINESS_WARE_EDIT_MAX_PRICE:
-		{
-			if(response)
-			{
-				new price;
-				if(sscanf(inputtext,"d",price) || price <= 0) return OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARE, 1, 3, "");
-				new selected = tmpSelected[playerid];
-				AvailableWares[selected][awMaxPrice] = price;
-				MsgSuccess(playerid, "VERSLO PREKËS", "Maksimali kaina pakeista.");
-				if(AvailableWares[selected][awMinPrice] > AvailableWares[selected][awMaxPrice])
-				{
-					IntegerSwitch(AvailableWares[selected][awMinPrice], AvailableWares[selected][awMaxPrice]);
-				}
-				OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARES_ALL, 1, tmpSelected[playerid], "");
-				SaveAvailableWares(selected, AvailableWares[selected][awItem]);
-			}
-			else OnDialogResponse(playerid, DIALOG_AM_BUSINESS_WARES_ALL, 1, tmpSelected[playerid], "");
-		}
+		
 		case DIALOG_AM_SALON_CREATE:
 		{
 			if(response)
@@ -14097,11 +12994,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 				{
-					case 5:
-					{
-						// verslai
-						ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_MAIN, DIALOG_STYLE_LIST, "Verslai", "Kurti naujà\nPerþiûrëti visus\nGalimos prekës parduotuvëms\nVerslo lygiai", "Tæsti", "Atðaukti");
-					}
 					case 6:
 					{
 						// tr. priemoniu salonai
@@ -15670,48 +14562,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				PlayerInfo[playerid][pJobActionIndex] = 0;
 			}
 		}
-		case DIALOG_FARMER_SELECT_JOB:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					if(GetPlayerVehicleID(playerid) == INVALID_VEHICLE_ID || VehicleInfo[GetPlayerVehicleID(playerid)][vJob] != JOB_FARMER)
-					{
-						PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_COMBAIN;
-						PlayerInfo[playerid][pJobActionTime] = 15;
-						SendFormat(playerid, 0xFFBA41FF, "Atsisëskite á artimiausià kombainà.");
-					}
-					else
-					{
-						PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_COLLECT_COMBAIN;
-						PlayerInfo[playerid][pJobActionTime] = 30;
-						PlayerInfo[playerid][pJobVehicle] = GetPlayerVehicleID(playerid);
-						new index = random(sizeof FarmerSpots);
-						PlayerInfo[playerid][pJobDestination] = index;
-						SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_FARMER_SPOT, FarmerSpots[index][0], FarmerSpots[index][1], FarmerSpots[index][2], 2.3);
-						SendFormat(playerid, 0xACE656FF, "Vaþiuokite á paþymëtus taðkus þemëlapyje.");
-					}
-					JobGUI_Show(playerid);
-					JobGUI_Update(playerid, .bottext = "_~n~_");
-				}
-				else if(listitem == 1)
-				{
-					JobGUI_Show(playerid);
-					JobGUI_Update(playerid, .bottext = "~n~_");
-					PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_BAG;
-					PlayerInfo[playerid][pJobActionTime] = 60;
-					new index = random(sizeof FarmerBagSpots);
-					PlayerInfo[playerid][pJobDestination] = index;
-					SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_FARMER_TAKE_BAG, FarmerBagSpots[index][0], FarmerBagSpots[index][1], FarmerBagSpots[index][2], 2.3);
-					SendFormat(playerid, 0xACE656FF, "Paimkite maiðà ið paþymëtos vietos þemëlapyje.");
-				}
-			}
-			else
-			{
-				PlayerInfo[playerid][pJobDuty] = 0;
-			}
-		}
+		
 		case DIALOG_FURNITURE_MAIN:
 		{
 			if(response)
@@ -21582,26 +20433,16 @@ stock GetJobTaskNameById(job, task)
 				case JOB_ACTION_CARGO_LEAVE_CAR: name = "Islipkite";
 			}
 		}
-		case JOB_FARMER:
-		{
-			switch(task)
-			{
-				case JOB_ACTION_TAKE_COMBAIN: name = "Iseskite i kombaina";
-				case JOB_ACTION_COLLECT_COMBAIN: name = "Surinkite derliu";
-				case JOB_ACTION_PUT_BAG: name = "Nuneskite maisa";
-				case JOB_ACTION_TAKE_BAG: name = "Paimkite maisa";
-			}
-		}
 		case JOB_MECHANIC:
 		{
 			switch(task)
 			{
 				case JOB_ACTION_TAKE_REPAINT: name = "Paimkite dazus";
 				case JOB_ACTION_REPAINT_VEHICLE: name = "Perdazykite tr. priemone";
-				case JOB_ACTION_TAKE_REPAIR, JOB_ACTION_TAKE_ENGINE, JOB_ACTION_TAKE_ENGINE_REPAIR, JOB_ACTION_TAKE_BATTERY, JOB_ACTION_TAKE_BATTERY_REPAIR: name = "Paimkite dalis sandeliuke";
+				case JOB_ACTION_TAKE_REPAIR, JOB_ACTION_TAKE_ENGINE, JOB_ACTION_TAKE_ENGINE_REPAIR, JOB_ACTION_TAKE_BATTERY, JOB_ACTION_TAKE_BATTERY_REPAIR: name = "Paimkite dalis";
 				case JOB_ACTION_PUT_PARTS_VEHICLE, JOB_ACTION_PUT_BATTERY, JOB_ACTION_PUT_BATTERY_REPAIR, JOB_ACTION_PUT_ENGINE, JOB_ACTION_PUT_ENGINE_REPAIR: name = "Nuneskite dalis";
 				case JOB_ACTION_REPAIR_VEHICLE: name = "Tvarkykite tr. priemone";
-				case JOB_ACTION_TAKE_WHEELS: name = "Paimkite dalis sandeliuke";
+				case JOB_ACTION_TAKE_WHEELS: name = "Paimkite dalis";
 				case JOB_ACTION_PUT_WHEELS_VEHICLE: name = "Nuneskite dalis";
 				case JOB_ACTION_TUNE_VEHICLE: name = "Tuninguokite tr. priemone";
 			}
@@ -22100,53 +20941,6 @@ stock GetXYInFrontOfPlayer(playerid, &Float:x, &Float:y, Float:distance)
 
 	x += (distance * floatsin(-a, degrees));
 	y += (distance * floatcos(-a, degrees));
-}
-
-stock AM_ShowAllBusiness(playerid, page)
-{
-	tmpAmenuCurPage[playerid] = page;
-	tmpAmenuIter[playerid] = 0;
-	tmpAmenuNextPage[playerid] = false;
-
-	new string[7000] = "{BABABA}Nr.\t{BABABA}Pavadinimas\t{BABABA}MySQL ID (numeris)\t{BABABA}Savininkas{FFFFFF}\n",
-		owner[24],
-		real_iter,
-		count_on_this_page,
-		line[66];
-	
-	foreach(new businessid : Business)
-	{
-		if(BusinessInfo[businessid][bId] != 0)
-		{
-			if(real_iter >= MAX_BUSINESS_PER_PAGE * tmpAmenuCurPage[playerid])
-			{
-				if(count_on_this_page >= MAX_BUSINESS_PER_PAGE)
-				{
-					if(Iter_Last(Business) != businessid)
-					{
-						tmpAmenuNextPage[playerid] = true;
-						strcat(string, "Kitas >>\n");
-						break;
-					}
-				}
-				else
-				{
-					if(BusinessInfo[businessid][bOwner] == 0) format(owner, 10, "-");
-					else format(owner, sizeof owner, GetNameBySql(BusinessInfo[businessid][bOwner]));
-
-					format(line, sizeof line, "%d.\t%.10s%s\t%d\t%s\n", real_iter+1, BusinessInfo[businessid][bName], strlen(BusinessInfo[businessid][bName]) > 10 ? ("..") : (" "), BusinessInfo[businessid][bId], owner);
-					strcat(string, line);
-				}
-				count_on_this_page++;
-			}
-			real_iter++;
-		}
-	}
-	tmpAmenuIter[playerid] = count_on_this_page;
-	if(real_iter == 0) return ShowPlayerAdminMenu(playerid) , SendWarning(playerid, "Nëra verslø.");
-	if(tmpPage_Object[playerid] > 0) strcat(string, "<< Atgal");
-	ShowPlayerDialog(playerid, DIALOG_AM_BUSINESS_ALL, DIALOG_STYLE_TABLIST_HEADERS, "Verslai", string, "Tæsti", "Atðaukti");
-	return 1;
 }
 
 stock ShowOwnedFurniture(playerid, page, type, iter)
@@ -23527,7 +22321,8 @@ stock House_DeleteFurniture(house)
 {
 	new 
 		last_iter = -1,
-		__reset_HFurniture[E_HOUSE_FURNITURE_DATA];
+		__reset_HFurniture[E_HOUSE_FURNITURE_DATA],
+		count_deleted = 0;
 
 	foreach(new furnitureid : HFurniture)
 	{
@@ -23541,6 +22336,7 @@ stock House_DeleteFurniture(house)
 				Iter_Remove(HFurniture, last_iter);
 			}
 			last_iter = furnitureid;
+			count_deleted++;
 		}
 	}
 	if(last_iter != -1) Iter_Remove(HFurniture, last_iter);
@@ -23550,7 +22346,7 @@ stock House_DeleteFurniture(house)
 		return 1;
 	}
 	mysql_tquery_inline(chandler, using inline updateHouse, "DELETE FROM `houses_furniture` WHERE HouseId = '%d'", HouseInfo[house][hId]);
-	return 1;
+	return count_deleted;
 }
 
 stock LoadHouseFurniture(bool:restart = false)
@@ -23653,7 +22449,8 @@ stock Garage_DeleteFurniture(garage)
 {
 	// istrinam ir furniture
 	new __reset_GFurniture[E_GARAGE_FURNITURE_DATA],
-		last_iter = -1;
+		last_iter = -1,
+		count_deleted = 0;
     foreach(new furnitureid : GFurniture)
     {
         if(gFurnitureInfo[furnitureid][gfOwner] == GarageInfo[garage][gOwner])
@@ -23667,12 +22464,13 @@ stock Garage_DeleteFurniture(garage)
                 Iter_Remove(GFurniture, last_iter);
             }
             last_iter = furnitureid;
+			count_deleted++;
         }
     }
     (last_iter != -1) && Iter_Remove(GFurniture, last_iter);
 	inline deleteFurniture() return 1;
 	mysql_tquery_inline(chandler, using inline deleteFurniture, "DELETE FROM `garages_furniture` WHERE GarageId = '%d'", GarageInfo[garage][gId]);
-	return 1;
+	return count_deleted;
 }
 
 stock LoadGarageFurniture(bool:restart = false)
@@ -23771,6 +22569,39 @@ public GarageFurnitureLoad()
 	return 1;
 }
 
+
+stock Business_DeleteFurniture(business)
+{
+	new count_deleted,
+		last_iter = -1,
+		__reset_BFurniture[E_BUSINESS_FURNITURE_DATA];
+	foreach(new furnitureid : BFurniture)
+	{
+		if(bFurnitureInfo[furnitureid][bfOwner] == BusinessInfo[business][bId])
+		{
+			if(IsValidDynamicObject(bFurnitureInfo[furnitureid][bfObject])) DestroyDynamicObject(bFurnitureInfo[furnitureid][bfObject], "furniture", "admin_delete_business_furniture");
+			bFurnitureInfo[furnitureid] = __reset_BFurniture;
+			bFurnitureInfo[furnitureid][bfObject] = INVALID_OBJECT_ID;
+			if(last_iter != -1 && last_iter != furnitureid)
+			{
+				Iter_Remove(BFurniture, last_iter);
+				count_deleted++;
+			}
+			last_iter = furnitureid;
+		}
+	}
+	if(last_iter != -1) Iter_Remove(BFurniture, last_iter);
+
+	inline deleteBFurniture()
+	{
+		return 1;
+	}
+	mysql_tquery_inline(chandler, using inline deleteBFurniture, "\
+		DELETE FROM `business_furniture` WHERE BusinessId = '%d'",
+		BusinessInfo[business][bId]
+	);
+	return count_deleted;
+}
 
 stock LoadBusinessFurniture(bool:restart = false)
 {
@@ -26570,7 +25401,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				{
 					new spot = random(sizeof MechanicPartSpots);
 					PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_REPAIR;
-					PlayerInfo[playerid][pJobActionTime] = 30;
+					PlayerInfo[playerid][pJobActionTime] = 60;
 					SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_REPAIR, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
 				}
 				new __tmpskin = GetPlayerSkin(playerid);
@@ -26609,7 +25440,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				{
 					new spot = random(sizeof MechanicPartSpots);
 					PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_WHEELS;
-					PlayerInfo[playerid][pJobActionTime] = 30;
+					PlayerInfo[playerid][pJobActionTime] = 60;
 					SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_TAKE_WHEELS, MechanicPartSpots[spot][0], MechanicPartSpots[spot][1], MechanicPartSpots[spot][2], 2.3);
 				}
 				new __tmpskin = GetPlayerSkin(playerid);
@@ -27363,7 +26194,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 			new vehicleid = GetPlayerVehicleID(playerid);
 			PlayerInfo[playerid][pJobVehicle] = vehicleid;
 			PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_WHEELS;
-			PlayerInfo[playerid][pJobActionTime] = 30;
+			PlayerInfo[playerid][pJobActionTime] = 60;
 			PlayerInfo[playerid][pJobVehicle] = vehicleid;
 			PlayerInfo[playerid][pJobActionIndex] = 0;
 			PlayerInfo[playerid][pJobCurrentType] = 4;
@@ -35215,7 +34046,7 @@ CMD:repair(playerid, params[])
 	PlayerInfo[playerid][pJobCurrentType] = 3;
 	PlayerInfo[playerid][pJobDestination] = 0;
 	PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_REPAIR;
-	PlayerInfo[playerid][pJobActionTime] = 30;
+	PlayerInfo[playerid][pJobActionTime] = 60;
 	JobGUI_Show(playerid);
 	new string[126];
 	format(string, sizeof string, "~n~~n~TVARKOMA TR. PRIEMONE: %s", strtoupper(GetModelName(GetVehicleModel(vehicleid))));
@@ -35236,7 +34067,7 @@ CMD:repaint(playerid, params[])
 	if(GetPlayerMoney(playerid) < DEFAULT_REPAINT_PRICE) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_REPAINT_PRICE);
 	PlayerInfo[playerid][pJobVehicle] = vehicleid;
 	PlayerInfo[playerid][pJobCurrentAction] = JOB_ACTION_TAKE_REPAINT;
-	PlayerInfo[playerid][pJobActionTime] = 30;
+	PlayerInfo[playerid][pJobActionTime] = 60;
 	JobGUI_Show(playerid);
 	new string[126];
 	format(string, sizeof string, "~n~~n~PERDAZOMA TR. PRIEMONE: %s", strtoupper(GetModelName(GetVehicleModel(vehicleid))));
@@ -35272,7 +34103,7 @@ CMD:jobstats(playerid, params[])
 					default: nextxp = PlayerInfo[playerid][pJobLevel];
 				}
 			}
-			case JOB_MECHANIC, JOB_FARMER:
+			case JOB_MECHANIC:
 			{
 				nextxp = 0;
 			}
@@ -35320,9 +34151,6 @@ CMD:duty(playerid, params[])
 					CHECKPOINT_TYPE_TAKE_REPAIR,
 					CHECKPOINT_TYPE_TAKE_REPAINT,
 					CHECKPOINT_TYPE_TAKE_WHEELS,
-					CHECKPOINT_TYPE_FARMER_TAKE_BAG,
-					CHECKPOINT_TYPE_FARMER_PUT_BAG,
-					CHECKPOINT_TYPE_FARMER_SPOT,
 					CHECKPOINT_TYPE_CARGO_CRATES_TAKE,
 					CHECKPOINT_TYPE_CARGO_UNLOAD,
 					CHECKPOINT_TYPE_CARGO_LOAD,
@@ -35334,18 +34162,7 @@ CMD:duty(playerid, params[])
 					CHECKPOINT_TYPE_PUT_WHEELS,
 					CHECKPOINT_TYPE_PUT_ENGINE_VEHICLE,
 					CHECKPOINT_TYPE_PUT_BATTERY_VEHICLE)) DisablePlayerCheckpointEx(playerid);
-				if(GetPlayerVehicleSeat(playerid) == 0)
-				{
-					new vehicleid = GetPlayerVehicleID(playerid);
-					switch(VehicleInfo[vehicleid][vJob])
-					{
-						case JOB_FARMER:
-						{
-							RemovePlayerFromVehicle(playerid);
-							SetVehicleToRespawn(vehicleid);
-						}
-					}
-				}
+				
 				PlayerInfo[playerid][pJobVehicle] = INVALID_VEHICLE_ID;
 				log_set_table("logs_jobs");
 			}
@@ -35411,16 +34228,6 @@ CMD:duty(playerid, params[])
 							SendWarning(playerid, "Nesate kroviniø iðveþiotojo tr. priemonëje.");
 							return 1;
 						}
-					}
-					case JOB_FARMER:
-					{
-						if(PlayerInfo[playerid][pPayCheck]+Jobs[jobid][jobPayDay] >= Jobs[jobid][jobMaxPayout])
-						{
-							// pasieke limita ismokejimo, tegu nebedirba.
-							SendFormat(playerid, 0xEB7C6EFF, "Jûs jau pasiekæs uþdarbio limità, todël atlygis uþ darbà nebus priskaièiuojamas.");
-						}
-						ShowPlayerDialog(playerid, DIALOG_FARMER_SELECT_JOB, DIALOG_STYLE_LIST, "Fermeris", "Rinkti derliø kombainu\nNeðioti maiðus", "Tæsti", "Atðaukti");
-						PlayerInfo[playerid][pJobDuty] = 1;
 					}
 					case JOB_MECHANIC:
 					{

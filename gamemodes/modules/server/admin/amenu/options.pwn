@@ -60,7 +60,7 @@ static _Opts_Vehicles_Main(playerid)
                 SetGVarIntEx("CountVehicleClass", !GetGVarInt("CountVehicleClass"));
                 SaveServerIntEx("CountVehicleClass", GetGVarInt("CountVehicleClass"));
 
-                MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+                MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
 
                 log_init(true);
                 log_set_table("logs_admins");
@@ -96,7 +96,7 @@ static _Opts_Vehicles_InputTaxes(playerid, error[] = "")
 
             SetGVarIntEx("VehicleTaxes", taxes);
             SaveServerIntEx("VehicleTaxes", GetGVarInt("VehicleTaxes"));
-            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
             
             log_init(true);
             log_set_table("logs_admins");
@@ -157,7 +157,7 @@ static _Opts_Business_InputTaxes(playerid, error[] = "")
             
             SetGVarIntEx("BusinessTaxes", taxes);            
             SaveServerIntEx("BusinessTaxes", GetGVarInt("BusinessTaxes"));
-            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
 
             log_init(true);
             log_set_table("logs_admins");
@@ -196,7 +196,7 @@ static _Opts_Business_FuelCapacity(playerid, error[] = "")
 
             SetGVarIntEx("BusinessFuelCapacity", capacity);
             SaveServerIntEx("BusinessFuelCapacity", GetGVarInt("BusinessFuelCapacity"));
-            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
 
             log_init(true);
             log_set_table("logs_admins");
@@ -233,7 +233,7 @@ static _Opts_Business_FuelOrderPrice(playerid, error[] = "")
             
             SetGVarFloatEx("BusinessOrderFuelPrice", price);    
             SaveServerFloatEx("BusinessOrderFuelPrice", GetGVarFloat("BusinessOrderFuelPrice"));
-            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
 
             log_init(true);
             log_set_table("logs_admins");
@@ -293,7 +293,7 @@ stock _Opts_Houses_InputTaxes(playerid, error[] = "")
             
             SetGVarIntEx("HouseTaxes", taxes);
             SaveServerIntEx("HouseTaxes", GetGVarInt("HouseTaxes"));
-            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
 
         
             log_init(true);
@@ -373,7 +373,7 @@ static _Opts_OnOff_Main(playerid)
                 SaveServerIntEx(setting, GetGVarInt(setting));
                 current_set = !current_set;
 
-                MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+                MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
 
                 switch(YHash(setting, false))
                 {
@@ -513,7 +513,7 @@ static _Opts_Places_Main(playerid)
         SetGVarFloatEx(va_return("%sY", set), y);
         SetGVarFloatEx(va_return("%sZ", set), z);
 
-        MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai sëkmingai pakeisti.");
+        MsgSuccess(playerid, "Nustatymai", "Nustatymai sëkmingai pakeisti.");
 
         if(!isequal(set, "Spawn"))
         {
@@ -586,7 +586,7 @@ static _Opts_Other_PVM(playerid, error[] = "")
             SetGVarIntEx("TaxesToCity", percent);
 
             SaveServerIntEx("TaxesToCity", GetGVarInt("TaxesToCity"));
-            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
             log_init(true);
             log_set_table("logs_admins");
             log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
@@ -628,7 +628,7 @@ static _Opts_Other_PolicePercent(playerid, error[] = "")
         
             SetGVarIntEx("TaxesToPolice", percent);
             SaveServerIntEx("TaxesToPolice", GetGVarInt("TaxesToPolice"));
-            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
 
             log_init(true);
             log_set_table("logs_admins");
@@ -662,7 +662,7 @@ static _Opts_Other_MaxChars(playerid, error[] = "")
             SetGVarIntEx("MaxCharacters", limit);
             
             SaveServerIntEx("MaxCharacters", GetGVarInt("MaxCharacters"));
-            MsgSuccess(playerid, "NUSTATYMAI", "Nustatymai atnaujinti");
+            MsgSuccess(playerid, "Nustatymai", "Nustatymai atnaujinti");
             log_init(true);
             log_set_table("logs_admins");
             log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");

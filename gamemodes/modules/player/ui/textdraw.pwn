@@ -315,21 +315,7 @@ stock BlindfoldTD_Create_Global()
     TextDrawSetShadow(BlindfoldTD,1);
 }
 
-hook OnPlayerConnect(playerid)
-{
-	player_SpamBar_Showed[playerid] = false;
 
-	TaxometerTD[playerid] = CreatePlayerTextDraw(playerid, 45.047412, 326.106597, "Taksometras:_0.00$");
-	PlayerTextDrawLetterSize(playerid, TaxometerTD[playerid], 0.172952, 0.998400);
-	PlayerTextDrawTextSize(playerid, TaxometerTD[playerid], 128.000000, 0.000000);
-	PlayerTextDrawAlignment(playerid, TaxometerTD[playerid], 1);
-	PlayerTextDrawColor(playerid, TaxometerTD[playerid], -93);
-	PlayerTextDrawUseBox(playerid, TaxometerTD[playerid], 1);
-	PlayerTextDrawBoxColor(playerid, TaxometerTD[playerid], 58);
-	PlayerTextDrawBackgroundColor(playerid, TaxometerTD[playerid], 38);
-	PlayerTextDrawFont(playerid, TaxometerTD[playerid], 2);
-	PlayerTextDrawSetProportional(playerid, TaxometerTD[playerid], 1);
-}
 
 stock PayPhoneTD_Create_Player(playerid)
 {
@@ -3925,4 +3911,21 @@ stock CharCreateTD_Create_Player(playerid)
 	PlayerTextDrawFont(playerid, create_p_td_gender[playerid], 1);
 	PlayerTextDrawSetProportional(playerid, create_p_td_gender[playerid], 1);
 	PlayerTextDrawSetShadow(playerid, create_p_td_gender[playerid], 0);
+}
+
+
+hook OnPlayerConnect(playerid)
+{
+	player_SpamBar_Showed[playerid] = false;
+
+	TaxometerTD[playerid] = CreatePlayerTextDraw(playerid, 45.047412, 326.106597, "Taksometras:_0.00$");
+	PlayerTextDrawLetterSize(playerid, TaxometerTD[playerid], 0.172952, 0.998400);
+	PlayerTextDrawTextSize(playerid, TaxometerTD[playerid], 128.000000, 0.000000);
+	PlayerTextDrawAlignment(playerid, TaxometerTD[playerid], 1);
+	PlayerTextDrawColor(playerid, TaxometerTD[playerid], -93);
+	PlayerTextDrawUseBox(playerid, TaxometerTD[playerid], 1);
+	PlayerTextDrawBoxColor(playerid, TaxometerTD[playerid], 58);
+	PlayerTextDrawBackgroundColor(playerid, TaxometerTD[playerid], 38);
+	PlayerTextDrawFont(playerid, TaxometerTD[playerid], 2);
+	PlayerTextDrawSetProportional(playerid, TaxometerTD[playerid], 1);
 }
