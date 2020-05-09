@@ -1688,7 +1688,6 @@ new
 	player_NewChars[MAX_PLAYERS],
 	player_DataChars[MAX_PLAYERS],
 	player_charList_Selected[MAX_PLAYERS],
-	bool:player_charList_ConfirmShown[MAX_PLAYERS],
 	bool:player_charList_GUIShown[MAX_PLAYERS],
 	player_CharName[MAX_PLAYERS][MAX_PLAYER_NAME + 1],
 	player_CharGender[MAX_PLAYERS],
@@ -2809,8 +2808,6 @@ public SecondTimer()
 		//if(lastarea[playerid] != GetPlayerMobileAreaStrenght(playerid)) { lastarea[playerid] = GetPlayerMobileAreaStrenght(playerid); SendFormat(playerid, -1, "Entered %d zone", lastarea[playerid]); }
 	
 		// Narkotikai, efektai
-		if(player_WaitCharTextdraw[playerid] > 0) player_WaitCharTextdraw[playerid]--;
-
 		new Float:health;
 		DrugTextdrawShowed = false;
 		GetPlayerHealth(playerid, health);
@@ -6314,14 +6311,22 @@ hook OnPlayerLeaveCharSelect(playerid)
 	return 1;
 }
 
+ptask PT_CharCreationSecond[1000](playerid)
+{
+	if(player_WaitCharTextdraw[playerid] > 0)
+	{
+		player_WaitCharTextdraw[playerid]--;
+	}
+}
+
 stock ShowPlayerLeaveConfirm(playerid)
 {
-	player_charList_ConfirmShown[playerid] = true;
+	player_charList_GUIShown[playerid] = true;
 	dialog_Clear();
 	dialog_AddLine("Ar tikrai norite palikti serverá?");
 	inline confirmLeaveServer(response, listitem)
 	{
-		player_charList_ConfirmShown[playerid] = false;
+		player_charList_GUIShown[playerid] = false;
 		player_WaitCharTextdraw[playerid] = 1;
 
 		if(response) 	Kick(playerid);
@@ -7056,9 +7061,8 @@ stock DonatorMenu_Main(playerid, selected)
 					player_charList_GUIShown[playerid] = false;
 					return 1;
 				}
-				dialog_Show(playerid, using inline about, DIALOG_STYLE_MSGBOX, "Remëjo meniu > Informacija", "Uþdaryti", "");
-
 				player_charList_GUIShown[playerid] = true;
+				dialog_Show(playerid, using inline about, DIALOG_STYLE_MSGBOX, "Remëjo meniu > Informacija", "Uþdaryti", "");
 			}
 			dialog_Row("Veikëjo vardo keitimas")
 			{
@@ -23791,7 +23795,6 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 	SpectateOn[playerid] = INVALID_PLAYER_ID;
 	
 
-	player_charList_ConfirmShown[playerid] = false;
 	player_charList_GUIShown[playerid] = false;
 	if(reset_char_data)
 	{
@@ -25157,7 +25160,8 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 			CancelSelectTextDraw(playerid);
 			return 1;
 		}
-		if(!player_charList_GUIShown[playerid] && !player_charList_ConfirmShown[playerid] && player_WaitCharTextdraw[playerid] <= 0)
+		if(	!player_charList_GUIShown[playerid] &&
+			player_WaitCharTextdraw[playerid] <= 0)
 		{
 			for(new i = 0; i < 2; i++)
 			{
@@ -32109,6 +32113,7 @@ CMD:pay(playerid, params[])
 	GivePlayerMoney(playerid, -amount);
 	SendFormat(playerid, 0x1EC600FF, "Padavëte %s $%d", GetPlayerNameEx(receiverid, true), amount);
 	SendFormat(receiverid, 0x1EC600FF, "Gavote $%d ið %s", amount, GetPlayerNameEx(playerid, true));
+
 	SaveAccountIntEx(receiverid, "Money", GetPlayerMoney(receiverid));
 	SaveAccountIntEx(playerid, "Money", GetPlayerMoney(playerid));
 	ApplyAnimation_Single(playerid, "DEALER", "shop_pay", 4.0, false, true, true, true, false);

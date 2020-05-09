@@ -25,13 +25,13 @@ static _Vehicles_Main(playerid)
         {   
             new vehicleid = GetClosestVehicle(playerid, 5.0);
             dialog_Row("Pridëti naujà")                            return _Vehicles_CreateNew(playerid);
-            dialog_Row("{FFFFFF}Keisti modelá")                    return _Vehicles_ChangeModel(playerid, vehicleid); 
+            dialog_Row("Keisti modelá")                            return _Vehicles_ChangeModel(playerid, vehicleid); 
             dialog_Row("Keisti spalvà")                            return _Vehicles_ChangeColor(playerid, vehicleid);
             dialog_Row("Nustatyti frakcijà")                       return _Vehicles_ChangeFaction(playerid, vehicleid); 
             dialog_Row("Nustatyti darbà")                          return _Vehicles_ChangeJob(playerid, vehicleid); 
             dialog_Row("Nustatyti minimalø darbo/frakcijos lygá")  return _Vehicles_ChangeLevel(playerid, vehicleid); 
             dialog_Row("Iðsaugoti pozicijà")                       return _Vehicles_SavePosition(playerid, vehicleid); 
-            dialog_Row("{C60000}Iðtrinti")                         return _Vehicles_Delete(playerid, vehicleid); 
+            dialog_Row("Iðtrinti")                                 return _Vehicles_Delete(playerid, vehicleid); 
         }
         else AMenu_Main(playerid);
     }

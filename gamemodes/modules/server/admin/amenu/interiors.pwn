@@ -13,7 +13,7 @@ static _Interiors_ShowList(playerid, page = 0)
     inline loadInts()
     {
         dialog_Clear();
-        dialog_AddLine("{11ff99}>> Iðsaugoti naujà interjerà dabartinëje vietoje");
+        dialog_AddLine("{11ff99}>>> Iðsaugoti naujà interjerà dabartinëje vietoje");
 
         new name[24],
             rows = cache_num_rows();
@@ -33,7 +33,7 @@ static _Interiors_ShowList(playerid, page = 0)
         {
             if(response)
             {
-                dialog_Row(">> Iðsaugoti naujà interjerà")  return _Interiors_CreateNew(playerid);
+                dialog_Row(">>> Iðsaugoti naujà interjerà")  return _Interiors_CreateNew(playerid);
                 dialog_Row("<<< ATGAL")                     return _Interiors_ShowList(playerid, page - 1);
                 dialog_Row(">>> KITAS")                     return _Interiors_ShowList(playerid, page + 1);
 

@@ -133,7 +133,7 @@ static _Factions_ShowDetails(playerid, faction)
             dialog_Row("Keisti spawn vietà")             return _Factions_ChangeSpawn(playerid, faction);
             dialog_Row("Keisti tipà")                    return _Factions_ChangeType(playerid, faction);
             dialog_Row("Suteikti/atimti frakcijos chat") return _Factions_ChangeFChat(playerid, faction);
-            dialog_Row("{C60000}Iðtrinti")               return _Factions_Delete(playerid, faction);
+            dialog_Row("Iðtrinti")                       return _Factions_Delete(playerid, faction);
         }
         else _Factions_ShowList(playerid);
     }
