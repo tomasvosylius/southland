@@ -457,7 +457,8 @@ static _CarShops_Cars_Main(playerid, salon)
 
     dialog_Clear();
     dialog_AddLine("{BABABA}Nr.\t{BABABA}Modelis\t{BABABA}Reikalingas remëjo lygis\t{BABABA}Kaina");
-    new salonSql = SalonData[salon][salonId], line[32],
+    new salonSql = SalonData[salon][salonId],
+        line[32],
         i;
     foreach(new sell : SellVehicle)
     {

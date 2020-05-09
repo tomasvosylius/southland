@@ -16,9 +16,6 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
             KickEx(playerid);
             return 1;
         }
-        case CHEAT_MONEY: {
-            format(reason, sizeof reason, "Memory hacking");
-        }
         case CHEAT_WARP_TO_CAR, CHEAT_CAR_CHANGER, CHEAT_TROLLBOSS, CHEAT_SEAT_CHANGER: {
             ban = true;
             format(reason, sizeof reason, "Maðinø teleportacija");
@@ -46,6 +43,11 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
         }
         case CHEAT_HEALTH: {
             format(reason, sizeof reason, "Gyvybiø cheat");
+        }
+        case CHEAT_MONEY: {
+        // Mirtis nuima -200, sprunk yra dalykai. Todel nekickinam
+        //     format(reason, sizeof reason, "Memory hacking");
+            return 1;
         }
         case CHEAT_ARMOUR: {
             // format(reason, sizeof reason, "Ðarvø cheat");
