@@ -522,8 +522,9 @@ native gpci(playerid, serial[], len);
 #define DEFAULT_JOB_TRUCKER_XP_TO_LVL3 	16
 #define DEFAULT_JOB_TRUCKER_XP_TO_LVL4 	16
 // koordinates
-#define DEFAULT_MECHANIC_REPAIR_SPOT 	2160.17, -1916.58, 13.53
-#define DEFAULT_MECHANIC_REPAINT_SPOT 	2160.17, -1916.58, 13.53
+#define DEFAULT_MECHANIC_REPAIR_SPOT 	2176.6042,-1873.3920,13.5430
+#define DEFAULT_MECHANIC_REPAINT_SPOT 	2176.6042,-1873.3920,13.5430
+
 #define DEFAULT_POLICE_WEAPON_BUY_SPOT	277.8176, 2023.3016, 17.6406
 #define DEFAULT_POLICE_SKINS_BUY_SPOT	277.9161,1956.1644,17.6406
 #define DEFAULT_POLICE_SPECIAL_BUY_SPOT	278.6557,1991.2023,17.6406
@@ -2072,13 +2073,15 @@ new Float:FarmerBagSpots[][3] = {
 };
 
 new Float:MechanicPartSpots[][3] = {
-	{2146.0999, -1915.6182, 13.1938}
+	{2167.0132,-1876.3346,13.5430},
+	{2166.7612,-1873.3693,13.5430},
+	{2166.5947,-1867.6635,13.5430}
 };
 
 #define BASE_PAYDAY_NO_JOB		200
 new Jobs[][E_JOB_DATA] = {
 	// Id 			Name 					  	X 		Y 			Z 			Payday 	Max 	Bonus 	Contract
-	{JOB_MECHANIC, 	"Tr. priemoniø mechanikai", 2170.38, -1909.48, 13.53, 		400, 	1100, 	10, 	2},
+	{JOB_MECHANIC, 	"Tr. priemoniø mechanikai", 2187.76, -1875.85, 13.54, 		400, 	1100, 	10, 	2},
 	{JOB_TRUCKER, 	"Kroviniø iðveþiotojai", 	2432.76, -2097.25, 13.55, 		300, 	1100, 	15, 	2}
 };
 

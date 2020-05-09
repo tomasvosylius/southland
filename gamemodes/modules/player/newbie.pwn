@@ -38,8 +38,8 @@ static
         {
             "~w~Vienas is galimu darbu - ~r~mechanikai~w~, kurie uzsiima transporto taisymu ir tobulinimu.",
             5.0,
-            {2126.5168,-1875.8082,21.7220},
-            {2157.2954,-1904.0613,16.7034}
+            {2209.1108,-1930.4907,29.4107},
+            {2167.6653,-1881.1880,19.8893}
         },
         {
             "~w~Cia gali isidarbinti ~r~kroviniu isveziotoju~w~ ir neblogai uzdirbti. Visi zaidejai ~g~~h~alga~w~ gauna kas 30min.",
