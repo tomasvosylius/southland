@@ -26,3 +26,6 @@
 #define ALS_DO_PlayerEngineTurning<%0> %0<PlayerEngineTurning,iii>(more:playerid,more:vehicleid,end:have_permission)
 
 #define ALS_DO_ProxyResult<%0> %0<ProxyResult,ii>(more:playerid,end:result)
+
+// UI
+#define ALS_DO_LoadBarEnd<%0> %0<LoadBarEnd,is>(more:playerid,end_string:type[])

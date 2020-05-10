@@ -6,7 +6,7 @@
  *
  */
 
-#include <YSI\y_hooks>
+#include <YSI_Coding\y_hooks>
 
 #define VL_SUCCESS_COLOR 1409243252
 #define VL_DENIED_COLOR -12570764
@@ -56,10 +56,6 @@ new Text:ATM_Background,
 	Text:ATM_Effect1[4],
 	Text:ATM_Effect2[4];
 
-new Text:TipBox_Base,
-	Text:TipBox_NameBase,
-	Text:TipBox_Name,
-	Text:TipBox_LowText;
 
 new 
 	Text:create_g_td_model_bg,
@@ -243,20 +239,11 @@ new PlayerText:InfoBar[MAX_PLAYERS];
 
 new PlayerText:MechTune_BasePart[MAX_PLAYERS][18];
 
-
 new PlayerText:DMV_LicenseModel[MAX_PLAYERS],
 	PlayerText:DMV_InfoLeft[MAX_PLAYERS],
 	PlayerText:DMV_CarModel[MAX_PLAYERS];
-
-new PlayerText:TipBox_Info[MAX_PLAYERS];
 	
 new PlayerText:Furniture_Data[MAX_PLAYERS];
-
-new PlayerText:LoadBar_Base[MAX_PLAYERS],
-	PlayerText:LoadBar_LoadFull[MAX_PLAYERS],
-	PlayerText:LoadBar_Loaded[MAX_PLAYERS],
-	PlayerText:LoadBar_Text[MAX_PLAYERS];
-
 
 new PlayerText:JobGuiTD_TopText[MAX_PLAYERS],
 	PlayerText:JobGuiTD_BotText[MAX_PLAYERS];
@@ -303,7 +290,6 @@ hook OnGameModeInit()
 	ATM_Create_Global();
 	MechTune_Create_Global();
 	JailTimeTD_Create_Global();
-	TipBox_Create_Global();
 	PayPhoneTD_Create_Global();
 	BlindfoldTD_Create_Global();
 	CharListTD_Create_Global();
@@ -329,19 +315,7 @@ stock BlindfoldTD_Create_Global()
     TextDrawSetShadow(BlindfoldTD,1);
 }
 
-hook OnPlayerConnect(playerid)
-{
-	TaxometerTD[playerid] = CreatePlayerTextDraw(playerid, 45.047412, 326.106597, "Taksometras:_0.00$");
-	PlayerTextDrawLetterSize(playerid, TaxometerTD[playerid], 0.172952, 0.998400);
-	PlayerTextDrawTextSize(playerid, TaxometerTD[playerid], 128.000000, 0.000000);
-	PlayerTextDrawAlignment(playerid, TaxometerTD[playerid], 1);
-	PlayerTextDrawColor(playerid, TaxometerTD[playerid], -93);
-	PlayerTextDrawUseBox(playerid, TaxometerTD[playerid], 1);
-	PlayerTextDrawBoxColor(playerid, TaxometerTD[playerid], 58);
-	PlayerTextDrawBackgroundColor(playerid, TaxometerTD[playerid], 38);
-	PlayerTextDrawFont(playerid, TaxometerTD[playerid], 2);
-	PlayerTextDrawSetProportional(playerid, TaxometerTD[playerid], 1);
-}
+
 
 stock PayPhoneTD_Create_Player(playerid)
 {
@@ -500,313 +474,7 @@ stock PayPhoneTD_Create_Global()
 	TextDrawSetProportional(PayPhoneTD_Small[2], 0);
 	TextDrawSetShadow(PayPhoneTD_Small[2], 0);
 }
-
-/*
-stock MDC_Create_Global()
-{
-	MDC_MainBackground = TextDrawCreate(153.238128, 128.560043, "mainbg");
-	TextDrawLetterSize(MDC_MainBackground, 0.000000, 26.495243);
-	TextDrawTextSize(MDC_MainBackground, 496.000000, 0.000000);
-	TextDrawAlignment(MDC_MainBackground, 1);
-	TextDrawColor(MDC_MainBackground, -16897);
-	TextDrawUseBox(MDC_MainBackground, 1);
-	TextDrawBoxColor(MDC_MainBackground, 2105376255);
-	TextDrawSetShadow(MDC_MainBackground, 0);
-	TextDrawSetOutline(MDC_MainBackground, 0);
-	TextDrawBackgroundColor(MDC_MainBackground, 255);
-	TextDrawFont(MDC_MainBackground, 1);
-	TextDrawSetProportional(MDC_MainBackground, 1);
-	TextDrawSetShadow(MDC_MainBackground, 0);
-
-	MDC_HeaderBackground = TextDrawCreate(155.000000, 130.000000, "melynasheader");
-	TextDrawLetterSize(MDC_HeaderBackground, 0.000000, 0.780951);
-	TextDrawTextSize(MDC_HeaderBackground, 494.211181, 0.000000);
-	TextDrawAlignment(MDC_HeaderBackground, 1);
-	TextDrawColor(MDC_HeaderBackground, -1);
-	TextDrawUseBox(MDC_HeaderBackground, 1);
-	TextDrawBoxColor(MDC_HeaderBackground, 1788415);
-	TextDrawSetShadow(MDC_HeaderBackground, 0);
-	TextDrawSetOutline(MDC_HeaderBackground, 0);
-	TextDrawBackgroundColor(MDC_HeaderBackground, 255);
-	TextDrawFont(MDC_HeaderBackground, 1);
-	TextDrawSetProportional(MDC_HeaderBackground, 1);
-	TextDrawSetShadow(MDC_HeaderBackground, 0);
-
-	MDC_ExitButton = TextDrawCreate(487.000000, 130.000000, "LD_SPAC:white");
-	TextDrawLetterSize(MDC_ExitButton, 0.000000, 0.000000);
-	TextDrawTextSize(MDC_ExitButton, 7.000000, 7.000000);
-	TextDrawAlignment(MDC_ExitButton, 1);
-	TextDrawColor(MDC_ExitButton, -1644166913);
-	TextDrawSetShadow(MDC_ExitButton, 0);
-	TextDrawSetOutline(MDC_ExitButton, 0);
-	TextDrawBackgroundColor(MDC_ExitButton, 255);
-	TextDrawFont(MDC_ExitButton, 4);
-	TextDrawSetProportional(MDC_ExitButton, 0);
-	TextDrawSetShadow(MDC_ExitButton, 0);
-	TextDrawSetSelectable(MDC_ExitButton, true);
-
-	MDC_ExitText = TextDrawCreate(488.000000, 130.000000, "X");
-	TextDrawLetterSize(MDC_ExitText, 0.203428, 0.746666);
-	TextDrawAlignment(MDC_ExitText, 1);
-	TextDrawColor(MDC_ExitText, -724249345);
-	TextDrawSetShadow(MDC_ExitText, 0);
-	TextDrawSetOutline(MDC_ExitText, 0);
-	TextDrawBackgroundColor(MDC_ExitText, 255);
-	TextDrawFont(MDC_ExitText, 2);
-	TextDrawSetProportional(MDC_ExitText, 1);
-	TextDrawSetShadow(MDC_ExitText, 0);
-
-	MDC_MenuSeparate1 = TextDrawCreate(155.650039, 166.000000, "menu atskiria apacia");
-	TextDrawLetterSize(MDC_MenuSeparate1, 0.000000, -0.247620);
-	TextDrawTextSize(MDC_MenuSeparate1, 214.018890, 0.000000);
-	TextDrawAlignment(MDC_MenuSeparate1, 1);
-	TextDrawColor(MDC_MenuSeparate1, -156);
-	TextDrawUseBox(MDC_MenuSeparate1, 1);
-	TextDrawBoxColor(MDC_MenuSeparate1, 15);
-	TextDrawSetShadow(MDC_MenuSeparate1, 0);
-	TextDrawSetOutline(MDC_MenuSeparate1, 0);
-	TextDrawBackgroundColor(MDC_MenuSeparate1, 255);
-	TextDrawFont(MDC_MenuSeparate1, 1);
-	TextDrawSetProportional(MDC_MenuSeparate1, 1);
-	TextDrawSetShadow(MDC_MenuSeparate1, 0);
-
-	MDC_MenuSeparateSide = TextDrawCreate(217.149948, 142.949996, "menu atskiria");
-	TextDrawLetterSize(MDC_MenuSeparateSide, 0.000000, 11.942858);
-	TextDrawTextSize(MDC_MenuSeparateSide, 215.149948, 0.000000);
-	TextDrawAlignment(MDC_MenuSeparateSide, 1);
-	TextDrawColor(MDC_MenuSeparateSide, -156);
-	TextDrawUseBox(MDC_MenuSeparateSide, 1);
-	TextDrawBoxColor(MDC_MenuSeparateSide, 15);
-	TextDrawSetShadow(MDC_MenuSeparateSide, 0);
-	TextDrawSetOutline(MDC_MenuSeparateSide, 0);
-	TextDrawBackgroundColor(MDC_MenuSeparateSide, 255);
-	TextDrawFont(MDC_MenuSeparateSide, 1);
-	TextDrawSetProportional(MDC_MenuSeparateSide, 1);
-	TextDrawSetShadow(MDC_MenuSeparateSide, 0);
-
-	MDC_MenuSeparate2 = TextDrawCreate(155.699981, 214.699981, "menu atskiria apacia");
-	TextDrawLetterSize(MDC_MenuSeparate2, 0.000000, -0.247620);
-	TextDrawTextSize(MDC_MenuSeparate2, 215.000000, 0.000000);
-	TextDrawAlignment(MDC_MenuSeparate2, 1);
-	TextDrawColor(MDC_MenuSeparate2, -156);
-	TextDrawUseBox(MDC_MenuSeparate2, 1);
-	TextDrawBoxColor(MDC_MenuSeparate2, 15);
-	TextDrawSetShadow(MDC_MenuSeparate2, 0);
-	TextDrawSetOutline(MDC_MenuSeparate2, 0);
-	TextDrawBackgroundColor(MDC_MenuSeparate2, 255);
-	TextDrawFont(MDC_MenuSeparate2, 1);
-	TextDrawSetProportional(MDC_MenuSeparate2, 1);
-	TextDrawSetShadow(MDC_MenuSeparate2, 0);
-}
-
-stock MDC_Create_Player(playerid)
-{
-	MDC_HeaderText[playerid] = CreatePlayerTextDraw(playerid, 155.200012, 128.849990, "Red_County_Police_Department");
-	PlayerTextDrawLetterSize(playerid, MDC_HeaderText[playerid], 0.213952, 0.916133);
-	PlayerTextDrawAlignment(playerid, MDC_HeaderText[playerid], 1);
-	PlayerTextDrawColor(playerid, MDC_HeaderText[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, MDC_HeaderText[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_HeaderText[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_HeaderText[playerid], 255);
-	PlayerTextDrawFont(playerid, MDC_HeaderText[playerid], 1);
-	PlayerTextDrawSetProportional(playerid, MDC_HeaderText[playerid], 1);
-	PlayerTextDrawSetShadow(playerid, MDC_HeaderText[playerid], 0);
-
-	MDC_MenuButton[playerid][0] = CreatePlayerTextDraw(playerid, 154.000000, 141.000000, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuButton[playerid][0], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, MDC_MenuButton[playerid][0], 60.000000, 10.000000);
-	PlayerTextDrawAlignment(playerid, MDC_MenuButton[playerid][0], 1);
-	PlayerTextDrawColor(playerid, MDC_MenuButton[playerid][0], -1515870721);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][0], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuButton[playerid][0], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuButton[playerid][0], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuButton[playerid][0], 4);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuButton[playerid][0], 0);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][0], 0);
-	PlayerTextDrawSetSelectable(playerid, MDC_MenuButton[playerid][0], true);	
-
-	MDC_MenuText[playerid][0] = CreatePlayerTextDraw(playerid, 184.000000, 141.449966, "PAGRINDINIS");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuText[playerid][0], 0.129904, 0.823466);
-	PlayerTextDrawAlignment(playerid, MDC_MenuText[playerid][0], 2);
-	PlayerTextDrawColor(playerid, MDC_MenuText[playerid][0], 1061109759);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][0], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuText[playerid][0], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuText[playerid][0], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuText[playerid][0], 2);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuText[playerid][0], 1);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][0], 0);
-
-	MDC_MenuButton[playerid][1] = CreatePlayerTextDraw(playerid, 154.000000, 152.000000, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuButton[playerid][1], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, MDC_MenuButton[playerid][1], 60.000000, 10.000000);
-	PlayerTextDrawAlignment(playerid, MDC_MenuButton[playerid][1], 1);
-	PlayerTextDrawColor(playerid, MDC_MenuButton[playerid][1], -1515870721);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][1], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuButton[playerid][1], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuButton[playerid][1], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuButton[playerid][1], 4);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuButton[playerid][1], 0);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][1], 0);
-	PlayerTextDrawSetSelectable(playerid, MDC_MenuButton[playerid][1], true);	
-
-	MDC_MenuText[playerid][1] = CreatePlayerTextDraw(playerid, 184.199951, 152.649978, "paieska");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuText[playerid][1], 0.129904, 0.823466);
-	PlayerTextDrawAlignment(playerid, MDC_MenuText[playerid][1], 2);
-	PlayerTextDrawColor(playerid, MDC_MenuText[playerid][1], 1061109759);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][1], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuText[playerid][1], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuText[playerid][1], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuText[playerid][1], 2);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuText[playerid][1], 1);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][1], 0);
-
-	MDC_MenuButton[playerid][2] = CreatePlayerTextDraw(playerid, 154.000000, 167.350021, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuButton[playerid][2], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, MDC_MenuButton[playerid][2], 60.000000, 10.000000);
-	PlayerTextDrawAlignment(playerid, MDC_MenuButton[playerid][2], 1);
-	PlayerTextDrawColor(playerid, MDC_MenuButton[playerid][2], -1515870721);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][2], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuButton[playerid][2], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuButton[playerid][2], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuButton[playerid][2], 4);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuButton[playerid][2], 0);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][2], 0);
-	PlayerTextDrawSetSelectable(playerid, MDC_MenuButton[playerid][2], true);
-
-	MDC_MenuText[playerid][2] = CreatePlayerTextDraw(playerid, 184.549972, 168.350021, "ieskomi");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuText[playerid][2], 0.129904, 0.823466);
-	PlayerTextDrawAlignment(playerid, MDC_MenuText[playerid][2], 2);
-	PlayerTextDrawColor(playerid, MDC_MenuText[playerid][2], 1061109759);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][2], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuText[playerid][2], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuText[playerid][2], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuText[playerid][2], 2);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuText[playerid][2], 1);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][2], 0);
-
-	MDC_MenuButton[playerid][3] = CreatePlayerTextDraw(playerid, 154.000000, 178.499969, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuButton[playerid][3], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, MDC_MenuButton[playerid][3], 60.000000, 10.000000);
-	PlayerTextDrawAlignment(playerid, MDC_MenuButton[playerid][3], 1);
-	PlayerTextDrawColor(playerid, MDC_MenuButton[playerid][3], -1515870721);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][3], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuButton[playerid][3], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuButton[playerid][3], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuButton[playerid][3], 4);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuButton[playerid][3], 0);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][3], 0);
-	PlayerTextDrawSetSelectable(playerid, MDC_MenuButton[playerid][3], true);
-
-	MDC_MenuText[playerid][3] = CreatePlayerTextDraw(playerid, 185.000000, 179.000000, "GYVENTOJAI");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuText[playerid][3], 0.129904, 0.823466);
-	PlayerTextDrawAlignment(playerid, MDC_MenuText[playerid][3], 2);
-	PlayerTextDrawColor(playerid, MDC_MenuText[playerid][3], 1061109759);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][3], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuText[playerid][3], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuText[playerid][3], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuText[playerid][3], 2);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuText[playerid][3], 1);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][3], 0);
-
-	MDC_MenuButton[playerid][4] = CreatePlayerTextDraw(playerid, 154.000000, 189.549972, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuButton[playerid][4], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, MDC_MenuButton[playerid][4], 60.000000, 10.000000);
-	PlayerTextDrawAlignment(playerid, MDC_MenuButton[playerid][4], 1);
-	PlayerTextDrawColor(playerid, MDC_MenuButton[playerid][4], -1515870721);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][4], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuButton[playerid][4], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuButton[playerid][4], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuButton[playerid][4], 4);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuButton[playerid][4], 0);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][4], 0);
-	PlayerTextDrawSetSelectable(playerid, MDC_MenuButton[playerid][4], true);
-
-	MDC_MenuText[playerid][4] = CreatePlayerTextDraw(playerid, 185.000000, 190.200012, "TR._PRIEMONES");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuText[playerid][4], 0.129904, 0.823466);
-	PlayerTextDrawAlignment(playerid, MDC_MenuText[playerid][4], 2);
-	PlayerTextDrawColor(playerid, MDC_MenuText[playerid][4], 1061109759);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][4], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuText[playerid][4], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuText[playerid][4], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuText[playerid][4], 2);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuText[playerid][4], 1);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][4], 0);
-
-	MDC_MenuButton[playerid][5] = CreatePlayerTextDraw(playerid, 154.000000, 200.599975, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuButton[playerid][5], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, MDC_MenuButton[playerid][5], 60.000000, 10.000000);
-	PlayerTextDrawAlignment(playerid, MDC_MenuButton[playerid][5], 1);
-	PlayerTextDrawColor(playerid, MDC_MenuButton[playerid][5], -1515870721);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][5], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuButton[playerid][5], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuButton[playerid][5], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuButton[playerid][5], 4);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuButton[playerid][5], 0);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][5], 0);
-	PlayerTextDrawSetSelectable(playerid, MDC_MenuButton[playerid][5], true);
-
-	MDC_MenuText[playerid][5] = CreatePlayerTextDraw(playerid, 185.000000, 201.599975, "GINKLAI");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuText[playerid][5], 0.129904, 0.823466);
-	PlayerTextDrawAlignment(playerid, MDC_MenuText[playerid][5], 2);
-	PlayerTextDrawColor(playerid, MDC_MenuText[playerid][5], 1061109759);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][5], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuText[playerid][5], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuText[playerid][5], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuText[playerid][5], 2);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuText[playerid][5], 1);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][5], 0);
-
-	MDC_MenuButton[playerid][6] = CreatePlayerTextDraw(playerid, 154.000000, 216.000000, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuButton[playerid][6], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, MDC_MenuButton[playerid][6], 60.000000, 10.000000);
-	PlayerTextDrawAlignment(playerid, MDC_MenuButton[playerid][6], 1);
-	PlayerTextDrawColor(playerid, MDC_MenuButton[playerid][6], -1515870721);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][6], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuButton[playerid][6], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuButton[playerid][6], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuButton[playerid][6], 4);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuButton[playerid][6], 0);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][6], 0);
-	PlayerTextDrawSetSelectable(playerid, MDC_MenuButton[playerid][6], true);
-
-	MDC_MenuText[playerid][6] = CreatePlayerTextDraw(playerid, 185.000000, 217.000000, "cctv");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuText[playerid][6], 0.129904, 0.823466);
-	PlayerTextDrawAlignment(playerid, MDC_MenuText[playerid][6], 2);
-	PlayerTextDrawColor(playerid, MDC_MenuText[playerid][6], 1061109759);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][6], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuText[playerid][6], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuText[playerid][6], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuText[playerid][6], 2);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuText[playerid][6], 1);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][6], 0);
-
-	MDC_MenuButton[playerid][7] = CreatePlayerTextDraw(playerid, 154.000000, 227.000000, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuButton[playerid][7], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, MDC_MenuButton[playerid][7], 60.000000, 10.000000);
-	PlayerTextDrawAlignment(playerid, MDC_MenuButton[playerid][7], 1);
-	PlayerTextDrawColor(playerid, MDC_MenuButton[playerid][7], -1515870721);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][7], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuButton[playerid][7], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuButton[playerid][7], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuButton[playerid][7], 4);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuButton[playerid][7], 0);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuButton[playerid][7], 0);
-	PlayerTextDrawSetSelectable(playerid, MDC_MenuButton[playerid][7], true);
-
-	MDC_MenuText[playerid][7] = CreatePlayerTextDraw(playerid, 185.000000, 228.000000, "DARBUOTOJAI");
-	PlayerTextDrawLetterSize(playerid, MDC_MenuText[playerid][7], 0.129904, 0.823466);
-	PlayerTextDrawAlignment(playerid, MDC_MenuText[playerid][7], 2);
-	PlayerTextDrawColor(playerid, MDC_MenuText[playerid][7], 1061109759);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][7], 0);
-	PlayerTextDrawSetOutline(playerid, MDC_MenuText[playerid][7], 0);
-	PlayerTextDrawBackgroundColor(playerid, MDC_MenuText[playerid][7], 255);
-	PlayerTextDrawFont(playerid, MDC_MenuText[playerid][7], 2);
-	PlayerTextDrawSetProportional(playerid, MDC_MenuText[playerid][7], 1);
-	PlayerTextDrawSetShadow(playerid, MDC_MenuText[playerid][7], 0);
-}*/
 	
-
-
 stock DrugsEffect_Create_Global()
 {
 	DrugEffect[0] = TextDrawCreate(0.000000, 0.000000, "box");
@@ -1300,123 +968,6 @@ stock FurnitureTd_Create_Player(playerid)
 	return 1;
 }
 
-stock TipBox_Create_Global()
-{
-	TipBox_Base = TextDrawCreate(39.333332, 258.266662, "box");
-	TextDrawLetterSize(TipBox_Base, 0.000000, 7.904761);
-	TextDrawTextSize(TipBox_Base, 137.000000, 0.000000);
-	TextDrawAlignment(TipBox_Base, 1);
-	TextDrawColor(TipBox_Base, -1);
-	TextDrawUseBox(TipBox_Base, 1);
-	TextDrawBoxColor(TipBox_Base, 1347440895);
-	TextDrawSetShadow(TipBox_Base, 0);
-	TextDrawSetOutline(TipBox_Base, 0);
-	TextDrawBackgroundColor(TipBox_Base, 69);
-	TextDrawFont(TipBox_Base, 1);
-	TextDrawSetProportional(TipBox_Base, 1);
-	TextDrawSetShadow(TipBox_Base, 0);
-
-	TipBox_NameBase = TextDrawCreate(37.571434, 247.586669, "LD_SPAC:white");
-	TextDrawLetterSize(TipBox_NameBase, 0.000000, 0.000000);
-	TextDrawTextSize(TipBox_NameBase, 101.000000, 9.000000);
-	TextDrawAlignment(TipBox_NameBase, 1);
-	TextDrawColor(TipBox_NameBase, 842150655);
-	TextDrawSetShadow(TipBox_NameBase, 0);
-	TextDrawSetOutline(TipBox_NameBase, 0);
-	TextDrawBackgroundColor(TipBox_NameBase, 255);
-	TextDrawFont(TipBox_NameBase, 4);
-	TextDrawSetProportional(TipBox_NameBase, 0);
-	TextDrawSetShadow(TipBox_NameBase, 0);
-
-	TipBox_Name = TextDrawCreate(40.476181, 248.453323, "Patarimas");
-	TextDrawLetterSize(TipBox_Name, 0.323809, 1.280000);
-	TextDrawAlignment(TipBox_Name, 1);
-	TextDrawColor(TipBox_Name, -1);
-	TextDrawSetShadow(TipBox_Name, 0);
-	TextDrawSetOutline(TipBox_Name, 1);
-	TextDrawBackgroundColor(TipBox_Name, 505290495);
-	TextDrawFont(TipBox_Name, 0);
-	TextDrawSetProportional(TipBox_Name, 1);
-	TextDrawSetShadow(TipBox_Name, 0);
-
-	TipBox_LowText = TextDrawCreate(137.238128, 323.546600, "COMMUNITYRP.LT");
-	TextDrawLetterSize(TipBox_LowText, 0.110857, 0.746666);
-	TextDrawAlignment(TipBox_LowText, 3);
-	TextDrawColor(TipBox_LowText, -1);
-	TextDrawSetShadow(TipBox_LowText, 0);
-	TextDrawSetOutline(TipBox_LowText, 0);
-	TextDrawBackgroundColor(TipBox_LowText, 255);
-	TextDrawFont(TipBox_LowText, 2);
-	TextDrawSetProportional(TipBox_LowText, 1);
-	TextDrawSetShadow(TipBox_LowText, 0);
-	return 1;
-}
-stock TipBox_Create_Player(playerid) 
-{
-	TipBox_Info[playerid] = CreatePlayerTextDraw(playerid, 43.523757, 262.533325, "Ar_zinote,_kad_galite_naudoti~n~komandas_/enter_ir_/exit,~n~noredami_ieiti_arba_iseiti_is_~n~pastato?");
-	PlayerTextDrawLetterSize(playerid, TipBox_Info[playerid], 0.182476, 0.998400);
-	PlayerTextDrawAlignment(playerid, TipBox_Info[playerid], 1);
-	PlayerTextDrawColor(playerid, TipBox_Info[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, TipBox_Info[playerid], 1);
-	PlayerTextDrawSetOutline(playerid, TipBox_Info[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, TipBox_Info[playerid], 70);
-	PlayerTextDrawFont(playerid, TipBox_Info[playerid], 1);
-	PlayerTextDrawSetProportional(playerid, TipBox_Info[playerid], 1);
-	PlayerTextDrawSetShadow(playerid, TipBox_Info[playerid], 1);
-	return 1;
-}
-
-
-
-stock LoadBar_Create_Player(playerid)
-{
-	LoadBar_Base[playerid] = CreatePlayerTextDraw(playerid, 189.952392, 377.293304, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, LoadBar_Base[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_Base[playerid], 268.000000, 6.000000);
-	PlayerTextDrawAlignment(playerid, LoadBar_Base[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_Base[playerid], 168430335);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Base[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, LoadBar_Base[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, LoadBar_Base[playerid], 255);
-	PlayerTextDrawFont(playerid, LoadBar_Base[playerid], 4);
-	PlayerTextDrawSetProportional(playerid, LoadBar_Base[playerid], 0);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Base[playerid], 0);
-
-	LoadBar_LoadFull[playerid] = CreatePlayerTextDraw(playerid, 191.476211, 378.999969, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, LoadBar_LoadFull[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_LoadFull[playerid], 265.000000, 3.0);
-	PlayerTextDrawAlignment(playerid, LoadBar_LoadFull[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_LoadFull[playerid], 0x8E721Cff);
-	PlayerTextDrawSetShadow(playerid, LoadBar_LoadFull[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, LoadBar_LoadFull[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, LoadBar_LoadFull[playerid], 255);
-	PlayerTextDrawFont(playerid, LoadBar_LoadFull[playerid], 4);
-	PlayerTextDrawSetProportional(playerid, LoadBar_LoadFull[playerid], 0);
-	PlayerTextDrawSetShadow(playerid, LoadBar_LoadFull[playerid], 0);
-
-	LoadBar_Loaded[playerid] = CreatePlayerTextDraw(playerid, 191.476211, 378.999969, "LD_SPAC:white");
-	PlayerTextDrawLetterSize(playerid, LoadBar_Loaded[playerid], 0.000000, 0.000000);
-	PlayerTextDrawTextSize(playerid, LoadBar_Loaded[playerid], 0.000000, 3.0);
-	PlayerTextDrawAlignment(playerid, LoadBar_Loaded[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_Loaded[playerid], 0xEEBC26ff);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Loaded[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, LoadBar_Loaded[playerid], 0);
-	PlayerTextDrawBackgroundColor(playerid, LoadBar_Loaded[playerid], 255);
-	PlayerTextDrawFont(playerid, LoadBar_Loaded[playerid], 4);
-	PlayerTextDrawSetProportional(playerid, LoadBar_Loaded[playerid], 0);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Loaded[playerid], 0);
-
-	LoadBar_Text[playerid] = CreatePlayerTextDraw(playerid, 190.190536, 366.639923, "VARIKLIS_UZVEDAMAS");
-	PlayerTextDrawLetterSize(playerid, LoadBar_Text[playerid], 0.183238, 1.096533);
-	PlayerTextDrawAlignment(playerid, LoadBar_Text[playerid], 1);
-	PlayerTextDrawColor(playerid, LoadBar_Text[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Text[playerid], 1);
-	PlayerTextDrawSetOutline(playerid, LoadBar_Text[playerid], 1);
-	PlayerTextDrawBackgroundColor(playerid, LoadBar_Text[playerid], 5887);
-	PlayerTextDrawFont(playerid, LoadBar_Text[playerid], 2);
-	PlayerTextDrawSetProportional(playerid, LoadBar_Text[playerid], 1);
-	PlayerTextDrawSetShadow(playerid, LoadBar_Text[playerid], 1);
-}
 
 stock JailTimeTD_Create_Global()
 {
@@ -3501,11 +3052,13 @@ stock PhoneTD_Create_Player(playerid)
 	return 1;
 }
 
-
-
+static 
+	bool:player_SpamBar_Showed[MAX_PLAYERS];
 
 stock SpamBarTD_Show(playerid)
 {
+	player_SpamBar_Showed[playerid] = true;
+
 	TextDrawShowForPlayer(playerid, SpamBarTD_Base);
 	TextDrawShowForPlayer(playerid, SpamBarTD_LoadBase);
 	PlayerTextDrawShow(playerid, SpamBarTD_Load[playerid]);
@@ -3515,12 +3068,17 @@ stock SpamBarTD_Show(playerid)
 
 stock SpamBarTD_Hide(playerid)
 {
+	player_SpamBar_Showed[playerid] = false;
+
 	TextDrawHideForPlayer(playerid, SpamBarTD_Base);
 	TextDrawHideForPlayer(playerid, SpamBarTD_LoadBase);
 	PlayerTextDrawHide(playerid, SpamBarTD_Load[playerid]);
 	PlayerTextDrawHide(playerid, SpamBarTD_Value[playerid]);
 	return 1;
 }
+
+stock SpamBarTD_IsShowed(playerid) return player_SpamBar_Showed[playerid];
+
 
 stock JobGuiTD_Create_Global()
 {
@@ -3606,7 +3164,7 @@ stock BorderHUD_Hide(playerid)
 
 stock CharListTD_Create_Player(playerid)
 {
-	chars_p_td_lessinfo[playerid][0] = CreatePlayerTextDraw(playerid, 149.000000, 274.000000, "Lygis:_10_(2/50_XP)~n~Darbas:_nera~n~Grynieji:_1000$~n~Banke:_1000$", .perm = true);
+	chars_p_td_lessinfo[playerid][0] = CreatePlayerTextDraw(playerid, 149.000000, 274.000000, "Lygis:_10_(2/50_XP)~n~Darbas:_nera~n~Grynieji:_1000$~n~Banke:_1000$");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_lessinfo[playerid][0], 0.199616, 0.900264);
 	PlayerTextDrawAlignment(playerid, chars_p_td_lessinfo[playerid][0], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_lessinfo[playerid][0], -1);
@@ -3617,7 +3175,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_lessinfo[playerid][0], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_lessinfo[playerid][0], 0);
 
-	chars_p_td_smallname[playerid][0] = CreatePlayerTextDraw(playerid, 149.000000, 261.000000, "BENJAMIN_MC_FORBES_TIPO", .perm = true);
+	chars_p_td_smallname[playerid][0] = CreatePlayerTextDraw(playerid, 149.000000, 261.000000, "BENJAMIN_MC_FORBES_TIPO");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_smallname[playerid][0], 0.214855, 1.036798);
 	PlayerTextDrawAlignment(playerid, chars_p_td_smallname[playerid][0], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_smallname[playerid][0], -1);
@@ -3628,7 +3186,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_smallname[playerid][0], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_smallname[playerid][0], 1);
 
-	chars_p_td_charskin[playerid][0] = CreatePlayerTextDraw(playerid, 136.000000, 131.000000, "", .perm = true);
+	chars_p_td_charskin[playerid][0] = CreatePlayerTextDraw(playerid, 136.000000, 131.000000, "");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_charskin[playerid][0], 0.000000, 0.000000);
 	PlayerTextDrawTextSize(playerid, chars_p_td_charskin[playerid][0], 118.000000, 117.000000);
 	PlayerTextDrawAlignment(playerid, chars_p_td_charskin[playerid][0], 1);
@@ -3643,7 +3201,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetPreviewRot(playerid, chars_p_td_charskin[playerid][0], 0.000000, 0.000000, 0.000000, 1.007151);
 
 
-	chars_p_td_smallname[playerid][1] = CreatePlayerTextDraw(playerid, 256.000000, 261.000000, "BENJAMIN_MC_FORBES_TIPO", .perm = true);
+	chars_p_td_smallname[playerid][1] = CreatePlayerTextDraw(playerid, 256.000000, 261.000000, "BENJAMIN_MC_FORBES_TIPO");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_smallname[playerid][1], 0.214855, 1.036798);
 	PlayerTextDrawAlignment(playerid, chars_p_td_smallname[playerid][1], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_smallname[playerid][1], -1);
@@ -3654,7 +3212,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_smallname[playerid][1], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_smallname[playerid][1], 1);
 
-	chars_p_td_lessinfo[playerid][1] = CreatePlayerTextDraw(playerid, 256.599975, 274.000000, "Lygis:_10_(2/50_XP)~n~Darbas:_nera~n~Grynieji:_1000$~n~Banke:_1000$", .perm = true);
+	chars_p_td_lessinfo[playerid][1] = CreatePlayerTextDraw(playerid, 256.599975, 274.000000, "Lygis:_10_(2/50_XP)~n~Darbas:_nera~n~Grynieji:_1000$~n~Banke:_1000$");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_lessinfo[playerid][1], 0.199616, 0.900264);
 	PlayerTextDrawAlignment(playerid, chars_p_td_lessinfo[playerid][1], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_lessinfo[playerid][1], -1);
@@ -3666,7 +3224,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetShadow(playerid, chars_p_td_lessinfo[playerid][1], 0);
 
 
-	chars_p_td_charskin[playerid][1] = CreatePlayerTextDraw(playerid, 244.000000, 130.000000, "", .perm = true);
+	chars_p_td_charskin[playerid][1] = CreatePlayerTextDraw(playerid, 244.000000, 130.000000, "");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_charskin[playerid][1], 0.000000, 0.000000);
 	PlayerTextDrawTextSize(playerid, chars_p_td_charskin[playerid][1], 118.000000, 117.000000);
 	PlayerTextDrawAlignment(playerid, chars_p_td_charskin[playerid][1], 1);
@@ -3680,7 +3238,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetPreviewModel(playerid, chars_p_td_charskin[playerid][1], 154);
 	PlayerTextDrawSetPreviewRot(playerid, chars_p_td_charskin[playerid][1], 0.000000, 0.000000, 0.000000, 1.007151);
 
-	chars_p_td_error[playerid] = CreatePlayerTextDraw(playerid, 325.000000, 351.000000, "~n~_Sis_veikejas_yra_naudojamas!_Pirmiausia_turite_ji~n~_atjungti_nuo_zaidimo.~n~~n~", .perm = true);
+	chars_p_td_error[playerid] = CreatePlayerTextDraw(playerid, 325.000000, 351.000000, "~n~_Sis_veikejas_yra_naudojamas!_Pirmiausia_turite_ji~n~_atjungti_nuo_zaidimo.~n~~n~");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_error[playerid], 0.204571, 0.768000);
 	PlayerTextDrawTextSize(playerid, chars_p_td_error[playerid], 492.000000, 0.000000);
 	PlayerTextDrawAlignment(playerid, chars_p_td_error[playerid], 1);
@@ -3694,7 +3252,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_error[playerid], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_error[playerid], 0);
 
-	chars_p_td_bigname[playerid] = CreatePlayerTextDraw(playerid, 362.000000, 121.000000, "BENJAMIN_MC_FORBES_TIPO", .perm = true);
+	chars_p_td_bigname[playerid] = CreatePlayerTextDraw(playerid, 362.000000, 121.000000, "BENJAMIN_MC_FORBES_TIPO");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_bigname[playerid], 0.238474, 1.117865);
 	PlayerTextDrawAlignment(playerid, chars_p_td_bigname[playerid], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_bigname[playerid], -1);
@@ -3705,7 +3263,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_bigname[playerid], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_bigname[playerid], 1);
 
-	chars_p_td_biginfo[playerid] = CreatePlayerTextDraw(playerid, 362.000000, 132.000000 /*122.000000*/, "Administracijos_grupes:_(Ikurejas)~n~(Administratorius_I)_(Frakciju_valdyb~n~a)~n~Frakcija:_Los_Santos_Police_Dep.~n~Rangas:_Detective_I~n~Turimos_tr._priemones:_3~n~Turimi_namai:_3~n~Turimi_verslai:_3~n~", .perm = true);
+	chars_p_td_biginfo[playerid] = CreatePlayerTextDraw(playerid, 362.000000, 132.000000 /*122.000000*/, "Administracijos_grupes:_(Ikurejas)~n~(Administratorius_I)_(Frakciju_valdyb~n~a)~n~Frakcija:_Los_Santos_Police_Dep.~n~Rangas:_Detective_I~n~Turimos_tr._priemones:_3~n~Turimi_namai:_3~n~Turimi_verslai:_3~n~");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_biginfo[playerid], 0.199616, 0.900264); 
 	PlayerTextDrawAlignment(playerid, chars_p_td_biginfo[playerid], 1);
 	PlayerTextDrawColor(playerid, chars_p_td_biginfo[playerid], -1);
@@ -3716,7 +3274,7 @@ stock CharListTD_Create_Player(playerid)
 	PlayerTextDrawSetProportional(playerid, chars_p_td_biginfo[playerid], 1);
 	PlayerTextDrawSetShadow(playerid, chars_p_td_biginfo[playerid], 0);
 
-	chars_p_td_page_txt[playerid] = CreatePlayerTextDraw(playerid, 425.000000, 319.000000, "Puslapis:_3/3_antras_pt_kaire_desine", .perm = true);
+	chars_p_td_page_txt[playerid] = CreatePlayerTextDraw(playerid, 425.000000, 319.000000, "Puslapis:_3/3_antras_pt_kaire_desine");
 	PlayerTextDrawLetterSize(playerid, chars_p_td_page_txt[playerid], 0.192761, 0.951466);
 	PlayerTextDrawAlignment(playerid, chars_p_td_page_txt[playerid], 2);
 	PlayerTextDrawColor(playerid, chars_p_td_page_txt[playerid], 255);
@@ -4353,4 +3911,21 @@ stock CharCreateTD_Create_Player(playerid)
 	PlayerTextDrawFont(playerid, create_p_td_gender[playerid], 1);
 	PlayerTextDrawSetProportional(playerid, create_p_td_gender[playerid], 1);
 	PlayerTextDrawSetShadow(playerid, create_p_td_gender[playerid], 0);
+}
+
+
+hook OnPlayerConnect(playerid)
+{
+	player_SpamBar_Showed[playerid] = false;
+
+	TaxometerTD[playerid] = CreatePlayerTextDraw(playerid, 45.047412, 326.106597, "Taksometras:_0.00$");
+	PlayerTextDrawLetterSize(playerid, TaxometerTD[playerid], 0.172952, 0.998400);
+	PlayerTextDrawTextSize(playerid, TaxometerTD[playerid], 128.000000, 0.000000);
+	PlayerTextDrawAlignment(playerid, TaxometerTD[playerid], 1);
+	PlayerTextDrawColor(playerid, TaxometerTD[playerid], -93);
+	PlayerTextDrawUseBox(playerid, TaxometerTD[playerid], 1);
+	PlayerTextDrawBoxColor(playerid, TaxometerTD[playerid], 58);
+	PlayerTextDrawBackgroundColor(playerid, TaxometerTD[playerid], 38);
+	PlayerTextDrawFont(playerid, TaxometerTD[playerid], 2);
+	PlayerTextDrawSetProportional(playerid, TaxometerTD[playerid], 1);
 }

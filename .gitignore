@@ -4,3 +4,4 @@ logs/errors.log
 logs/warnings.log
 logs/*
 scriptfiles/*.db
+scriptfiles/YSI_CACHE.amx

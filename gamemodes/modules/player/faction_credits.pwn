@@ -1,6 +1,7 @@
 #include <YSI_Coding\y_hooks>
 
 #define MAX_WEAPONS_PER_WEEK    3
+#define DAYS_TO_REROLL_WEAPONS  7
 
 static 
     player_FactionCredits[MAX_PLAYERS],
@@ -19,12 +20,13 @@ static
     dealer_WeaponsList[][E_DEALER_WEAPONS] = {
         // [Weapon]             [Ammo]  [Base, random] Price, Credits price  [Chance(susideda visi ir pasidalina)]
         {WEAPON_DEAGLE,         30,     5000,  2000,          2,  15},
-        {WEAPON_COLT45,         40,     3000,  1200,          1,  20},
+        {WEAPON_COLT45,         40,     3000,  1200,          1,  30},
         {WEAPON_SHOTGUN,        30,     8000,  2000,          2,  15},
-        {WEAPON_BRASSKNUCKLE,   1,      500,   100,           0,  5},
-        {WEAPON_AK47,           90,     12000, 3000,          3,  10},
-        {WEAPON_MP5,            100,    10000, 2000,          2,  15},
-        {WEAPON_TEC9,           120,    9000,  2000,          2,  20}
+        {WEAPON_BRASSKNUCKLE,   1,      500,   100,           0,  10},
+        {WEAPON_KNIFE,          1,      9000,  2000,          2,  10},
+        {WEAPON_AK47,           90,     12000, 3000,          3,  0},//10},
+        {WEAPON_MP5,            100,    10000, 2000,          2,  5},
+        {WEAPON_TEC9,           120,    9000,  2000,          2,  10}
 };
 
 static  dealer_WeaponsSelected[MAX_WEAPONS_PER_WEEK],
@@ -58,29 +60,42 @@ static
 
 /* Events */
 hook OnServerOptionsLoad()
-{
-    new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID);
-    if(days <= 0)
-    {
-        _GunDealer_RerollWeapons(.save = true);
-    }
-    return 1;
+{  
+    _BlackMarket_CheckDays(.add = 0);
 }
 
 hook OnNewDay()
 {
-    new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID) - 1;
-    SetGVarInt("DAYS_REROLL_GUNS", days, SERVER_VARS_ID);
-
+    _BlackMarket_CheckDays();
+    return 1;
+}
+static _BlackMarket_CheckDays(add = -1)
+{
+    new days = GetGVarInt("DAYS_REROLL_GUNS") + add;
     if(days <= 0)
     {
-        _GunDealer_RerollWeapons(.save = true);
+        _GunDealer_RerollWeapons();
+        days = DAYS_TO_REROLL_WEAPONS;
     }
+
+    SetGVarInt("DAYS_REROLL_GUNS", days);
+    SaveServerIntEx("DAYS_REROLL_GUNS", days);
+
+    // new days = GetGVarInt("DAYS_REROLL_GUNS") - 1;
+
+    // if(days <= 0)
+    // {
+    //     SetGVarInt("DAYS_REROLL_GUNS", 7);
+    //     _GunDealer_RerollWeapons(.save = true);
+    // }
+    // else SetGVarInt("DAYS_REROLL_GUNS", 7);
     return 1;
 }
 
+
 hook OnGameModeInit()
 {
+    _GunDealer_RerollWeapons();
     _GunDealer_RerollPlace();
     return 1;
 }
@@ -140,9 +155,9 @@ static _GunDealer_RerollPlace()
     return 1;
 }
 
-static _GunDealer_RerollWeapons(bool:save = false)
+static _GunDealer_RerollWeapons()
 {
-    printf("_GunDealer_RerollWeapons(%d, %d):", save, GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID));
+    printf("_GunDealer_RerollWeapons(%d):", GetGVarInt("DAYS_REROLL_GUNS"));
     for(new w = 0; w < MAX_WEAPONS_PER_WEEK; w++)
     {
         new index = NONE;
@@ -164,11 +179,6 @@ static _GunDealer_RerollWeapons(bool:save = false)
             GetInventoryItemName(dealer_WeaponsList[index][dw_WeaponId]),
             dealer_WeaponsSelected_Price[w]
         );
-    }
-    if(save)
-    {
-        new days = GetGVarInt("DAYS_REROLL_GUNS", SERVER_VARS_ID);
-        SaveServerIntEx("DAYS_REROLL_GUNS", days);
     }
     return 1;
 }
@@ -224,32 +234,24 @@ CMD:orderweapons(playerid, params[])
 {
     if(player_FactionCredits[playerid] <= 0) return SendError(playerid, "Neturi nei 1 frakcijos kredito.");
 
-    dialog_SetHeader("{F2F2F2}Ðià savaitæ galiu pasiûlyt:\n");
-	
-    new 
-        body[1024];
+    dialog_Clear();
+    dialog_AddLine("{F2F2F2}Ðià savaitæ galiu pasiûlyt:\n");
 
     for(new w = 0; w < MAX_WEAPONS_PER_WEEK; w++)
     {
-        format(body, sizeof body, "%s{F2F2F2} - [%s] \t[%d$]  ((+%d f. kred.))\n",  
-            body,
+        dialog_AddLine("{F2F2F2} - [%s] \t[%d$]  ((+%d f. kred.))",
             GetInventoryItemName(dealer_WeaponsList[dealer_WeaponsSelected[w]][dw_WeaponId]),
             dealer_WeaponsSelected_Price[w],
             dealer_WeaponsList[dealer_WeaponsSelected[w]][dw_PriceCredits]
         );
     }
 
-	dialog_SetBody(body);
-	Dialog_Show(playerid, ConfirmWeaponsOrder, DIALOG_STYLE_MSGBOX, "Þinutë nuo 5649998:", dialog_GetBody(), "Paþymëti", "Uþdaryti");
+    inline confirmOrder(response, listitem)
+    {
+        response && _GunDealer_MarkCheckpoint(playerid);
+    }
+	dialog_Show(playerid, using inline confirmOrder, DIALOG_STYLE_MSGBOX, "Þinutë nuo 5649998:", "Paþymëti", "Uþdaryti");
     return 1;
-}
-Dialog:ConfirmWeaponsOrder(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-        _GunDealer_MarkCheckpoint(playerid);
-	}
-	return 1;
 }
 
 CMD:buyguns(playerid, params[])
@@ -308,60 +310,59 @@ static _GunDealer_MarkCheckpoint(playerid)
 
 static _GunDealer_ShowPurchaseList(playerid)
 {
-    dialog_SetHeader("");
-	
+    dialog_Clear();
 
     for(new w = 0; w < MAX_WEAPONS_PER_WEEK; w++)
     {
-        dialog_SetBody("{F2F2F2}%s\t[%d$]\t((+%d frakc. kred.))",
+        dialog_AddLine("{F2F2F2}%s\t[%d$]\t((+%d frakc. kred.))",
             GetInventoryItemName(dealer_WeaponsList[dealer_WeaponsSelected[w]][dw_WeaponId]),
             dealer_WeaponsSelected_Price[w],
             dealer_WeaponsList[dealer_WeaponsSelected[w]][dw_PriceCredits]
         );
     }
-	Dialog_Show(playerid, BuyBlackMarketGuns, DIALOG_STYLE_TABLIST, "Black market", dialog_GetBody(), "Pirkti", "Uþdaryti");
-    return 1;
-}
-Dialog:BuyBlackMarketGuns(playerid, response, listitem, inputtext[])
-{
-	if(response)
-	{
-        if(0 <= listitem < MAX_WEAPONS_PER_WEEK)
+
+    inline buyBlackMarketGuns(response, listitem)
+    {
+        if(response)
         {
-            new 
-                weapon = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_WeaponId], 
-                ammo = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_WeaponAmmo],
-                price = dealer_WeaponsSelected_Price[listitem],
-                creds = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_PriceCredits];
-
-            if(player_FactionCredits[playerid] < creds) 
-                return SendError(playerid, "Neturi frakc. kreditø.");
-            
-            if(GetPlayerMoney(playerid) < price) 
-                return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
-
-            new 
-                slot = -1;
-
-            if((slot = GetPlayerFreeInventorySlot(playerid)) != -1)
+            if(0 <= listitem < MAX_WEAPONS_PER_WEEK)
             {
-                GivePlayerInventoryItem(playerid, weapon, ammo, 0, slot);
+                new 
+                    weapon = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_WeaponId], 
+                    ammo = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_WeaponAmmo],
+                    price = dealer_WeaponsSelected_Price[listitem],
+                    creds = dealer_WeaponsList[dealer_WeaponsSelected[listitem]][dw_PriceCredits];
 
-                new final[256];
-                format(final, sizeof final, "** Kaukëtasis perduoda %s daiktà, kuris atrodo kaip %s.",
-                    GetPlayerNameEx(playerid, true), 
-                    GetInventoryItemName(weapon)
-                );
+                if(player_FactionCredits[playerid] < creds) 
+                    return SendError(playerid, "Neturi frakc. kreditø.");
+                
+                if(GetPlayerMoney(playerid) < price) 
+                    return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
 
-                ProxDetector(10.0, playerid, final, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA);
+                new 
+                    slot = -1;
 
-                Player_GiveFactionCredits(playerid, -creds);
-                GivePlayerMoney(playerid, -price);
+                if((slot = GetPlayerFreeInventorySlot(playerid)) != -1)
+                {
+                    GivePlayerInventoryItem(playerid, weapon, ammo, 0, slot);
+
+                    new final[256];
+                    format(final, sizeof final, "** Kaukëtasis perduoda %s daiktà, kuris atrodo kaip %s.",
+                        GetPlayerNameEx(playerid, true), 
+                        GetInventoryItemName(weapon)
+                    );
+
+                    ProxDetector(10.0, playerid, final, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA, 0xC2A2DAAA);
+
+                    Player_GiveFactionCredits(playerid, -creds);
+                    GivePlayerMoney(playerid, -price);
+                }
+                else SendWarning(playerid, "Neturi vietos inventoriuje.");
             }
-            else SendWarning(playerid, "Neturi vietos inventoriuje.");
         }
-	}
-	return 1;
+    }
+	dialog_Show(playerid, using inline buyBlackMarketGuns, DIALOG_STYLE_TABLIST, "Black market", "Pirkti", "Uþdaryti");
+    return 1;
 }
 
 
@@ -391,7 +392,7 @@ CMD:givefactioncredits(playerid, params[])
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`ActionText`,`Amount`");
 	log_set_values("'%d','%e','%d','%e','Dave frakcijos kreditu','%d'", LogPlayerId(playerid), LogPlayerName(playerid), LogPlayerId(receiverid), LogPlayerName(receiverid), amount);
-	log_push();
+	log_commit();
     return 1;
 }
 
@@ -424,10 +425,8 @@ hook OnPlayerRequestDataLoad(playerid)
             cache_get_value_name_int(0, "FactionCredits", player_FactionCredits[playerid]);
         }
     }
-    new string[126];
-    mysql_format(chandler, string, sizeof string, "\
+    mysql_tquery_inline(chandler, using inline loadFactionCredits, "\
         SELECT `FactionCredits` FROM `players_data` WHERE id = '%d'", PlayerInfo[playerid][pId]);
-    mysql_tquery_inline(chandler, string, using inline loadFactionCredits, "");
     return 1;
 }
 

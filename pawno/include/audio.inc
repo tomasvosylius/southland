@@ -15,7 +15,7 @@
  */
 
 #include <a_samp>
-#include <YSI\y_hooks>
+#include <YSI_Coding\y_hooks>
 
 // Natives (Main)
 

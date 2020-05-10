@@ -1,4 +1,4 @@
-#include <YSI\y_hooks>
+#include <YSI_Coding\y_hooks>
 
 enum PayNSprayData {
 	Float:pns_x,
@@ -16,12 +16,10 @@ static PayNSpray[][PayNSprayData] = {
 };
 
 static 
-	player_Point[MAX_PLAYERS],
 	bool:player_Fixing[MAX_PLAYERS];
 
 hook OnPlayerConnect(playerid)
 {
-	player_Point[playerid] = -1;
 	player_Fixing[playerid] = false;
 	return 1;
 }
@@ -63,56 +61,60 @@ CMD:fix(playerid, params[])
 }
 
 stock PayNSpray_ShowConfirm(playerid, point)
-{
-	player_Point[playerid] = point;
-	new 
-		string[256];
-	format(string, sizeof string, "{ffffff}Kaina: $%d\nTrukmë: 15sec\n\nPinigai atðaukus, nutolus ar iðlipus ið maðinos negràþinami.\nAr sutinkate taisyti tr. priemonæ?", PayNSpray[point][pns_price]);
-	Dialog_Show(playerid, ConfirmPayNSpray, DIALOG_STYLE_MSGBOX, "Taisymas", string, "Taip", "Ne");
-	return 1;
-}
-
-Dialog:ConfirmPayNSpray(playerid, response, listitem, inputtext[])
-{
-	if(response)
+{	
+	dialog_Clear();
+	dialog_AddLine("{ffffff}Kaina: $%d", PayNSpray[point][pns_price]);
+	dialog_AddLine("Trukmë: 15sec");
+	dialog_AddLine("Pinigai atðaukus, nutolus ar iðlipus ið maðinos negràþinami.");
+	dialog_AddLine("Ar sutinkate taisyti tr. priemonæ?");
+	
+	inline confirmPayNSpray(response, listitem)
 	{
-		new 
-			point = player_Point[playerid];
-		if(IsPlayerInRangeOfPoint(playerid, PayNSpray[point][pns_range], PayNSpray[point][pns_x], PayNSpray[point][pns_y], PayNSpray[point][pns_z]))
+		if(response)
 		{
-			if(GetPlayerVehicleSeat(playerid) != 0) return SendWarning(playerid, "Turite sedëti vairuotojo vietoje.");
+			if(IsPlayerInRangeOfPoint(playerid, 
+				PayNSpray[point][pns_range], 
+				PayNSpray[point][pns_x],
+				PayNSpray[point][pns_y],
+				PayNSpray[point][pns_z])
+			)
 			{
-				new 
-					vehicleid = GetPlayerVehicleID(playerid),
-					factionid = GetFactionArrayIndexById(VehicleInfo[vehicleid][vFaction]);
-				if(vehicleid != INVALID_VEHICLE_ID)
+				if(GetPlayerVehicleSeat(playerid) != 0) return SendWarning(playerid, "Turite sedëti vairuotojo vietoje.");
 				{
 					new 
-						price = PayNSpray[point][pns_price];
-					if(factionid != -1 && (FactionInfo[factionid][fType] == FACTION_TYPE_POLICE || FactionInfo[factionid][fType] == FACTION_TYPE_FIRE))
+						vehicleid = GetPlayerVehicleID(playerid),
+						factionid = GetFactionArrayIndexById(VehicleInfo[vehicleid][vFaction]);
+					if(vehicleid != INVALID_VEHICLE_ID)
 					{
-						SendFormat(playerid, 0xbababaff, "\"%s\" transporto priemonës sutaisymas nemokamas.", GetFactionName(factionid));
-					}
-					else
-					{
-						if(GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
-						GivePlayerMoney(playerid, -price);
-					}
+						new 
+							price = PayNSpray[point][pns_price];
+						if(factionid != -1 && (FactionInfo[factionid][fType] == FACTION_TYPE_POLICE || FactionInfo[factionid][fType] == FACTION_TYPE_FIRE))
+						{
+							SendFormat(playerid, 0xbababaff, "\"%s\" transporto priemonës sutaisymas nemokamas.", GetFactionName(factionid));
+						}
+						else
+						{
+							if(GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
+							GivePlayerMoney(playerid, -price);
+						}
 
-					SetTimerEx("T_PayNSpray", 1000, false, "dddd", playerid, vehicleid, point, 15);
-					
-					player_Fixing[playerid] = true;
-					SendFormat(playerid, 0x91e23bFF, "Transporto priemonës tvarkymas prasidëjo! Norëdami atðaukti, raðykite /cancelfix");
-					TogglePlayerControllable(playerid, 0);
+						SetTimerEx("T_PayNSpray", 1000, false, "dddd", playerid, vehicleid, point, 15);
+						
+						player_Fixing[playerid] = true;
+						SendFormat(playerid, 0x91e23bFF, "Transporto priemonës tvarkymas prasidëjo! Norëdami atðaukti, raðykite /cancelfix");
+						TogglePlayerControllable(playerid, 0);
 
-					printf("[debug] PayNSpray sutiko paint: %s, %d", GetPlayerNameEx(playerid), VehicleInfo[vehicleid][vId]);	
+						printf("[debug] PayNSpray sutiko paint: %s, %d", GetPlayerNameEx(playerid), VehicleInfo[vehicleid][vId]);	
+					}
 				}
 			}
+			else SendError(playerid, "Atsitraukëte nuo Pay 'n' Spray taðko!");
 		}
-		else SendError(playerid, "Atsitraukëte nuo Pay 'n' Spray taðko!");
 	}
+	dialog_Show(playerid, using inline confirmPayNSpray, DIALOG_STYLE_MSGBOX, "Taisymas", "Taip", "Ne");
 	return 1;
 }
+
 
 forward T_PayNSpray(playerid, vehicleid, point, timeleft);
 public T_PayNSpray(playerid, vehicleid, point, timeleft)

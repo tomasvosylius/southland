@@ -661,7 +661,10 @@ static _FAC_CheatDetected(playerid, code, extra_id_1 = 0, extra_id_2 = 0)
 			}
 		}
 	#endif
+	
 	FAC_Reset(playerid);
+	FAC_ResetPlayerMoney(playerid);
+
 	#if !defined _INC_y_hooks
 		#if defined FAC_OnPlayerConnect
 			return FAC_OnPlayerConnect(playerid);
@@ -682,6 +685,7 @@ static _FAC_CheatDetected(playerid, code, extra_id_1 = 0, extra_id_2 = 0)
 #endif
 {
 	FAC_Reset(playerid);
+	
 	#if !defined _INC_y_hooks
 		#if defined FAC_OnPlayerDisconnect
 			return FAC_OnPlayerDisconnect(playerid, reason);
@@ -712,7 +716,6 @@ stock FAC_GetAnticheatVersion()
 stock FAC_Reset(playerid)
 {
 	FAC_ResetPlayerWeapons(playerid);
-	FAC_ResetPlayerMoney(playerid);
 
 	new 
 		reset__AirBreak[E_AC_AIRBREAK];
@@ -815,10 +818,10 @@ stock FAC_Reset(playerid)
 		#if defined FAC_OnDialogResponse
 			return FAC_OnDialogResponse(playerid, dialogid, response, listitem, inputtext);
 		#else
-			return 1;
+			return 0;
 		#endif
 	#else 
-		return 1;
+		return 0;
 	#endif 
 }
 
@@ -2005,14 +2008,13 @@ stock FAC_DestroyVehicle(vehicleid)
 	}
 	return false;
 }
-#if !defined GetVehicleColor
-	stock GetVehicleColor(vehicleid, &color1, &color2)
-	{
-		color1 = vehicle_Colors[vehicleid][0];
-		color2 = vehicle_Colors[vehicleid][1];
-		return 1;
-	}
-#endif
+
+stock GetVehicleColor(vehicleid, &color1, &color2)
+{
+	color1 = vehicle_Colors[vehicleid][0];
+	color2 = vehicle_Colors[vehicleid][1];
+}
+
 stock FAC_ChangeVehicleColor(vehicleid, color1, color2)
 {
 	vehicle_Colors[vehicleid][0] = color1;
@@ -2151,7 +2153,8 @@ stock FAC_CheckWeaponCheat(playerid, id, bool:byslot)
 		new 
 			l_data[2];
 		GetPlayerWeaponData(playerid, slot, l_data[0], l_data[1]);
-		if((ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] != l_data[0] && l_data[0] != 0 && l_data[1] > 0) || (ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] < l_data[1] && l_data[1] > 0 && l_data[0] > 0))
+		if(	(ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] != l_data[0] && l_data[0] != 0 && l_data[1] > 0) || 
+			(ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] < l_data[1] && l_data[1] > 0 && l_data[0] > 0))
 		{
 			printf("CHEAT: cln[%d]:[%d] 	  srv[%d]:[%d]", l_data[0], l_data[1], ac__PlayerWeapons[playerid][slot][e_ac_WeaponId], ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo]);
 			ac__IgnoreWeapons[playerid] = 3;
@@ -2174,13 +2177,17 @@ stock FAC_ResetPlayerWeaponSlotData(playerid, slot)
 
 stock FAC_ResetPlayerWeapons(playerid)
 {
+	new 
+		result = ResetPlayerWeapons(playerid);
+
 	for(new slot = 0; slot < 13; slot++)
 	{
-		ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] = 0;
+		ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] = 
 		ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] = 0;
 	}
 	ac__LastWeapon[playerid] = 0;
-	return ResetPlayerWeapons(playerid);
+
+	return result;
 }
 
 stock RemovePlayerWeapon(playerid, weapon)
@@ -2208,18 +2215,33 @@ stock PlayerHasWeaponInSlot(playerid, slot)
 
 stock RemovePlayerWeaponInSlot(playerid, remove)
 {
+	/**
+		Removing su SetPlayerAmmo,
+		o veliau timeryje tikrint, jei ammo = 0, bet weaponid > 0, nustatyti WeaponId=0.
+	*/
+
 	new 	
-		data[13][2];
-	for(new slot = 0; slot < 13; slot++)
+		data[2];
+
+	GetPlayerWeaponData(playerid, remove, data[0], data[1]);
+	if(data[0] != 0)
+	{
+		return FAC_SetPlayerAmmo(playerid, data[0], 0);
+	}
+	return false;
+	
+/*	for(new slot = 0; slot < 13; slot++)
 	{
 		if(slot != remove) GetPlayerWeaponData(playerid, slot, data[slot][0], data[slot][1]);
 	}
+
 	FAC_ResetPlayerWeapons(playerid);
+
 	for(new slot = 0; slot < 13; slot++)
 	{
 		if(slot != remove) FAC_GivePlayerWeapon(playerid, data[slot][0], data[slot][1]);
 	}
-	return 1;
+	return 1;*/
 }
 
 stock FAC_GetWeaponSlot(weaponid)
@@ -2246,6 +2268,7 @@ stock FAC_GetWeaponSlot(weaponid)
 stock FAC_SetPlayerAmmo(playerid, weaponid, ammo)
 {
 	new 
+		result = SetPlayerAmmo(playerid, weaponid, ammo),
 		slot;
 	if((slot = FAC_GetWeaponSlot(weaponid)) != 0xFFFF)
 	{
@@ -2259,7 +2282,7 @@ stock FAC_SetPlayerAmmo(playerid, weaponid, ammo)
 			ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] += ammo;
 		}
 	}
-	return SetPlayerAmmo(playerid, weaponid, ammo);
+	return result;
 }
 
 stock FAC_GivePlayerWeapon(playerid, weaponid, ammo)

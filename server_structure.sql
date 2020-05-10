@@ -408,6 +408,7 @@ CREATE TABLE IF NOT EXISTS `drops_data` (
 CREATE TABLE IF NOT EXISTS `enters_exits` (
 `id` int(11) NOT NULL,
   `Name` varchar(32) NOT NULL,
+  `PickupType` int NOT NULL default 0,
   `EnterX` float NOT NULL,
   `EnterY` float NOT NULL,
   `EnterZ` float NOT NULL,
@@ -1793,9 +1794,7 @@ INSERT INTO `options` (`id`, `Key`, `Value`, `Type`) VALUES
 (26, 'OOCUnjailZ', '13.546875', 3),
 (27, 'TaxesToCity', '15', 1),
 (28, 'TaxesToPolice', '70', 1),
-(29, 'EnabledPoliceWeaponUsage', '0', 1),
 (30, 'EnabledFurnitureMultiSelect', '0', 1),
-(31, 'EnabledLoginTimer', '0', 1),
 (32, 'EnabledDroppedItemsSaving', '0', 1),
 (33, 'EnabledJobLabels', '1', 1),
 (34, 'EnabledBusinessLabels', '1', 1),
@@ -3192,12 +3191,14 @@ ALTER TABLE `players_data`
 --
 ALTER TABLE `players_drugs`
  ADD PRIMARY KEY (`id`);
+alter table `players_drugs` add foreign key (PlayerId) REFERENCES players_data(id) on update cascade on delete cascade;
 
 --
 -- Indexes for table `players_inventory`
 --
 ALTER TABLE `players_inventory`
  ADD PRIMARY KEY (`id`);
+alter table `players_inventory` add foreign key (PlayerId) REFERENCES players_data(id) on update cascade on delete cascade;
 
 --
 -- Indexes for table `players_jails`
@@ -3234,6 +3235,7 @@ ALTER TABLE `players_reports`
 --
 ALTER TABLE `players_settings`
  ADD PRIMARY KEY (`id`);
+alter table `players_settings` add foreign key (PlayerId) REFERENCES players_data(id) on update cascade on delete cascade;
 
 --
 -- Indexes for table `players_sms`
@@ -3258,6 +3260,7 @@ ALTER TABLE `players_warns`
 --
 ALTER TABLE `players_weapons`
  ADD PRIMARY KEY (`id`);
+alter table `players_weapons` add foreign key (PlayerId) REFERENCES players_data(id) on update cascade on delete cascade;
 
 --
 -- Indexes for table `san_news_sms`

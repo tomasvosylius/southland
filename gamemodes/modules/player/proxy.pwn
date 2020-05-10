@@ -19,8 +19,7 @@ hook OnPlayerConnect(playerid)
     player_RequestId[playerid] = Request:NONE;
 
     new 
-        ip[32],
-        string[256];
+        ip[32];
     GetPlayerIp(playerid, ip, sizeof ip);
     if(!strlen(ip))
     {
@@ -51,9 +50,8 @@ hook OnPlayerConnect(playerid)
         // https://blackbox.ipinfo.app/lookup/131.174.113.235
         return 1;
     }
-    mysql_format(chandler, string, sizeof string, "\
+    mysql_tquery_inline(chandler, using inline check_ip_blacklist, "\
         SELECT NULL FROM `ip_blacklist` WHERE IP = '%e'", ip);
-    mysql_tquery_inline(chandler, string, using inline check_ip_blacklist, "");
     return 1;
 }
 
@@ -84,8 +82,6 @@ public HTTP_OnProxyCheck(Request:id, E_HTTP_STATUS:status, data[], dataLen)
 
 static _Proxy_SendResult(index, result, bool:add_to_blacklist)
 {
-    new 
-        string[256];
     call OnProxyResult(index, result);
 
     if(result == 1 && add_to_blacklist)
@@ -98,8 +94,7 @@ static _Proxy_SendResult(index, result, bool:add_to_blacklist)
             printf("IP %s added to blacklist", ip);
             return 1;
         }
-        mysql_format(chandler, string, sizeof string, "INSERT INTO `ip_blacklist` (`IP`,`Reason`) VALUES ('%e', 'VPN')", ip);
-        mysql_tquery_inline(chandler, string, using inline insertion, "d");
+        mysql_tquery_inline(chandler, using inline insertion, "INSERT INTO `ip_blacklist` (`IP`,`Reason`) VALUES ('%e', 'VPN')", ip);
     }
     return 1;
 }

@@ -24,11 +24,10 @@ static
             {2118.7241,-1774.8286,13.3920}
         },
         {
-            "~w~Cia igysi vairavimo ~y~teises. ~w~Uz sio pastato rasi ~b~~h~San_News~w~, \
-            kuriame gali deti skelbimus su ~r~/ad",
-            5.5,
-            {1823.0577,-1739.1483,20.7241},
-            {1823.0577,-1739.1483,20.7241}
+            "~w~Cia igysi vairavimo ~y~teises.",
+            3.5,
+            {2085.1387,-1947.1952,18.6166},
+            {2058.8369,-1906.4808,16.0266}
         },
         {
             "~w~Noredamas pilti degalus, degalineje naudok komanda ~y~/fill~w~",
@@ -39,8 +38,8 @@ static
         {
             "~w~Vienas is galimu darbu - ~r~mechanikai~w~, kurie uzsiima transporto taisymu ir tobulinimu.",
             5.0,
-            {2126.5168,-1875.8082,21.7220},
-            {2157.2954,-1904.0613,16.7034}
+            {2209.1108,-1930.4907,29.4107},
+            {2167.6653,-1881.1880,19.8893}
         },
         {
             "~w~Cia gali isidarbinti ~r~kroviniu isveziotoju~w~ ir neblogai uzdirbti. Visi zaidejai ~g~~h~alga~w~ gauna kas 30min.",

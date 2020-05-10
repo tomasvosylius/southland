@@ -1,3 +1,9 @@
+#include <YSI_Coding\y_hooks>
+
+#if !defined IsValidVehicle
+    native IsValidVehicle(vehicleid);
+#endif
+
 stock SendChatMessage(playerid, color, const text[]) return SendClientMessage(playerid, color, text);
 stock SendChatMessageToAll(color, const text[]) return SendClientMessageToAll(color, text);
 stock CancelVehicleEnter(playerid)

@@ -1,5 +1,5 @@
-#include <YSI\y_hooks>
-#include <YSI\y_als>
+#include <YSI_Coding\y_hooks>
+#include <YSI_Core\y_als>
 
 #define LIMIT_OF_PLAYER_TEXT_DRAWS 350
 static stock _G(n, p) return (n >> (4 * p)) & 0xF;
