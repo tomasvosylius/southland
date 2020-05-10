@@ -2286,6 +2286,7 @@ public OnGameModeInit()
 
 	CreateDynamic3DTextLabel("Þvejybos vieta\nNaudokite /fishing", 0xFFFFFFFF, 2938.95, -1996.96, 3.07, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
 	CreateDynamic3DTextLabel("Þuvø supirktuvë\nNaudokite /sellfishes", 0xBABABAFF, 2900.65, -1934.49, 11.91, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
+	CreateDynamic3DTextLabel("/bell", 0xBABABAFF, 2264.5288,-69.9861,1024.6013, 2.85, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
 	// AddStaticVehicle(538, 1902.83, -1953.91, 13.50, 0.0, 0, 0);
 
 	Iter_Init(PlayerDamages);
@@ -27486,7 +27487,7 @@ CMD:rjc(playerid, params[])
 {
 	new mysql,
 		jobid;
-	if(sscanf(params,"d",mysql) || mysql < 0) return SendUsage(playerid, "/rfc [darbo MySQL id (/jobslist)]");
+	if(sscanf(params,"d",mysql) || mysql < 0) return SendUsage(playerid, "/rjc [darbo MySQL id (/jobslist)]");
 	if((jobid = GetJobArrayIndexById(mysql)) == -1) return SendError(playerid, "Tokio darbo nëra.");
 	new used[MAX_VEHICLES];
 	foreach(new receiverid : Player)
@@ -28720,7 +28721,7 @@ flags:slap(CMD_TYPE_ADMIN);
 CMD:slap(playerid, params[])
 {
 	new receiverid;
-	if(sscanf(params,"u",receiverid)) return SendUsage(playerid, "/goto [þaidëjas]");
+	if(sscanf(params,"u",receiverid)) return SendUsage(playerid, "/slap [þaidëjas]");
 	if(!CheckPlayerid(receiverid)) return InfoBox(playerid, IB_WRONG_PLAYER);
 	new Float:x, Float:y, Float:z;
 	GetPlayerPos(receiverid, x, y, z);
@@ -30839,6 +30840,8 @@ CMD:bell(playerid, params[])
 	format(string, sizeof string, "DISPEÈERINË: Pilietis laukia departamente.", GetPlayerNameEx(playerid, true, true));
 	SendFactionTypeMessage(FACTION_TYPE_POLICE, 0xFFCC3EFF, true, string);
 	rp_me(playerid, _, "paskambina varpeliu.");
+
+	SendFormat(playerid, 0xbababaff, "(( Praneðimà gavo visi darbuotojai ))");
 	return 1;
 }
 
