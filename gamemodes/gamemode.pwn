@@ -2287,6 +2287,7 @@ public OnGameModeInit()
 	CreateDynamic3DTextLabel("Þvejybos vieta\nNaudokite /fishing", 0xFFFFFFFF, 2938.95, -1996.96, 3.07, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
 	CreateDynamic3DTextLabel("Þuvø supirktuvë\nNaudokite /sellfishes", 0xBABABAFF, 2900.65, -1934.49, 11.91, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
 	CreateDynamic3DTextLabel("/bell", 0xBABABAFF, 2264.5288,-69.9861,1024.6013, 2.85, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
+	CreateDynamic3DTextLabel("/pdclothes\n/wepstore\n/vest", 0xBABABAFF, 2271.5259,-73.5560,1024.3364, 2.85, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
 	// AddStaticVehicle(538, 1902.83, -1953.91, 13.50, 0.0, 0, 0);
 
 	Iter_Init(PlayerDamages);
@@ -24821,7 +24822,9 @@ stock TakeDroppedItem(playerid)
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
-	if((HOLDING(KEY_CROUCH) && PRESSED(KEY_WALK)) || ((PRESSED(KEY_WALK) || HOLDING(KEY_WALK)) && GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_DUCK))
+	if(	(HOLDING(KEY_CROUCH) && PRESSED(KEY_WALK)) || 
+		((PRESSED(KEY_WALK) || HOLDING(KEY_WALK)) && GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_DUCK)
+	)
 	{
 		TakeDroppedItem(playerid);
 	}
@@ -29889,7 +29892,8 @@ CMD:payticket(playerid, params[])
 		vehicleid;
 	if((vehicleid = GetPlayerVehicleID(playerid)) != INVALID_VEHICLE_ID && IsPlayerInAnyVehicle(playerid))
 	{
-		if(!HaveVehicleKey(playerid, vehicleid, .check_only_owner = false, .canbejob = false, .ignore_admin_perm = true)) return SendWarning(playerid, "Neturite ðios tr. priemonës rakteliø.");
+		if(!HaveVehicleKey(playerid, vehicleid, .check_only_owner = false, .canbejob = false, .ignore_admin_perm = true))
+			return SendWarning(playerid, "Neturite ðios tr. priemonës rakteliø.");
 		if(VehicleInfo[vehicleid][vTicket] > 0)
 		{
 			if(GetPlayerMoney(playerid) < VehicleInfo[vehicleid][vTicket]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, VehicleInfo[vehicleid][vTicket]);
