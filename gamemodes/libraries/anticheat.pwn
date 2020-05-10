@@ -663,6 +663,7 @@ static _FAC_CheatDetected(playerid, code, extra_id_1 = 0, extra_id_2 = 0)
 	#endif
 	
 	FAC_Reset(playerid);
+	FAC_ResetPlayerMoney(playerid);
 
 	#if !defined _INC_y_hooks
 		#if defined FAC_OnPlayerConnect
@@ -684,6 +685,7 @@ static _FAC_CheatDetected(playerid, code, extra_id_1 = 0, extra_id_2 = 0)
 #endif
 {
 	FAC_Reset(playerid);
+	
 	#if !defined _INC_y_hooks
 		#if defined FAC_OnPlayerDisconnect
 			return FAC_OnPlayerDisconnect(playerid, reason);
@@ -714,7 +716,6 @@ stock FAC_GetAnticheatVersion()
 stock FAC_Reset(playerid)
 {
 	FAC_ResetPlayerWeapons(playerid);
-	FAC_ResetPlayerMoney(playerid);
 
 	new 
 		reset__AirBreak[E_AC_AIRBREAK];

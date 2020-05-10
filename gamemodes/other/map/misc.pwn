@@ -14,6 +14,7 @@ hook OnPlayerConnect(playerid)
 hook OnGameModeInit()
 {
 	new tmpobjid;
+	
 	// Degalines nematomi Idlewood aptvarai
 	tmpobjid = CreateDynamicObject(19445, 1942.29529, -1774.96631, 14.29397,   0.00000, 0.00000, 0.00000, -1, -1, -1, 60.0, 60.0);
 	SetDynamicObjectMaterial(tmpobjid, 0, 0, "none", "none", 0x00000000);

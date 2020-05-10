@@ -268,7 +268,10 @@ static _Garages_ChangeOwner(playerid, garage, error[] = "")
                         log_commit();
                         return 1;
                     }
-                    mysql_tquery_inline(chandler, using inline updateGarage, "UPDATE `garages_data` SET Owner = '0' WHERE id = '%d'", GarageInfo[garage][gId]);
+                    mysql_tquery_inline(chandler, using inline updateGarage, "\
+                        UPDATE `garages_data` SET Owner = '%d' WHERE id = '%d'", 
+                        ownersql, GarageInfo[garage][gId]
+                    );
                 }
                 else return _Garages_ChangeOwner(playerid, garage, .error = "Þaidëjas tokiu vardu/SQL ID neegzistuoja!");
             }   

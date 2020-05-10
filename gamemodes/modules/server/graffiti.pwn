@@ -1,7 +1,6 @@
 #include <YSI_Coding\y_hooks>
 
-
-#define DEFAULT_GRAFFITI_SIZE 		47
+#define DEFAULT_GRAFFITI_SIZE 		60
 
 enum E_GRAFFITI_DATA
 {
@@ -63,28 +62,41 @@ CMD:graffitisize(playerid, params[])
 flags:deletegraffiti(CMD_TYPE_ADMIN);
 CMD:deletegraffiti(playerid, params[])
 {
-	foreach(new graffiti : Graffiti)
+	new 
+		graffiti = NONE,
+		Float:last_distance;
+	foreach(new g : Graffiti)
 	{
-		if(IsPlayerInRangeOfPoint(playerid, 10.0, Graffiti[graffiti][graffitiX], Graffiti[graffiti][graffitiY], Graffiti[graffiti][graffitiZ]))
+		new Float:dist;
+		if((dist = GetPlayerDistanceFromPoint(playerid,
+						Graffiti[g][graffitiX],
+						Graffiti[g][graffitiY],
+						Graffiti[g][graffitiZ])) < last_distance || graffiti == NONE)
 		{
-			if(IsValidDynamicObject(Graffiti[graffiti][graffitiObject])) DestroyDynamicObject(Graffiti[graffiti][graffitiObject]);
-
-			new 
-				string[126];
-			mysql_format(chandler, string, sizeof string, "DELETE FROM `graffiti` WHERE id = '%d'", Graffiti[graffiti][graffitiId]);
-			mysql_fquery(chandler, string, "GraffitiSaved");
-
-			new 
-				reset[E_GRAFFITI_DATA];
-			Graffiti[graffiti] = reset;
-			Graffiti[graffiti][graffitiObject] = -1;
-
-			SendFormat(playerid, -1, "Artimiausias graffiti iðtrintas!");
-			Iter_Remove(Graffiti, graffiti);
-			return 1;
+			last_distance = dist;
+			graffiti = g;
 		}
 	}
-	SendFormat(playerid, -1, "Nesate ðalia graffiti!");
+	if(graffiti != NONE)
+	{
+		if(IsValidDynamicObject(Graffiti[graffiti][graffitiObject])) DestroyDynamicObject(Graffiti[graffiti][graffitiObject]);
+
+		new 
+			string[126];
+		mysql_format(chandler, string, sizeof string, "DELETE FROM `graffiti` WHERE id = '%d'", Graffiti[graffiti][graffitiId]);
+		mysql_fquery(chandler, string, "GraffitiSaved");
+
+		new 
+			reset[E_GRAFFITI_DATA];
+		Graffiti[graffiti] = reset;
+		Graffiti[graffiti][graffitiObject] = -1;
+
+		SendFormat(playerid, -1, "Artimiausias graffiti iðtrintas!");
+		Iter_Remove(Graffiti, graffiti);
+		return 1;
+	}
+	else SendFormat(playerid, -1, "Nesate ðalia graffiti!");
+
 	return 1;
 }
 
@@ -117,29 +129,42 @@ CMD:graffiti(playerid, params[])
 	GetPlayerWeaponData(playerid, slot, weaponid, ammo);
 	if(weaponid != WEAPON_SPRAYCAN || GetPlayerWeapon(playerid) != WEAPON_SPRAYCAN) return SendWarning(playerid, "Rankose turite turëti Spray Can.");
 
-	Dialog_Show(playerid, DialogInputGraffiti, DIALOG_STYLE_INPUT, "Graffiti", "{ffffff}Áveskite tekstà, kurá norite iðpaiðyti\n\nGalimos spalvos:\n{FF8B00}[•] {ffffff}(o) - oranþinë\n{5B3F01}[•] {ffffff}(br) - ruda\n{0000FF}[•] {ffffff}(bl) - mëlyna\n{000000}[•] {ffffff}(b) - juoda\n{008000}[•] {ffffff}(g) - þalia\n{FFFFFF}[•] {ffffff}(w) - balta\n{FFFF00}[•] {ffffff}(y) - geltona\n{FF0000}[•] {ffffff}(r) - raudona\n{800000}[•] {ffffff}(mr) - tamsiai raudona\n\n(n) - nauja eilute", "Pradëti", "Atðaukti");
+	dialog_Clear();
+	dialog_AddLine("{ffffff}Áveskite tekstà, kurá norite iðpaiðyti");
+	dialog_AddLine("Galimos spalvos:");
+	dialog_AddLine("{FF8B00}[•] {ffffff}(o) - oranþinë");
+	dialog_AddLine("{5B3F01}[•] {ffffff}(br) - ruda");
+	dialog_AddLine("{0000FF}[•] {ffffff}(bl) - mëlyna");
+	dialog_AddLine("{000000}[•] {ffffff}(b) - juoda");
+	dialog_AddLine("{008000}[•] {ffffff}(g) - þalia");
+	dialog_AddLine("{FFFFFF}[•] {ffffff}(w) - balta");
+	dialog_AddLine("{FFFF00}[•] {ffffff}(y) - geltona");
+	dialog_AddLine("{FF0000}[•] {ffffff}(r) - raudona");
+	dialog_AddLine("{800000}[•] {ffffff}(mr) - tamsiai raudona");
+	dialog_AddLine("(n) - nauja eilute");
+
+	inline input(response, listitem)
+	{
+		if(response)
+		{
+			if(strlen(dialog_Input()) <= 3) return SendWarning(playerid, "Neávedëte teksto!");
+			format(player_GraffitiString[playerid], 256, "%s", dialog_Input());
+
+			_Graffiti_SelectFont(playerid);			
+		}
+	}
+	dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Graffiti", "Pradëti", "Atðaukti");
 	return 1;
 }
 
-Dialog:DialogInputGraffiti(playerid, response, listitem, inputtext[])
+static _Graffiti_SelectFont(playerid)
 {
-	if(response)
+	dialog_Clear();
+	for(new i = 0; i < sizeof graffiti_Fonts; i++)
 	{
-		if(strlen(inputtext) <= 3) return SendWarning(playerid, "Neávedëte teksto!");
-		format(player_GraffitiString[playerid], 256, "%s", inputtext);
-		new 
-			string[256];
-		for(new i = 0; i < sizeof graffiti_Fonts; i++)
-		{
-			format(string, sizeof string, "%s%s\n", string, graffiti_Fonts[i]);
-		}
-		Dialog_Show(playerid, DialogGraffitiFont, DIALOG_STYLE_LIST, "Graffiti ðriftas", string, "Tæsti", "Atðaukti");
+		dialog_AddLine(graffiti_Fonts[i]);
 	}
-	return 1;
-}
-Dialog:DialogGraffitiFont(playerid, response, listitem, inputtext[])
-{
-	if(response)
+	inline select(response, listitem)
 	{
 		new 
 			Float:x, Float:y, Float:z;
@@ -154,7 +179,7 @@ Dialog:DialogGraffitiFont(playerid, response, listitem, inputtext[])
 
 		PlayerInfo[playerid][pGraffitiAllowed] -- ;
 	}
-	return 1;
+	dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, "Graffiti ðriftas", "Tæsti", "Atðaukti");
 }
 
 hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)

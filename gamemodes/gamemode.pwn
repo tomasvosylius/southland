@@ -2100,9 +2100,9 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player\ui/loadbar.pwn"
 
 /** Server modules */
-// #include "modules\bots/npc.pwn"
+#include "modules\bots/npc.pwn"
 #include "modules\server/inventory.pwn"
-// #include "modules\server/graffiti.pwn"
+#include "modules\server/graffiti.pwn"
 #include "modules\server/boombox.pwn"
 #include "modules\server/paynspray.pwn"
 //#include "modules\server/gifts.pwn"
@@ -2296,7 +2296,6 @@ public OnGameModeInit()
 	// Timers
 	// ==============================================================================
 	SetTimer("SecondTimer", 1000, true);
-	SetTimer("MaxSpeedTimer", 300, true);
 	return 1;
 }
 
@@ -2335,7 +2334,7 @@ ptask PT_VehicleSpeedo[200](playerid)
 		 */
 		if(Checkpoint[playerid] == CHECKPOINT_TYPE_DMV && tmpEditing_Component_DMV[playerid] > 0)
 		{
-			if(speed > 75)
+			if(speed > 100 && !(30 <= PlayerExtra[playerid][peSpeedLimit] <= 80))
 			{
 				PlayerExtra[playerid][peDMVSpeed]++;
 			}
@@ -2385,30 +2384,26 @@ ptask PT_VehicleSpeedo[200](playerid)
 
 thread(JailReset);
 
-forward MaxSpeedTimer();
-public MaxSpeedTimer()
+// 	SetTimer("MaxSpeedTimer", 300, true);
+ptask PT_MaxSpeed[300](playerid)
 {
-	foreach(new playerid : Player)
+	if(GetPlayerVehicleSeat(playerid) == 0)
 	{
-		if(GetPlayerVehicleSeat(playerid) == 0)
+		new vehicleid = GetPlayerVehicleID(playerid);
+		if(VehicleInfo[vehicleid][vEngined])
 		{
-			new vehicleid = GetPlayerVehicleID(playerid);
-			if(VehicleInfo[vehicleid][vEngined])
+			new speed = GetVehicleSpeed(vehicleid),
+				model = GetVehicleModel(vehicleid);
+			if(
+				(PlayerExtra[playerid][peSpeedLimit] > 0 && speed > PlayerExtra[playerid][peSpeedLimit])
+				||
+				(IsModelShitty(model) && speed > GetMaxShittyCarSpeed(model))
+			)
 			{
-				new speed = GetVehicleSpeed(vehicleid),
-					model = GetVehicleModel(vehicleid);
-				if(
-					(PlayerExtra[playerid][peSpeedLimit] > 0 && speed > PlayerExtra[playerid][peSpeedLimit])
-					||
-					(IsModelShitty(model) && speed > GetMaxShittyCarSpeed(model))
-				)
-				{
-					SetVehicleSpeed(vehicleid, speed - 20);
-				}
+				SetVehicleSpeed(vehicleid, speed - 20);
 			}
 		}
 	}
-	return 1;
 }
 
 stock IsModelShitty(model)
@@ -3451,6 +3446,7 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 	{
 		if(IsPlayerConnected(call_receiver))
 		{
+			
 			if(IsPlayerConnected(call_receiver)) SendFormat(call_receiver, 0xE77B33FF, "Ryðys nutrûko!");
 
 			PhoneInfo[call_receiver][phoneTalkingTo] = INVALID_PLAYER_ID;
@@ -3463,6 +3459,8 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 				PhoneTD_Show(call_receiver, PHONE_PAGE_MAIN);
 			}
 			else PhoneTD_Hide(call_receiver);
+		
+			(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USECELLPHONE) && SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 		
 			// PhoneInfo[call_receiver][phoneTalkingTo] =
 			// PhoneInfo[call_receiver][phoneRinging] = INVALID_PLAYER_ID;
@@ -5356,11 +5354,13 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 		while(attempt <= 5)
 		{
+			new Float:from_z	= attempt == 1 ? (PlayerInfo[playerid][pPosZ]+0.85) : (PlayerInfo[playerid][pPosZ] + (5.5*attempt) + ((attempt-1)*10.0)),
+				Float:to_z 		= attempt == 1 ? (PlayerInfo[playerid][pPosZ]-0.85) : (PlayerInfo[playerid][pPosZ] - (5.5*attempt) + ((attempt-1)*10.0));
 			new result = CA_RayCastLine(
 				// Start
-				PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ] + (6.5*attempt) + ((attempt-1)*10.0),
+				PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], from_z,
 				// End
-				PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ] - (6.5*attempt) + ((attempt-1)*10.0),
+				PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], to_z,
 				// Store
 				PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], groundZ
 			);
@@ -6214,7 +6214,7 @@ hook OnPlayerSpawnChar(playerid, selected)
 			pc_cmd_giftinfo(playerid, "");
 		}*/
 	}
-	is_confirmed && mysql_format(chandler, string, sizeof string, "SELECT Name,id FROM `players_data` WHERE id = '%d'", id) || mysql_format(chandler, string, sizeof string, "SELECT Name,Skin,id FROM `players_new` WHERE id = '%d'", id); 
+	is_confirmed && mysql_format(chandler, string, sizeof string, "SELECT Name,id,Skin FROM `players_data` WHERE id = '%d'", id) || mysql_format(chandler, string, sizeof string, "SELECT Name,Skin,id FROM `players_new` WHERE id = '%d'", id); 
 	mysql_tquery(chandler, string, "SpawnCharDataLoad", "dd", playerid, selected);
 	return 1;
 }
@@ -6955,7 +6955,7 @@ stock CheckNameUsageAnywhere(name[], check_user = false)
 	}
 	cache_delete(result);
 
-	mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `players_locks` WHERE Name = '%e'", name);
+	mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `players_locks` WHERE PlayerName = '%e'", name);
 	result = mysql_query(chandler, string, true);
 	cache_set_active(result);
 	if(cache_num_rows())
@@ -13297,14 +13297,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 1:
 					{
 						// detective
-						mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET `FactionPermission1` = 1  - `FactionPermission1` WHERE id = '%d'", workerid);
+						mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET `FactionPermission2` = 1  - `FactionPermission2` WHERE id = '%d'", workerid);
 						mysql_fquery(chandler, string, "FactionSaved");
 						log_set_values("'%d','%e','%d','%e','(FM) Pakeite 1 grupes nustatyma darbuotojui','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), workerid, GetNameBySql(workerid));
 					}
 					case 2:
 					{
 						// spec
-						mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET `FactionPermission1` = 1  - `FactionPermission1` WHERE id = '%d'", workerid);
+						mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET `FactionPermission3` = 1  - `FactionPermission3` WHERE id = '%d'", workerid);
 						mysql_fquery(chandler, string, "FactionSaved");
 						log_set_values("'%d','%e','%d','%e','(FM) Pakeite 1 grupes nustatyma darbuotojui','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), workerid, GetNameBySql(workerid));
 					}
@@ -13391,6 +13391,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						
 							IsValidDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]) && DestroyDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]);
 							PlayerExtra[playerid][pePoliceBadgeText] = INVALID_3DTEXT_ID;
+							
 
 							new channel = PlayerInfo[receiverid][pRadioChannel];
 							if((900 <= channel < 950) || (950 <= channel < 1000) || (1000 <= channel < 1050)) PlayerInfo[receiverid][pRadioChannel] = 0;
@@ -13398,9 +13399,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							SaveAccountIntEx(receiverid, "FactionLeader", 0);
 							SaveAccountIntEx(receiverid, "JobLevel", 0);
 							SaveAccountIntEx(receiverid, "PoliceBadge", 0);
-						
-							SetPlayerArmour(playerid, 0.0);
-							ResetServerSidedWeapons(playerid);
+
+							SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
+							SetPlayerArmour(receiverid, 0.0);
+							ResetServerSidedWeapons(receiverid);
 
 							PlayerExtra[receiverid][peTazer] = 0;
 						}
@@ -16918,7 +16920,7 @@ stock ShowPlayerStats(playerid, receiverid)
 			GetPlayerFactionRankName(playerid)
 		);
 	}
-	if(PlayerInfo[playerid][pJob] > 0)
+	else if(PlayerInfo[playerid][pJob] > 0)
 	{
 		SendFormat(receiverid, 0xFCFCFCFF, "[Darbas: \"%s\" > {DADADA}/jobstats{FCFCFC}]", 
 			GetJobName(PlayerInfo[playerid][pJob])
@@ -20204,7 +20206,7 @@ stock PayDay(playerid)
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`Amount`");
 	log_set_values("'%d','%e','Gavo alga','%d'", LogPlayerId(playerid), LogPlayerName(playerid), payday);
 	log_commit();
-	SaveAccount(playerid);
+	SaveAccount(playerid, .save_inventory = true);
 	return 1;
 }
 
@@ -22693,8 +22695,7 @@ stock SaveAccount(playerid, bool:save_inventory = false, bool:save_groups = true
 	/*
 	 *
 	 */
-	new string[1024],
-		Float:x, Float:y, Float:z, Float:a;
+	new Float:x, Float:y, Float:z, Float:a;
 	if(PlayerInfo[playerid][pViewStatus] == PLAYER_VIEW_STATUS_NONE)
 	{
 		GetPlayerPos(playerid, x, y, z);
@@ -22707,15 +22708,55 @@ stock SaveAccount(playerid, bool:save_inventory = false, bool:save_groups = true
 		z = PlayerInfo[playerid][pPosZ];
 	}
 	GetPlayerFacingAngle(playerid, a);
-	mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET X = '%f', Y = '%f', Z = '%f', A = '%f', Skin = '%d', XP = '%d', Level = '%d', SideJob = '%d',", x, y, z, a, PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pXP], PlayerInfo[playerid][pLevel], PlayerInfo[playerid][pSideJob]);
-	mysql_format(chandler, string, sizeof string, "%sJob = '%d', JobContract = '%d', JobXP = '%d', JobLevel = '%d', PayCheck = '%d', HaveCars = '%d', PayDayCollected = '%d',", string, PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobContract], PlayerInfo[playerid][pJobXP], PlayerInfo[playerid][pJobLevel], PlayerInfo[playerid][pPayCheck], PlayerInfo[playerid][pHaveCars], PlayerInfo[playerid][pPayDayCollected]);
-	mysql_format(chandler, string, sizeof string, "%sMoney = '%d', Faction = '%d', PayDayTime = '%d', Savings = '%d', Bank = '%d', VW = '%d', Interior = '%d', FactionLeader = '%d',", string, GetPlayerMoney(playerid), PlayerInfo[playerid][pFaction], PlayerInfo[playerid][pPayDayTime], PlayerInfo[playerid][pSavings], PlayerInfo[playerid][pBank], GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), PlayerInfo[playerid][pFactionLeader]);
-	mysql_format(chandler, string, sizeof string, "%sHoursPlayed = '%d', BankCard = '%d', PoliceBadge = '%d', FactionPermission1 = '%d', FactionPermission2 = '%d', FactionPermission3 = '%d',", string, PlayerInfo[playerid][pHoursPlayed], PlayerInfo[playerid][pBankCard], PlayerInfo[playerid][pPoliceBadge], PlayerInfo[playerid][pFactionPermissions][0], PlayerInfo[playerid][pFactionPermissions][1], PlayerInfo[playerid][pFactionPermissions][2]);
-	mysql_format(chandler, string, sizeof string, "%sPhoneNumber = '%d', JailTime = '%d', JailType = '%d', Fishes = '%d', FishedLimit = '%d'", string, PlayerInfo[playerid][pPhoneNumber], PlayerInfo[playerid][pJailTime], PlayerInfo[playerid][pJailType], PlayerInfo[playerid][pFishes], PlayerInfo[playerid][pFishedLimit]);
-	mysql_format(chandler, string, sizeof string, "%s WHERE id = '%d'", string, PlayerInfo[playerid][pId]);
-	mysql_fquery(chandler, string, "AccountSave");
-	mysql_format(chandler, string, sizeof string, "UPDATE `dealers_data` SET Type = '%d' WHERE PlayerId = '%d' AND Active = '1'", PlayerInfo[playerid][pDealer], PlayerInfo[playerid][pId]);
-	mysql_fquery(chandler, string, "AccountSave");
+	
+	inline savePlayer()
+	{
+		if(mysql_errno() != 0)
+		{
+			printf("Klaida saugant zaideja %s(%d)! %d", ret_GetPlayerName(playerid), PlayerInfo[playerid][pId], mysql_errno());
+		}
+		return 1;
+	}
+	
+	mysql_tquery_inline(chandler, using inline savePlayer, "\
+		UPDATE `players_data` SET X = '%f', Y = '%f', Z = '%f', A = '%f', Skin = '%d', XP = '%d', Level = '%d', SideJob = '%d' WHERE id = '%d'", 
+		x, y, z, a, PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pXP], PlayerInfo[playerid][pLevel], PlayerInfo[playerid][pSideJob],
+		PlayerInfo[playerid][pId]
+	);
+	mysql_tquery_inline(chandler, using inline savePlayer, "\
+		UPDATE `players_data` SET Job = '%d', JobContract = '%d', JobXP = '%d', JobLevel = '%d', PayCheck = '%d', \
+		HaveCars = '%d', PayDayCollected = '%d' WHERE id = '%d'", 
+		PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobContract], PlayerInfo[playerid][pJobXP],
+		PlayerInfo[playerid][pJobLevel], PlayerInfo[playerid][pPayCheck], PlayerInfo[playerid][pHaveCars],
+		PlayerInfo[playerid][pPayDayCollected],
+		PlayerInfo[playerid][pId]
+	);
+	mysql_tquery_inline(chandler, using inline savePlayer, "\
+		UPDATE `players_data` SET Money = '%d', Faction = '%d', PayDayTime = '%d', Savings = '%d', Bank = '%d', \
+		VW = '%d', Interior = '%d', FactionLeader = '%d' WHERE id = '%d'", 
+		GetPlayerMoney(playerid), PlayerInfo[playerid][pFaction], PlayerInfo[playerid][pPayDayTime],
+		PlayerInfo[playerid][pSavings], PlayerInfo[playerid][pBank], GetPlayerVirtualWorld(playerid),
+		GetPlayerInterior(playerid), PlayerInfo[playerid][pFactionLeader],
+		PlayerInfo[playerid][pId]
+	);
+	mysql_tquery_inline(chandler, using inline savePlayer, "\
+		UPDATE `players_data` SET HoursPlayed = '%d', BankCard = '%d', PoliceBadge = '%d', FactionPermission1 = '%d', \
+		FactionPermission2 = '%d', FactionPermission3 = '%d' WHERE id = '%d'",
+		PlayerInfo[playerid][pHoursPlayed], PlayerInfo[playerid][pBankCard], PlayerInfo[playerid][pPoliceBadge],
+		PlayerInfo[playerid][pFactionPermissions][0], PlayerInfo[playerid][pFactionPermissions][1], PlayerInfo[playerid][pFactionPermissions][2],
+		PlayerInfo[playerid][pId]
+	);
+	mysql_tquery_inline(chandler, using inline savePlayer, "\
+		UPDATE `players_data` SET PhoneNumber = '%d', JailTime = '%d', JailType = '%d', Fishes = '%d', \
+		FishedLimit = '%d' WHERE id = '%d'", 
+		PlayerInfo[playerid][pPhoneNumber], PlayerInfo[playerid][pJailTime], PlayerInfo[playerid][pJailType],
+		PlayerInfo[playerid][pFishes], PlayerInfo[playerid][pFishedLimit],
+		PlayerInfo[playerid][pId]
+	);
+	mysql_tquery_inline(chandler, using inline savePlayer, "\
+		UPDATE `dealers_data` SET Type = '%d' WHERE PlayerId = '%d' AND Active = '1'",
+		PlayerInfo[playerid][pDealer], PlayerInfo[playerid][pId]
+	);
 
 	if(save_user)
 	{
@@ -22895,9 +22936,11 @@ public AccountLoad(playerid)
 			PlayerInfo[playerid][pFaction] = 0;
 			SaveAccountIntEx(playerid, "Faction", 0);
 		}
+
 		new tmpint;
 		cache_get_value_name_int(0, "Money", tmpint);
 		GivePlayerMoney(playerid, tmpint);
+
 		cache_get_value_name_int(0, "Skin", PlayerInfo[playerid][pSkin]);
 		//if(!(0 <= PlayerInfo[playerid][pSkin] <= 311)) PlayerInfo[playerid][pSkin] = 1;
 		cache_get_value_name_int(0, "Interior", PlayerInfo[playerid][pInterior]);
@@ -25465,7 +25508,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 				}
 				
 				SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_DMV, DmvCheckpoints[type][0][0], DmvCheckpoints[type][0][1], DmvCheckpoints[type][0][2], 2.3);
-				SendFormat(playerid, 0xFFC1C1FF, "Linkime sëkmës laikant {DF7878}praktikos egzaminà {FFC1C1}(naudokite /maxspeed 60).");
+				SendFormat(playerid, 0xFFC1C1FF, "Linkime sëkmës laikant {DF7878}praktikos egzaminà {FFC1C1}(naudokite /maxspeed 80).");
 
 			}
 			return 1;
@@ -25735,13 +25778,13 @@ hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 				(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_GOLD)
 			)
 			{
-				new string[256];
+				new string[300];
 				mysql_format(chandler, string, sizeof string, "SELECT \
 					vdb.*, \
 				    COUNT(var.id) AS CrimesCount \
 				FROM vehicles_data vdb \
 				LEFT JOIN vehicles_arrested var ON vdb.id = var.VehicleId AND var.Valid = 1 \
-				WHERE vdb.id = '%d' GROUP BY vdb.id", vehiclesql);
+				WHERE vdb.id = '%d' AND vdb.SpawnedId = '0' GROUP BY vdb.id", vehiclesql);
 				//mysql_format(chandler, string, sizeof string, "SELECT *,COUNT FROM `vehicles_data` WHERE id = '%d'", tmpArray[playerid][(tmpPage_Object[playerid]*4)-(4-td)]);
 				mysql_tquery(chandler, string, "VehicleGet", "dd", playerid, td);
 			}
@@ -26110,9 +26153,6 @@ public VehicleGet(playerid, textdraw_index)
 
 	if((vehicleid = CreateVehicle(model, x, y, z, a, color1, color2, -1, 0)) != INVALID_VEHICLE_ID)
 	{
-		// Iskart updatiname data
-		mysql_query(chandler, va_return("UPDATE `vehicles_data` SET SpawnedId = '%d' WHERE id = '%d'", vehicleid, sql_id), false);
-
 		PlayerTextDrawHide(playerid, VL_FindBox[playerid][textdraw_index]);
 		PlayerTextDrawHide(playerid, VL_SpawnBox[playerid][textdraw_index]);
 		PlayerTextDrawHide(playerid, VL_FindText[playerid][textdraw_index]);
@@ -26136,6 +26176,9 @@ public VehicleGet(playerid, textdraw_index)
 		PlayerTextDrawShow(playerid, VL_FindBox[playerid][textdraw_index]);
 		PlayerTextDrawShow(playerid, VL_SpawnText[playerid][textdraw_index]);
 		cache_get_value_name_int(0, "id", VehicleInfo[vehicleid][vId]);
+
+		SaveVehicleIntEx(vehicleid, "SpawnedId", vehicleid);
+
 		cache_get_value_name_int(0, "Dealer", VehicleInfo[vehicleid][vDealer]);
 		cache_get_value_name_int(0, "Ticket", VehicleInfo[vehicleid][vTicket]);
 		new numbers[86], panels, doors, lights, tires, health;
@@ -29701,7 +29744,7 @@ CMD:mdc(playerid, params[])
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		new v_factionid = GetFactionArrayIndexById(VehicleInfo[GetPlayerVehicleID(playerid)][vFaction]);
-		if(FactionInfo[v_factionid][fType] == FACTION_TYPE_POLICE) allowed = true;
+		if(v_factionid != -1 && FactionInfo[v_factionid][fType] == FACTION_TYPE_POLICE) allowed = true;
 	}
 	else if(
 		IsPlayerInPD(playerid) || 
@@ -29729,6 +29772,7 @@ CMD:mdclothes(playerid, params[])
 		}
 		else ShowModelSelectionMenu(playerid, mdskinslist, "Apranga");
 	}
+	else SendWarning(playerid, "Nesate viduje.");
 	return 1;
 }
 CMD:pdclothes(playerid, params[])
@@ -29744,6 +29788,7 @@ CMD:pdclothes(playerid, params[])
 		}
 		else ShowModelSelectionMenu(playerid, pdskinslist, "Apranga");
 	}
+	else SendWarning(playerid, "Nesate viduje.");
 	return 1;
 }
 CMD:heal(playerid, params[])
@@ -30205,7 +30250,8 @@ CMD:studiosmslist(playerid, params[])
 {
 	new
 		factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-	if(factionid == -1 || FactionInfo[factionid][fType] != FACTION_TYPE_SAN_NEWS) return SendWarning(playerid, "Jûsø frakcija ðios negalimybës neturi.");
+	if(factionid == -1 || FactionInfo[factionid][fType] != FACTION_TYPE_SAN_NEWS)
+		return SendWarning(playerid, "Jûsø frakcija ðios negalimybës neturi.");
 	mysql_tquery(chandler, "SELECT * FROM `san_news_sms` ORDER BY Date DESC LIMIT 50;", "SanNewsSMSLoad", "d", playerid);
 	return 1;
 }
@@ -30218,6 +30264,8 @@ public SanNewsSMSLoad(playerid)
 		text[128];
 
 	dialog_Clear();
+
+	if(!cache_num_rows()) return SendWarning(playerid, "Þinuèiø nëra.");
 
 	for(new i = 0, rows = cache_num_rows(); i < rows; i++)
 	{
@@ -30545,7 +30593,6 @@ CMD:trunkweapon(playerid, params[])
 						}
 					}
 				}
-				break;
 			}
 		}
 		SendWarning(playerid, "Ðio ginklo Jums padëti á ðià tr. priemonæ negalima.");
@@ -30607,6 +30654,7 @@ CMD:wepstore(playerid, params[])
 			ShowPlayerDialog(playerid, DIALOG_WEAPON_STORE, DIALOG_STYLE_LIST, "Policijos ginklinë", "Desert Eagle\nBananas\nAðarinës dujos\nShotgun\nCamera", "Imti", "Atðaukti");
 		}
 	}
+	else SendWarning(playerid, "Nesate viduje.");
 	return 1;
 }
 
@@ -31867,6 +31915,8 @@ CMD:leavefaction(playerid, params[])
 		}
 		PlayerExtra[playerid][pePoliceBadgeText] = INVALID_3DTEXT_ID;
 
+		SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
+		SetPlayerArmour(playerid, 0.0);
 		ResetServerSidedWeapons(playerid);
 	}
 	else
@@ -33265,6 +33315,10 @@ CMD:p(playerid, params[])
 alias:h("hangup","hang");
 CMD:h(playerid, params[])
 {
+	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USECELLPHONE)
+	{
+		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+	}
 	if(PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID || PhoneInfo[playerid][phoneRinging] != INVALID_PLAYER_ID)
 	{
 		// jau kalba su kazkuo
@@ -34584,7 +34638,7 @@ CMD:maxspeed(playerid, params[])
 	new speed;
 	if(GetPlayerVehicleSeat(playerid) != 0) return InfoBox(playerid, IB_NOT_IN_VEHICLE);
 	if(sscanf(params,"d",speed)) return SendUsage(playerid, "/maxspeed [greitis]");
-	if(speed < 30)
+	if(speed < 30 || PlayerExtra[playerid][peSpeedLimit] > 0)
 	{
 		PlayerExtra[playerid][peSpeedLimit] = 0;
 		MsgSuccess(playerid, "RIBOTUVAS", "Iðjungëte greièio ribotuvà.");

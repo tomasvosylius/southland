@@ -362,7 +362,10 @@ static _Business_ChangeOwner(playerid, business, error[] = "")
                         log_commit();
                         return 1;
                     }
-                    mysql_tquery_inline(chandler, using inline updateBusiness, "UPDATE `business_data` SET Owner = '0' WHERE id = '%d'", BusinessInfo[business][bId]);
+                    mysql_tquery_inline(chandler, using inline updateBusiness, "\
+                        UPDATE `business_data` SET Owner = '%d' WHERE id = '%d'",
+                        ownersql, BusinessInfo[business][bId]
+                    );
                 }
                 else return _Business_ChangeOwner(playerid, business, .error = "Þaidëjas tokiu vardu/SQL ID neegzistuoja!");
             }   

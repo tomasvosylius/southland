@@ -17,7 +17,6 @@ enum E_CCTV_PLAYER_DATA
 	pCctvBeforeInt,
 	Float:pCctvUDDeg,
 	Float:pCctvLRDeg,
-	pCctvTimer,
 	bool:pCctvActive,
 	pCctvCurrent
 };
@@ -63,7 +62,6 @@ new CCTV[][E_CCTV_ARRAY_DATA] = {
 
 hook OnPlayerDisconnect(playerid)
 {
-	if(pCCTV[playerid][pCctvActive]) KillTimer(pCCTV[playerid][pCctvTimer]);
 	//reset(CCTV, pCCTV[playerid], E_CCTV_PLAYER_DATA);
 	new __reset_CCTV_Player[E_CCTV_PLAYER_DATA];
 	pCCTV[playerid] = __reset_CCTV_Player;
@@ -79,18 +77,23 @@ stock CCTV_StartStream(playerid, cctv)
 	if(0 <= cctv < sizeof CCTV)
 	{
 		pCCTV[playerid][pCctvActive] = true;
-		pCCTV[playerid][pCctvTimer] = SetTimerEx("CCTVMoveTimer", 100, true, "dd", playerid, cctv);
 		pCCTV[playerid][pCctvCurrent] = cctv;
+		defer PT_CCTVMove(playerid, cctv);
+
 		GetPlayerPos(playerid, pCCTV[playerid][pCctvBeforeX], pCCTV[playerid][pCctvBeforeY], pCCTV[playerid][pCctvBeforeZ]);
 		SetPlayerPos(playerid, CCTV[cctv][cctvX], CCTV[cctv][cctvY], -1.0);
 		SetPlayerCameraPos(playerid, CCTV[cctv][cctvX], CCTV[cctv][cctvY], CCTV[cctv][cctvZ]);
+		
 		CCTV_MoveCamera(playerid, 0.0, 0.0, cctv);
+		
 		pCCTV[playerid][pCctvBeforeVW] = GetPlayerVirtualWorld(playerid);
 		pCCTV[playerid][pCctvBeforeInt] = GetPlayerInterior(playerid);
 		PlayerInfo[playerid][pViewStatus] = PLAYER_VIEW_STATUS_CCTV;
+		
 		SetPlayerInterior(playerid, CCTV[cctv][cctvInterior]);
 		SetPlayerVirtualWorld(playerid, 0);
 		TogglePlayerControllable(playerid, false);
+
 		SendFormat(playerid, 0x7BC19EFF, "Kameros valdymas: up, down, left, right mygtukais.");
 		return true;
 	}
@@ -101,7 +104,6 @@ stock CCTV_StopStream(playerid)
 {
 	if(pCCTV[playerid][pCctvActive])
 	{
-		KillTimer(pCCTV[playerid][pCctvTimer]);
 		new __reset_CCTV_Player[E_CCTV_PLAYER_DATA];
 		SetPlayerInterior(playerid, pCCTV[playerid][pCctvBeforeInt]);
 		SetPlayerVirtualWorld(playerid, pCCTV[playerid][pCctvBeforeVW]);
@@ -115,9 +117,10 @@ stock CCTV_StopStream(playerid)
 	return false;
 }
 
-forward CCTVMoveTimer(playerid, cctv);
-public CCTVMoveTimer(playerid, cctv)
+timer PT_CCTVMove[100](playerid, cctv)
 {
+	if(!pCCTV[playerid][pCctvActive]) return;
+
 	new 
 		unused,
 		ud,
@@ -153,7 +156,7 @@ public CCTVMoveTimer(playerid, cctv)
 			CCTV_MoveCamera(playerid, pCCTV[playerid][pCctvLRDeg], pCCTV[playerid][pCctvUDDeg], pCCTV[playerid][pCctvCurrent]);
 		}
 	}
-	return 1;
+	defer PT_CCTVMove(playerid, cctv);
 }
 
 stock CCTV_MoveCamera(playerid, Float:lrdeg, Float:uddeg, cctv)

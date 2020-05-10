@@ -290,7 +290,10 @@ static _Houses_ChangeOwner(playerid, house, error[] = "")
                         log_commit();
                         return 1;
                     }
-                    mysql_tquery_inline(chandler, using inline updateHouse, "UPDATE `houses_data` SET Owner = '0' WHERE id = '%d'", HouseInfo[house][hId]);
+                    mysql_tquery_inline(chandler, using inline updateHouse, "\
+                        UPDATE `houses_data` SET Owner = '%d' WHERE id = '%d'", 
+                        ownersql, HouseInfo[house][hId]
+                    );
                 }
                 else return _Houses_ChangeOwner(playerid, house, .error = "Þaidëjas tokiu vardu/SQL ID neegzistuoja!");
             }   
@@ -443,7 +446,7 @@ static _Houses_Delete(playerid, house)
     mysql_tquery_inline(chandler, using inline deleteHouse, "\
         DELETE FROM `houses_data` WHERE id = '%d';\
         DELETE FROM `houses_inventory` WHERE house = '%d';\
-        DELETE FROM `houses_dubkeys` WHERE house = '%d'", 
+        DELETE FROM `houses_dubkeys` WHERE house = '%d';", 
         HouseInfo[house][hId], HouseInfo[house][hId], HouseInfo[house][hId]
     );
     HouseInfo[house] = __reset_House;
