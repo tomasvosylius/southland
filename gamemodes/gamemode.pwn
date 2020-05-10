@@ -62,7 +62,7 @@ native WP_Hash(buffer[], len, const str[]);
 native gpci(playerid, serial[], len);
 // ==============================================================================
 // Serveris
-#define CODE_VERSION 		1.2.1
+#define CODE_VERSION 		1.2.2
 #define CODE_VERSION_P 		1147
 #define SERVER_DEBUG_LEVEL 	3 		// [0:nieko] [1:errorai, gm klaidos] [2:visi callbackai] [3:funkcijos]
 //#define BETA_TEST_MODE 	// galima /reportbug naudot
