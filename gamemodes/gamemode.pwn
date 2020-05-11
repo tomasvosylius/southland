@@ -2029,6 +2029,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other\map\vm_corner.pwn"
 #include "other\map\corona247.pwn"
 #include "other\map\mechanics2.pwn"
+#include "other\map\lspd_renew.pwn"
 #include "other\map\detailings.pwn"
 #include "other\map\misc.pwn"
 #include "other\map\interiors.pwn"

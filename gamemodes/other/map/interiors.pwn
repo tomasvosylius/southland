@@ -11444,7 +11444,7 @@ hook OnGameModeInit()
 	SetDynamicObjectMaterial(tmpobjid, 0, 19480, "signsurf", "sign", 0x00000000);
 	SetDynamicObjectMaterial(tmpobjid, 1, 19480, "signsurf", "sign", 0x00000000);
 	SetDynamicObjectMaterial(tmpobjid, 2, 19480, "signsurf", "sign", 0x00000000);
-	SetDynamicObjectMaterialText(tmpobjid, 0, "PERSONAL ONLY", 130, "Quartz MS", 50, 0, 0xFFFFFFFF, 0x00000000, 0);
+	SetDynamicObjectMaterialText(tmpobjid, 0, "PERSONNEL ONLY", 130, "Quartz MS", 50, 0, 0xFFFFFFFF, 0x00000000, 0);
 	tmpobjid = CreateDynamicObject(19566,2266.507,-70.082,1024.272,0.000,0.000,0.000,-1,-1,-1,300.000,300.000);
 	SetDynamicObjectMaterial(tmpobjid, 0, 18773, "tunnelsections", "stonewall4", 0x00000000);
 	tmpobjid = CreateDynamicObject(19858,2266.045,-46.645,1025.680,0.000,0.000,0.000,-1,-1,-1,300.000,300.000);
