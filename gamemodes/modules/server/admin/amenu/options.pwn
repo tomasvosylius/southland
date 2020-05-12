@@ -316,7 +316,6 @@ static _Opts_OnOff_Main(playerid)
 {
     dialog_Clear();
     dialog_AddLine("{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë");
-    dialog_AddLine("{FFFFFF}Furniture multi-select sistema\t%s", GetGVarInt("EnabledFurnitureMultiSelect") > 0 ? ("Ájungta") : ("Iðjungta"));
     dialog_AddLine("Pervedimø sistema\t%s", GetGVarInt("EnabledTransactions") > 0 ? ("Ájungta") : ("Iðjungta"));
     dialog_AddLine("Saugoti iðmestus daiktus\t%s", GetGVarInt("EnabledDroppedItemsSaving") > 0 ? ("Taip") : ("Ne"));
     dialog_AddLine("Darbø 3DTextLabel tekstai\t%s", GetGVarInt("EnabledJobLabels") > 0 ? ("Rodomi") : ("Iðjungti"));
@@ -329,11 +328,6 @@ static _Opts_OnOff_Main(playerid)
         {
             new perm[56], 
                 setting[56];
-            dialog_Row("Furniture multi-select")
-            {
-                format(perm, 56, "EnableFurnitureMultiSelect");
-                format(setting, 56, "EnabledFurnitureMultiSelect");
-            }
             dialog_Row("Saugoti iðmestus daiktus")     
             {
                 format(perm, 56, "EnableDroppedItemsSaving");
@@ -377,13 +371,6 @@ static _Opts_OnOff_Main(playerid)
 
                 switch(YHash(setting, false))
                 {
-                    case _I<EnabledFurnitureMultiSelect>: 
-                    {
-                        foreach(new receiver : Player)
-                        {
-                            FurnitureMultiSelectionEnabled{receiver} = !!current_set;
-                        }
-                    }
                     case _I<EnableBusinessLabels>: 
                     {
                         foreach(new businessid : Business) Business_FixLabels(businessid, current_set);

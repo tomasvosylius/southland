@@ -20,8 +20,12 @@
 #define ALS_DO_FullPayday<%0> %0<FullPayday,>(none:)
 #define ALS_DO_NewDay<%0> %0<NewDay,>(none:)
 
+// Loads
 #define ALS_DO_MysqlEstablished<%0> %0<MysqlEstablished,>(none:)
 #define ALS_DO_ServerOptionsLoad<%0> %0<ServerOptionsLoad,>(none:)
+#define ALS_DO_HouseLoad<%0> %0<HouseLoad,i>(end:house)
+#define ALS_DO_BusinessLoad<%0> %0<BusinessLoad,i>(end:business)
+#define ALS_DO_GarageLoad<%0> %0<GarageLoad,i>(end:garage)
 
 #define ALS_DO_PlayerEngineTurning<%0> %0<PlayerEngineTurning,iii>(more:playerid,more:vehicleid,end:have_permission)
 
