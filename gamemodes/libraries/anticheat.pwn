@@ -2099,7 +2099,7 @@ public t_ac__WeaponsTimer()
 			#pragma unused playerWeapon
 			for(new slot = 0; slot < 13; slot++)
 			{
-				if(FAC_CheckWeaponCheat(playerid, slot, true))
+				if(FAC_CheckWeaponCheat(playerid, slot, true, __line))
 				{
 					#if AC_WEAPONS_SKIP_MULTIPLE_BANS
 						break; // cheata radom, breakinam, kad nespamintu apie tolimesnisu cheatintus ginklus.
@@ -2119,7 +2119,7 @@ public t_ac__WeaponsTimer()
 
 public FAC_OnPlayerWeaponChanged(playerid, newweapon, oldweapon)
 {
-	if(newweapon != 0) FAC_CheckWeaponCheat(playerid, newweapon, false);
+	if(newweapon != 0) FAC_CheckWeaponCheat(playerid, newweapon, false, __line);
 	else if(oldweapon != 0)
 	{
 		new 
@@ -2135,7 +2135,7 @@ public FAC_OnPlayerWeaponChanged(playerid, newweapon, oldweapon)
 			}
 			else
 			{
-				FAC_CheckWeaponCheat(playerid, slot, true);
+				FAC_CheckWeaponCheat(playerid, slot, true, __line);
 			}
 		}
 	}
@@ -2143,7 +2143,7 @@ public FAC_OnPlayerWeaponChanged(playerid, newweapon, oldweapon)
 	return 1;
 }
 
-stock FAC_CheckWeaponCheat(playerid, id, bool:byslot)
+stock FAC_CheckWeaponCheat(playerid, id, bool:byslot, line = 0)
 {
 	new 
 		slot;
@@ -2156,7 +2156,12 @@ stock FAC_CheckWeaponCheat(playerid, id, bool:byslot)
 		if(	(ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] != l_data[0] && l_data[0] != 0 && l_data[1] > 0) || 
 			(ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] < l_data[1] && l_data[1] > 0 && l_data[0] > 0))
 		{
-			printf("CHEAT: cln[%d]:[%d] 	  srv[%d]:[%d]", l_data[0], l_data[1], ac__PlayerWeapons[playerid][slot][e_ac_WeaponId], ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo]);
+			printf("FAC_CheckWeaponCheat(%d, id: %d, byslot: %d) .pwn:%d", playerid, id, _:byslot, line);
+			printf("CHEAT: cln[%d]:[%d] 	  srv[%d]:[%d]", 
+				l_data[0], l_data[1],
+				ac__PlayerWeapons[playerid][slot][e_ac_WeaponId], ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo]
+			);
+
 			ac__IgnoreWeapons[playerid] = 3;
 			FAC_ResetPlayerWeapons(playerid);
 
@@ -2186,6 +2191,7 @@ stock FAC_ResetPlayerWeapons(playerid)
 		ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] = 0;
 	}
 	ac__LastWeapon[playerid] = 0;
+	ac__IgnoreWeapons[playerid] = 3;
 
 	return result;
 }
@@ -2215,6 +2221,7 @@ stock PlayerHasWeaponInSlot(playerid, slot)
 
 stock RemovePlayerWeaponInSlot(playerid, remove)
 {
+	printf("RemovePlayerWeaponInSlot: %d [slot: %d]", playerid, remove);
 	/**
 		Removing su SetPlayerAmmo,
 		o veliau timeryje tikrint, jei ammo = 0, bet weaponid > 0, nustatyti WeaponId=0.
@@ -2224,12 +2231,7 @@ stock RemovePlayerWeaponInSlot(playerid, remove)
 		data[2];
 
 	GetPlayerWeaponData(playerid, remove, data[0], data[1]);
-	if(data[0] != 0)
-	{
-		return FAC_SetPlayerAmmo(playerid, data[0], 0);
-	}
-	return false;
-	
+	return FAC_SetPlayerAmmo(playerid, data[0], 0);
 /*	for(new slot = 0; slot < 13; slot++)
 	{
 		if(slot != remove) GetPlayerWeaponData(playerid, slot, data[slot][0], data[slot][1]);
@@ -2267,6 +2269,7 @@ stock FAC_GetWeaponSlot(weaponid)
 
 stock FAC_SetPlayerAmmo(playerid, weaponid, ammo)
 {
+	printf("FAC_SetPlayerAmmo: %d, [wep:%d, ammo:%d]", playerid, weaponid, ammo);
 	new 
 		result = SetPlayerAmmo(playerid, weaponid, ammo),
 		slot;
@@ -2281,6 +2284,7 @@ stock FAC_SetPlayerAmmo(playerid, weaponid, ammo)
 		{
 			ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] += ammo;
 		}
+		ac__IgnoreWeapons[playerid] = 3;
 	}
 	return result;
 }
@@ -2304,6 +2308,7 @@ stock FAC_GivePlayerWeapon(playerid, weaponid, ammo)
 			ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] = ammo;
 		}
 		ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] = weaponid;
+		ac__IgnoreWeapons[playerid] = 3;
 		new ret = GivePlayerWeapon(playerid, weaponid, ammo);
 		return ret;
 	}

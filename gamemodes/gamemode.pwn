@@ -26660,7 +26660,8 @@ CMD:pickcases(playerid, params[])
 	return 1;
 }
 
-CMD:tazer(playerid, params[])
+alias:taser("tazer");
+CMD:taser(playerid, params[])
 {
 	new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
 	if(factionid == -1) return InfoBox(playerid, IB_NOT_IN_FACTION);
