@@ -64,7 +64,7 @@ static _Garages_Add(playerid)
 
             Iter_Add(Garage, garage);
             
-            FixGarageLabels(garage);
+            Garage_FixLabels(garage);
             MsgSuccess(playerid, "SERVERIS", "Sëkmingai sukûrëte garaþà, kurio ID: %d", GarageInfo[garage][gId]);
 
             log_init(true);
@@ -192,7 +192,7 @@ static _Garages_ChangePrice(playerid, garage, error[] = "")
                 return _Garages_ChangePrice(playerid, garage, .error = "Blogai ávestas skaièius.");
 
             GarageInfo[garage][gPrice] = amount;
-            FixGarageLabels(garage);
+            Garage_FixLabels(garage);
 
             inline updateGarage()
             {
@@ -257,7 +257,7 @@ static _Garages_ChangeOwner(playerid, garage, error[] = "")
                     inline updateGarage()
                     {
                         GarageInfo[garage][gOwner] = ownersql;
-                        FixGarageLabels(garage);
+                        Garage_FixLabels(garage);
                         MsgSuccess(playerid, "Garaþai", "Pakeitëte garaþo savininkà (savininko ID: %d).", ownersql);
                         _Garages_ShowDetails(playerid, garage);
 
@@ -298,7 +298,7 @@ static _Garages_ChangeEnter(playerid, garage)
     GarageInfo[garage][gEnterX] = x,
     GarageInfo[garage][gEnterY] = y,
     GarageInfo[garage][gEnterZ] = z;
-    FixGarageLabels(garage);
+    Garage_FixLabels(garage);
 
     inline updateGarage()
     {
@@ -334,7 +334,7 @@ static _Garages_ChangeExit(playerid, garage)
     GarageInfo[garage][gExitX] = x,
     GarageInfo[garage][gExitY] = y,
     GarageInfo[garage][gExitZ] = z;
-    FixGarageLabels(garage);
+    Garage_FixLabels(garage);
 
     inline updateGarage()
     {

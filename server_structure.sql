@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `business_data` (
   `ExitX` float NOT NULL,
   `ExitY` int(11) NOT NULL,
   `ExitZ` int(11) NOT NULL,
+  `OutFurnitureRange` float not null,
   `ExtraX` float NOT NULL,
   `ExtraY` float NOT NULL,
   `ExtraZ` float NOT NULL,
@@ -115,8 +116,8 @@ CREATE TABLE IF NOT EXISTS `business_dubkeys` (
 --
 
 CREATE TABLE IF NOT EXISTS `business_furniture` (
-`id` int(11) NOT NULL,
-  `BusinessId` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `OwnerId` int(11) NOT NULL,
   `Model` int(11) NOT NULL,
   `X` float NOT NULL,
   `Y` float NOT NULL,
@@ -124,26 +125,13 @@ CREATE TABLE IF NOT EXISTS `business_furniture` (
   `RX` float NOT NULL,
   `RY` float NOT NULL,
   `RZ` float NOT NULL,
+  `PlaceType` tinyint(1) NOT NULL,
   `VW` int(11) NOT NULL,
-  `Interior` int(11) NOT NULL,
+  `Int` int(11) NOT NULL,
   `Name` varchar(24) COLLATE utf8_lithuanian_ci NOT NULL,
   `Added` int(11) NOT NULL,
-  `Category` varchar(86) COLLATE utf8_lithuanian_ci NOT NULL,
   `Price` int(11) NOT NULL,
-  `Type` tinyint(1) NOT NULL,
-  `Date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `Texture0` smallint(6) NOT NULL,
-  `Texture1` smallint(6) NOT NULL,
-  `Texture2` smallint(6) NOT NULL,
-  `Texture3` smallint(6) NOT NULL,
-  `Texture4` smallint(6) NOT NULL,
-  `Texture5` smallint(6) NOT NULL,
-  `Color0` smallint(6) NOT NULL,
-  `Color1` smallint(6) NOT NULL,
-  `Color2` smallint(6) NOT NULL,
-  `Color3` smallint(6) NOT NULL,
-  `Color4` smallint(6) NOT NULL,
-  `Color5` smallint(6) NOT NULL
+  `Date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_lithuanian_ci;
 
 -- --------------------------------------------------------
@@ -658,8 +646,8 @@ CREATE TABLE IF NOT EXISTS `garages_data` (
 --
 
 CREATE TABLE IF NOT EXISTS `garages_furniture` (
-`id` int(11) NOT NULL,
-  `GarageId` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `OwnerId` int(11) NOT NULL,
   `Model` int(11) NOT NULL,
   `X` float NOT NULL,
   `Y` float NOT NULL,
@@ -668,25 +656,11 @@ CREATE TABLE IF NOT EXISTS `garages_furniture` (
   `RY` float NOT NULL,
   `RZ` float NOT NULL,
   `VW` int(11) NOT NULL,
-  `Interior` int(11) NOT NULL,
+  `Int` int(11) NOT NULL,
   `Name` varchar(24) NOT NULL,
   `Price` mediumint(9) NOT NULL,
-  `Added` int(11) NOT NULL,
-  `Category` varchar(86) NOT NULL,
   `Date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `Type` tinyint(4) NOT NULL,
-  `Texture0` int(11) NOT NULL,
-  `Texture1` int(11) NOT NULL,
-  `Texture2` int(11) NOT NULL,
-  `Texture3` int(11) NOT NULL,
-  `Texture4` int(11) NOT NULL,
-  `Texture5` int(11) NOT NULL,
-  `Color0` int(11) NOT NULL,
-  `Color1` int(11) NOT NULL,
-  `Color2` int(11) NOT NULL,
-  `Color3` int(11) NOT NULL,
-  `Color4` int(11) NOT NULL,
-  `Color5` int(11) NOT NULL
+  `PlaceType` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -1588,6 +1562,7 @@ CREATE TABLE IF NOT EXISTS `houses_data` (
   `ExitX` float NOT NULL,
   `ExitY` float NOT NULL,
   `ExitZ` float NOT NULL,
+  `OutFurnitureRange` float not null,
   `Interior` int(11) NOT NULL,
   `VW` int(11) NOT NULL,
   `Owner` int(11) NOT NULL,
@@ -1631,8 +1606,8 @@ CREATE TABLE IF NOT EXISTS `houses_dubkeys` (
 --
 
 CREATE TABLE IF NOT EXISTS `houses_furniture` (
-`id` int(11) NOT NULL,
-  `HouseId` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `OwnerId` int(11) NOT NULL,
   `Model` int(11) NOT NULL,
   `X` float NOT NULL,
   `Y` float NOT NULL,
@@ -1641,25 +1616,11 @@ CREATE TABLE IF NOT EXISTS `houses_furniture` (
   `RY` float NOT NULL,
   `RZ` float NOT NULL,
   `VW` int(11) NOT NULL,
-  `Interior` int(11) NOT NULL,
+  `Int` int(11) NOT NULL,
   `Name` varchar(24) COLLATE utf8_lithuanian_ci NOT NULL,
   `Price` int(11) NOT NULL,
-  `Added` int(11) NOT NULL,
-  `Category` varchar(86) COLLATE utf8_lithuanian_ci NOT NULL,
   `Date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `Type` tinyint(4) NOT NULL,
-  `Texture0` smallint(6) NOT NULL,
-  `Texture1` smallint(6) NOT NULL,
-  `Texture2` smallint(6) NOT NULL,
-  `Texture3` smallint(6) NOT NULL,
-  `Texture4` smallint(6) NOT NULL,
-  `Texture5` smallint(6) NOT NULL,
-  `Color0` smallint(6) NOT NULL,
-  `Color1` smallint(6) NOT NULL,
-  `Color2` smallint(6) NOT NULL,
-  `Color3` smallint(6) NOT NULL,
-  `Color4` smallint(6) NOT NULL,
-  `Color5` smallint(6) NOT NULL
+  `PlaceType` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_lithuanian_ci;
 
 -- --------------------------------------------------------

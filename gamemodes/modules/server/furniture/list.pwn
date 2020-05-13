@@ -1,3 +1,24 @@
+enum E_FURNITURE_LIST_DATA
+{
+	furnitureListCategory,
+	furnitureListName[34],
+	furnitureListModel,
+	furnitureListPrice
+};
+
+enum E_FURNITURE_TEXTURES_DATA
+{
+	textureModel,
+	textureFile[32],
+	textureName[32]
+};
+
+enum E_FURNITURE_COLORS_DATA
+{
+	colorName[32],
+	colorCode
+};
+
 #define FURNITURE_CATEGORY_LAMPS 		0
 #define FURNITURE_CATEGORY_DOORS 		1
 #define FURNITURE_CATEGORY_WALLS 		2
@@ -18,6 +39,7 @@
 #define FURNITURE_CATEGORY_TRASH 		17
 #define FURNITURE_CATEGORY_CURTAIN 		18
 #define FURNITURE_CATEGORY_STAIRS 		19
+#define FURNITURE_CATEGORY_OUTSIDE		20
 
 new FurnitureTextures[][E_FURNITURE_TEXTURES_DATA] = {
 	{0, "none", "none"},
@@ -188,7 +210,7 @@ new FurnitureColors[][E_FURNITURE_COLORS_DATA] = {
 	{"Tamsi roþinë", 0xFF610B5E}
 };
 
-new FurnitureListNames[][36] = {
+new FurnitureListNames_Inside[][36] = {
 	/* FURNITURE_CATEGORY_LAMPS */ {"Ðviestuvai"},
 	/* FURNITURE_CATEGORY_DOORS */ {"Durys"},
 	/* FURNITURE_CATEGORY_WALLS */ {"Sienos"},
@@ -209,6 +231,9 @@ new FurnitureListNames[][36] = {
 	/* FURNITURE_CATEGORY_TRASH */ {"Ðiukðlës"},
 	/* FURNITURE_CATEGORY_CURTAIN */ {"Uþuolaidos"},
 	/* FURNITURE_CATEGORY_STAIRS */ {"Laiptai"}
+};
+new FurnitureListNames_Outside[][13] = {
+	/* FURNITURE_CATEGORY_OUTSIDE */ {"Lauko baldai"}
 };
 
 new FurnitureList[][E_FURNITURE_LIST_DATA] = {
@@ -1560,5 +1585,11 @@ new FurnitureList[][E_FURNITURE_LIST_DATA] = {
 	{FURNITURE_CATEGORY_OTHER, "Virvë", 19088, 20},
 	{FURNITURE_CATEGORY_OTHER, "Virvë", 19089, 20},
 	{FURNITURE_CATEGORY_OTHER, "tinklas", 2945, 50},
-	{FURNITURE_CATEGORY_OTHER, "stiklas", 19325, 100}
+	{FURNITURE_CATEGORY_OTHER, "stiklas", 19325, 100},
+
+	{FURNITURE_CATEGORY_OUTSIDE, "Sofa", 1763, 200},
+	{FURNITURE_CATEGORY_OUTSIDE, "Sulankstoma kede", 2121, 100},
+	{FURNITURE_CATEGORY_OUTSIDE, "Restorano kede", 2807, 150},
+	{FURNITURE_CATEGORY_OUTSIDE, "Stalas su kedem", 1432, 500},
+	{FURNITURE_CATEGORY_OUTSIDE, "Grilius", 19831, 200}
 };

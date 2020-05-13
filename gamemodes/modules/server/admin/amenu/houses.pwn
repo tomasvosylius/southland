@@ -163,6 +163,7 @@ static _Houses_ShowDetails(playerid, house)
     dialog_AddLine("{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë");
     dialog_AddLine("Kaina\t$%d", HouseInfo[house][hPrice]);
     dialog_AddLine("Savininkas\t%s", GetNameBySql(HouseInfo[house][hOwner]));
+    dialog_AddLine("Lauko furniture range\t%0.1f", HouseInfo[house][hOutFurnitureRange]);
     dialog_AddLine("Keisti áëjimo vietà");
     dialog_AddLine("Keisti iðëjimo vietà");
     dialog_AddLine("Iðvalyti baldus");
@@ -177,6 +178,7 @@ static _Houses_ShowDetails(playerid, house)
         {
             dialog_Row("Kaina")                           return _Houses_ChangePrice(playerid, house);
             dialog_Row("Savininkas")                      return _Houses_ChangeOwner(playerid, house);
+            dialog_Row("Lauko furniture range")           return _Houses_ChangeFurnitureRange(playerid, house);
             dialog_Row("Keisti áëjimo vietà")             return _Houses_ChangeEnter(playerid, house);
             dialog_Row("Keisti iðëjimo vietà")            return _Houses_ChangeExit(playerid, house);
             dialog_Row("Iðvalyti baldus")                 return _Houses_ClearFurniture(playerid, house);
@@ -300,6 +302,49 @@ static _Houses_ChangeOwner(playerid, house, error[] = "")
             mysql_tquery_inline(chandler, using inline getPlayerId, query);
         }
         else _Houses_ShowDetails(playerid, house);
+    }
+    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Namo redagavimas", "Keisti", "Atðaukti");
+    return 1;
+}
+
+static _Houses_ChangeFurnitureRange(playerid, house, error[] = "")
+{
+    if(!HaveAdminPermission(playerid, "EditHouseOwner"))
+    {
+        InfoBox(playerid, IB_NO_PRIVILEGE);
+        return _Houses_ShowList(playerid);
+    }
+    dialog_Clear();
+    dialog_AddLine("{FFFFFF}Áveskite naujà namo lauko furniture spindulá.");
+    dialog_AddLine("{FFFFFF}Pvz. 20.0");
+    dialog_AddErrorLine(error);
+    inline input(response, listitem)
+    {
+        if(response)
+        {
+            new Float:range;
+            if(sscanf(dialog_Input(),"f",range) || range < 0.0)
+                return _Houses_ChangeFurnitureRange(playerid, house, .error = "Blogai ávestas skaièius.");
+            
+            HouseInfo[house][hOutFurnitureRange] = range;
+            
+            inline updateHouse()
+            {
+                MsgSuccess(playerid, "Namai", "Pakeitëte namo lauko furniture range á %.1f", range);
+                return 1;
+            }
+            mysql_tquery_inline(chandler, using inline updateHouse, "\
+                UPDATE `houses_data` SET OutFurnitureRange = '%f' WHERE id = '%d'",
+                range, HouseInfo[house][hId]
+            );
+            
+            log_init(true);
+            log_set_table("logs_admins");
+            log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
+            log_set_values("'%d','%e','(AM) Pakeite namo fur.range','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[house][hId], floatround(range));
+            log_commit();
+        }
+        _Houses_ShowDetails(playerid, house);
     }
     dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Namo redagavimas", "Keisti", "Atðaukti");
     return 1;

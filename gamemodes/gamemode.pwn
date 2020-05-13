@@ -48,6 +48,7 @@
 #include <colandreas>
 #include <timestamp>
 #include <mSelection>
+#include <previewmodel>
 #include <screen>
 #include <requests>
 #include <garage_block>
@@ -89,9 +90,6 @@ native gpci(playerid, serial[], len);
 #define MAX_MAP_ICONS					100
 #define MAX_GARAGES 					200
 #define MAX_ATMS						50
-#define MAX_HOUSE_FURNITURES 			12000
-#define MAX_BUSINESS_FURNITURES 		12000
-#define MAX_GARAGE_FURNITURES 			12000
 #define MAX_FACTIONS					10
 #define MAX_FACTION_RANKS				20
 #define MAX_BUG_REPORT_TEXT	 			1024
@@ -109,6 +107,12 @@ native gpci(playerid, serial[], len);
 #define MAX_PLAYER_IP 					21
 #define MAX_SHELLS 						5
 #define MAX_WATER_AREAS 				303
+// Donators, remejai
+#define MAX_AFK_TIME_NO_DONATOR			8
+#define MAX_AFK_TIME_SILVER_USER		14	
+#define MAX_AFK_TIME_GOLD_USER			20
+#define TIME_TO_RESET_DONATOR 			2592000 // 30days
+
 // namu baldai
 #define MAX_HFURNITURE 					150
 #define MAX_HFURNITURE_BRONZE 			250
@@ -124,11 +128,7 @@ native gpci(playerid, serial[], len);
 #define MAX_GFURNITURE_BRONZE 			100
 #define MAX_GFURNITURE_SILVER 			200
 #define MAX_GFURNITURE_GOLD 			300
-// Donators, remejai
-#define MAX_AFK_TIME_NO_DONATOR			8
-#define MAX_AFK_TIME_SILVER_USER		14	
-#define MAX_AFK_TIME_GOLD_USER			20
-#define TIME_TO_RESET_DONATOR 			2592000 // 30days
+
 
 // Inventorius
 #define MAX_INVENTORY_SLOTS 				15
@@ -165,7 +165,6 @@ native gpci(playerid, serial[], len);
 #define TIME_TO_DELETE_DROPS			18000 // 5val.  	60sec= 1mmin // kas kiek UNIX sec issitrins visi objektai
 #define MINUTES_TO_PLAY_FOR_PAYDAY 				15 // kiek minuciu reik prazaist, kad gautum payday
 #define ADMIN_PERMISSIONS_PER_PAGE		18 // kiek permisionu per page rodyt ( << >> )
-#define MAX_FURNITURE_PER_PAGE 			180
 #define MAX_HOUSES_PER_PAGE 			100
 #define MAX_BUSINESS_PER_PAGE 			100
 // ==============================================================================
@@ -229,7 +228,6 @@ native gpci(playerid, serial[], len);
 #define MAX_LOCK_LEVEL					4
 #define MAX_OWNED_VEHICLES				10
 #define VEHICLE_ARRAY_LIMIT				20
-#define FURNITURE_ARRAY_LIMIT 			150
 #define VEHICLE_BUY_PARK_PRICE 			300
 #define VEHICLE_REGISTER_PRICE 			150
 #define TRUNKS_SPACE_POLICE_WEAPONS		200
@@ -237,23 +235,6 @@ native gpci(playerid, serial[], len);
 // Dialogai
 #define DIALOG_NONE 					0
 #define DIALOG_PASSWORD 				1
-#define DIALOG_FURNITURE_MAIN			4
-#define DIALOG_FURNITURE_OWNED			5
-#define DIALOG_FURNITURE_EDIT_MAIN		6
-#define DIALOG_FURNITURE_CATEGORIES		7
-#define DIALOG_FURNITURE_BUYABLE		8
-#define DIALOG_FURNITURE_CHANGE_NAME	9
-#define DIALOG_FURNITURE_CHANGE_RX		10
-#define DIALOG_FURNITURE_CHANGE_RY		11
-#define DIALOG_FURNITURE_CHANGE_RZ		12
-#define DIALOG_FURNITURE_TEXTURES		13
-#define DIALOG_FURNITURE_TEXTURE_EDIT	14
-#define DIALOG_FURNITURE_COLORS_LIST	15
-#define DIALOG_FURNITURE_TEXTURES_LIST	16
-#define DIALOG_FURNITURE_EDIT_SELECTED	17
-#define DIALOG_FURNITURE_CHANGE_RX_M	18
-#define DIALOG_FURNITURE_CHANGE_RY_M	19
-#define DIALOG_FURNITURE_CHANGE_RZ_M	20
 #define DIALOG_CARGO_LIST				21
 #define DIALOG_MECHANIC_SELECT_COLORS	23
 #define DIALOG_INVENTORY				24
@@ -318,7 +299,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_HM_DUBKEY_EDIT_MAIN 		142
 #define DIALOG_HM_UPDATES_MAIN 			143
 
-#define DIALOG_AFURNITURE_MAIN 			145
 #define DIALOG_HM_SAFE_MAIN  			146
 #define DIALOG_HM_SAFE_DEPOSIT 			147
 #define DIALOG_HM_SAFE_WITHDRAW 		148
@@ -556,7 +536,6 @@ native gpci(playerid, serial[], len);
 #define DONATOR_SILVER 					2
 #define DONATOR_GOLD					3
 // Invalids
-#define INVALID_FURNITURE 				-1
 #undef INVALID_OBJECT_ID
 #define INVALID_OBJECT_ID 				-1
 #define INVALID_HOUSE_ID				-1
@@ -654,9 +633,8 @@ native gpci(playerid, serial[], len);
 #define FACTION_TYPE_LEGAL 				5
 #define FACTION_TYPE_SAN_NEWS			6
 
-#define EDITING_TYPE_DYNAMIC_FURNITURE	1
-#define EDITING_TYPE_DYNAMIC_ATM 		2
-#define EDITING_TYPE_DYNAMIC_PAYPHONE 	3
+#define EDITING_TYPE_DYNAMIC_ATM 		1
+#define EDITING_TYPE_DYNAMIC_PAYPHONE 	2
 
 #define WHEELSFRONT_LEFT	0
 #define WHEELSFRONT_RIGHT	1
@@ -698,16 +676,15 @@ native gpci(playerid, serial[], len);
 #define ESC_TYPE_NONE 					0
 #define ESC_TYPE_VLIST					1
 #define ESC_TYPE_VSHOP					2
-#define ESC_TYPE_FURNITURE				3
-#define ESC_TYPE_MECHTUNE				4
-#define ESC_TYPE_LOGIN					5
-#define ESC_TYPE_ATM					6
-#define ESC_TYPE_DMV 					7
-#define ESC_TYPE_PHONE 					8
-#define ESC_TYPE_MDC 					9
-#define ESC_TYPE_PAYPHONE 				10
-#define ESC_TYPE_CHARSELECT 			11
-#define ESC_TYPE_CHARCREATE 			12
+#define ESC_TYPE_MECHTUNE				3
+#define ESC_TYPE_LOGIN					4
+#define ESC_TYPE_ATM					5
+#define ESC_TYPE_DMV 					6
+#define ESC_TYPE_PHONE 					7
+#define ESC_TYPE_MDC 					8
+#define ESC_TYPE_PAYPHONE 				9
+#define ESC_TYPE_CHARSELECT 			10
+#define ESC_TYPE_CHARCREATE 			11
 
 #define CHECKPOINT_TYPE_VEHICLE 			1
 #define CHECKPOINT_TYPE_JOB 				2
@@ -845,7 +822,7 @@ native gpci(playerid, serial[], len);
 forward OnPlayerJobTimeExpired(playerid, jobid, actionid, type);
 
 forward OnPlayerUseInventoryItem(playerid, slotid);
-forward OnPlayerDropInventoryItem(playerid, type, itter, slotid);
+forward OnPlayerDropInventoryItem(playerid, type, iter, slotid);
 forward OnPlayerPutInventoryItem(playerid, slotid, to_type, to_itter);
 forward OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot);
 forward OnPlayerGiveInventoryItem(playerid, slotid);
@@ -1252,6 +1229,7 @@ enum E_HOUSE_DATA
 	Float:hExitX,
 	Float:hExitY,
 	Float:hExitZ,
+	Float:hOutFurnitureRange,
 	// Extra enters-exits
 	hExtraExterior[MAX_HOUSE_EXTRA_ENTERS],
 	hExtraInterior[MAX_HOUSE_EXTRA_ENTERS],
@@ -1336,6 +1314,7 @@ enum E_BUSINESS_DATA
 	Float:bExtraX,
 	Float:bExtraY,
 	Float:bExtraZ,
+	Float:bOutFurnitureRange,
 	// Extra enters-exits
 	bExtraExterior[MAX_BUSINESS_EXTRA_ENTERS],
 	bExtraInterior[MAX_BUSINESS_EXTRA_ENTERS],
@@ -1406,59 +1385,7 @@ enum E_FACTION_TRUNK_WEAPONS_DATA
 };
 new VehicleWeaponsInventory[MAX_VEHICLES][MAX_VEHICLE_WEAPON_SLOTS][E_FACTION_TRUNK_WEAPONS_DATA];
 
-enum E_HOUSE_FURNITURE_DATA
-{
-	hfId,
-	hfModel,
-	hfOwner,
-	hfType,
-	hfObject,
-	hfPrice,
-	hfVW,
-	hfName[34],
-	hfInterior,
-	hfColor[MAX_TEXTURE_SLOTS],
-	hfTexture[MAX_TEXTURE_SLOTS],
-	Float:hfPos[3],
-	Float:hfRot[3]
-};
-new hFurnitureInfo[MAX_HOUSE_FURNITURES][E_HOUSE_FURNITURE_DATA];
 
-enum E_BUSINESS_FURNITURE_DATA
-{
-	bfId,
-	bfModel,
-	bfOwner,
-	bfType,
-	bfObject,
-	bfPrice,
-	bfVW,
-	bfName[34],
-	bfInterior,
-	bfColor[MAX_TEXTURE_SLOTS],
-	bfTexture[MAX_TEXTURE_SLOTS],
-	Float:bfPos[3],
-	Float:bfRot[3]
-};
-new bFurnitureInfo[MAX_BUSINESS_FURNITURES][E_BUSINESS_FURNITURE_DATA];
-
-enum E_GARAGE_FURNITURE_DATA
-{
-	gfId,
-	gfModel,
-	gfOwner,
-	gfType,
-	gfObject,
-	gfPrice,
-	gfVW,
-	gfName[34],
-	gfInterior,
-	gfColor[MAX_TEXTURE_SLOTS],
-	gfTexture[MAX_TEXTURE_SLOTS],
-	Float:gfPos[3],
-	Float:gfRot[3]
-};
-new gFurnitureInfo[MAX_GARAGE_FURNITURES][E_GARAGE_FURNITURE_DATA];
 
 enum E_SELL_VEHICLE_DATA
 {
@@ -1505,27 +1432,6 @@ enum E_JOB_DATA
 	jobContract,
 	Text3D:jobLabel,
 	jobPickup
-};
-
-enum E_FURNITURE_LIST_DATA
-{
-	furnitureListCategory,
-	furnitureListName[34],
-	furnitureListModel,
-	furnitureListPrice
-};
-
-enum E_FURNITURE_TEXTURES_DATA
-{
-	textureModel,
-	textureFile[32],
-	textureName[32]
-};
-
-enum E_FURNITURE_COLORS_DATA
-{
-	colorName[32],
-	colorCode
 };
 
 enum E_CLOTHES_LIST_DATA
@@ -1576,9 +1482,6 @@ new PlayerDamages[MAX_PLAYERS][30][E_PLAYER_DAMAGES_INFO];
 // Global kintamieji
 new Iterator:House<MAX_HOUSES>,
 	Iterator:Business<MAX_BUSINESS>,
-	Iterator:HFurniture<MAX_HOUSE_FURNITURES>,
-	Iterator:BFurniture<MAX_BUSINESS_FURNITURES>,
-	Iterator:GFurniture<MAX_GARAGE_FURNITURES>,
 	Iterator:Salon<MAX_SALONS>,
 	Iterator:SellVehicle<MAX_SALON_MODELS>,
 	Iterator:DroppedItem<MAX_DROPPED_ITEMS>,
@@ -1599,16 +1502,11 @@ new
 		CollectedReportBugData[MAX_PLAYERS][MAX_BUG_REPORT_TEXT],
 	#endif
 	Roadblocks[MAX_ROADBLOCKS],
-	tmpFurniturePage[MAX_PLAYERS],
 
 	tmpAmenuCurPage[MAX_PLAYERS],
 	tmpAmenuIter[MAX_PLAYERS],
 	bool:tmpAmenuNextPage[MAX_PLAYERS],
 
-	bool:tmpFurnitureNextPage[MAX_PLAYERS],
-	Float:FurniturePreview_RX[MAX_PLAYERS],
-	Float:FurniturePreview_RY[MAX_PLAYERS],
-	Float:FurniturePreview_RZ[MAX_PLAYERS],
 	tmpType_Salon[MAX_PLAYERS],
 	tmpTexture_MarkStart_CP[MAX_PLAYERS],
 	tmpArray[MAX_PLAYERS][150],
@@ -1636,7 +1534,6 @@ new
 	Offer[MAX_PLAYERS][4],
 	bool:OOCChanelEnabled = false,
 	bool:DisabledPM[MAX_PLAYERS],
-	bool:FurnitureMultiSelectionEnabled[MAX_PLAYERS char],
 	bool:ShowingInfoBar[MAX_PLAYERS char],
 	bool:ShowingJailTimer[MAX_PLAYERS char],
 	bool:ShowingJobGUI[MAX_PLAYERS char],
@@ -2025,7 +1922,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 //#include "core\map\alhambra_replacement.pwn"
 // #include "core\map\empty_houses.pwn"
 
-#include "other\map\vm.pwn"
+/*#include "other\map\vm.pwn"
 #include "other\map\vm_corner.pwn"
 #include "other\map\corona247.pwn"
 #include "other\map\mechanics2.pwn"
@@ -2044,7 +1941,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other\map\bank.pwn"
 #include "other\map\train_ganton.pwn"
 #include "other\map\train_jefferson.pwn"
-#include "other\map\pier.pwn"
+#include "other\map\pier.pwn"*/
 
 // #include "other\map\mechanics.pwn"
 // #include "other\map\china_town.pwn"
@@ -2070,16 +1967,16 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 // #include "core\map\deja_vu.pwn"
 // #include "core\map\idlewood_park.pwn"
 
-/** Lists etc. */
-#include "other/furniture_list.pwn"
-#include "other/clothes_list.pwn"
-#include "other/body_parts.pwn"
-
 /** Libraries */
+#include "hooks.pwn"
 #include "libraries/samp.pwn"
 #include "libraries/macros.pwn"
 #include "libraries/chat.pwn"
-#include "libraries/als.pwn"
+
+/** Lists etc. */
+#include "other/clothes_list.pwn"
+#include "other/body_parts.pwn"
+
 
 #include "libraries/dialog.pwn"
 #include "libraries/anticheat.pwn"
@@ -2123,6 +2020,11 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\server\admin\amenu/factions.pwn"
 #include "modules\server\admin\amenu/business.pwn"
 #include "modules\server\admin\amenu/carshops.pwn"
+
+// Furniture
+#include "modules\server\furniture/list.pwn"
+#include "modules\server\furniture/core.pwn"
+#include "modules\server\furniture/menu.pwn"
 
 // Jobs
 #include "modules\server\jobs/thief.pwn"
@@ -2274,9 +2176,6 @@ public OnGameModeInit()
 	LoadAvailableWares();
 	LoadATMs();
 	LoadPayPhones();
-	LoadHouseFurniture(false);
-	LoadBusinessFurniture(false);
-	LoadGarageFurniture(false);
 	LoadSalons(false);
 	LoadSellVehicles(false);
 	LoadServerVehicles(false);
@@ -2462,7 +2361,7 @@ ptask PT_DeathTimer[1002](playerid)
 		new string[86],
 			seconds, minutes;
 		divmod(PlayerExtra[playerid][peDeath], 60, seconds, minutes);
-		format(string, sizeof string, "_~n~~w~KOMOS BUSENOJE: ~r~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~/die~n~_", seconds, minutes);
+		format(string, sizeof string, "_~n~~w~KOMOS BUSENOJE: ~r~~h~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~~h~/die~n~_", seconds, minutes);
 
 		if(GetPlayerDistanceFromPoint(playerid,
 			PlayerInfo[playerid][pPosX],
@@ -5000,112 +4899,10 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		Float:oldz, Float:oldrz;
 	GetDynamicObjectPos(objectid, oldx, oldy, oldz);
 	GetDynamicObjectRot(objectid, oldrx, oldry, oldrz);
-	if(response == EDIT_RESPONSE_FINAL)
-	{
-		switch(tmpEditing_Component_DMV[playerid])
-		{
-			case EDITING_TYPE_DYNAMIC_FURNITURE:
-			{
-				// furniture
-				switch(tmpType_Salon[playerid])
-				{
-					case 1:
-					{
-						// namas
-						if(GetDistanceBetweenPoints3D(x, y, z, HouseInfo[tmpIter[playerid]][hExitX], HouseInfo[tmpIter[playerid]][hExitY], HouseInfo[tmpIter[playerid]][hExitZ]) > 100.0)
-						{
-							SendFormat(playerid, 0xBABABAFF, "Esate per daug nutolæ nuo pastato.");
-							SetDynamicObjectPos(objectid, oldx, oldy, oldz);
-							SetDynamicObjectRot(objectid, oldrx, oldry, oldrz);
-							OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-							return 1;
-						}
-						new string[186],
-							selected = tmpSelected[playerid];
-						hFurnitureInfo[selected][hfPos][0] = x;
-						hFurnitureInfo[selected][hfPos][1] = y;
-						hFurnitureInfo[selected][hfPos][2] = z;
-						hFurnitureInfo[selected][hfRot][0] = rx;
-						hFurnitureInfo[selected][hfRot][1] = ry;
-						hFurnitureInfo[selected][hfRot][2] = rz;
-						tmpEditing_Component_DMV[playerid] = 0;
-						SetDynamicObjectPos(hFurnitureInfo[selected][hfObject], x, y, z);
-						SetDynamicObjectRot(hFurnitureInfo[selected][hfObject], rx, ry, rz);
-						mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET X = '%f', Y = '%f', Z = '%f', RX = '%f', RY = '%f', RZ = '%f' WHERE id = '%d'", x, y, z, rx, ry, rz, hFurnitureInfo[selected][hfId]);
-						mysql_fquery(chandler, string, "FurnitureSaved");
-						InfoBox(playerid, "~g~ISSAUGOTA", "OBJEKTO POZICIJA");
-						OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-					}
-					case 2:
-					{
-						// verslas
-						if(GetDistanceBetweenPoints3D(x, y, z, BusinessInfo[tmpIter[playerid]][bExitX], BusinessInfo[tmpIter[playerid]][bExitY], BusinessInfo[tmpIter[playerid]][bExitZ]) > 100.0)
-						{
-							SendFormat(playerid, 0xBABABAFF, "Esate per daug nutolæ nuo pastato.");
-							SetDynamicObjectPos(objectid, oldx, oldy, oldz);
-							SetDynamicObjectRot(objectid, oldrx, oldry, oldrz);
-							OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-							return 1;
-						}
-						new string[186],
-							selected = tmpSelected[playerid];
-						bFurnitureInfo[selected][bfPos][0] = x;
-						bFurnitureInfo[selected][bfPos][1] = y;
-						bFurnitureInfo[selected][bfPos][2] = z;
-						bFurnitureInfo[selected][bfRot][0] = rx;
-						bFurnitureInfo[selected][bfRot][1] = ry;
-						bFurnitureInfo[selected][bfRot][2] = rz;
-						tmpEditing_Component_DMV[playerid] = 0;
-						SetDynamicObjectPos(bFurnitureInfo[selected][bfObject], x, y, z);
-						SetDynamicObjectRot(bFurnitureInfo[selected][bfObject], rx, ry, rz);
-						mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET X = '%f', Y = '%f', Z = '%f', RX = '%f', RY = '%f', RZ = '%f' WHERE id = '%d'", x, y, z, rx, ry, rz, bFurnitureInfo[selected][bfId]);
-						mysql_fquery(chandler, string, "FurnitureSaved");
-						InfoBox(playerid, "~g~ISSAUGOTA", "OBJEKTO POZICIJA");
-						OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-					}
-					case 3:
-					{
-						// garazas
-						if(GetDistanceBetweenPoints3D(x, y, z, GarageInfo[tmpIter[playerid]][gExitX], GarageInfo[tmpIter[playerid]][gExitY], GarageInfo[tmpIter[playerid]][gExitZ]) > 100.0)
-						{
-							SendFormat(playerid, 0xBABABAFF, "Esate per daug nutolæ nuo pastato.");
-							SetDynamicObjectPos(objectid, oldx, oldy, oldz);
-							SetDynamicObjectRot(objectid, oldrx, oldry, oldrz);
-							OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-							return 1;
-						}
-						new string[186],
-							selected = tmpSelected[playerid];
-						gFurnitureInfo[selected][gfPos][0] = x;
-						gFurnitureInfo[selected][gfPos][1] = y;
-						gFurnitureInfo[selected][gfPos][2] = z;
-						gFurnitureInfo[selected][gfRot][0] = rx;
-						gFurnitureInfo[selected][gfRot][1] = ry;
-						gFurnitureInfo[selected][gfRot][2] = rz;
-						tmpEditing_Component_DMV[playerid] = 0;
-						SetDynamicObjectPos(gFurnitureInfo[selected][gfObject], x, y, z);
-						SetDynamicObjectRot(gFurnitureInfo[selected][gfObject], rx, ry, rz);
-						mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET X = '%f', Y = '%f', Z = '%f', RX = '%f', RY = '%f', RZ = '%f' WHERE id = '%d'", x, y, z, rx, ry, rz, gFurnitureInfo[selected][gfId]);
-						mysql_fquery(chandler, string, "FurnitureSaved");
-						InfoBox(playerid, "~g~ISSAUGOTA", "OBJEKTO POZICIJA");
-						OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-					}
-				}
-			}
-			default:
-			{
-				SetDynamicObjectPos(objectid, x, y, z);
-				SetDynamicObjectRot(objectid, rx, ry, rz);
-			}
-		}
-	}
-	else if(response == EDIT_RESPONSE_CANCEL)
+	if(response == EDIT_RESPONSE_CANCEL)
 	{
 		SetDynamicObjectPos(objectid, oldx, oldy, oldz);
 		SetDynamicObjectRot(objectid, oldrx, oldry, oldrz);
-
-		if(tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_FURNITURE) OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-		tmpEditing_Component_DMV[playerid] = 0;
 	}
 	return 1;
 }
@@ -6047,7 +5844,6 @@ public OnPlayerConnect(playerid)
 			KickEx(playerid);
 		}
 		DMV_Create_Player(playerid);
-		FurnitureTd_Create_Player(playerid);
 		JailTimeTD_Create_Player(playerid);
 		MechTune_Create_Player(playerid);
 		VLTextdraw_Create_Player(playerid);
@@ -10076,7 +9872,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(GarageInfo[tmpIter[playerid]][gSale] > 0)
 						{
 							GarageInfo[tmpIter[playerid]][gSale] = 0;
-							FixGarageLabels(tmpIter[playerid]);
+							Garage_FixLabels(tmpIter[playerid]);
 							SaveGarageIntEx(tmpIter[playerid], "Sale", 0);
 							log_init(true);
 							log_set_table("logs_garages");
@@ -10100,7 +9896,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					garageid = tmpIter[playerid];
 				if(sscanf(inputtext,"d",price) || price < 0) OnDialogResponse(playerid, DIALOG_GM_MAIN, 1, 0, "");
 				GarageInfo[garageid][gSale] = price;
-				FixGarageLabels(garageid);
+				Garage_FixLabels(garageid);
 				SaveGarageIntEx(garageid, "Sale", price);
 				MsgSuccess(playerid, "GARAÞAS", "Sëkmingai ádëjote garaþà á pardavimà uþ $%d", price);
 				pc_cmd_gmenu(playerid, "");
@@ -12442,7 +12238,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				// 0 - guns
 				// 1 - drugs
 				// 2 - all
-				new itter = Iter_Free(DealerHouse),
+				new iter = Iter_Free(DealerHouse),
 					Float:x, Float:y, Float:z,
 					int = GetPlayerInterior(playerid),
 					vw = GetPlayerVirtualWorld(playerid),
@@ -12459,16 +12255,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
 				if(mysql_errno() == 0)
 				{
-					DealerHouseInfo[itter][dealerHouseId] = cache_insert_id();
-					DealerHouseInfo[itter][dealerHouseEnterX] = x,
-					DealerHouseInfo[itter][dealerHouseEnterY] = y,
-					DealerHouseInfo[itter][dealerHouseEnterZ] = z,
-					DealerHouseInfo[itter][dealerHouseExterior] = int,
-					DealerHouseInfo[itter][dealerHouseType] = listitem,
-					DealerHouseInfo[itter][dealerHouseOutVW] = vw;
-					Iter_Add(DealerHouse, itter);
+					DealerHouseInfo[iter][dealerHouseId] = cache_insert_id();
+					DealerHouseInfo[iter][dealerHouseEnterX] = x,
+					DealerHouseInfo[iter][dealerHouseEnterY] = y,
+					DealerHouseInfo[iter][dealerHouseEnterZ] = z,
+					DealerHouseInfo[iter][dealerHouseExterior] = int,
+					DealerHouseInfo[iter][dealerHouseType] = listitem,
+					DealerHouseInfo[iter][dealerHouseOutVW] = vw;
+					Iter_Add(DealerHouse, iter);
 					MsgSuccess(playerid, "JUODOJI RINKA", "Namas sëkmingai pridëtas.");
-					log_set_values("'%d','%e','(BM) Sukure konsp. nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), DealerHouseInfo[itter][dealerHouseId]);
+					log_set_values("'%d','%e','(BM) Sukure konsp. nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), DealerHouseInfo[iter][dealerHouseId]);
 				}
 				else
 				{
@@ -12658,23 +12454,23 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new name[24];
 				if(sscanf(inputtext,"s[24]",name)) return OnDialogResponse(playerid, DIALOG_AM_PARKING_MAIN, 1, 1, "");
-				new itter = Iter_Free(Parking);
-				GetPlayerPos(playerid, ParkingInfo[itter][parkingEnterX], ParkingInfo[itter][parkingEnterY], ParkingInfo[itter][parkingEnterZ]);
-				ParkingInfo[itter][parkingOutVW] = GetPlayerVirtualWorld(playerid);
-				ParkingInfo[itter][parkingInterior] = GetPlayerInterior(playerid);
+				new iter = Iter_Free(Parking);
+				GetPlayerPos(playerid, ParkingInfo[iter][parkingEnterX], ParkingInfo[iter][parkingEnterY], ParkingInfo[iter][parkingEnterZ]);
+				ParkingInfo[iter][parkingOutVW] = GetPlayerVirtualWorld(playerid);
+				ParkingInfo[iter][parkingInterior] = GetPlayerInterior(playerid);
 				new string[256];
-				mysql_format(chandler, string, sizeof string, "INSERT INTO `parkings_data` (`Name`,`EnterX`,`EnterY`,`EnterZ`,`OutVW`,`Exterior`) VALUES ('%e','%f','%f','%f','%d','%d')", name, ParkingInfo[itter][parkingEnterX], ParkingInfo[itter][parkingEnterY], ParkingInfo[itter][parkingEnterZ], ParkingInfo[itter][parkingOutVW], ParkingInfo[itter][parkingExterior]);
+				mysql_format(chandler, string, sizeof string, "INSERT INTO `parkings_data` (`Name`,`EnterX`,`EnterY`,`EnterZ`,`OutVW`,`Exterior`) VALUES ('%e','%f','%f','%f','%d','%d')", name, ParkingInfo[iter][parkingEnterX], ParkingInfo[iter][parkingEnterY], ParkingInfo[iter][parkingEnterZ], ParkingInfo[iter][parkingOutVW], ParkingInfo[iter][parkingExterior]);
 				new Cache:result = mysql_query(chandler, string, true);
-				format(ParkingInfo[itter][parkingName], 24, name);
-				ParkingInfo[itter][parkingId] = cache_insert_id();
+				format(ParkingInfo[iter][parkingName], 24, name);
+				ParkingInfo[iter][parkingId] = cache_insert_id();
 				cache_delete(result);
-				Iter_Add(Parking, itter);
-				FixParkingLabels(itter);
-				MsgSuccess(playerid, "AIKÐTELËS", "Sëkmingai sukûrëte naujà aikðtelæ, kurios ID: %d", ParkingInfo[itter][parkingId]);
+				Iter_Add(Parking, iter);
+				FixParkingLabels(iter);
+				MsgSuccess(playerid, "AIKÐTELËS", "Sëkmingai sukûrëte naujà aikðtelæ, kurios ID: %d", ParkingInfo[iter][parkingId]);
 				log_init(true);
 				log_set_table("logs_admins");
 				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`");
-				log_set_values("'%d','%e','(AM) Sukure nauja parkinga','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ParkingInfo[itter][parkingId]);
+				log_set_values("'%d','%e','(AM) Sukure nauja parkinga','%d'", LogPlayerId(playerid), LogPlayerName(playerid), ParkingInfo[iter][parkingId]);
 				log_commit();
 			}
 			else OnDialogResponse(playerid, DIALOG_AM_MAIN, 1, 10, "");
@@ -14053,1085 +13849,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				PlayerInfo[playerid][pJobActionIndex] = 0;
 			}
 		}
-		
-		case DIALOG_FURNITURE_MAIN:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					// esami
-					ShowOwnedFurniture(playerid, 0, tmpType_Salon[playerid], tmpIter[playerid]);
-				}
-				if(listitem == 1)
-				{
-					// pirkti
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							// namui
-							if( (PlayerInfo[playerid][pDonator] == DONATOR_NONE && CountHouseFurniture(tmpIter[playerid]) >= MAX_HFURNITURE) ||
-								(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && CountHouseFurniture(tmpIter[playerid]) >= MAX_HFURNITURE_BRONZE) ||
-								(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && CountHouseFurniture(tmpIter[playerid]) >= MAX_HFURNITURE_SILVER) ||
-								(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && CountHouseFurniture(tmpIter[playerid]) >= MAX_HFURNITURE_GOLD))
-							{
-								SendError(playerid, "Jûs jau esatæ pasiekæs baldø limità. Daugiau apie limitus: www."#PROJECT_NAME"."#PROJECT_DOMAIN"");
-								return 1;
-							}
-						}
-						case 2:
-						{
-							// verslui
-							if( (PlayerInfo[playerid][pDonator] == DONATOR_NONE && CountBusinessFurniture(tmpIter[playerid]) >= MAX_BFURNITURE) ||
-								(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && CountBusinessFurniture(tmpIter[playerid]) >= MAX_BFURNITURE_BRONZE) ||
-								(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && CountBusinessFurniture(tmpIter[playerid]) >= MAX_BFURNITURE_SILVER) ||
-								(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && CountBusinessFurniture(tmpIter[playerid]) >= MAX_BFURNITURE_GOLD))
-							{
-								SendError(playerid, "Jûs jau esatæ pasiekæs baldø limità. Daugiau apie limitus: www."#PROJECT_NAME"."#PROJECT_DOMAIN"");
-								return 1;
-							}
-						}
-						case 3:
-						{
-							// garazui
-							if( (PlayerInfo[playerid][pDonator] == DONATOR_NONE && CountGarageFurniture(tmpIter[playerid]) >= MAX_GFURNITURE) ||
-								(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && CountGarageFurniture(tmpIter[playerid]) >= MAX_GFURNITURE_BRONZE) ||
-								(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && CountGarageFurniture(tmpIter[playerid]) >= MAX_GFURNITURE_SILVER) ||
-								(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && CountGarageFurniture(tmpIter[playerid]) >= MAX_GFURNITURE_GOLD))
-							{
-								SendError(playerid, "Jûs jau esatæ pasiekæs baldø limità. Daugiau apie limitus: www."#PROJECT_NAME"."#PROJECT_DOMAIN"");
-								return 1;
-							}
-						}
-					}
-					new string[1024];
-					for(new list = 0; list < sizeof FurnitureListNames; list++)
-					{
-						format(string, sizeof string, "%s%s\n", string, FurnitureListNames[list]);
-					}
-					ShowPlayerDialog(playerid, DIALOG_FURNITURE_CATEGORIES, DIALOG_STYLE_LIST, "Baldø pirkimas", string, "Tæsti", "Atðaukti");
-				}
-			}
-		}
-
-		case DIALOG_FURNITURE_OWNED:
-		{
-			if(response)
-			{
-				/*if(listitem >= tmpTexture_MarkStart_CP[playerid])
-				{
-					if(GetGVarInt("EnabledFurnitureMultiSelect"))
-					{
-						// paspaude Ijungti/isjungti zymejima
-						if(listitem == tmpTexture_MarkStart_CP[playerid])
-						{
-							FurnitureMultiSelectionEnabled{playerid} = !FurnitureMultiSelectionEnabled{playerid};
-							if(FurnitureMultiSelectionEnabled{playerid} == true)
-							{
-								SendFormat(playerid, 0xFFCB69FF, "Ájungëte multi-þymëjimà.");
-							}
-							else
-							{
-								SendFormat(playerid, 0xFFCB69FF, "Iðjungëte multi-þymëjimà.");
-								for(new i = 0; i < FURNITURE_ARRAY_LIMIT; i++)
-								{
-									// nullinam data
-									tmpArray[playerid][i] = 0;
-								}
-							}
-							OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-						}
-						else if(listitem == tmpTexture_MarkStart_CP[playerid]+1)
-						{
-							// pazymeti visus, kitas neimanomas pasirinkimas
-							for(new i = 0; i < FURNITURE_ARRAY_LIMIT; i++)
-							{
-								tmpArray[playerid][i] = 1;
-							}
-							OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-						}
-						else if(listitem == tmpTexture_MarkStart_CP[playerid]+2)
-						{
-							// atzymeti visus kitas neimanomas pasirinkimas cia
-							for(new i = 0; i < FURNITURE_ARRAY_LIMIT; i++)
-							{
-								tmpArray[playerid][i] = 0;
-							}
-							OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-						}
-						else if(listitem == tmpTexture_MarkStart_CP[playerid]+3)
-						{
-							// redaguoti
-							ShowPlayerDialog(playerid, DIALOG_FURNITURE_EDIT_SELECTED, DIALOG_STYLE_LIST, "Pasirinktø baldø redagavimas", "Atstatyti pasukimà\nPasukimo keitimas\nParduoti", "Tæsti", "Atðaukti");
-						}
-					}
-				}
-				else
-				{
-				if(FurnitureMultiSelectionEnabled{playerid} == true)
-				{
-					// pazymejo kazkuri
-					tmpArray[playerid][listitem] = !tmpArray[playerid][listitem];
-					OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-				}*/
-				
-				if(listitem >= MAX_FURNITURE_PER_PAGE)
-				{
-					if(listitem == MAX_FURNITURE_PER_PAGE && tmpFurnitureNextPage[playerid]) ShowOwnedFurniture(playerid, tmpFurniturePage[playerid] + 1, tmpType_Salon[playerid], tmpIter[playerid]);
-					else if((listitem == MAX_FURNITURE_PER_PAGE && !tmpFurnitureNextPage[playerid]) || (listitem == MAX_FURNITURE_PER_PAGE - 1 && tmpFurnitureNextPage[playerid]) && tmpFurniturePage[playerid] > 0)  ShowOwnedFurniture(playerid, tmpFurniturePage[playerid] + 1, tmpType_Salon[playerid], tmpIter[playerid]);
-				}
-				else
-				{
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							// tiesiog rodom editinima
-							new id;
-							foreach(new tmpfurnitureid : HFurniture) // vietoj tmpSlots
-							{
-								if(hFurnitureInfo[tmpfurnitureid][hfOwner] == HouseInfo[tmpIter[playerid]][hId])
-								{
-									if(id == listitem + tmpFurniturePage[playerid]*MAX_FURNITURE_PER_PAGE)
-									{
-										tmpSelected[playerid] = tmpfurnitureid;
-										break;
-									}
-									id++;
-								}
-							}
-						}
-						case 2:
-						{
-							new id;
-							foreach(new tmpfurnitureid : BFurniture) // vietoj tmpSlots
-							{
-								if(bFurnitureInfo[tmpfurnitureid][bfOwner] == BusinessInfo[tmpIter[playerid]][bId])
-								{
-									if(id == listitem + tmpFurniturePage[playerid]*MAX_FURNITURE_PER_PAGE)
-									{
-										tmpSelected[playerid] = tmpfurnitureid;
-										break;
-									}
-									id++;
-								}
-							}
-						}
-						case 3:
-						{
-							new id;
-							foreach(new tmpfurnitureid : GFurniture) // vietoj tmpSlots
-							{
-								if(gFurnitureInfo[tmpfurnitureid][gfOwner] == GarageInfo[tmpIter[playerid]][gId])
-								{
-									if(id == listitem + tmpFurniturePage[playerid]*MAX_FURNITURE_PER_PAGE)
-									{
-										tmpSelected[playerid] = tmpfurnitureid;
-										break;
-									}
-									id++;
-								}
-							}
-						}
-					}
-					ShowPlayerDialog(playerid, DIALOG_FURNITURE_EDIT_MAIN, DIALOG_STYLE_LIST, "Baldo redagavimas", "Pozicijos keitimas\nPervadinti baldà\nAtstatyti pasukimà\nPasukimo keitimas\nTekstûrø keitimas\nDuplikuoti\nParduoti", "Tæsti", "Atðaukti");
-				}
-				//}
-			}
-			else pc_cmd_furniture(playerid, "");
-		}
-
-		case DIALOG_FURNITURE_EDIT_SELECTED:
-		{
-			if(GetGVarInt("EnabledFurnitureMultiSelect"))
-			{
-				if(response)
-				{
-					switch(listitem)
-					{
-						case 0: // atstatyti pasukima
-						{
-							new array[150],
-								index;
-							FurnitureFromIteratorToArray(array, index, tmpType_Salon[playerid], tmpIter[playerid]);
-							for(new i = 0; i < sizeof tmpArray[]; i++)
-							{
-								if(tmpArray[playerid][i] == 1)
-								{
-									// jei sitas pazymetas, tada
-									new string[126];
-									switch(tmpType_Salon[playerid])
-									{
-										case 1:
-										{
-											mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET RX = '0.0', RY = '0.0', RZ = '0.0' WHERE id = '%d'", hFurnitureInfo[array[i]][hfId]);
-											SetDynamicObjectRot(hFurnitureInfo[array[i]][hfObject], 0.0, 0.0, 0.0);
-										}
-										case 2:
-										{
-											mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET RX = '0.0', RY = '0.0', RZ = '0.0' WHERE id = '%d'", bFurnitureInfo[array[i]][bfId]);
-											SetDynamicObjectRot(bFurnitureInfo[array[i]][bfObject], 0.0, 0.0, 0.0);
-										}
-										case 3:
-										{
-											mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET RX = '0.0', RY = '0.0', RZ = '0.0' WHERE id = '%d'", gFurnitureInfo[array[i]][gfId]);
-											SetDynamicObjectRot(gFurnitureInfo[array[i]][gfObject], 0.0, 0.0, 0.0);
-										}
-									}
-									mysql_fquery(chandler, string, "FurnitureSaved");
-									InfoBox(playerid, "~w~POZICIJA", "~g~ATSTATYTA");
-									OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-								}
-							}
-						}
-						case 1: // pasukimas
-						{
-							ShowPlayerDialog(playerid, DIALOG_FURNITURE_CHANGE_RX_M, DIALOG_STYLE_INPUT, "Baldo redagavimas", "{BABABA}Áveskite naujà {FFFFFF}X{BABABA} pasukimo kampà.\n{BABABA}Sekanèiame lange galësite ávesti Y kampà.\nJei nenorite keisti - nieko neáraðykite.", "Tæsti", "Atðaukti");
-						}
-						case 2: // parduoti
-						{
-
-						}
-					}
-				}
-				else OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-			}
-		}
-		case DIALOG_FURNITURE_CHANGE_RX_M:
-		{
-			if(response)
-			{
-				if(strlen(inputtext))
-				{
-					new string[126],
-						array[150],
-						Float:ry,
-						Float:rz,
-						Float:unused,
-						type = tmpType_Salon[playerid],
-						index;
-					FurnitureFromIteratorToArray(array, index, type, tmpIter[playerid]);
-					for(new i = 0; i < sizeof tmpArray[]; i++)
-					{
-						if(tmpArray[playerid][i] == 1)
-						{
-							// sitas pazymetas
-							switch(type)
-							{
-								case 1:
-								{
-									mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET RX = '%f' WHERE id = '%d'", floatstr(inputtext), hFurnitureInfo[array[i]][hfId]);
-									mysql_fquery(chandler, string, "SelectedFurnitureUpdate");
-									GetDynamicObjectRot(hFurnitureInfo[array[i]][hfObject], unused, ry, rz);
-									SetDynamicObjectRot(hFurnitureInfo[array[i]][hfObject], floatstr(inputtext), ry, rz);
-									hFurnitureInfo[array[i]][hfRot][0] = floatstr(inputtext);
-								}
-								case 2:
-								{
-									mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET RX = '%f' WHERE id = '%d'", floatstr(inputtext), bFurnitureInfo[array[i]][bfId]);
-									mysql_fquery(chandler, string, "SelectedFurnitureUpdate");
-									GetDynamicObjectRot(bFurnitureInfo[array[i]][bfObject], unused, ry, rz);
-									SetDynamicObjectRot(bFurnitureInfo[array[i]][bfObject], floatstr(inputtext), ry, rz);
-									bFurnitureInfo[array[i]][bfRot][0] = floatstr(inputtext);
-								}
-								case 3:
-								{
-									mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET RX = '%f' WHERE id = '%d'", floatstr(inputtext), gFurnitureInfo[array[i]][gfId]);
-									mysql_fquery(chandler, string, "SelectedFurnitureUpdate");
-									GetDynamicObjectRot(gFurnitureInfo[array[i]][gfObject], unused, ry, rz);
-									SetDynamicObjectRot(gFurnitureInfo[array[i]][gfObject], floatstr(inputtext), ry, rz);
-									gFurnitureInfo[array[i]][gfRot][0] = floatstr(inputtext);
-								}
-							}
-						}
-					}
-					InfoBox(playerid, "~g~ATNAUJINTAS", "PASUKIMO KAMPAS X");
-				}
-				ShowPlayerDialog(playerid, DIALOG_FURNITURE_CHANGE_RY_M, DIALOG_STYLE_INPUT, "Baldo redagavimas", "{BABABA}Áveskite naujà {FFFFFF}Y{BABABA} pasukimo kampà.\n{BABABA}Sekanèiame lange galësite ávesti Z kampà.\nJei nenorite keisti - nieko neáraðykite.", "Tæsti", "Atðaukti");
-			}
-			else OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-		}
-		case DIALOG_FURNITURE_CHANGE_RY_M:
-		{
-			if(response)
-			{
-				if(strlen(inputtext))
-				{
-					new string[126],
-						Float:rx,
-						array[150],
-						Float:rz,
-						Float:unused,
-						type = tmpType_Salon[playerid],
-						index;
-					FurnitureFromIteratorToArray(array, index, type, tmpIter[playerid]);
-					for(new i = 0; i < sizeof tmpArray[]; i++)
-					{
-						if(tmpArray[playerid][i] == 1)
-						{
-							// sitas pazymetas
-							switch(type)
-							{
-								case 1:
-								{
-									mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET RY = '%f' WHERE id = '%d'", floatstr(inputtext), hFurnitureInfo[array[i]][hfId]);
-									mysql_fquery(chandler, string, "SelectedFurnitureUpdate");
-									GetDynamicObjectRot(hFurnitureInfo[array[i]][hfObject], rx, unused, rz);
-									SetDynamicObjectRot(hFurnitureInfo[array[i]][hfObject], rx, floatstr(inputtext), rz);
-									hFurnitureInfo[array[i]][hfRot][1] = floatstr(inputtext);
-								}
-								case 2:
-								{
-									mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET RY = '%f' WHERE id = '%d'", floatstr(inputtext), bFurnitureInfo[array[i]][bfId]);
-									mysql_fquery(chandler, string, "SelectedFurnitureUpdate");
-									GetDynamicObjectRot(bFurnitureInfo[array[i]][bfObject], rx, unused, rz);
-									SetDynamicObjectRot(bFurnitureInfo[array[i]][bfObject], rx, floatstr(inputtext), rz);
-									bFurnitureInfo[array[i]][bfRot][1] = floatstr(inputtext);
-								}
-								case 3:
-								{
-									mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET RY = '%f' WHERE id = '%d'", floatstr(inputtext), gFurnitureInfo[array[i]][gfId]);
-									mysql_fquery(chandler, string, "SelectedFurnitureUpdate");
-									GetDynamicObjectRot(gFurnitureInfo[array[i]][gfObject], rx, unused, rz);
-									SetDynamicObjectRot(gFurnitureInfo[array[i]][gfObject], rx, floatstr(inputtext), rz);
-									gFurnitureInfo[array[i]][gfRot][1] = floatstr(inputtext);
-								}
-							}
-						}
-					}
-					InfoBox(playerid, "~g~ATNAUJINTAS", "PASUKIMO KAMPAS Y");
-				}
-				ShowPlayerDialog(playerid, DIALOG_FURNITURE_CHANGE_RY_M, DIALOG_STYLE_INPUT, "Baldo redagavimas", "{BABABA}Áveskite naujà {FFFFFF}Z{BABABA} pasukimo kampà.\n{BABABA}Sekanèiame lange galësite ávesti Z kampà.\nJei nenorite keisti - nieko neáraðykite.", "Tæsti", "Atðaukti");
-			}
-			else OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-		}
-		case DIALOG_FURNITURE_CHANGE_RZ_M:
-		{
-			if(response)
-			{
-				if(strlen(inputtext))
-				{
-					new string[126],
-						array[150],
-						Float:rx,
-						Float:ry,
-						Float:unused,
-						type = tmpType_Salon[playerid],
-						index;
-					FurnitureFromIteratorToArray(array, index, type, tmpIter[playerid]);
-					for(new i = 0; i < sizeof tmpArray[]; i++)
-					{
-						if(tmpArray[playerid][i] == 1)
-						{
-							// sitas pazymetas
-							switch(type)
-							{
-								case 1:
-								{
-									mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET RZ = '%f' WHERE id = '%d'", floatstr(inputtext), hFurnitureInfo[array[i]][hfId]);
-									mysql_fquery(chandler, string, "SelectedFurnitureUpdate");
-									GetDynamicObjectRot(hFurnitureInfo[array[i]][hfObject], rx, ry, unused);
-									SetDynamicObjectRot(hFurnitureInfo[array[i]][hfObject], rx, ry, floatstr(inputtext));
-									hFurnitureInfo[array[i]][hfRot][2] = floatstr(inputtext);
-								}
-								case 2:
-								{
-									mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET RZ = '%f' WHERE id = '%d'", floatstr(inputtext), bFurnitureInfo[array[i]][bfId]);
-									mysql_fquery(chandler, string, "SelectedFurnitureUpdate");
-									GetDynamicObjectRot(bFurnitureInfo[array[i]][bfObject], rx, ry, unused);
-									SetDynamicObjectRot(bFurnitureInfo[array[i]][bfObject], rx, ry, floatstr(inputtext));
-									bFurnitureInfo[array[i]][bfRot][2] = floatstr(inputtext);
-								}
-								case 3:
-								{
-									mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET RZ = '%f' WHERE id = '%d'", floatstr(inputtext), gFurnitureInfo[array[i]][gfId]);
-									mysql_fquery(chandler, string, "SelectedFurnitureUpdate");
-									GetDynamicObjectRot(gFurnitureInfo[array[i]][gfObject], rx, ry, unused);
-									SetDynamicObjectRot(gFurnitureInfo[array[i]][gfObject], rx, ry, floatstr(inputtext));
-									gFurnitureInfo[array[i]][gfRot][2] = floatstr(inputtext);
-								}
-							}
-						}
-					}
-					InfoBox(playerid, "~g~ATNAUJINTAS", "PASUKIMO KAMPAS Z");
-				}
-				pc_cmd_furniture(playerid, "");
-			}
-			else OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-		}
-		case DIALOG_FURNITURE_EDIT_MAIN:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0: // pozicija
-					{
-						tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_FURNITURE;
-						switch(tmpType_Salon[playerid])
-						{
-							case 1: EditDynamicObject(playerid, hFurnitureInfo[tmpSelected[playerid]][hfObject]);
-							case 2: EditDynamicObject(playerid, bFurnitureInfo[tmpSelected[playerid]][bfObject]);
-							case 3: EditDynamicObject(playerid, gFurnitureInfo[tmpSelected[playerid]][gfObject]);
-						}
-					}
-					case 1:
-					{
-						new string[156],
-							name[86];
-						switch(tmpType_Salon[playerid])
-						{
-							case 1: format(name, sizeof name, hFurnitureInfo[tmpSelected[playerid]][hfName]);
-							case 2: format(name, sizeof name, bFurnitureInfo[tmpSelected[playerid]][bfName]);
-							case 3: format(name, sizeof name, gFurnitureInfo[tmpSelected[playerid]][gfName]);
-						}
-						format(string, sizeof string, "{BABABA}Áveskite naujà baldo pavadinimà. Dabartinis:\n%s", name);
-						ShowPlayerDialog(playerid, DIALOG_FURNITURE_CHANGE_NAME, DIALOG_STYLE_INPUT, "Baldo redagavimas", string, "Keisti", "Atðaukti");
-					}
-					case 2:
-					{
-						new string[126];
-						switch(tmpType_Salon[playerid])
-						{
-							case 1:
-							{
-								mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET RX = '0.0', RY = '0.0', RZ = '0.0' WHERE id = '%d'", hFurnitureInfo[tmpSelected[playerid]][hfId]);
-								SetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], 0.0, 0.0, 0.0);
-							}
-							case 2:
-							{
-								mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET RX = '0.0', RY = '0.0', RZ = '0.0' WHERE id = '%d'", bFurnitureInfo[tmpSelected[playerid]][bfId]);
-								SetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], 0.0, 0.0, 0.0);
-							}
-							case 3:
-							{
-								mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET RX = '0.0', RY = '0.0', RZ = '0.0' WHERE id = '%d'", gFurnitureInfo[tmpSelected[playerid]][gfId]);
-								SetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], 0.0, 0.0, 0.0);
-							}
-						}
-						mysql_fquery(chandler, string, "FurnitureSaved");
-						InfoBox(playerid, "~w~POZICIJA", "~g~ATSTATYTA");
-						OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-					}
-					case 3:
-					{
-						new string[256],
-							Float:cur, Float:un;
-						switch(tmpType_Salon[playerid])
-						{
-							case 1: GetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], cur, un, un);
-							case 2: GetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], cur, un, un);
-							case 3: GetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], cur, un, un);
-						}
-						format(string, sizeof string, "{BABABA}Áveskite naujà {FFFFFF}X{BABABA} pasukimo kampà. Dabartinis: {FFFFFF}%0.1f\n{BABABA}Sekanèiame lange galësite ávesti Y ir Z kampus.\nJei nenorite keisti - nieko neáraðykite.", cur);
-						ShowPlayerDialog(playerid, DIALOG_FURNITURE_CHANGE_RX, DIALOG_STYLE_INPUT, "Baldo redagavimas", string, "Keisti", "Atðaukti");
-					}
-					case 4:
-					{
-						// teksturos
-						new string[212];
-						for(new i = 0; i < MAX_TEXTURE_SLOTS; i++)	format(string, sizeof string, "%sSlot %d\n", string, i);
-						ShowPlayerDialog(playerid, DIALOG_FURNITURE_TEXTURES, DIALOG_STYLE_LIST, "Baldo redagavimas", string, "Tæsti", "Atðaukti");
-					}
-					case 5:
-					{
-						// duplikuoti
-						// tmpselected = objekto itter
-
-						new price, owner, Float:pos[3], Float:rot[3],
-							model, name[34],
-							selected = tmpSelected[playerid],
-							building = tmpIter[playerid];
-						switch(tmpType_Salon[playerid])
-						{
-							case 1:
-							{
-								// hf
-								if( (PlayerInfo[playerid][pDonator] == DONATOR_NONE && CountHouseFurniture(building) >= MAX_HFURNITURE) ||
-									(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && CountHouseFurniture(building) >= MAX_HFURNITURE_BRONZE) ||
-									(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && CountHouseFurniture(building) >= MAX_HFURNITURE_SILVER) ||
-									(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && CountHouseFurniture(building) >= MAX_HFURNITURE_GOLD))
-								{
-									return SendError(playerid, "Jûs jau esatæ pasiekæs baldø limità. Daugiau apie limitus: www."#PROJECT_NAME"."#PROJECT_DOMAIN"");
-								}
-								owner = HouseInfo[building][hId];
-								price = hFurnitureInfo[selected][hfPrice];
-								model = hFurnitureInfo[selected][hfModel];
-								for(new i = 0; i < 3; i++)
-								{
-									pos[i] = hFurnitureInfo[selected][hfPos][i];
-									rot[i] = hFurnitureInfo[selected][hfRot][i];
-								}
-								format(name, 34, hFurnitureInfo[selected][hfName]);
-							}
-							case 2:
-							{
-								// bf
-								if( (PlayerInfo[playerid][pDonator] == DONATOR_NONE && CountBusinessFurniture(building) >= MAX_BFURNITURE) ||
-									(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && CountBusinessFurniture(building) >= MAX_BFURNITURE_BRONZE) ||
-									(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && CountBusinessFurniture(building) >= MAX_BFURNITURE_SILVER) ||
-									(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && CountBusinessFurniture(building) >= MAX_BFURNITURE_GOLD))
-								{
-									return SendError(playerid, "Jûs jau esatæ pasiekæs baldø limità. Daugiau apie limitus: www."#PROJECT_NAME"."#PROJECT_DOMAIN"");
-								}
-								owner = BusinessInfo[building][bId];
-								price = bFurnitureInfo[selected][bfPrice];
-								model = bFurnitureInfo[selected][bfModel];
-								for(new i = 0; i < 3; i++)
-								{
-									pos[i] = bFurnitureInfo[selected][bfPos][i];
-									rot[i] = bFurnitureInfo[selected][bfRot][i];
-								}
-								format(name, 34, bFurnitureInfo[selected][bfName]);
-							}
-							case 3:
-							{
-								// gf
-								if( (PlayerInfo[playerid][pDonator] == DONATOR_NONE && CountGarageFurniture(building) >= MAX_GFURNITURE) ||
-									(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && CountGarageFurniture(building) >= MAX_GFURNITURE_BRONZE) ||
-									(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && CountGarageFurniture(building) >= MAX_GFURNITURE_SILVER) ||
-									(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && CountGarageFurniture(building) >= MAX_GFURNITURE_GOLD))
-								{
-									return SendError(playerid, "Jûs jau esatæ pasiekæs baldø limità. Daugiau apie limitus: www."#PROJECT_NAME"."#PROJECT_DOMAIN"");
-								}
-								owner = GarageInfo[building][gId];
-								price = gFurnitureInfo[selected][gfPrice];
-								model = gFurnitureInfo[selected][gfModel];
-								for(new i = 0; i < 3; i++)
-								{
-									pos[i] = gFurnitureInfo[selected][gfPos][i];
-									rot[i] = gFurnitureInfo[selected][gfRot][i];
-								}
-								format(name, 34, gFurnitureInfo[selected][gfName]);
-							}
-						}
-						if(GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
-						else
-						{
-							//BuyFurniture(playerid, tmpType_Salon[playerid], ownerid, FurnitureList[tmpSelected[playerid]][furnitureListPrice], FurnitureList[tmpSelected[playerid]][furnitureListModel], FurnitureList[tmpSelected[playerid]][furnitureListName], FurnitureListNames[FurnitureList[tmpSelected[playerid]][furnitureListCategory]], PlayerInfo[playerid][pPosX]+2.0, PlayerInfo[playerid][pPosY]+2.0, PlayerInfo[playerid][pPosZ]+1.0, 0.0, 0.0, 0.0);
-							GivePlayerMoney(playerid, -price);
-							BuyFurniture(playerid, tmpType_Salon[playerid], owner, price, model, name, "Duplikuoti", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
-						}
-					}
-					case 6:
-					{
-						// pardavimas
-						new name[26],
-							string[126],
-							price;
-						log_init(true);
-						switch(tmpType_Salon[playerid])
-						{
-							case 1:
-							{
-								price = hFurnitureInfo[tmpSelected[playerid]][hfPrice]/2;
-								GivePlayerMoney(playerid, price);
-								format(name, sizeof name, hFurnitureInfo[tmpSelected[playerid]][hfName]);
-								Iter_Remove(HFurniture, tmpSelected[playerid]);
-								mysql_format(chandler, string, sizeof string, "DELETE FROM `houses_furniture` WHERE id = '%d'", hFurnitureInfo[tmpSelected[playerid]][hfId]);
-								mysql_fquery(chandler, string, "FurnitureDeleted");
-								log_set_table("logs_houses");
-								log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`Amount`");
-								log_set_values("'%d','%e','%d','Pardave balda','%d'", LogPlayerId(playerid), LogPlayerName(playerid), hFurnitureInfo[tmpSelected[playerid]][hfOwner], price);
-							}
-							case 2:
-							{
-								price = bFurnitureInfo[tmpSelected[playerid]][bfPrice]/2;
-								new businessid = FindBusinessBySql(bFurnitureInfo[tmpSelected[playerid]][bfOwner]);
-								GivePlayerMoney(playerid, price);
-								format(name, sizeof name, bFurnitureInfo[tmpSelected[playerid]][bfName]);
-								Iter_Remove(BFurniture, tmpSelected[playerid]);
-								mysql_format(chandler, string, sizeof string, "DELETE FROM `business_furniture` WHERE id = '%d'", bFurnitureInfo[tmpSelected[playerid]][bfId]);
-								mysql_fquery(chandler, string, "FurnitureDeleted");
-								log_set_table("logs_business");
-								log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`BusinessName`,`ActionText`,`Amount`");
-								log_set_values("'%d','%e','%d','%e','Pardave balda','%d'", LogPlayerId(playerid), LogPlayerName(playerid), bFurnitureInfo[tmpSelected[playerid]][bfOwner], BusinessInfo[businessid][bName], price);
-							}
-							case 3:
-							{
-								price = gFurnitureInfo[tmpSelected[playerid]][gfPrice]/2;
-								GivePlayerMoney(playerid, price);
-								format(name, sizeof name, gFurnitureInfo[tmpSelected[playerid]][gfName]);
-								Iter_Remove(GFurniture, tmpSelected[playerid]);
-								mysql_format(chandler, string, sizeof string, "DELETE FROM `garages_furniture` WHERE id = '%d'", gFurnitureInfo[tmpSelected[playerid]][gfId]);
-								mysql_fquery(chandler, string, "FurnitureDeleted");
-								log_set_table("logs_garages");
-								log_set_keys("`PlayerId`,`PlayerName`,`GarageId`,`ActionText`,`Amount`");
-								log_set_values("'%d','%e','%d','Pardave balda','%d'", LogPlayerId(playerid), LogPlayerName(playerid), gFurnitureInfo[tmpSelected[playerid]][gfOwner], price);
-							}
-						}
-						log_commit();
-						SendFormat(playerid, 0xBABABAFF, "Baldas \"%s\" sëkmingai parduotas. Gavote $%d", name, price);
-						NullFurnitureItem(tmpType_Salon[playerid], tmpSelected[playerid]);
-						pc_cmd_furniture(playerid, "");
-					}
-				}
-			}
-			else pc_cmd_furniture(playerid, "");
-		}
-		case DIALOG_FURNITURE_TEXTURES:
-		{
-			if(response)
-			{
-				tmpTexture_MarkStart_CP[playerid] = listitem;
-				new string[212],
-					selected = tmpSelected[playerid],
-					current_txt[25],
-					current_col[25];
-				switch(tmpType_Salon[playerid])
-				{
-					case 1:
-					{
-						format(current_txt, 25, FurnitureTextures[hFurnitureInfo[selected][hfTexture][listitem]][textureName]);
-						format(current_col, 25, FurnitureColors[hFurnitureInfo[selected][hfColor][listitem]][colorName]);
-					}
-					case 2:
-					{
-						format(current_txt, 25, FurnitureTextures[bFurnitureInfo[selected][bfTexture][listitem]][textureName]);
-						format(current_col, 25, FurnitureColors[bFurnitureInfo[selected][bfColor][listitem]][colorName]);
-					}
-					case 3:
-					{
-						format(current_txt, 25, FurnitureTextures[gFurnitureInfo[selected][gfTexture][listitem]][textureName]);
-						format(current_col, 25, FurnitureColors[gFurnitureInfo[selected][gfColor][listitem]][colorName]);
-					}
-				}
-				format(string, sizeof string, "Tekstûros keitimas [%s]\nSpalvos keitimas [%s]", current_txt, current_col);
-				ShowPlayerDialog(playerid, DIALOG_FURNITURE_TEXTURE_EDIT, DIALOG_STYLE_LIST, "Baldo redagavimas", string, "Tæsti", "Atðaukti");
-			}
-			else pc_cmd_furniture(playerid, "");
-		}
-		case DIALOG_FURNITURE_TEXTURE_EDIT:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					new string[512] = "Paðalinti esamà\n";
-					for(new i = 1; i < sizeof FurnitureTextures; i++)
-					{
-						strcat(string, FurnitureTextures[i][textureName]);
-						strcat(string, "\n");
-					}
-					ShowPlayerDialog(playerid, DIALOG_FURNITURE_TEXTURES_LIST, DIALOG_STYLE_LIST, "Baldo redagavimas", string, "Tæsti", "Atðaukti");
-				}
-				else if(listitem == 1)
-				{
-					new
-						string[512] = "Paðalinti esamà\n";
-					for(new i = 1; i < sizeof FurnitureColors; i++)
-					{
-						format(string, sizeof string, "%s{%06x}%s\n", string, (FurnitureColors[i][colorCode] * 0x100) >>> 8, FurnitureColors[i][colorName]);
-					}
-					ShowPlayerDialog(playerid, DIALOG_FURNITURE_COLORS_LIST, DIALOG_STYLE_LIST, "Baldo redagavimas", 	string, "Tæsti", "Atðaukti");
-				}
-			}
-			else pc_cmd_furniture(playerid, "");
-		}
-		case DIALOG_FURNITURE_TEXTURES_LIST:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					// pasalinti esama
-					new object,
-						model,
-						color,
-						selected = tmpSelected[playerid],
-						texture = tmpTexture_MarkStart_CP[playerid],
-						string[126];
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							object = hFurnitureInfo[selected][hfObject];
-							model = hFurnitureInfo[selected][hfModel];
-							color = hFurnitureInfo[selected][hfColor][texture];
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET `Texture%d` = '0' WHERE id = '%d'", texture, hFurnitureInfo[selected][hfId]);
-						}
-						case 2:
-						{
-							object = bFurnitureInfo[selected][bfObject];
-							model = bFurnitureInfo[selected][bfModel];
-							color = bFurnitureInfo[selected][bfColor][texture];
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET `Texture%d` = '0' WHERE id = '%d'", texture, bFurnitureInfo[selected][bfId]);
-						}
-						case 3:
-						{
-							object = gFurnitureInfo[selected][gfObject];
-							model = gFurnitureInfo[selected][gfModel];
-							color = gFurnitureInfo[selected][gfColor][texture];
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET `Texture%d` = '0' WHERE id = '%d'", texture, gFurnitureInfo[selected][gfId]);
-						}
-					}
-					if(IsDynamicObjectMaterialUsed(object, texture))
-					{
-						switch(tmpType_Salon[playerid])
-						{
-							case 1: hFurnitureInfo[selected][hfTexture][texture] = 0;
-							case 2: bFurnitureInfo[selected][bfTexture][texture] = 0;
-							case 3: gFurnitureInfo[selected][gfTexture][texture] = 0;
-						}
-						SetDynamicObjectMaterial(object, texture, model, "none", "none", color == 0 ? 0 : FurnitureColors[color][colorCode]);
-						mysql_fquery(chandler, string, "FurnitureTextureSave");
-					}
-					else
-					{
-						InfoBox(playerid, "NERA", "TEKSTUROS");
-						OnDialogResponse(playerid, DIALOG_FURNITURE_EDIT_MAIN, 1, 4, "");
-					}
-				}
-				else
-				{
-					new object,
-						selected = tmpSelected[playerid],
-						texture = tmpTexture_MarkStart_CP[playerid],
-						string[186];
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							object = hFurnitureInfo[selected][hfObject];
-						}
-						case 2:
-						{
-							object = bFurnitureInfo[selected][bfObject];
-						}
-						case 3:
-						{
-							object = gFurnitureInfo[selected][gfObject];
-						}
-					}
-
-					SetDynamicObjectMaterial(object, texture, FurnitureTextures[listitem][textureModel], FurnitureTextures[listitem][textureFile], FurnitureTextures[listitem][textureName], 0);
-					Streamer_Update(playerid);
-					SendFormat(playerid, 0xBABABAFF, "Pakeitëte tekstûrà %d slote.", texture); 
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							hFurnitureInfo[selected][hfTexture][texture] = listitem; 
-							hFurnitureInfo[selected][hfColor][texture] = 0; // istrinam ir spalva
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET `Texture%d` = '%d', `Color%d` = '0' WHERE id = '%d'", texture, listitem, texture, hFurnitureInfo[selected][hfId]);
-						}
-						case 2:
-						{
-							bFurnitureInfo[selected][bfTexture][texture] = listitem;
-							bFurnitureInfo[selected][bfColor][texture] = 0;
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET `Texture%d` = '%d', `Color%d` = '0' WHERE id = '%d'", texture, listitem, texture, bFurnitureInfo[selected][bfId]);
-						}
-						case 3:
-						{
-							gFurnitureInfo[selected][gfTexture][texture] = listitem;
-							gFurnitureInfo[selected][gfColor][texture] = 0;
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET `Texture%d` = '%d', `Color%d` = '0' WHERE id = '%d'", texture, listitem, texture, gFurnitureInfo[selected][gfId]);
-						}
-					}
-					mysql_fquery(chandler, string, "FurnitureTextureSave");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_FURNITURE_EDIT_MAIN, 1, 4, "");
-		}
-		case DIALOG_FURNITURE_COLORS_LIST:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					new object,
-						model,
-						color,
-						selected = tmpSelected[playerid],
-						texture = tmpTexture_MarkStart_CP[playerid],
-						texture_id,
-						string[126];
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							object = hFurnitureInfo[selected][hfObject];
-							model = hFurnitureInfo[selected][hfModel];
-							color = hFurnitureInfo[selected][hfColor][texture];
-							texture_id = hFurnitureInfo[selected][hfTexture][texture];
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET `Color%d` = '0' WHERE id = '%d'", texture, hFurnitureInfo[selected][hfId]);
-						}
-						case 2:
-						{
-							object = bFurnitureInfo[selected][bfObject];
-							model = bFurnitureInfo[selected][bfModel];
-							color = bFurnitureInfo[selected][bfColor][texture];
-							texture_id = bFurnitureInfo[selected][bfTexture][texture];
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET `Color%d` = '0' WHERE id = '%d'", texture, bFurnitureInfo[selected][bfId]);
-						}
-						case 3:
-						{
-							object = gFurnitureInfo[selected][gfObject];
-							model = gFurnitureInfo[selected][gfModel];
-							color = gFurnitureInfo[selected][gfColor][texture];
-							texture_id = gFurnitureInfo[selected][gfTexture][texture];
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET `Color%d` = '0' WHERE id = '%d'", texture, gFurnitureInfo[selected][gfId]);
-						}
-					}
-					// pasalinti esama
-					if(color != 0)
-					{
-						if(texture_id == 0)
-						{
-							// nera teksturos
-							SetDynamicObjectMaterial(object, texture, model, "none", "none", 0);
-						}
-						else
-						{
-							// tekstura yra, ja issaugom, nuimam tik spalva
-							SetDynamicObjectMaterial(object, texture, FurnitureTextures[texture_id][textureModel], FurnitureTextures[texture_id][textureFile], FurnitureTextures[texture_id][textureName], 0);
-							switch(tmpType_Salon[playerid])
-							{
-								case 1:
-								{
-									hFurnitureInfo[selected][hfColor][texture] = 0;
-								}
-								case 2:
-								{
-									bFurnitureInfo[selected][bfColor][texture] = 0;
-								}
-								case 3:
-								{
-									gFurnitureInfo[selected][gfColor][texture] = 0;
-								}
-							}
-						}
-						mysql_fquery(chandler, string, "FurnitureColorSave");
-					}
-					else
-					{
-						InfoBox(playerid, "NERA", "SPALVOS");
-						OnDialogResponse(playerid, DIALOG_FURNITURE_EDIT_MAIN, 1, 4, "");
-					}
-				}
-				else
-				{
-					new object,
-						selected = tmpSelected[playerid],
-						texture = tmpTexture_MarkStart_CP[playerid],
-						texture_id,
-						string[126];
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							object = hFurnitureInfo[selected][hfObject];
-							texture_id = hFurnitureInfo[selected][hfTexture][texture];
-							hFurnitureInfo[selected][hfColor][texture] = listitem;
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET `Color%d` = '%d' WHERE id = '%d'", texture, listitem, hFurnitureInfo[selected][hfId]);
-						}
-						case 2:
-						{
-							object = bFurnitureInfo[selected][bfObject];
-							texture_id = bFurnitureInfo[selected][bfTexture][texture];
-							bFurnitureInfo[selected][bfColor][texture] = listitem;
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET `Color%d` = '%d' WHERE id = '%d'", texture, listitem, bFurnitureInfo[selected][bfId]);
-						}
-						case 3:
-						{
-							object = gFurnitureInfo[selected][gfObject];
-							texture_id = gFurnitureInfo[selected][gfTexture][texture];
-							gFurnitureInfo[selected][gfColor][texture] = listitem;
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET `Color%d` = '%d' WHERE id = '%d'", texture, listitem, gFurnitureInfo[selected][gfId]);
-						}
-					}
-					if(texture_id == 0)
-					{
-						// nera teksturos, tik spalva keiciam
-						SetDynamicObjectMaterial(object, texture, -1, " ", " ", FurnitureColors[listitem][colorCode]);
-					}
-					else
-					{
-						// paliekam tekstura, tik pridedam spalva
-						SetDynamicObjectMaterial(object, texture, FurnitureTextures[texture_id][textureModel], FurnitureTextures[texture_id][textureFile], FurnitureTextures[texture_id][textureName], FurnitureColors[listitem][colorCode]);
-					}
-					Streamer_Update(playerid);
-					SendFormat(playerid, 0xBABABAFF, "Pakeitëte spalvà %d slote.", texture);
-					mysql_fquery(chandler, string, "FurnitureColorSave");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_FURNITURE_EDIT_MAIN, 1, 4, "");
-		}
-		case DIALOG_FURNITURE_CHANGE_RX:
-		{
-			if(response)
-			{
-				if(strlen(inputtext))
-				{
-					new Float:rx, Float:ry, Float:rz, string[126];
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET RX = '%f' WHERE id = '%d'", floatstr(inputtext), hFurnitureInfo[tmpSelected[playerid]][hfId]);
-							GetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], rx, ry, rz);
-							SetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], floatstr(inputtext), ry, rz);
-							hFurnitureInfo[tmpSelected[playerid]][hfRot][0] = floatstr(inputtext);
-						}
-						case 2:
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET RX = '%f' WHERE id = '%d'", floatstr(inputtext), bFurnitureInfo[tmpSelected[playerid]][bfId]);
-							GetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], rx, ry, rz);
-							SetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], floatstr(inputtext), ry, rz);
-							bFurnitureInfo[tmpSelected[playerid]][bfRot][0] = floatstr(inputtext);
-						}
-						case 3:
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET RX = '%f' WHERE id = '%d'", floatstr(inputtext), gFurnitureInfo[tmpSelected[playerid]][gfId]);
-							GetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], rx, ry, rz);
-							SetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], floatstr(inputtext), ry, rz);
-							gFurnitureInfo[tmpSelected[playerid]][gfRot][0] = floatstr(inputtext);
-						}
-					}
-					mysql_fquery(chandler, string, "FurnitureSaved");
-					InfoBox(playerid, "~g~ATNAUJINTAS", "PASUKIMO KAMPAS X");
-				}
-				new string[256],
-					Float:cur, Float:un;
-				if(tmpType_Salon[playerid] == 1) GetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], un, cur, un);
-				else if(tmpType_Salon[playerid] == 2) GetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], un, cur, un);
-				else if(tmpType_Salon[playerid] == 3) GetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], un, cur, un);
-				format(string, sizeof string, "{BABABA}Áveskite naujà {FFFFFF}Y{BABABA} pasukimo kampà. Dabartinis: {FFFFFF}%0.1f\nJei nenorite keisti - nieko neáraðykite.", cur);
-				ShowPlayerDialog(playerid, DIALOG_FURNITURE_CHANGE_RY, DIALOG_STYLE_INPUT, "Baldo redagavimas", string, "Keisti", "Atðaukti");
-			}
-			else pc_cmd_furniture(playerid, "");
-		}
-		case DIALOG_FURNITURE_CHANGE_RY:
-		{
-			if(response)
-			{
-				if(strlen(inputtext))
-				{
-					new Float:rx, Float:ry, Float:rz, string[126];
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET RY = '%f' WHERE id = '%d'", floatstr(inputtext), hFurnitureInfo[tmpSelected[playerid]][hfId]);
-							GetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], rx, ry, rz);
-							SetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], rx, floatstr(inputtext), rz);
-							hFurnitureInfo[tmpSelected[playerid]][hfRot][1] = floatstr(inputtext);
-						}
-						case 2:
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET RY = '%f' WHERE id = '%d'", floatstr(inputtext), bFurnitureInfo[tmpSelected[playerid]][bfId]);
-							GetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], rx, ry, rz);
-							SetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], rx, floatstr(inputtext), rz);
-							bFurnitureInfo[tmpSelected[playerid]][bfRot][1] = floatstr(inputtext);
-						}
-						case 3:
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET RY = '%f' WHERE id = '%d'", floatstr(inputtext), gFurnitureInfo[tmpSelected[playerid]][gfId]);
-							GetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], rx, ry, rz);
-							SetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], rx, floatstr(inputtext), rz);
-							gFurnitureInfo[tmpSelected[playerid]][gfRot][1] = floatstr(inputtext);
-						}
-					}
-					mysql_fquery(chandler, string, "FurnitureSaved");
-					InfoBox(playerid, "~g~ATNAUJINTAS", "PASUKIMO KAMPAS Y");
-				}
-				new string[256],
-					Float:cur, Float:un;
-				if(tmpType_Salon[playerid] == 1) GetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], un, un, cur);
-				else if(tmpType_Salon[playerid] == 2) GetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], un, un, cur);
-				else if(tmpType_Salon[playerid] == 3) GetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], un, un, cur);
-				format(string, sizeof string, "{BABABA}Áveskite naujà {FFFFFF}Z{BABABA} pasukimo kampà. Dabartinis: {FFFFFF}%0.1f\nJei nenorite keisti - nieko neáraðykite.", cur);
-				ShowPlayerDialog(playerid, DIALOG_FURNITURE_CHANGE_RZ, DIALOG_STYLE_INPUT, "Baldo redagavimas", string, "Keisti", "Atðaukti");
-			}
-			else pc_cmd_furniture(playerid, "");
-		}
-		case DIALOG_FURNITURE_CHANGE_RZ:
-		{
-			if(response)
-			{
-				if(strlen(inputtext))
-				{
-					new Float:rx, Float:ry, Float:rz, string[126];
-					switch(tmpType_Salon[playerid])
-					{
-						case 1:
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET RZ = '%f' WHERE id = '%d'", floatstr(inputtext), hFurnitureInfo[tmpSelected[playerid]][hfId]);
-							GetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], rx, ry, rz);
-							SetDynamicObjectRot(hFurnitureInfo[tmpSelected[playerid]][hfObject], rx, ry, floatstr(inputtext));
-							hFurnitureInfo[tmpSelected[playerid]][hfRot][2] = floatstr(inputtext);
-						}
-						case 2:
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET RZ = '%f' WHERE id = '%d'", floatstr(inputtext), bFurnitureInfo[tmpSelected[playerid]][bfId]);
-							GetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], rx, ry, rz);
-							SetDynamicObjectRot(bFurnitureInfo[tmpSelected[playerid]][bfObject], rx, ry, floatstr(inputtext));
-							bFurnitureInfo[tmpSelected[playerid]][bfRot][2] = floatstr(inputtext);
-						}
-						case 3:
-						{
-							mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET RZ = '%f' WHERE id = '%d'", floatstr(inputtext), gFurnitureInfo[tmpSelected[playerid]][gfId]);
-							GetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], rx, ry, rz);
-							SetDynamicObjectRot(gFurnitureInfo[tmpSelected[playerid]][gfObject], rx, ry, floatstr(inputtext));
-							gFurnitureInfo[tmpSelected[playerid]][gfRot][2] = floatstr(inputtext);
-						}
-					}
-					mysql_fquery(chandler, string, "FurnitureSaved");
-					InfoBox(playerid, "~g~ATNAUJINTAS", "PASUKIMO KAMPAS Z");
-				}
-			}
-			OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-		}
-		case DIALOG_FURNITURE_CHANGE_NAME:
-		{
-			if(response)
-			{
-				if(!strlen(inputtext) || strsymbols(inputtext, "{") || strsymbols(inputtext, "}")) return OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 1, "") , InfoBox(playerid, "NETEISINGAS", "FORMATAS");
-				new string[186];
-				switch(tmpType_Salon[playerid])
-				{
-					case 1:
-					{
-						format(hFurnitureInfo[tmpSelected[playerid]][hfName], 24, inputtext);
-						mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET Name = '%e' WHERE id = '%d'", inputtext, hFurnitureInfo[tmpSelected[playerid]][hfId]);
-					}
-					case 2:
-					{
-						format(bFurnitureInfo[tmpSelected[playerid]][bfName], 24, inputtext);
-						mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET Name = '%e' WHERE id = '%d'", inputtext, bFurnitureInfo[tmpSelected[playerid]][bfId]);
-					}
-					case 3:
-					{
-						format(gFurnitureInfo[tmpSelected[playerid]][gfName], 24, inputtext);
-						mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET Name = '%e' WHERE id = '%d'", inputtext, gFurnitureInfo[tmpSelected[playerid]][gfId]);
-					}
-				}
-				SendFormat(playerid, 0xBABABAFF, "Pavadinimas pakeistas á: {FFFFFF}%s", inputtext);
-				InfoBox(playerid, "~g~ISSAUGOTAS", "BALDO PAVADINIMAS");
-				OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 0, "");
-				mysql_fquery(chandler, string, "FurnitureSaved");
-			}
-			else OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 1, "");
-		}
-		case DIALOG_FURNITURE_CATEGORIES:
-		{
-			if(response)
-			{
-				new items[1024],
-					count;
-				for(new i = 0; i < sizeof FurnitureList; i++)
-				{
-					if(FurnitureList[i][furnitureListCategory] == listitem)
-					{
-						items[count] = FurnitureList[i][furnitureListModel];
-						count++;
-					}
-				}
-				ShowModelSelectionMenuEx(playerid, items, count, formatlt(FurnitureListNames[listitem]), listitem+5000, 0.0, 0.0, 30.0);
-			}
-			else pc_cmd_furniture(playerid, "");
-		}
 		case DIALOG_PHONE_OPTIONS_MAIN:
 		{
 			if(response)
@@ -15567,30 +14284,30 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 		new Float:x,
 			Float:y,
 			Float:z,
-			itter = LastShellItter[playerid] = Iter_Free(Shell);
+			iter = LastShellItter[playerid] = Iter_Free(Shell);
 
 		GetPlayerPos(playerid, x, y, z);
 
-		LastShellShotVector[playerid][0] = Shells[itter][shellPos][0] = x,
-		LastShellShotVector[playerid][1] = Shells[itter][shellPos][1] = y,
-		LastShellShotVector[playerid][2] = Shells[itter][shellPos][2] = z;
+		LastShellShotVector[playerid][0] = Shells[iter][shellPos][0] = x,
+		LastShellShotVector[playerid][1] = Shells[iter][shellPos][1] = y,
+		LastShellShotVector[playerid][2] = Shells[iter][shellPos][2] = z;
 
-		Shells[itter][shellLabel] = CreateDynamic3DTextLabel("Kulkø gilzës (( {2599BC}1{6AB3C9} ))\n{F8F8F8}/pickcases", 0x6AB3C9FF, x, y, z-0.75, 1.8, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid)),
-		Shells[itter][shellObject] = CreateDynamicObject(3027, x, y, z-0.87, 0.0, 90.0, 0.0, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), .called = "shells", .extra = "create");  // 19625first 19182white //19177biggerwhite
-		SetDynamicObjectMaterial(Shells[itter][shellObject], 0, 1650, "petrolcan", "redcan", 0xFFFFFFFF);
+		Shells[iter][shellLabel] = CreateDynamic3DTextLabel("Kulkø gilzës (( {2599BC}1{6AB3C9} ))\n{F8F8F8}/pickcases", 0x6AB3C9FF, x, y, z-0.75, 1.8, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid)),
+		Shells[iter][shellObject] = CreateDynamicObject(3027, x, y, z-0.87, 0.0, 90.0, 0.0, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), .called = "shells", .extra = "create");  // 19625first 19182white //19177biggerwhite
+		SetDynamicObjectMaterial(Shells[iter][shellObject], 0, 1650, "petrolcan", "redcan", 0xFFFFFFFF);
 
-		Shells[itter][shellUniqueId] = unique;
-		Shells[itter][shellCount] = 1;
-		Shells[itter][shellTime] = TimeNow;
-		Iter_Add(Shell, itter);
+		Shells[iter][shellUniqueId] = unique;
+		Shells[iter][shellCount] = 1;
+		Shells[iter][shellTime] = TimeNow;
+		Iter_Add(Shell, iter);
 	}
 	else
 	{
 		// toj pacioj vietoj arba dar saudo
-		new itter = LastShellItter[playerid];
-		Shells[itter][shellCount]++;
-		format(string, sizeof string, "Kulkø gilzës (( {2599BC}%d{6AB3C9} ))\n{F8F8F8}/pickcases", Shells[itter][shellCount]);
-		UpdateDynamic3DTextLabelText(Shells[itter][shellLabel], 0x6AB3C9FF, string);
+		new iter = LastShellItter[playerid];
+		Shells[iter][shellCount]++;
+		format(string, sizeof string, "Kulkø gilzës (( {2599BC}%d{6AB3C9} ))\n{F8F8F8}/pickcases", Shells[iter][shellCount]);
+		UpdateDynamic3DTextLabelText(Shells[iter][shellLabel], 0x6AB3C9FF, string);
 	}
 	LastWeapon[playerid] = weaponid,
 	LastShotTime[playerid] = TimeNow;
@@ -15621,22 +14338,6 @@ public OnPlayerModelSelectionEx(playerid, response, extraid, modelid)
 			}
 		}
 		else pc_cmd_buyclothes(playerid, "");
-	}
-	else if(extraid >= 5000)
-	{
-		if(response)
-		{
-			new category = extraid-5000;
-			for(new i = 0; i < sizeof FurnitureList; i++)
-			{
-				if(FurnitureList[i][furnitureListCategory] == category && FurnitureList[i][furnitureListModel] == modelid)
-				{
-					SetTimerEx("FurniturePreviewTimer", 200, false, "dd", playerid, i);
-					break;
-				}
-			}
-		}
-		else OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 1, "recalled");
 	}
 	return 1;
 }
@@ -15742,7 +14443,6 @@ public PlayerFactionAddLoad(playerid)
 	return 1;
 }
 
-thread(SelectedFurnitureUpdate);
 thread(DealerGunAdded);
 thread(DealerDrugAdded);
 thread(DealerSaved);
@@ -16306,48 +15006,6 @@ public FactionUsersLoaded(playerid)
 	return 1;
 }
 
-forward FurniturePreviewTimer(playerid, i);
-public FurniturePreviewTimer(playerid, i)
-{
-	#if SERVER_DEBUG_LEVEL >= 3
-		printf("[debug] FurniturePreviewTimer(%s, %d)", GetPlayerNameEx(playerid), i);
-	#endif
-	PlayerInfo[playerid][pViewStatus] = PLAYER_VIEW_STATUS_FURNITURE;
-	tmpSelected[playerid] = i;
-	new
-		Float:vector_x = 0.0,
-		Float:vector_y = 0.0,
-		Float:player_z = 1300.0;
-
-	GetPlayerPos(playerid, PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ]);
-	SetPlayerPos(playerid, vector_x, vector_y, player_z);
-	SetPlayerWeather(playerid, 0);
-	SetPlayerTime(playerid, 12, 0);
-
-	GetXYInFrontOfPlayer(playerid, vector_x, vector_y, 1.0);
-	tmpPage_Object[playerid] = CreateDynamicObject(FurnitureList[i][furnitureListModel], vector_x, vector_y, player_z, 0.0, 0.0, 0.0, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), .called = "furniture", .extra = "preview");
-	TogglePlayerControllable(playerid, false);
-	GetXYInFrontOfPlayer(playerid, vector_x, vector_y, 13.0);
-
-	new
-		Float:object_x,
-		Float:object_y,
-		Float:object_z,
-		string[126];
-
-	GetDynamicObjectPos(tmpPage_Object[playerid], object_x, object_y, object_z);
-	SetPlayerCameraPos(playerid, vector_x, vector_y, player_z);
-	SetPlayerCameraLookAt(playerid, object_x, object_y, object_z);
-
-	SetPlayerPos(playerid, vector_x, vector_y, player_z);
-	format(string, sizeof string, "KATEGORIJA:_%s~n~PAVADINIMAS:_%s~n~KAINA:_~g~$%d", strtoupper(formatlt(FurnitureListNames[FurnitureList[i][furnitureListCategory]])), strtoupper(formatlt(FurnitureList[i][furnitureListName])), FurnitureList[i][furnitureListPrice]);
-	ShowPlayerFurnitureBuy(playerid, string);
-	SelectTextDraw(playerid, 0xE6E6E6FF);
-	return 1;
-}
-
-thread(FurnitureColorSave);
-thread(FurnitureTextureSave);
 /*
 
 oooooooooooo ooooo     ooo ooooo      ooo   .oooooo.   ooooooooooooo ooooo   .oooooo.   ooooo      ooo  .oooooo..o
@@ -17642,7 +16300,7 @@ stock PlayerPayPhoneCall(playerid, payphone, number)
 		{
 			if(	(PhoneInfo[receiverid][phoneRinging] != INVALID_PLAYER_ID || PhoneInfo[receiverid][phoneTalkingTo] != INVALID_PLAYER_ID) ||
 				(GetESCType(receiverid) != ESC_TYPE_PHONE && GetESCType(receiverid) != ESC_TYPE_NONE) ||
-				(tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_FURNITURE || tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_ATM || tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_PAYPHONE))
+				(tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_ATM || tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_PAYPHONE))
 			{
 				// zaidejas jau kalba su kazkuo arba naudojas kazkokia sistema textdraw
 				receiverid = PhoneInfo[playerid][phoneRinging] = INVALID_PLAYER_ID;
@@ -17722,7 +16380,7 @@ stock PlayerPhoneCall(playerid, number)
 			if(	(PlayerExtra[playerid][peDeath] > 0) ||
 				(PhoneInfo[receiverid][phoneRinging] != INVALID_PLAYER_ID || PhoneInfo[receiverid][phoneTalkingTo] != INVALID_PLAYER_ID) ||
 				(GetESCType(receiverid) != ESC_TYPE_PHONE && GetESCType(receiverid) != ESC_TYPE_NONE) ||
-				(tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_FURNITURE || tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_ATM || tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_PAYPHONE))
+				(tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_ATM || tmpEditing_Component_DMV[playerid] == EDITING_TYPE_DYNAMIC_PAYPHONE))
 			{
 				// zaidejas jau kalba su kazkuo arba naudojas kazkokia sistema textdraw
 				receiverid = PhoneInfo[playerid][phoneRinging] = INVALID_PLAYER_ID;
@@ -18253,27 +16911,6 @@ stock IsNumeric(const string[]) // Mike
 	return true;
 }
 
-stock CountHouseFurniture(id)
-{
-	new count;
-	foreach(new i : HFurniture) if(hFurnitureInfo[i][hfOwner] == id) count++;
-	return count;
-}
-
-stock CountBusinessFurniture(id)
-{
-	new count;
-	foreach(new i : BFurniture) if(bFurnitureInfo[i][bfOwner] == id) count++;
-	return count;
-}
-
-stock CountGarageFurniture(id)
-{
-	new count;
-	foreach(new i : GFurniture) if(gFurnitureInfo[i][gfOwner] == id) count++;
-	return count;
-}
-
 stock ShowPlayerATM(playerid, atmid)
 {
 	for(new i = 0; i < 8; i++)
@@ -18618,7 +17255,7 @@ stock CheckBan(playerid)
 }
 /*
 forward OnPlayerUseInventoryItem(playerid, slotid);
-forward OnPlayerDropInventoryItem(playerid, type, itter, slotid);
+forward OnPlayerDropInventoryItem(playerid, type, iter, slotid);
 forward OnPlayerPutInventoryItem(playerid, slotid, to_type, to_itter);
 forward OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot);
 forward OnPlayerGiveInventoryItem(playerid, slotid);
@@ -18691,10 +17328,10 @@ public OnPlayerPutInventoryItem(playerid, slotid, to_type, to_itter)
 	return 1;
 }
 
-public OnPlayerDropInventoryItem(playerid, type, itter, slotid)
+public OnPlayerDropInventoryItem(playerid, type, iter, slotid)
 {
 	// galima ismest tik zaidejui arba tik is masinos
-	if(!IsVehicleInRangeOfPlayer(itter, playerid, 5.0) && type == INVENTORY_TYPE_VEHICLE)
+	if(!IsVehicleInRangeOfPlayer(iter, playerid, 5.0) && type == INVENTORY_TYPE_VEHICLE)
 	{
 		InfoBox(playerid, IB_NOT_CLOSE_VEHICLE);
 		return 1;
@@ -18725,10 +17362,10 @@ public OnPlayerDropInventoryItem(playerid, type, itter, slotid)
 		}
 		case INVENTORY_TYPE_VEHICLE:
 		{
-			if(IsVehicleInventorySlotClear(itter, slotid)) return SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
+			if(IsVehicleInventorySlotClear(iter, slotid)) return SendWarning(playerid, "Pasirinkta inventoriaus vieta yra tuðèia.");
 
 			new 
-				itemid = VehicleInventory[itter][slotid][invId];
+				itemid = VehicleInventory[iter][slotid][invId];
 			rp_me(playerid, _, "iðmeta daiktà ið bagaþinës, atrodantá kaip %s.", GetInventoryItemName(itemid, .lower_case = true));
 			if(itemid == ITEM_MASK)
 			{
@@ -18740,7 +17377,7 @@ public OnPlayerDropInventoryItem(playerid, type, itter, slotid)
 					ShowPlayerNameTagForPlayer(receiverid, playerid, true);
 				}
 			}
-			Vehicle_DropItem(playerid, itter, slotid, itemid == ITEM_SHELLS ? false : true);
+			Vehicle_DropItem(playerid, iter, slotid, itemid == ITEM_SHELLS ? false : true);
 		}
 	}
 	return 1;
@@ -19293,8 +17930,8 @@ stock Inventory_ShowActionSelect(playerid, type, iter, slot, itemid)
 		dialog_Row("Padëti daiktà á namà/verslà")
 		{
 			new 
-				put_to_type = -1, put_to_iter = -1;
-			if((put_to_iter = GetClosestHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID) 
+				put_to_type = -1, put_to_iter = -1, unused;
+			if((put_to_iter = GetClosestHouse(playerid, 50.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID) 
 				put_to_type = INVENTORY_TYPE_HOUSE;
 
 			else if((put_to_iter = GetClosestDealerHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID) 
@@ -20258,103 +18895,6 @@ stock ProxDetectorCoords(Float:radi, Float:x, Float:y, Float:z, string[], color1
 	return 1;
 }
 
-stock FurnitureFromIteratorToArray(array[], &index, type, furnitureowneritter)
-{
-	/*
-		Funkcija praeis pro visa HFurniture itterator ir jei furniture savininkas = reikiamam, ji itrauks i array.
-		Todel visi array index is eiles bus uzpildyti ir visi priklausys vienam savininkui pasirinktam.
-	*/
-	if(type == 1)
-	{
-		foreach(new furnitureid : HFurniture)
-		{
-			if(hFurnitureInfo[furnitureid][hfOwner] == HouseInfo[furnitureowneritter][hId])
-			{
-				array[index] = furnitureid;
-			}
-		}
-	}
-	else if(type == 2)
-	{
-		foreach(new furnitureid : BFurniture)
-		{
-			if(bFurnitureInfo[furnitureid][bfOwner] == BusinessInfo[furnitureowneritter][bId])
-			{
-				array[index] = furnitureid;
-			}
-		}
-	}
-	else if(type == 3)
-	{
-		foreach(new furnitureid : GFurniture)
-		{
-			if(gFurnitureInfo[furnitureid][gfOwner] == GarageInfo[furnitureowneritter][gId])
-			{
-				array[index] = furnitureid;
-			}
-		}
-	}
-	return 1;
-}
-
-stock NullFurnitureItem(type, itter)
-{
-	/*
-		Funkcija nu'null'ins furniture array pasirinkta index.
-	*/
-	switch(type)
-	{
-		case 1:
-		{
-			new __reset_HFurniture[E_HOUSE_FURNITURE_DATA];
-			format(hFurnitureInfo[itter][hfName], 1, "");
-			if(IsValidDynamicObject(hFurnitureInfo[itter][hfObject])) DestroyDynamicObject(hFurnitureInfo[itter][hfObject], "furniture", "null");
-			hFurnitureInfo[itter] = __reset_HFurniture;
-			hFurnitureInfo[itter][hfObject] = INVALID_OBJECT_ID;
-		}
-		case 2:
-		{
-			new __reset_BFurniture[E_BUSINESS_FURNITURE_DATA];
-			format(bFurnitureInfo[itter][bfName], 1, "");
-			if(IsValidDynamicObject(bFurnitureInfo[itter][bfObject])) DestroyDynamicObject(bFurnitureInfo[itter][bfObject], "furniture", "null");
-			bFurnitureInfo[itter] = __reset_BFurniture;
-			bFurnitureInfo[itter][bfObject] = INVALID_OBJECT_ID;
-		}
-		case 3:
-		{
-			new __reset_GFurniture[E_GARAGE_FURNITURE_DATA];
-			format(gFurnitureInfo[itter][gfName], 1, "");
-			if(IsValidDynamicObject(gFurnitureInfo[itter][gfObject])) DestroyDynamicObject(gFurnitureInfo[itter][gfObject], "furniture", "null");
-			gFurnitureInfo[itter] = __reset_GFurniture;
-			gFurnitureInfo[itter][gfObject] = INVALID_OBJECT_ID;
-		}
-	}
-	return 1;
-}
-
-stock DestroyFurniturePreview(playerid, bool:show = true)
-{
-	/*
-		Funkcija, kuri isjungs ir uzbaigs zaidejui furniture objekto perziura.
-	*/
-	SetPlayerWeather(playerid, GetWorldWeather());
-	SetPlayerTime(playerid, GetWorldTime(), 0);
-
-	SetPlayerPos(playerid, PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ]);
-	TogglePlayerControllable(playerid, true);
-	SetCameraBehindPlayer(playerid);
-	HidePlayerFurnitureBuy(playerid);
-	GetESCType(playerid) = ESC_TYPE_NONE;
-	if(PlayerInfo[playerid][pViewStatus] == PLAYER_VIEW_STATUS_FURNITURE)
-	{
-		if(IsValidDynamicObject(tmpPage_Object[playerid])) DestroyDynamicObject(tmpPage_Object[playerid], "furniture", "preview");
-	}
-	tmpPage_Object[playerid] = INVALID_OBJECT_ID;
-	CancelSelectTextDraw(playerid);
-	PlayerInfo[playerid][pViewStatus] = PLAYER_VIEW_STATUS_NONE;
-	show && OnDialogResponse(playerid, DIALOG_FURNITURE_MAIN, 1, 1, "");
-	return 1;
-}
 
 forward DestroyBlood(objectid);
 public DestroyBlood(objectid)
@@ -20394,247 +18934,6 @@ stock GetObjectFrontVector(objectid, bool:dynamic, Float:distance, &Float:x, &Fl
 	return false;
 }
 
-stock GetXYInFrontOfPlayer(playerid, &Float:x, &Float:y, Float:distance)
-{
-	/*
-		Funkcija, kuri isgaus X Y koordinates zaidejo priekyje uz tam tikro atstumo.
-	*/
-	new Float:a;
-
-	GetPlayerPos(playerid, x, y, a);
-	GetPlayerFacingAngle(playerid, a);
-
-	if (GetPlayerVehicleID(playerid)) {
-	    GetVehicleZAngle(GetPlayerVehicleID(playerid), a);
-	}
-
-	x += (distance * floatsin(-a, degrees));
-	y += (distance * floatcos(-a, degrees));
-}
-
-stock ShowOwnedFurniture(playerid, page, type, iter)
-{
-	new 
-		mainstr[4048],
-		lowstr[86],
-		id;
-
-	tmpFurniturePage[playerid] = page;
-	tmpType_Salon[playerid] = type;
-	tmpIter[playerid] = iter;
-	tmpFurnitureNextPage[playerid] = false;
-
-	switch(tmpType_Salon[playerid])
-	{
-		case 1:
-		{
-			foreach(new furnitureid : HFurniture)
-			{
-				if(hFurnitureInfo[furnitureid][hfOwner] == HouseInfo[iter][hId])
-				{
-					if(id >= page*MAX_FURNITURE_PER_PAGE)
-					{
-						if(id >= MAX_FURNITURE_PER_PAGE*(page+1)) 
-						{
-							tmpFurnitureNextPage[playerid] = true;
-							strcat(mainstr, ">> Kitas");
-							break;
-						}
-						else
-						{
-							format(lowstr, sizeof lowstr, "%s%d. %.20s%s\n", (FurnitureMultiSelectionEnabled{playerid} == true ? ((tmpArray[playerid][id] == 1 ? ("[{48BE2D}+{FFFFFF}] ") : ("[{FF0000}-{FFFFFF}] "))) : ("")), id+1, hFurnitureInfo[furnitureid][hfName], strlen(hFurnitureInfo[furnitureid][hfName]) > 14 ? ("..") : (""));
-							strcat(mainstr, lowstr);
-						}
-					}
-					id++;
-				}
-			}
-			tmpTexture_MarkStart_CP[playerid] = id;
-		}
-		case 2:
-		{
-			foreach(new furnitureid : BFurniture)
-			{
-				if(bFurnitureInfo[furnitureid][bfOwner] == BusinessInfo[iter][bId])
-				{
-					if(id >= page*MAX_FURNITURE_PER_PAGE)
-					{
-						if(id >= MAX_FURNITURE_PER_PAGE*(page+1)) 
-						{
-							strcat(mainstr, ">> Kitas");
-							tmpFurnitureNextPage[playerid] = true;
-							break;
-						}
-						else
-						{
-							format(lowstr, sizeof lowstr, "%s%d. %.14s%s\n", (FurnitureMultiSelectionEnabled{playerid} == true ? ((tmpArray[playerid][id] == 1 ? ("[{48BE2D}+{FFFFFF}] ") : ("[{FF0000}-{FFFFFF}] "))) : ("")), id+1, bFurnitureInfo[furnitureid][bfName], strlen(bFurnitureInfo[furnitureid][bfName]) > 14 ? ("..") : (""));
-							strcat(mainstr, lowstr);
-						}
-					}
-					id++;
-				}
-			}
-			tmpTexture_MarkStart_CP[playerid] = id;
-		}
-		case 3:
-		{
-			foreach(new furnitureid : GFurniture)
-			{
-				if(gFurnitureInfo[furnitureid][gfOwner] == GarageInfo[iter][gId])
-				{
-					if(id >= page*MAX_FURNITURE_PER_PAGE)
-					{
-						if(id >= MAX_FURNITURE_PER_PAGE*(page+1)) 
-						{
-							strcat(mainstr, ">> Kitas");
-							tmpFurnitureNextPage[playerid] = true;
-							break;
-						}
-						else
-						{
-							format(lowstr, sizeof lowstr, "%s%d. %.14s%s\n", (FurnitureMultiSelectionEnabled{playerid} == true ? ((tmpArray[playerid][id] == 1 ? ("[{48BE2D}+{FFFFFF}] ") : ("[{FF0000}-{FFFFFF}] "))) : ("")), id+1, gFurnitureInfo[furnitureid][gfName], strlen(gFurnitureInfo[furnitureid][gfName]) > 14 ? ("..") : (""));
-							strcat(mainstr, lowstr);
-						}
-					}
-					id++;
-				}
-			}
-			tmpTexture_MarkStart_CP[playerid] = id;
-		}
-	}
-	if(strlen(mainstr))
-	{
-		/*if(GetGVarInt("EnabledFurnitureMultiSelect"))
-		{
-			if(FurnitureMultiSelectionEnabled{playerid} == true) strcat(mainstr, "{E67D32}Iðjungti þymëjimà\nPaþymëti visus\nAtþymëti visus\nRedaguoti paþymëtus");
-			else strcat(mainstr, "{E6A732}Ájungti þymëjimà");
-		}*/
-		//if(tmpFurniturePage[playerid] > 0) strcat(mainstr, "<< Atgal");
-		ShowPlayerDialog(playerid, DIALOG_FURNITURE_OWNED, DIALOG_STYLE_LIST, "Turimi baldai", mainstr, "Tæsti", "Atðaukti");
-	}
-	else pc_cmd_furniture(playerid, ""), InfoBox(playerid, "NERA", "BALDU");
-}
-
-stock ShowPlayerFurnitureBuy(playerid, string[])
-{
-	/*
-		Funkcija, rodanti zaidejui furniture objekto pirkima textdrawuose.
-	*/
-	FurniturePreview_RX[playerid] = 0.0,
-	FurniturePreview_RY[playerid] = 0.0,
-	FurniturePreview_RZ[playerid] = 0.0;
-	TextDrawShowForPlayer(playerid, Furniture_LeftBorder);
-	TextDrawShowForPlayer(playerid, Furniture_LeftBase);
-	TextDrawShowForPlayer(playerid, Furniture_Left);
-	TextDrawShowForPlayer(playerid, Furniture_RightBorder);
-	TextDrawShowForPlayer(playerid, Furniture_RightBase);
-	TextDrawShowForPlayer(playerid, Furniture_Right);
-	TextDrawShowForPlayer(playerid, Furniture_UpBorder);
-	TextDrawShowForPlayer(playerid, Furniture_UpBase);
-	TextDrawShowForPlayer(playerid, Furniture_Up);
-	TextDrawShowForPlayer(playerid, Furniture_DownBorder);
-	TextDrawShowForPlayer(playerid, Furniture_DownBase);
-	TextDrawShowForPlayer(playerid, Furniture_Down);
-	TextDrawShowForPlayer(playerid, Furniture_BuyBorder);
-	TextDrawShowForPlayer(playerid, Furniture_BuyBase);
-	TextDrawShowForPlayer(playerid, Furniture_Buy);
-	TextDrawShowForPlayer(playerid, Furniture_CloseBorder);
-	TextDrawShowForPlayer(playerid, Furniture_CloseBase);
-	TextDrawShowForPlayer(playerid, Furniture_Close);
-	TextDrawShowForPlayer(playerid, Furniture_DataBase);
-	PlayerTextDrawSetString(playerid, Furniture_Data[playerid], string);
-	PlayerTextDrawShow(playerid, Furniture_Data[playerid]);
-	ShowESCTextdraw(playerid, ESC_TYPE_FURNITURE);
-	return 1;
-}
-
-stock HidePlayerFurnitureBuy(playerid)
-{
-	/*
-		Funkcija, isjungianti zaidejo furniture pirkimo langa.
-	*/
-	TextDrawHideForPlayer(playerid, Furniture_LeftBorder);
-	TextDrawHideForPlayer(playerid, Furniture_LeftBase);
-	TextDrawHideForPlayer(playerid, Furniture_Left);
-	TextDrawHideForPlayer(playerid, Furniture_RightBorder);
-	TextDrawHideForPlayer(playerid, Furniture_RightBase);
-	TextDrawHideForPlayer(playerid, Furniture_Right);
-	TextDrawHideForPlayer(playerid, Furniture_UpBorder);
-	TextDrawHideForPlayer(playerid, Furniture_UpBase);
-	TextDrawHideForPlayer(playerid, Furniture_Up);
-	TextDrawHideForPlayer(playerid, Furniture_DownBorder);
-	TextDrawHideForPlayer(playerid, Furniture_DownBase);
-	TextDrawHideForPlayer(playerid, Furniture_Down);
-	TextDrawHideForPlayer(playerid, Furniture_BuyBorder);
-	TextDrawHideForPlayer(playerid, Furniture_BuyBase);
-	TextDrawHideForPlayer(playerid, Furniture_Buy);
-	TextDrawHideForPlayer(playerid, Furniture_CloseBorder);
-	TextDrawHideForPlayer(playerid, Furniture_CloseBase);
-	TextDrawHideForPlayer(playerid, Furniture_Close);
-	TextDrawHideForPlayer(playerid, Furniture_DataBase);
-	PlayerTextDrawHide(playerid, Furniture_Data[playerid]);
-	return 1;
-}
-
-stock formatlt(string[])
-{
-	/*
-		Funkcija, pavercianti eilute su lietuviskomis raidemis i angliskas
-	*/
-	new strlenght = strlen(string),
-		str[126];
-	format(str, sizeof str, string);
-	for(new i = 0; i < strlenght; i++)
-	{
-		if(str[i] == 'À') str[i] = 'A';
-		if(str[i] == 'à') str[i] = 'a';
-		if(str[i] == 'È') str[i] = 'C';
-		if(str[i] == 'è') str[i] = 'c';
-		if(str[i] == 'Æ') str[i] = 'E';
-		if(str[i] == 'æ') str[i] = 'e';
-		if(str[i] == 'Ë') str[i] = 'E';
-		if(str[i] == 'ë') str[i] = 'e';
-		if(str[i] == 'Á') str[i] = 'I';
-		if(str[i] == 'á') str[i] = 'i';
-		if(str[i] == 'Ð') str[i] = 'S';
-		if(str[i] == 'ð') str[i] = 's';
-		if(str[i] == 'Ø') str[i] = 'U';
-		if(str[i] == 'ø') str[i] = 'u';
-		if(str[i] == 'Û') str[i] = 'U';
-		if(str[i] == 'û') str[i] = 'u';
-		if(str[i] == 'Þ') str[i] = 'Z';
-		if(str[i] == 'þ') str[i] = 'z';
-	}
-	return str;
-}
-
-
-
-stock IsVehicleDrivingBackwards(vehicleid)
-{
-	/*
-		Funkcija, grazinanti reiksme ar masina vaziuoja atgal.
-	*/
-    new Float:Float[3];
-    if(GetVehicleVelocity(vehicleid, Float[1], Float[2], Float[0]))
-    {
-        GetVehicleZAngle(vehicleid, Float[0]);
-        if(Float[0] < 90)
-        {
-            if(Float[1] > 0 && Float[2] < 0) return true;
-        }
-        else if(Float[0] < 180)
-        {
-            if(Float[1] > 0 && Float[2] > 0) return true;
-        }
-        else if(Float[0] < 270)
-        {
-            if(Float[1] < 0 && Float[2] > 0) return true;
-        }
-        else if(Float[1] < 0 && Float[2] < 0) return true;
-    }
-    return false;
-}
 
 stock DisconnectPlayer(playerid)
 {
@@ -20651,7 +18950,6 @@ stock DisconnectPlayer(playerid)
 		}
 	}
 	ResetPlayerJobTask(playerid);
-	DestroyFurniturePreview(playerid, false);
 	return 1;
 }
 
@@ -20982,36 +19280,7 @@ stock FindPlayerByName(name[])
 	return INVALID_PLAYER_ID;
 }
 
-stock ClearBFurniture(itter)
-{
-	/*
-	 * Iðvalo array verslo furniture objekto.
-	 */
-	new __reset_BFurniture[E_BUSINESS_FURNITURE_DATA];
-	bFurnitureInfo[itter] = __reset_BFurniture;
-	bFurnitureInfo[itter][bfObject] = INVALID_OBJECT_ID;
-	return 1;
-}
-stock ClearHFurniture(itter)
-{
-	/*
-	 * Iðvalo array namo furniture objekto.
-	 */
-	new __reset_HFurniture[E_HOUSE_FURNITURE_DATA];
-	hFurnitureInfo[itter] = __reset_HFurniture;
-	hFurnitureInfo[itter][hfObject] = INVALID_OBJECT_ID;
-	return 1;
-}
-stock ClearGFurniture(itter)
-{
-	/*
-	 * Iðvalo array namo furniture objekto.
-	 */
-	new __reset_GFurniture[E_GARAGE_FURNITURE_DATA];
-	gFurnitureInfo[itter] = __reset_GFurniture;
-	gFurnitureInfo[itter][gfObject] = INVALID_OBJECT_ID;
-	return 1;
-}
+
 stock GetPlayerNameEx(playerid, bool:roleplay = false, bool:ignoremask = false)
 {
 	/*
@@ -21156,11 +19425,15 @@ public BusinessLoad()
 		cache_get_value_name(i, "Name", BusinessInfo[i][bName], 24);
 		cache_get_value_name(i, "Slogan", BusinessInfo[i][bSlogan], 128);
 
+		cache_get_value_name_float(i, "OutFurnitureRange", BusinessInfo[i][bOutFurnitureRange]);
+
 		Business_CreatePickup(i);
 		Business_FixLabels(i, enabled_labels);
 
 		Iter_Add(Business, i);
 		LoadBusinessInventory(i);
+
+		call OnBusinessLoad(i);
 	}
 	printf("[load] %d verslu", rows);
 	return 1;
@@ -21599,6 +19872,8 @@ public HousesLoad()
 		cache_get_value_name_int(i, "UpdateClothes", HouseInfo[i][hUpdateClothes]);
 		cache_get_value_name_int(i, "UpdateSafe", HouseInfo[i][hUpdateSafe]);
 		cache_get_value_name_int(i, "Safe", HouseInfo[i][hSafe]);
+		
+		cache_get_value_name_float(i, "OutFurnitureRange", HouseInfo[i][hOutFurnitureRange]);
 
 		HouseInfo[i][hVW] = HouseInfo[i][hId] + HOUSE_VIRTUAL_WORLD;
 		cache_get_value_name_int(i, "OutVW", HouseInfo[i][hOutVW]);
@@ -21608,6 +19883,8 @@ public HousesLoad()
 		House_FixLabels(i, enabled_labels);
 		Iter_Add(House, i);
 		LoadHouseInventory(i);
+
+		call OnHouseLoad(i);
 	}
 	printf("[load] %d namu", rows);
 	return 1;
@@ -21783,389 +20060,6 @@ public PayPhonesLoad()
 		Iter_Add(PayPhone, i);
 	}
 	printf("[load] %d taksofonu", rows);
-	return 1;
-}
-
-stock House_DeleteFurniture(house)
-{
-	new 
-		last_iter = -1,
-		__reset_HFurniture[E_HOUSE_FURNITURE_DATA],
-		count_deleted = 0;
-
-	foreach(new furnitureid : HFurniture)
-	{
-		if(hFurnitureInfo[furnitureid][hfOwner] == HouseInfo[house][hId])
-		{
-			IsValidDynamicObject(hFurnitureInfo[furnitureid][hfObject]) && DestroyDynamicObject(hFurnitureInfo[furnitureid][hfObject], "furniture", "admin_delete_house_furniture");
-			hFurnitureInfo[furnitureid] = __reset_HFurniture;
-			hFurnitureInfo[furnitureid][hfObject] = INVALID_OBJECT_ID;
-			if(last_iter != -1 && last_iter != furnitureid)
-			{
-				Iter_Remove(HFurniture, last_iter);
-			}
-			last_iter = furnitureid;
-			count_deleted++;
-		}
-	}
-	if(last_iter != -1) Iter_Remove(HFurniture, last_iter);
-	
-	inline updateHouse()
-	{
-		return 1;
-	}
-	mysql_tquery_inline(chandler, using inline updateHouse, "DELETE FROM `houses_furniture` WHERE HouseId = '%d'", HouseInfo[house][hId]);
-	return count_deleted;
-}
-
-stock LoadHouseFurniture(bool:restart = false)
-{
-	/*
-	 * Funkcija, kuria uzkraunami visu namu objektai.
-	 */
-	if(restart)
-	{
-		foreach(new fur : HFurniture)
-		{
-			if(IsValidDynamicObject(hFurnitureInfo[fur][hfObject])) DestroyDynamicObject(hFurnitureInfo[fur][hfObject], "furniture", "RestartHouses");
-			ClearHFurniture(fur);
-		}
-		Iter_Clear(HFurniture);
-	}
-	mysql_tquery(chandler, "SELECT * FROM `houses_furniture`", "HouseFurnitureLoad");
-	return 1;
-}
-
-forward HouseFurnitureLoad();
-public HouseFurnitureLoad()
-{
-	Iter_Clear(HFurniture);
-	new rows = cache_num_rows(),
-		colorstr[18],
-		texturestr[18];
-	for(new i = 0; i < rows; i++)
-	{
-		cache_get_value_name(i, "Name", hFurnitureInfo[i][hfName], 34);
-		cache_get_value_name_int(i, "id", hFurnitureInfo[i][hfId]);
-		cache_get_value_name_int(i, "Model", hFurnitureInfo[i][hfModel]);
-		cache_get_value_name_int(i, "HouseId", hFurnitureInfo[i][hfOwner]);
-		cache_get_value_name_int(i, "Type", hFurnitureInfo[i][hfType]);
-		cache_get_value_name_int(i, "VW", hFurnitureInfo[i][hfVW]);
-		cache_get_value_name_int(i, "Interior", hFurnitureInfo[i][hfInterior]);
-		cache_get_value_name_int(i, "Price", hFurnitureInfo[i][hfPrice]);
-		cache_get_value_name_float(i, "X", hFurnitureInfo[i][hfPos][0]);
-		cache_get_value_name_float(i, "Y", hFurnitureInfo[i][hfPos][1]);
-		cache_get_value_name_float(i, "Z", hFurnitureInfo[i][hfPos][2]);
-		cache_get_value_name_float(i, "RX", hFurnitureInfo[i][hfRot][0]);
-		cache_get_value_name_float(i, "RY", hFurnitureInfo[i][hfRot][1]);
-		cache_get_value_name_float(i, "RZ", hFurnitureInfo[i][hfRot][2]);
-		hFurnitureInfo[i][hfObject] = CreateDynamicObject(hFurnitureInfo[i][hfModel], hFurnitureInfo[i][hfPos][0], hFurnitureInfo[i][hfPos][1], hFurnitureInfo[i][hfPos][2], hFurnitureInfo[i][hfRot][0], hFurnitureInfo[i][hfRot][1], hFurnitureInfo[i][hfRot][2], hFurnitureInfo[i][hfVW], hFurnitureInfo[i][hfInterior], .called = "furniture", .extra = "HouseFurnitureLoad");
-		for(new texture = 0; texture < MAX_TEXTURE_SLOTS; texture++)
-		{
-			new 
-				texture_file[24],
-				texture_name[24],
-				texture_model,
-				color_code;
-
-			format(texturestr, sizeof texturestr, "Texture%d", texture);
-			cache_get_value_name_int(i, texturestr, hFurnitureInfo[i][hfTexture][texture]);
-
-			format(colorstr, sizeof colorstr, "Color%d", texture);
-			cache_get_value_name_int(i, colorstr, hFurnitureInfo[i][hfColor][texture]);
-
-			format(texture_file, 5, "none");
-			format(texture_name, 5, "none");
-			texture_model = hFurnitureInfo[i][hfModel];
-
-			if(hFurnitureInfo[i][hfColor][texture] != 0)
-			{
-				if(hFurnitureInfo[i][hfColor][texture] > sizeof FurnitureColors)
-				{
-					new string[86];
-					mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET `%e` = '0' WHERE id = '%d'", colorstr, hFurnitureInfo[i][hfId]);
-					mysql_query(chandler, string, false);
-				}
-				else
-				{
-					color_code = FurnitureColors[hFurnitureInfo[i][hfColor][texture]][colorCode];
-				}
-			}
-			if(hFurnitureInfo[i][hfTexture][texture] != 0)
-			{
-				if(hFurnitureInfo[i][hfTexture][texture] > sizeof FurnitureTextures)
-				{
-					new string[86];
-					mysql_format(chandler, string, sizeof string, "UPDATE `houses_furniture` SET `%e` = '0' WHERE id = '%d'", texturestr, hFurnitureInfo[i][hfId]);
-					mysql_query(chandler, string, false);
-				}
-				else
-				{
-					format(texture_file, sizeof texture_file, FurnitureTextures[hFurnitureInfo[i][hfTexture][texture]][textureFile]);
-					format(texture_name, sizeof texture_name, FurnitureTextures[hFurnitureInfo[i][hfTexture][texture]][textureName]);
-					texture_model = FurnitureTextures[hFurnitureInfo[i][hfTexture][texture]][textureModel];
-				}
-			}
-			SetDynamicObjectMaterial(hFurnitureInfo[i][hfObject], texture, texture_model, texture_file, texture_name, color_code);
-		}
-		Iter_Add(HFurniture, i);
-	}
-	printf("[load] %d namu baldu", rows);
-	return 1;
-}
-
-stock Garage_DeleteFurniture(garage)
-{
-	// istrinam ir furniture
-	new __reset_GFurniture[E_GARAGE_FURNITURE_DATA],
-		last_iter = -1,
-		count_deleted = 0;
-    foreach(new furnitureid : GFurniture)
-    {
-        if(gFurnitureInfo[furnitureid][gfOwner] == GarageInfo[garage][gOwner])
-        {
-            IsValidDynamicObject(gFurnitureInfo[furnitureid][gfObject]) && DestroyDynamicObject(gFurnitureInfo[furnitureid][gfObject], "furniture", "admin_delete_garage");
-            gFurnitureInfo[furnitureid] = __reset_GFurniture;
-            gFurnitureInfo[furnitureid][gfObject] = INVALID_OBJECT_ID;
-
-            if(last_iter != -1 && last_iter != furnitureid)
-            {
-                Iter_Remove(GFurniture, last_iter);
-            }
-            last_iter = furnitureid;
-			count_deleted++;
-        }
-    }
-    (last_iter != -1) && Iter_Remove(GFurniture, last_iter);
-	inline deleteFurniture() return 1;
-	mysql_tquery_inline(chandler, using inline deleteFurniture, "DELETE FROM `garages_furniture` WHERE GarageId = '%d'", GarageInfo[garage][gId]);
-	return count_deleted;
-}
-
-stock LoadGarageFurniture(bool:restart = false)
-{
-	/*
-	 * Funkcija, kuria uzkraunami visu garazu objektai.
-	 */
-	if(restart)
-	{
-		foreach(new fur : GFurniture)
-		{
-			if(IsValidDynamicObject(gFurnitureInfo[fur][gfObject])) DestroyDynamicObject(gFurnitureInfo[fur][gfObject], "furniture", "GarageRestart");
-			ClearHFurniture(fur);
-		}
-		Iter_Clear(GFurniture);
-	}
-	mysql_tquery(chandler, "SELECT * FROM `garages_furniture`", "GarageFurnitureLoad");
-	return 1;
-}
-
-forward GarageFurnitureLoad();
-public GarageFurnitureLoad()
-{
-	Iter_Clear(GFurniture);
-	new rows = cache_num_rows(),
-		colorstr[18],
-		texturestr[18];
-	for(new i = 0; i < rows; i++)
-	{
-		cache_get_value_name(i, "Name", gFurnitureInfo[i][gfName], 34);
-		cache_get_value_name_int(i, "id", gFurnitureInfo[i][gfId]);
-		cache_get_value_name_int(i, "Model", gFurnitureInfo[i][gfModel]);
-		cache_get_value_name_int(i, "GarageId", gFurnitureInfo[i][gfOwner]);
-		cache_get_value_name_int(i, "Type", gFurnitureInfo[i][gfType]);
-		cache_get_value_name_int(i, "VW", gFurnitureInfo[i][gfVW]);
-		cache_get_value_name_int(i, "Interior", gFurnitureInfo[i][gfInterior]);
-		cache_get_value_name_int(i, "Price", gFurnitureInfo[i][gfPrice]);
-		cache_get_value_name_float(i, "X", gFurnitureInfo[i][gfPos][0]);
-		cache_get_value_name_float(i, "Y", gFurnitureInfo[i][gfPos][1]);
-		cache_get_value_name_float(i, "Z", gFurnitureInfo[i][gfPos][2]);
-		cache_get_value_name_float(i, "RX", gFurnitureInfo[i][gfRot][0]);
-		cache_get_value_name_float(i, "RY", gFurnitureInfo[i][gfRot][1]);
-		cache_get_value_name_float(i, "RZ", gFurnitureInfo[i][gfRot][2]);
-		gFurnitureInfo[i][gfObject] = CreateDynamicObject(gFurnitureInfo[i][gfModel], gFurnitureInfo[i][gfPos][0], gFurnitureInfo[i][gfPos][1], gFurnitureInfo[i][gfPos][2], gFurnitureInfo[i][gfRot][0], gFurnitureInfo[i][gfRot][1], gFurnitureInfo[i][gfRot][2], gFurnitureInfo[i][gfVW], gFurnitureInfo[i][gfInterior], .called = "furniture", .extra = "GarageFurniturelo");
-		for(new texture = 0; texture < MAX_TEXTURE_SLOTS; texture++)
-		{
-			new 
-				texture_file[24],
-				texture_name[24],
-				texture_model,
-				color_code;
-
-			format(texturestr, sizeof texturestr, "Texture%d", texture);
-			cache_get_value_name_int(i, texturestr, gFurnitureInfo[i][gfTexture][texture]);
-
-			format(colorstr, sizeof colorstr, "Color%d", texture);
-			cache_get_value_name_int(i, colorstr, gFurnitureInfo[i][gfColor][texture]);
-
-			format(texture_file, 5, "none");
-			format(texture_name, 5, "none");
-			texture_model = gFurnitureInfo[i][gfModel];
-
-			if(gFurnitureInfo[i][gfColor][texture] != 0)
-			{
-				if(gFurnitureInfo[i][gfColor][texture] > sizeof FurnitureColors)
-				{
-					new string[86];
-					mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET `%e` = '0' WHERE id = '%d'", colorstr, gFurnitureInfo[i][gfId]);
-					mysql_query(chandler, string, false);
-				}
-				else
-				{
-					color_code = FurnitureColors[gFurnitureInfo[i][gfColor][texture]][colorCode];
-				}
-			}
-			if(gFurnitureInfo[i][gfTexture][texture] != 0)
-			{
-				if(gFurnitureInfo[i][gfTexture][texture] > sizeof FurnitureTextures)
-				{
-					new string[86];
-					mysql_format(chandler, string, sizeof string, "UPDATE `garages_furniture` SET `%e` = '0' WHERE id = '%d'", texturestr, gFurnitureInfo[i][gfId]);
-					mysql_query(chandler, string, false);
-				}
-				else
-				{
-					format(texture_file, sizeof texture_file, FurnitureTextures[gFurnitureInfo[i][gfTexture][texture]][textureFile]);
-					format(texture_name, sizeof texture_name, FurnitureTextures[gFurnitureInfo[i][gfTexture][texture]][textureName]);
-					texture_model = FurnitureTextures[gFurnitureInfo[i][gfTexture][texture]][textureModel];
-				}
-			}
-			SetDynamicObjectMaterial(gFurnitureInfo[i][gfObject], texture, texture_model, texture_file, texture_name, color_code);
-		}
-		Iter_Add(GFurniture, i);
-	}
-	printf("[load] %d garazu baldu", rows);
-	return 1;
-}
-
-
-stock Business_DeleteFurniture(business)
-{
-	new count_deleted,
-		last_iter = -1,
-		__reset_BFurniture[E_BUSINESS_FURNITURE_DATA];
-	foreach(new furnitureid : BFurniture)
-	{
-		if(bFurnitureInfo[furnitureid][bfOwner] == BusinessInfo[business][bId])
-		{
-			if(IsValidDynamicObject(bFurnitureInfo[furnitureid][bfObject])) DestroyDynamicObject(bFurnitureInfo[furnitureid][bfObject], "furniture", "admin_delete_business_furniture");
-			bFurnitureInfo[furnitureid] = __reset_BFurniture;
-			bFurnitureInfo[furnitureid][bfObject] = INVALID_OBJECT_ID;
-			if(last_iter != -1 && last_iter != furnitureid)
-			{
-				Iter_Remove(BFurniture, last_iter);
-				count_deleted++;
-			}
-			last_iter = furnitureid;
-		}
-	}
-	if(last_iter != -1) Iter_Remove(BFurniture, last_iter);
-
-	inline deleteBFurniture()
-	{
-		return 1;
-	}
-	mysql_tquery_inline(chandler, using inline deleteBFurniture, "\
-		DELETE FROM `business_furniture` WHERE BusinessId = '%d'",
-		BusinessInfo[business][bId]
-	);
-	return count_deleted;
-}
-
-stock LoadBusinessFurniture(bool:restart = false)
-{
-	/*
-	 * Funkcija, kuria uzkraunami visu namu objektai.
-	 */
-	if(restart)
-	{
-		foreach(new fur: BFurniture)
-		{
-			if(IsValidDynamicObject(bFurnitureInfo[fur][bfObject])) DestroyDynamicObject(bFurnitureInfo[fur][bfObject], "furniture", "BusinessRestart");
-			ClearBFurniture(fur);
-		}
-		Iter_Clear(BFurniture);
-	}
-	mysql_tquery(chandler, "SELECT * FROM `business_furniture`", "BusinessFurnitureLoad");
-	return 1;
-}
-
-forward BusinessFurnitureLoad();
-public BusinessFurnitureLoad()
-{
-	Iter_Clear(BFurniture);
-	new rows = cache_num_rows(),
-		texturestr[18],
-		colorstr[18];
-	for(new i = 0; i < rows; i++)
-	{
-		cache_get_value_name(i, "Name", bFurnitureInfo[i][bfName], 34);
-		cache_get_value_name_int(i, "id", bFurnitureInfo[i][bfId]);
-		cache_get_value_name_int(i, "Model", bFurnitureInfo[i][bfModel]);
-		cache_get_value_name_int(i, "BusinessId", bFurnitureInfo[i][bfOwner]);
-		cache_get_value_name_int(i, "Type", bFurnitureInfo[i][bfType]);
-		cache_get_value_name_int(i, "VW", bFurnitureInfo[i][bfVW]);
-		cache_get_value_name_int(i, "Interior", bFurnitureInfo[i][bfInterior]);
-		cache_get_value_name_int(i, "Price", bFurnitureInfo[i][bfPrice]);
-		cache_get_value_name_float(i, "X", bFurnitureInfo[i][bfPos][0]);
-		cache_get_value_name_float(i, "Y", bFurnitureInfo[i][bfPos][1]);
-		cache_get_value_name_float(i, "Z", bFurnitureInfo[i][bfPos][2]);
-		cache_get_value_name_float(i, "RX", bFurnitureInfo[i][bfRot][0]);
-		cache_get_value_name_float(i, "RY", bFurnitureInfo[i][bfRot][1]);
-		cache_get_value_name_float(i, "RZ", bFurnitureInfo[i][bfRot][2]);
-		bFurnitureInfo[i][bfObject] = CreateDynamicObject(bFurnitureInfo[i][bfModel], bFurnitureInfo[i][bfPos][0], bFurnitureInfo[i][bfPos][1], bFurnitureInfo[i][bfPos][2], bFurnitureInfo[i][bfRot][0], bFurnitureInfo[i][bfRot][1], bFurnitureInfo[i][bfRot][2], bFurnitureInfo[i][bfVW], bFurnitureInfo[i][bfInterior], .called = "furniture", .extra = "BusinessFurnitureLoad");
-		for(new texture = 0; texture < MAX_TEXTURE_SLOTS; texture++)
-		{
-			new 
-				texture_file[24],
-				texture_name[24],
-				texture_model,
-				color_code;
-
-			format(texturestr, sizeof texturestr, "Texture%d", texture);
-			cache_get_value_name_int(i, texturestr, bFurnitureInfo[i][bfTexture][texture]);
-
-			format(colorstr, sizeof colorstr, "Color%d", texture);
-			cache_get_value_name_int(i, colorstr, bFurnitureInfo[i][bfColor][texture]);
-
-			format(texture_file, 5, "none");
-			format(texture_name, 5, "none");
-			texture_model = bFurnitureInfo[i][bfModel];
-
-			if(bFurnitureInfo[i][bfColor][texture] != 0)
-			{
-				if(bFurnitureInfo[i][bfColor][texture] > sizeof FurnitureColors)
-				{
-					new string[86];
-					mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET `%e` = '0' WHERE id = '%d'", colorstr, bFurnitureInfo[i][bfId]);
-					mysql_query(chandler, string, false);
-				}
-				else
-				{
-					color_code = FurnitureColors[bFurnitureInfo[i][bfColor][texture]][colorCode];
-				}
-			}
-			if(bFurnitureInfo[i][bfTexture][texture] != 0)
-			{
-				if(bFurnitureInfo[i][bfTexture][texture] > sizeof FurnitureTextures)
-				{
-					new string[86];
-					mysql_format(chandler, string, sizeof string, "UPDATE `business_furniture` SET `%e` = '0' WHERE id = '%d'", texturestr, bFurnitureInfo[i][bfId]);
-					mysql_query(chandler, string, false);
-				}
-				else
-				{
-					format(texture_file, sizeof texture_file, FurnitureTextures[bFurnitureInfo[i][bfTexture][texture]][textureFile]);
-					format(texture_name, sizeof texture_name, FurnitureTextures[bFurnitureInfo[i][bfTexture][texture]][textureName]);
-					texture_model = FurnitureTextures[bFurnitureInfo[i][bfTexture][texture]][textureModel];
-				}
-			}
-			SetDynamicObjectMaterial(bFurnitureInfo[i][bfObject], texture, texture_model, texture_file, texture_name, color_code);
-
-		}
-		Iter_Add(BFurniture, i);
-	}
-	printf("[load] %d verslu baldu", rows);
 	return 1;
 }
 
@@ -22376,20 +20270,20 @@ public GaragesLoad()
 		cache_get_value_name_float(i, "CarExitY", GarageInfo[i][gCarExitY]);
 		cache_get_value_name_float(i, "CarExitZ", GarageInfo[i][gCarExitZ]);
 		cache_get_value_name_float(i, "CarExitA", GarageInfo[i][gCarExitA]);
-		FixGarageLabels(i);
+		Garage_FixLabels(i);
 		Iter_Add(Garage, i);
+
+		call OnGarageLoad(i);
 	}
 	printf("[load] %d garazu", rows);
 	return 1;
 }
 
-stock FixGarageLabels(i)
+stock Garage_FixLabels(i)
 {
-	if(IsValidDynamic3DTextLabel(GarageInfo[i][gLabel]))
-	{
-		DestroyDynamic3DTextLabel(GarageInfo[i][gLabel]);
-	}
+	IsValidDynamic3DTextLabel(GarageInfo[i][gLabel]) && DestroyDynamic3DTextLabel(GarageInfo[i][gLabel]);
 	GarageInfo[i][gLabel] = INVALID_3DTEXT_ID;
+	
 	new string[256];
 	if(GarageInfo[i][gOwner] == 0) format(string, sizeof string, "{FFFFFF}Garaþas parduodamas!\nKaina: $%d (/buygarage){DADADA}\n\n", GarageInfo[i][gPrice]);
 	else format(string, sizeof string, "");
@@ -23439,7 +21333,7 @@ stock GetClosestHouseInCoords(Float:x, Float:y, Float:z, playerid, Float:distanc
 	}
 	return last_house;
 }
-stock GetClosestHouse(playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
+stock GetClosestHouse(playerid, Float:distance = 5.0, &was_inside, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
 {
 	/*
 	 * Funkcija naudojama isgauti artimiausia zaidejo nama
@@ -23489,6 +21383,7 @@ stock GetClosestHouse(playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_A
 			}
 		}
 	}
+	was_inside = last_was_inside;
 	return last_house;
 }
 
@@ -23871,7 +21766,6 @@ stock ResetData(playerid, bool:reset_char_data = true, bool:reset_user_data = tr
 		PreparePlayerData(playerid);
 	}
 
-	FurnitureMultiSelectionEnabled{playerid} = 
 	SeenATMCommand{playerid} = 
 	SeenFillCommand{playerid} = 
 	SeenPayPhoneCommand{playerid} = false;
@@ -24267,126 +22161,6 @@ stock BuyVehicle(playerid, model, name[], price, color1, color2, lock, salon, do
 }
 
 thread(VehicleBoughtEx);
-
-stock BuyFurniture(playerid, type, owner, price, model, name[], category[], Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
-{
-	new
-		string[321],
-		row_owner[16],
-		table_name_prefix[16];
-	if(type == 1)
-	{
-		format(row_owner, 16, "HouseId");
-		format(table_name_prefix, 16, "houses");
-	}
-	else if(type == 2)
-	{
-		format(row_owner, 16, "BusinessId");
-		format(table_name_prefix, 16, "business");
-	}
-	else if(type == 3)
-	{
-		format(row_owner, 16, "GarageId");
-		format(table_name_prefix, 16, "garages");
-	}
-	mysql_format(chandler, string, sizeof string, "INSERT INTO `%s_furniture` (`Model`,`%s`,`Price`,`Name`,`Category`,`Added`,`Interior`,`VW`,`X`,`Y`,`Z`,`RX`,`RY`,`RZ`) VALUES ('%d','%d','%d','%s','%s','%d','%d','%d','%f','%f','%f','%f','%f','%f')", table_name_prefix, row_owner, model, owner, price, name, category, PlayerInfo[playerid][pId], GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid), x, y, z, rx, ry, rz);
-	mysql_tquery(chandler, string, "FurnitureBought", "dddddssffffff", playerid, type, owner, price, model, name, category, x, y, z, rx, ry, rz);
-	return 1;
-}
-
-forward FurnitureBought(playerid, type, owner, price, model, name[], category[], Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz);
-public FurnitureBought(playerid, type, owner, price, model, name[], category[], Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
-{
-	new
-		id;
-	log_init(true);
-	switch(type)
-	{
-		case 1:
-		{
-			// namui
-			id = Iter_Free(HFurniture);
-			hFurnitureInfo[id][hfObject] = CreateDynamicObject(model, x, y, z, rx, ry, rz, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), .called = "furniture", .extra = "BuyHouseFurniture");
-			hFurnitureInfo[id][hfPrice] = price;
-			hFurnitureInfo[id][hfId] = cache_insert_id();
-			hFurnitureInfo[id][hfRot][0] = rx;
-			hFurnitureInfo[id][hfRot][1] = ry;
-			hFurnitureInfo[id][hfRot][2] = rz;
-			hFurnitureInfo[id][hfPos][0] = x;
-			hFurnitureInfo[id][hfPos][1] = y;
-			hFurnitureInfo[id][hfPos][2] = z;
-			hFurnitureInfo[id][hfModel] = model;
-			hFurnitureInfo[id][hfOwner] = owner;
-			format(hFurnitureInfo[id][hfName], 24, name);
-			hFurnitureInfo[id][hfInterior] = GetPlayerInterior(playerid);
-			hFurnitureInfo[id][hfVW] = GetPlayerVirtualWorld(playerid);
-			Streamer_Update(playerid);
-			EditDynamicObject(playerid, hFurnitureInfo[id][hfObject]);
-			tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_FURNITURE;
-			Iter_Add(HFurniture, id);
-			log_set_table("logs_houses");
-			log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`,`ExtraString`,`Amount`");
-			log_set_values("'%d','%e','%d','Nupirko balda','%e/%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), owner, category, name, price);
-		}
-		case 2:
-		{
-			// verslui
-			id = Iter_Free(BFurniture);
-			bFurnitureInfo[id][bfObject] = CreateDynamicObject(model, x, y, z, rx, ry, rz, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), .called = "furniture", .extra = "BuyBusinessFurniture");
-			bFurnitureInfo[id][bfPrice] = price;
-			bFurnitureInfo[id][bfId] = cache_insert_id();
-			bFurnitureInfo[id][bfRot][0] = rx;
-			bFurnitureInfo[id][bfRot][1] = ry;
-			bFurnitureInfo[id][bfRot][2] = rz;
-			bFurnitureInfo[id][bfPos][0] = x;
-			bFurnitureInfo[id][bfPos][1] = y;
-			bFurnitureInfo[id][bfPos][2] = z;
-			bFurnitureInfo[id][bfModel] = model;
-			bFurnitureInfo[id][bfOwner] = owner;
-			format(bFurnitureInfo[id][bfName], 24, name);
-			bFurnitureInfo[id][bfInterior] = GetPlayerInterior(playerid);
-			bFurnitureInfo[id][bfVW] = GetPlayerVirtualWorld(playerid);
-			Streamer_Update(playerid);
-			EditDynamicObject(playerid, bFurnitureInfo[id][bfObject]);
-			tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_FURNITURE;
-			Iter_Add(BFurniture, id);
-			log_set_table("logs_business");
-			log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`,`ExtraString`,`Amount`");
-			log_set_values("'%d','%e','%d','Nupirko balda','%e/%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), owner, category, name, price);
-		}
-		case 3:
-		{
-			// garazui
-			id = Iter_Free(GFurniture);
-			gFurnitureInfo[id][gfObject] = CreateDynamicObject(model, x, y, z, rx, ry, rz, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), .called = "furniture", .extra = "BuyGarageFurniture");
-			gFurnitureInfo[id][gfPrice] = price;
-			gFurnitureInfo[id][gfId] = cache_insert_id();
-			gFurnitureInfo[id][gfRot][0] = rx;
-			gFurnitureInfo[id][gfRot][1] = ry;
-			gFurnitureInfo[id][gfRot][2] = rz;
-			gFurnitureInfo[id][gfPos][0] = x;
-			gFurnitureInfo[id][gfPos][1] = y;
-			gFurnitureInfo[id][gfPos][2] = z;
-			gFurnitureInfo[id][gfModel] = model;
-			gFurnitureInfo[id][gfOwner] = owner;
-			format(gFurnitureInfo[id][gfName], 24, name);
-			gFurnitureInfo[id][gfInterior] = GetPlayerInterior(playerid);
-			gFurnitureInfo[id][gfVW] = GetPlayerVirtualWorld(playerid);
-			Streamer_Update(playerid);
-			EditDynamicObject(playerid, gFurnitureInfo[id][gfObject]);
-			tmpEditing_Component_DMV[playerid] = EDITING_TYPE_DYNAMIC_FURNITURE;
-			Iter_Add(GFurniture, id);
-			log_set_table("logs_garages");
-			log_set_keys("`PlayerId`,`PlayerName`,`GarageId`,`ActionText`,`ExtraString`,`Amount`");
-			log_set_values("'%d','%e','%d','Nupirko balda','%e/%e','%d'", LogPlayerId(playerid), LogPlayerName(playerid), owner, category, name, price);
-		}
-	}
-	tmpSelected[playerid] = id;
-	log_commit();
-	return 1;
-}
-
-
 
 public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 {
@@ -24794,24 +22568,24 @@ public VehicleDataAddDubkeys(playerid, show, save_data, last_rows)
 
 stock TakeDroppedItem(playerid)
 {
-	foreach(new itter : DroppedItem)
+	foreach(new iter : DroppedItem)
 	{
-		if(IsPlayerInRangeOfPoint(playerid, 1.0, DroppedItems[itter][droppedItemX], DroppedItems[itter][droppedItemY], DroppedItems[itter][droppedItemZ]))
+		if(IsPlayerInRangeOfPoint(playerid, 1.0, DroppedItems[iter][droppedItemX], DroppedItems[iter][droppedItemY], DroppedItems[iter][droppedItemZ]))
 		{
-			if(DroppedItems[itter][droppedItemId] != 0 && DroppedItems[itter][droppedItemAmount] != 0)
+			if(DroppedItems[iter][droppedItemId] != 0 && DroppedItems[iter][droppedItemAmount] != 0)
 			{
 				new slotid;
 				if((slotid = GetPlayerFreeInventorySlot(playerid)) == -1) return SendWarning(playerid, "nëra pakankamai vietos inventoriuje.");
-				GivePlayerInventoryItem(playerid, DroppedItems[itter][droppedItemId], DroppedItems[itter][droppedItemAmount], DroppedItems[itter][droppedItemExtraId], slotid);
-				if(IsValidDynamicObject(DroppedItems[itter][droppedItemObject])) DestroyDynamicObject(DroppedItems[itter][droppedItemObject], "drops", "take");
+				GivePlayerInventoryItem(playerid, DroppedItems[iter][droppedItemId], DroppedItems[iter][droppedItemAmount], DroppedItems[iter][droppedItemExtraId], slotid);
+				if(IsValidDynamicObject(DroppedItems[iter][droppedItemObject])) DestroyDynamicObject(DroppedItems[iter][droppedItemObject], "drops", "take");
 				new string[126];
-				rp_me(playerid, _, "paima daiktà nuo þemës, kuris atrodo kaip %s.", GetInventoryItemName(DroppedItems[itter][droppedItemId], .lower_case = true));
-				mysql_format(chandler, string, sizeof string, "UPDATE `drops_data` SET Valid = '0', PickedBy = '%d' WHERE id = '%d'", PlayerInfo[playerid][pId], DroppedItems[itter][droppedItemMysqlId]);
+				rp_me(playerid, _, "paima daiktà nuo þemës, kuris atrodo kaip %s.", GetInventoryItemName(DroppedItems[iter][droppedItemId], .lower_case = true));
+				mysql_format(chandler, string, sizeof string, "UPDATE `drops_data` SET Valid = '0', PickedBy = '%d' WHERE id = '%d'", PlayerInfo[playerid][pId], DroppedItems[iter][droppedItemMysqlId]);
 				mysql_fquery(chandler, string, "DropDeletedAuto");
 				new clear[E_DROPPED_ITEMS_DATA];
-				DroppedItems[itter] = clear;
-				DroppedItems[itter][droppedItemObject] = INVALID_OBJECT_ID;
-				Iter_Remove(DroppedItem, itter);
+				DroppedItems[iter] = clear;
+				DroppedItems[iter][droppedItemObject] = INVALID_OBJECT_ID;
+				Iter_Remove(DroppedItem, iter);
 				return true;
 			}
 		}
@@ -25122,12 +22896,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 				tmpSelected[playerid] = -1;
 				return 1;
 			}
-			case ESC_TYPE_FURNITURE:
-			{
-				DestroyFurniturePreview(playerid);
-				GetESCType(playerid) = ESC_TYPE_NONE;
-				return 1;
-			}
+
 			case ESC_TYPE_MECHTUNE:
 			{
 				if(tmpSelected[playerid] != 0)
@@ -25555,63 +23324,7 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 			HidePlayerATM(playerid);
 			CancelSelectTextDraw(playerid);
 		}
-		if(clickedid == Furniture_BuyBase)
-		{
-			if(GetPlayerMoney(playerid) < FurnitureList[tmpSelected[playerid]][furnitureListPrice]) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, FurnitureList[tmpSelected[playerid]][furnitureListPrice]);
-			if( (tmpType_Salon[playerid] == 1 && GetClosestHouseInCoords(PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ], playerid, 70.0, CHECK_TYPE_INSIDE) == tmpIter[playerid] && HaveHouseKey(playerid, tmpIter[playerid], "P_FurnitureControl")) ||
-				(tmpType_Salon[playerid] == 2 && GetClosestBusinessInCoords(PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ], playerid, 70.0, CHECK_TYPE_INSIDE) == tmpIter[playerid] && HaveBusinessKey(playerid, tmpIter[playerid], "P_FurnitureControl")) || 
-				(tmpType_Salon[playerid] == 3 && GetClosestGarageInCoords(PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ], playerid, 70.0, CHECK_TYPE_INSIDE) == tmpIter[playerid] && GarageInfo[tmpIter[playerid]][gOwner] == PlayerInfo[playerid][pId]))
-			{
-				DestroyFurniturePreview(playerid, false);
-				new ownerid;// = (tmpType_Salon[playerid] == 1 ? HouseInfo[tmpIter[playerid]][hId] : BusinessInfo[tmpIter[playerid]][bId]);
-				switch(tmpType_Salon[playerid])
-				{
-					case 1: ownerid = HouseInfo[tmpIter[playerid]][hId];
-					case 2: ownerid = BusinessInfo[tmpIter[playerid]][bId];
-					case 3: ownerid = GarageInfo[tmpIter[playerid]][gId];
-				}
-				BuyFurniture(playerid, tmpType_Salon[playerid], ownerid, FurnitureList[tmpSelected[playerid]][furnitureListPrice], FurnitureList[tmpSelected[playerid]][furnitureListModel], FurnitureList[tmpSelected[playerid]][furnitureListName], FurnitureListNames[FurnitureList[tmpSelected[playerid]][furnitureListCategory]], PlayerInfo[playerid][pPosX]+2.0, PlayerInfo[playerid][pPosY]+2.0, PlayerInfo[playerid][pPosZ]+1.0, 0.0, 0.0, 0.0);
-				GivePlayerMoney(playerid, -FurnitureList[tmpSelected[playerid]][furnitureListPrice]);
-			}
-			return 1;
-		}
-		if(clickedid == Furniture_DownBase)
-		{
-			new Float:x, Float:y, Float:z;
-			GetDynamicObjectPos(tmpPage_Object[playerid], x, y, z),
-			FurniturePreview_RY[playerid] -= 30.0,
-			MoveDynamicObject(tmpPage_Object[playerid], x, y, z, 10, FurniturePreview_RX[playerid], FurniturePreview_RY[playerid], FurniturePreview_RZ[playerid]);
-			return 1;
-		}
-		if(clickedid == Furniture_UpBase)
-		{
-			new Float:x, Float:y, Float:z;
-			GetDynamicObjectPos(tmpPage_Object[playerid], x, y, z),
-			FurniturePreview_RY[playerid] += 30.0,
-			MoveDynamicObject(tmpPage_Object[playerid], x, y, z, 10, FurniturePreview_RX[playerid], FurniturePreview_RY[playerid], FurniturePreview_RZ[playerid]);
-			return 1;
-		}
-		if(clickedid == Furniture_LeftBase)
-		{
-			new Float:x, Float:y, Float:z;
-			GetDynamicObjectPos(tmpPage_Object[playerid], x, y, z),
-			FurniturePreview_RZ[playerid] -= 30.0,
-			MoveDynamicObject(tmpPage_Object[playerid], x, y, z, 10, FurniturePreview_RX[playerid], FurniturePreview_RY[playerid], FurniturePreview_RZ[playerid]);
-			return 1;
-		}
-		if(clickedid == Furniture_RightBase)
-		{
-			new Float:x, Float:y, Float:z;
-			GetDynamicObjectPos(tmpPage_Object[playerid], x, y, z),
-			FurniturePreview_RZ[playerid] += 30.0,
-			MoveDynamicObject(tmpPage_Object[playerid], x, y, z, 10, FurniturePreview_RX[playerid], FurniturePreview_RY[playerid], FurniturePreview_RZ[playerid]);
-			return 1;
-		}
-		if(clickedid == Furniture_CloseBase)
-		{
-			DestroyFurniturePreview(playerid);
-			return 1;
-		}
+
 		if(clickedid == vShop_NextBase)
 		{
 			if(tmpArray[playerid][(tmpPage_Object[playerid]+1)*3-3] != -1)
@@ -28081,12 +25794,12 @@ CMD:setstartmoney(playerid, params[])
 flags:cleardroppeditems(CMD_TYPE_ADMIN);
 CMD:cleardroppeditems(playerid, params[])
 {
-	foreach(new itter : DroppedItem)
+	foreach(new iter : DroppedItem)
 	{
-		if(IsValidDynamicObject(DroppedItems[itter][droppedItemObject])) DestroyDynamicObject(DroppedItems[itter][droppedItemObject], "drops", "clear");
+		if(IsValidDynamicObject(DroppedItems[iter][droppedItemObject])) DestroyDynamicObject(DroppedItems[iter][droppedItemObject], "drops", "clear");
 		new clear[E_DROPPED_ITEMS_DATA];
-		DroppedItems[itter] = clear;
-		DroppedItems[itter][droppedItemObject] = INVALID_OBJECT_ID;
+		DroppedItems[iter] = clear;
+		DroppedItems[iter][droppedItemObject] = INVALID_OBJECT_ID;
 	}
 	Iter_Clear(DroppedItem);
 	SendFormat(playerid, 0xFFAD40FF, "Iðvalëte visus iðmestus daiktus.");
@@ -28096,14 +25809,14 @@ CMD:cleardroppeditems(playerid, params[])
 flags:cleardroppedshells(CMD_TYPE_ADMIN);
 CMD:cleardroppedshells(playerid, params[])
 {
-	foreach(new itter : Shell)
+	foreach(new iter : Shell)
 	{
-		if(IsValidDynamicObject(Shells[itter][shellObject])) DestroyDynamicObject(Shells[itter][shellObject], "shells", "clear");
-		if(IsValidDynamic3DTextLabel(Shells[itter][shellLabel])) DestroyDynamic3DTextLabel(Shells[itter][shellLabel]);
+		if(IsValidDynamicObject(Shells[iter][shellObject])) DestroyDynamicObject(Shells[iter][shellObject], "shells", "clear");
+		if(IsValidDynamic3DTextLabel(Shells[iter][shellLabel])) DestroyDynamic3DTextLabel(Shells[iter][shellLabel]);
 		new clear[E_SHELL_DATA];
-		Shells[itter] = clear;
-		Shells[itter][shellObject] = INVALID_OBJECT_ID;
-		Shells[itter][shellLabel] = INVALID_3DTEXT_ID;
+		Shells[iter] = clear;
+		Shells[iter][shellObject] = INVALID_OBJECT_ID;
+		Shells[iter][shellLabel] = INVALID_3DTEXT_ID;
 	}
 	Iter_Clear(Shell);
 	SendFormat(playerid, 0xFFAD40FF, "Iðvalëte visas gilzes.");
@@ -29186,44 +26899,45 @@ flags:afriskproperty(CMD_TYPE_ADMIN);
 CMD:afriskproperty(playerid, params[])
 {
 	new 
-		itter = -1;
+		iter = -1,
+		unused;
 
 	log_init(true);
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ReceiverId`");
-	if((itter = GetClosestHouse(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
+	if((iter = GetClosestHouse(playerid, 60.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Namo inventorius:");
 		for(new i = 0; i < MAX_HOUSE_INVENTORY_SLOTS; i++)
 		{
-			if(HouseInventory[itter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
-			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(HouseInventory[itter][i][invId]), HouseInventory[itter][i][invAmount], HouseInventory[itter][i][invExtraId]);
+			if(HouseInventory[iter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
+			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(HouseInventory[iter][i][invId]), HouseInventory[iter][i][invAmount], HouseInventory[iter][i][invExtraId]);
 		}
-		log_set_values("'%d','%e','Apieskojo nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[itter][hId]);
+		log_set_values("'%d','%e','Apieskojo nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[iter][hId]);
 		log_commit();
 		return 1;
 	}
-	else if((itter = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	else if((iter = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Verslo inventorius:");
 		for(new i = 0; i < MAX_BUSINESS_INVENTORY_SLOTS; i++)
 		{
-			if(HouseInventory[itter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
-			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(BusinessInventory[itter][i][invId]), BusinessInventory[itter][i][invAmount], BusinessInventory[itter][i][invExtraId]);
+			if(HouseInventory[iter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
+			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(BusinessInventory[iter][i][invId]), BusinessInventory[iter][i][invAmount], BusinessInventory[iter][i][invExtraId]);
 		}
-		log_set_values("'%d','%e','Apieskojo versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[itter][bId]);
+		log_set_values("'%d','%e','Apieskojo versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[iter][bId]);
 		log_commit();
 		return 1;
 	}
-	else if((itter = GetClosestDealerHouse(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
+	else if((iter = GetClosestDealerHouse(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Namo inventorius:");
 		for(new i = 0; i < MAX_DEALER_HOUSE_INVENTORY_SLOTS; i++)
 		{
-			if(HouseInventory[itter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
-			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(DealerHouseInventory[itter][i][invId]), DealerHouseInventory[itter][i][invAmount], DealerHouseInventory[itter][i][invExtraId]);
+			if(HouseInventory[iter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
+			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(DealerHouseInventory[iter][i][invId]), DealerHouseInventory[iter][i][invAmount], DealerHouseInventory[iter][i][invExtraId]);
 		}
-		log_set_values("'%d','%e','Apieskojo dealer house','%d'", LogPlayerId(playerid), LogPlayerName(playerid), DealerHouseInfo[itter][dealerHouseId]);
+		log_set_values("'%d','%e','Apieskojo dealer house','%d'", LogPlayerId(playerid), LogPlayerName(playerid), DealerHouseInfo[iter][dealerHouseId]);
 		log_commit();
 		return 1;
 	}
@@ -29234,7 +26948,7 @@ CMD:afriskproperty(playerid, params[])
 CMD:friskproperty(playerid, params[])
 {
 	new 
-		itter = -1;
+		iter = -1, unused;
 
 	new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
 	if(FactionInfo[factionid][fType] != FACTION_TYPE_POLICE || factionid == -1) return SendError(playerid, "Jûsø frakcija ðios funkcijos neturi.");
@@ -29243,42 +26957,42 @@ CMD:friskproperty(playerid, params[])
 	log_init(true);
 	log_set_table("logs_factions");
 	log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`");
-	if((itter = GetClosestHouse(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
+	if((iter = GetClosestHouse(playerid, 60.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Namo inventorius:");
 		for(new i = 0; i < MAX_HOUSE_INVENTORY_SLOTS; i++)
 		{
-			if(HouseInventory[itter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
-			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(HouseInventory[itter][i][invId]), HouseInventory[itter][i][invAmount], HouseInventory[itter][i][invExtraId]);
+			if(HouseInventory[iter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
+			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(HouseInventory[iter][i][invId]), HouseInventory[iter][i][invAmount], HouseInventory[iter][i][invExtraId]);
 		}
-		log_set_values("'%d','%e','%d','%e','Apieskojo nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), HouseInfo[itter][hId]);
+		log_set_values("'%d','%e','%d','%e','Apieskojo nama','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), HouseInfo[iter][hId]);
 		log_commit();
 		rp_me(playerid, _, "padaro namo kratà.");
 		return 1;
 	}
-	else if((itter = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	else if((iter = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Verslo inventorius:");
 		for(new i = 0; i < MAX_BUSINESS_INVENTORY_SLOTS; i++)
 		{
-			if(BusinessInventory[itter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
-			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(BusinessInventory[itter][i][invId]), BusinessInventory[itter][i][invAmount], BusinessInventory[itter][i][invExtraId]);
+			if(BusinessInventory[iter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
+			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(BusinessInventory[iter][i][invId]), BusinessInventory[iter][i][invAmount], BusinessInventory[iter][i][invExtraId]);
 		}
 		rp_me(playerid, _, "padaro verslo kratà.");
-		log_set_values("'%d','%e','%d','%e','Apieskojo versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), BusinessInfo[itter][bId]);
+		log_set_values("'%d','%e','%d','%e','Apieskojo versla','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), BusinessInfo[iter][bId]);
 		log_commit();
 		return 1;
 	}
-	else if((itter = GetClosestDealerHouse(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
+	else if((iter = GetClosestDealerHouse(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Namo inventorius:");
 		for(new i = 0; i < MAX_DEALER_HOUSE_INVENTORY_SLOTS; i++)
 		{
-			if(DealerHouseInventory[itter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
-			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(DealerHouseInventory[itter][i][invId]), DealerHouseInventory[itter][i][invAmount], DealerHouseInventory[itter][i][invExtraId]);
+			if(DealerHouseInventory[iter][i][invId] <= 0) SendFormat(playerid, 0xBABABAFF, "%d. Tuðèia");
+			else SendFormat(playerid, 0xFFFFFFFF, "%d. %s [%d vnt.] [e. id: %d]", i + 1, GetInventoryItemName(DealerHouseInventory[iter][i][invId]), DealerHouseInventory[iter][i][invAmount], DealerHouseInventory[iter][i][invExtraId]);
 		}
 		rp_me(playerid, _, "padaro namo kratà.");
-		log_set_values("'%d','%e','%d','%e','Apieskojo dealer house','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), DealerHouseInfo[itter][dealerHouseId]);
+		log_set_values("'%d','%e','%d','%e','Apieskojo dealer house','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), DealerHouseInfo[iter][dealerHouseId]);
 		log_commit();
 		return 1;
 	}
@@ -31014,33 +28728,33 @@ CMD:ramdoor(playerid, params[])
 {
 	new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
 	if(FactionInfo[factionid][fType] != FACTION_TYPE_POLICE || factionid == -1) return SendError(playerid, "Jûsø frakcija ðios funkcijos neturi.");
-	new itter;
-	if((itter = GetClosestHouse(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
+	new iter, unused;
+	if((iter = GetClosestHouse(playerid, 5.0, unused, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
 	{
-		if(HouseInfo[itter][hLocked] <= 0) return SendWarning(playerid, "Namo durys atrakintos.");
+		if(HouseInfo[iter][hLocked] <= 0) return SendWarning(playerid, "Namo durys atrakintos.");
 		else
 		{
-			HouseInfo[itter][hLocked] = 0;
+			HouseInfo[iter][hLocked] = 0;
 			rp_me(playerid, _, "iðlauþia namo duris.");
 		}
 		return 1;
 	}
-	else if((itter = GetClosestBusiness(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_BUSINESS_ID)
+	else if((iter = GetClosestBusiness(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_BUSINESS_ID)
 	{
-		if(BusinessInfo[itter][bLocked] <= 0) return SendWarning(playerid, "Verslo durys atrakintos.");
+		if(BusinessInfo[iter][bLocked] <= 0) return SendWarning(playerid, "Verslo durys atrakintos.");
 		else
 		{
-			BusinessInfo[itter][bLocked] = 0;
+			BusinessInfo[iter][bLocked] = 0;
 			rp_me(playerid, _, "iðlauþia verslo duris.");
 		}
 		return 1;
 	}
-	else if((itter = GetClosestGarage(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_GARAGE_ID)
+	else if((iter = GetClosestGarage(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_GARAGE_ID)
 	{
-		if(GarageInfo[itter][gLocked] <= 0) return SendWarning(playerid, "Garaþo durys atrakintos.");
+		if(GarageInfo[iter][gLocked] <= 0) return SendWarning(playerid, "Garaþo durys atrakintos.");
 		else
 		{
-			GarageInfo[itter][gLocked] = 0;
+			GarageInfo[iter][gLocked] = 0;
 			rp_me(playerid, _, "iðlauþia garaþo duris.");
 		}
 		return 1;
@@ -31554,8 +29268,9 @@ CMD:dhinv(playerid, params[])
 }
 CMD:hinv(playerid, params[])
 {
-	new houseid = INVALID_HOUSE_ID;
-	if((houseid = GetClosestHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, houseid, .check_only_owner = true))
+	new houseid = INVALID_HOUSE_ID,
+		unused;
+	if((houseid = GetClosestHouse(playerid, 50.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, houseid, .check_only_owner = true))
 	{
 		Inventory_ShowItems(playerid, INVENTORY_TYPE_HOUSE, houseid);
 	}
@@ -31812,8 +29527,9 @@ CMD:setspawn(playerid, params[])
 	else if(!strcmp(type,"namas",true))
 	{
 		// namas
-		new houseid = INVALID_HOUSE_ID;
-		if((houseid = GetClosestHouse(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
+		new houseid = INVALID_HOUSE_ID,
+			unused;
+		if((houseid = GetClosestHouse(playerid, 5.0, unused, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
 		{
 			if(HaveHouseKey(playerid, houseid))
 			{
@@ -32953,34 +30669,6 @@ CMD:afurniture(playerid, params[])
 	return 1;
 }*/
 
-CMD:furniture(playerid, params[])
-{
-	new itterid;
-	tmpType_Salon[playerid] = 0;
-	if((itterid = GetClosestHouse(playerid, 70.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, itterid, "P_FurnitureControl"))
-	{
-		tmpType_Salon[playerid] = 1;
-		tmpIter[playerid] = itterid;
-	}
-	else if((itterid = GetClosestBusiness(playerid, 70.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID && HaveBusinessKey(playerid, itterid, "P_FurnitureControl"))
-	{
-		tmpType_Salon[playerid] = 2;
-		tmpIter[playerid] = itterid;
-	}
-	else if((itterid = GetClosestGarage(playerid, 70.0, CHECK_TYPE_INSIDE)) != INVALID_GARAGE_ID && GarageInfo[itterid][gOwner] == PlayerInfo[playerid][pId])
-	{
-		tmpType_Salon[playerid] = 3;
-		tmpIter[playerid] = itterid;
-	}
-	if(tmpType_Salon[playerid] != 0)
-	{
-		tmpFurniturePage[playerid] = 0;
-		ShowPlayerDialog(playerid, DIALOG_FURNITURE_MAIN, DIALOG_STYLE_LIST, "Baldai", "Perþiûrëti esamus baldus\nPirkti baldus", "Tæsti", "Atðaukti");
-	}
-	else InfoBox(playerid, "NESATE", "NAME ARBA VERSLE ARBA GARAZE");
-	return 1;
-}
-
 alias:screen("options","textdraws");
 CMD:screen(playerid, params[])
 {
@@ -33822,26 +31510,28 @@ CMD:duty(playerid, params[])
 }
 CMD:changeclothes(playerid, params[])
 {
-	new itter = INVALID_HOUSE_ID;
-	if((itter = GetClosestHouse(playerid, 60.0, CHECK_TYPE_INSIDE)) == INVALID_HOUSE_ID) return InfoBox(playerid, IB_NOT_IN_HOUSE_OR_BUSINESS);
-	if(!HaveHouseKey(playerid, itter)) return InfoBox(playerid, IB_NOT_IN_HOUSE_OR_BUSINESS);
-	if(HouseInfo[itter][hUpdateClothes] <= 0) return SendWarning(playerid, "Neturite tinkamos árangos.");
+	new iter = INVALID_HOUSE_ID,
+		unused;
+	if((iter = GetClosestHouse(playerid, 60.0, unused, CHECK_TYPE_INSIDE)) == INVALID_HOUSE_ID) return InfoBox(playerid, IB_NOT_IN_HOUSE_OR_BUSINESS);
+	if(!HaveHouseKey(playerid, iter)) return InfoBox(playerid, IB_NOT_IN_HOUSE_OR_BUSINESS);
+	if(HouseInfo[iter][hUpdateClothes] <= 0) return SendWarning(playerid, "Neturite tinkamos árangos.");
 	else ShowModelSelectionMenu(playerid, clskinslist, "Apranga");
 	return 1;
 }
 CMD:eat(playerid, params[])
 {
-	new itter = -1;
-	if((itter = GetClosestHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
+	new iter = -1,
+		unused;
+	if((iter = GetClosestHouse(playerid, 50.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
 	{
-		if(HouseInfo[itter][hUpdateEat] > 0)
+		if(HouseInfo[iter][hUpdateEat] > 0)
 		{
 			SetPlayerHealth(playerid, GetPlayerMaxHealth(playerid));
 			rp_ame(playerid, "pavalgo.");
 			log_init(true);
 			log_set_table("logs_houses");
 			log_set_keys("`PlayerId`,`PlayerName`,`HouseId`,`ActionText`");
-			log_set_values("'%d','%e','%d','Pavalge name'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[itter][hId]);
+			log_set_values("'%d','%e','%d','Pavalge name'", LogPlayerId(playerid), LogPlayerName(playerid), HouseInfo[iter][hId]);
 			log_commit();
 		}
 		else
@@ -33849,16 +31539,16 @@ CMD:eat(playerid, params[])
 			SendWarning(playerid, "Namas neturi ðio atnaujinimo.");
 		}
 	}
-	else if((itter = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	else if((iter = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
 	{
-		if(BusinessInfo[itter][bUpdateEat] > 0)
+		if(BusinessInfo[iter][bUpdateEat] > 0)
 		{
 			SetPlayerHealth(playerid, GetPlayerMaxHealth(playerid));
 			rp_ame(playerid, "pavalgo.");
 			log_init(true);
 			log_set_table("logs_business");
 			log_set_keys("`PlayerId`,`PlayerName`,`BusinessId`,`ActionText`");
-			log_set_values("'%d','%e','%d','Pavalge versle'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[itter][bId]);
+			log_set_values("'%d','%e','%d','Pavalge versle'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[iter][bId]);
 			log_commit();
 		}
 		else
@@ -33872,8 +31562,9 @@ CMD:eat(playerid, params[])
 alias:hmenu("house","namas");
 CMD:hmenu(playerid, params[])
 {
-	new houseid = INVALID_HOUSE_ID;
-	if((houseid = GetClosestHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, houseid, .check_only_owner = true))
+	new houseid = INVALID_HOUSE_ID,
+		unused;
+	if((houseid = GetClosestHouse(playerid, 50.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, houseid, .check_only_owner = true))
 	{
 		tmpIter[playerid] = houseid;
 		new string[256];
@@ -33979,8 +31670,9 @@ CMD:renthouse(playerid, params[])
 	else
 	{
 		cache_delete(result);
-		new houseid;
-		if((houseid = GetClosestHouse(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
+		new houseid,
+			unused;
+		if((houseid = GetClosestHouse(playerid, 5.0, unused, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
 		{
 			if(HouseInfo[houseid][hOwner] == PlayerInfo[playerid][pId]) return SendError(playerid, "Ðio namo savininkas esate jûs.");
 			if(HouseInfo[houseid][hRent] > 0)
@@ -34014,9 +31706,10 @@ CMD:renthouse(playerid, params[])
 }
 CMD:buyhouse(playerid, params[])
 {
-	new houseid = INVALID_HOUSE_ID;
+	new houseid = INVALID_HOUSE_ID,
+		unused;
 	if(PlayerInfo[playerid][pLevel] < 3) return SendWarning(playerid, "Jûsø lygis nëra 3");
-	if((houseid = GetClosestHouse(playerid, 4.0, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
+	if((houseid = GetClosestHouse(playerid, 4.0, unused, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
 	{
 		if(HouseInfo[houseid][hOwner] > 0 && HouseInfo[houseid][hSale] == 0) return SendError(playerid, "Ðis namas turi savininkà ir nëra parduodamas.");
 		if(HouseInfo[houseid][hOwner] == PlayerInfo[playerid][pId]) return 1; // pats savininkas
@@ -34189,7 +31882,7 @@ CMD:buygarage(playerid, params[])
 		GarageInfo[garageid][gSale] = 0;
 		GarageInfo[garageid][gOwner] = PlayerInfo[playerid][pId];
 		SaveGarageIntEx(garageid, "Owner", PlayerInfo[playerid][pId]);
-		FixGarageLabels(garageid);
+		Garage_FixLabels(garageid);
 	}
 	else SendWarning(playerid, "Ásitikinkite, kad esate lauke prie garaþo.");
 	return 1;
@@ -34489,8 +32182,9 @@ CMD:bmenu(playerid, params[])
 
 CMD:lock(playerid, params[])
 {
-	new itterid;
-	if((itterid = GetClosestHouse(playerid, 4.0)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, itterid))
+	new itterid,
+		unused;
+	if((itterid = GetClosestHouse(playerid, 4.0, unused)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, itterid))
 	{
 		HouseInfo[itterid][hLocked] = !HouseInfo[itterid][hLocked];
 		SaveHouseIntEx(itterid, "Locked", HouseInfo[itterid][hLocked]);
@@ -35283,331 +32977,4 @@ stock KickFromBroadcast(playerid)
 	player_InviteToBroadcast[playerid] = false;
 	format(player_BroadcastAnonimousStr[playerid], 1, "");
 	return 1;
-}
-
-new Float:wAreas[MAX_WATER_AREAS][6] =
-{
-        {-1584.00000, -1826.00000, -1360.00000, -1642.00000, -69.0, 0.0},
-        {-3000.00000, 354.00000, -2832.00000, 2942.00000, -69.0, 0.0},
-        {-2832.00000, 1296.00000, -2704.00000, 2192.00000, -69.0, 0.0},
-        {-2704.00000, 1360.00000, -2240.00000, 2224.00000, -69.0, 0.0},
-        {-2240.00000, 1432.00000, -2000.00000, 2224.00000, -69.0, 0.0},
-        {-2064.00000, 1312.00000, -2000.00000, 1432.00000, -69.0, 0.0},
-        {-2000.00000, 1392.00000, -1712.00000, 1792.00000, -69.0, 0.0},
-        {-2000.00000, 1792.00000, -1724.00000, 2016.00000, -69.0, 0.0},
-        {-2000.00000, 2016.00000, -1836.00000, 2176.00000, -69.0, 0.0},
-        {-2000.00000, 2176.00000, -1920.00000, 2224.00000, -69.0, 0.0},
-        {-2208.00000, 2224.00000, -2000.00000, 2432.00000, -69.0, 0.0},
-        {-2208.00000, 2432.00000, -2000.00000, 2576.00000, -69.0, 0.0},
-        {-2352.00000, 2448.00000, -2208.00000, 2576.00000, -69.0, 0.0},
-        {-2312.00000, 2344.00000, -2208.00000, 2448.00000, -69.0, 0.0},
-        {-1712.00000, 1360.00000, -1600.00000, 1792.00000, -69.0, 0.0},
-        {-1664.00000, 1280.00000, -1600.00000, 1360.00000, -69.0, 0.0},
-        {-1600.00000, 1280.00000, -1440.00000, 1696.00000, -69.0, 0.0},
-        {-1600.00000, 1696.00000, -1488.00000, 1744.00000, -69.0, 0.0},
-        {-1440.00000, 1440.00000, -1232.00000, 1696.00000, -69.0, 0.0},
-        {-1232.00000, 1440.00000, -1136.00000, 1616.00000, -69.0, 0.0},
-        {-1440.00000, 1280.00000, -1136.00000, 1440.00000, -69.0, 0.0},
-        {-1136.00000, 1248.00000, -1104.00000, 1424.00000, -69.0, 0.0},
-        {-1520.00000, 1104.00000, -1104.00000, 1248.00000, -69.0, 0.0},
-        {-1520.00000, 1248.00000, -1136.00000, 1280.00000, -69.0, 0.0},
-        {-1600.00000, 1200.00000, -1520.00000, 1280.00000, -69.0, 0.0},
-        {-1104.00000, 944.00000, -932.00000, 1136.00000, -69.0, 0.0},
-        {-1424.00000, 944.00000, -1104.00000, 1104.00000, -69.0, 0.0},
-        {-1520.00000, 1008.00000, -1424.00000, 1104.00000, -69.0, 0.0},
-        {-1424.00000, 784.00000, -896.00000, 944.00000, -69.0, 0.0},
-        {-1488.00000, 560.00000, -896.00000, 784.00000, -69.0, 0.0},
-        {-1536.00000, 560.00000, -1488.00000, 672.00000, -69.0, 0.0},
-        {-896.00000, 208.00000, -768.00000, 732.00000, -69.0, 0.0},
-        {-1600.00000, 208.00000, -896.00000, 560.00000, -69.0, 0.0},
-        {-992.00000, -144.00000, -912.00000, 208.00000, -69.0, 0.0},
-        {-1748.00000, -816.00000, -1180.00000, -592.00000, -69.0, 0.0},
-        {-1458.00000, -592.00000, -1054.00000, -432.00000, -69.0, 0.0},
-        {-3000.00000, -1186.00000, -2880.00000, -822.00000, -69.0, 0.0},
-        {-2880.00000, -1168.00000, -2768.00000, -896.00000, -69.0, 0.0},
-        {-2768.00000, -1106.00000, -2656.00000, -830.00000, -69.0, 0.0},
-        {-2656.00000, -1024.00000, -2512.00000, -816.00000, -69.0, 0.0},
-        {-2512.00000, -976.00000, -2400.00000, -816.00000, -69.0, 0.0},
-        {-2400.00000, -1056.00000, -2256.00000, -864.00000, -69.0, 0.0},
-        {-2256.00000, -1198.00000, -2144.00000, -950.00000, -69.0, 0.0},
-        {-2144.00000, -1408.00000, -2000.00000, -1072.00000, -69.0, 0.0},
-        {-2000.00000, -1536.00000, -1856.00000, -1280.00000, -69.0, 0.0},
-        {-1856.00000, -1648.00000, -1728.00000, -1440.00000, -69.0, 0.0},
-        {-1728.00000, -1728.00000, -1584.00000, -1520.00000, -69.0, 0.0},
-        {-1360.00000, -2052.00000, -1216.00000, -1696.00000, -69.0, 0.0},
-        {-1440.00000, -2110.00000, -1360.00000, -1950.00000, -69.0, 0.0},
-        {-1484.00000, -2180.00000, -1440.00000, -2036.00000, -69.0, 0.0},
-        {-1572.00000, -2352.00000, -1484.00000, -2096.00000, -69.0, 0.0},
-        {-1216.00000, -2208.00000, -1104.00000, -1864.00000, -69.0, 0.0},
-        {-1232.00000, -2304.00000, -1120.00000, -2208.00000, -69.0, 0.0},
-        {-1270.00000, -2480.00000, -1178.00000, -2304.00000, -69.0, 0.0},
-        {-1260.00000, -2560.00000, -1188.00000, -2480.00000, -69.0, 0.0},
-        {-1262.00000, -2640.00000, -1146.00000, -2560.00000, -69.0, 0.0},
-        {-1216.00000, -2752.00000, -1080.00000, -2640.00000, -69.0, 0.0},
-        {-1200.00000, -2896.00000, -928.00000, -2752.00000, -69.0, 0.0},
-        {-2016.00000, -3000.00000, -1520.00000, -2704.00000, -69.0, 0.0},
-        {-1520.00000, -3000.00000, -1376.00000, -2894.00000, -69.0, 0.0},
-        {-2256.00000, -3000.00000, -2016.00000, -2772.00000, -69.0, 0.0},
-        {-2448.00000, -3000.00000, -2256.00000, -2704.00000, -69.0, 0.0},
-        {-3000.00000, -3000.00000, -2448.00000, -2704.00000, -69.0, 0.0},
-        {-3000.00000, -2704.00000, -2516.00000, -2576.00000, -69.0, 0.0},
-        {-3000.00000, -2576.00000, -2600.00000, -2448.00000, -69.0, 0.0},
-        {-3000.00000, -2448.00000, -2628.00000, -2144.00000, -69.0, 0.0},
-        {-3000.00000, -2144.00000, -2670.00000, -2032.00000, -69.0, 0.0},
-        {-3000.00000, -2032.00000, -2802.00000, -1904.00000, -69.0, 0.0},
-        {-3000.00000, -1904.00000, -2920.00000, -1376.00000, -69.0, 0.0},
-        {-3000.00000, -1376.00000, -2936.00000, -1186.00000, -69.0, 0.0},
-        {-768.00000, 208.00000, -720.00000, 672.00000, -69.0, 0.0},
-        {-720.00000, 256.00000, -656.00000, 672.00000, -69.0, 0.0},
-        {-656.00000, 276.00000, -496.00000, 576.00000, -69.0, 0.0},
-        {-496.00000, 298.00000, -384.00000, 566.00000, -69.0, 0.0},
-        {-384.00000, 254.00000, -224.00000, 530.00000, -69.0, 0.0},
-        {-224.00000, 212.00000, -64.00000, 528.00000, -69.0, 0.0},
-        {-64.00000, 140.00000, 64.00000, 544.00000, -69.0, 0.0},
-        {64.00000, 140.00000, 304.00000, 544.00000, -69.0, 0.0},
-        {120.00000, 544.00000, 304.00000, 648.00000, -69.0, 0.0},
-        {304.00000, 164.00000, 384.00000, 608.00000, -69.0, 0.0},
-        {384.00000, 222.00000, 464.00000, 630.00000, -69.0, 0.0},
-        {464.00000, 304.00000, 544.00000, 656.00000, -69.0, 0.0},
-        {544.00000, 362.00000, 800.00000, 646.00000, -69.0, 0.0},
-        {800.00000, 432.00000, 944.00000, 704.00000, -69.0, 0.0},
-        {944.00000, 480.00000, 976.00000, 720.00000, -69.0, 0.0},
-        {976.00000, 528.00000, 1040.00000, 704.00000, -69.0, 0.0},
-        {1040.00000, 560.00000, 1280.00000, 672.00000, -69.0, 0.0},
-        {1280.00000, 480.00000, 1472.00000, 640.00000, -69.0, 0.0},
-        {1472.00000, 432.00000, 1616.00000, 640.00000, -69.0, 0.0},
-        {1616.00000, 416.00000, 1824.00000, 608.00000, -69.0, 0.0},
-        {1824.00000, 400.00000, 2160.00000, 576.00000, -69.0, 0.0},
-        {2160.00000, 400.00000, 2432.00000, 512.00000, -69.0, 0.0},
-        {2432.00000, 368.00000, 2560.00000, 544.00000, -69.0, 0.0},
-        {2560.00000, 336.00000, 2720.00000, 576.00000, -69.0, 0.0},
-        {2720.00000, 196.00000, 2816.00000, 560.00000, -69.0, 0.0},
-        {2816.00000, 160.00000, 3000.00000, 576.00000, -69.0, 0.0},
-        {2860.00000, -80.00000, 3000.00000, 160.00000, -69.0, 0.0},
-        {-1376.00000, -3000.00000, -544.00000, -2896.00000, -69.0, 0.0},
-        {-928.00000, -2896.00000, -544.00000, -2800.00000, -69.0, 0.0},
-        {-544.00000, -3000.00000, -320.00000, -2824.00000, -69.0, 0.0},
-        {-320.00000, -3000.00000, -192.00000, -2876.00000, -69.0, 0.0},
-        {-192.00000, -3000.00000, 160.00000, -2920.00000, -69.0, 0.0},
-        {-128.00000, -2920.00000, 160.00000, -2872.00000, -69.0, 0.0},
-        {-60.00000, -2872.00000, 160.00000, -2816.00000, -69.0, 0.0},
-        {-4.00000, -2816.00000, 160.00000, -2672.00000, -69.0, 0.0},
-        {40.00000, -2672.00000, 160.00000, -2256.00000, -69.0, 0.0},
-        {16.00000, -2560.00000, 40.00000, -2256.00000, -69.0, 0.0},
-        {-32.00000, -2440.00000, 16.00000, -2256.00000, -69.0, 0.0},
-        {-32.00000, -2488.00000, 16.00000, -2440.00000, -69.0, 0.0},
-        {-96.00000, -2440.00000, -32.00000, -2256.00000, -69.0, 0.0},
-        {-168.00000, -2384.00000, -96.00000, -2256.00000, -69.0, 0.0},
-        {-224.00000, -2256.00000, 160.00000, -2080.00000, -69.0, 0.0},
-        {-248.00000, -2080.00000, 160.00000, -1968.00000, -69.0, 0.0},
-        {-280.00000, -1968.00000, -128.00000, -1824.00000, -69.0, 0.0},
-        {-264.00000, -2016.00000, -248.00000, -1968.00000, -69.0, 0.0},
-        {-264.00000, -1824.00000, -128.00000, -1640.00000, -69.0, 0.0},
-        {-128.00000, -1768.00000, 124.00000, -1648.00000, -69.0, 0.0},
-        {-128.00000, -1792.00000, 140.00000, -1768.00000, -69.0, 0.0},
-        {-128.00000, -1968.00000, 148.00000, -1792.00000, -69.0, 0.0},
-        {160.00000, -2128.00000, 592.00000, -1976.00000, -69.0, 0.0},
-        {480.00000, -1976.00000, 592.00000, -1896.00000, -69.0, 0.0},
-        {352.00000, -1976.00000, 480.00000, -1896.00000, -69.0, 0.0},
-        {232.00000, -1976.00000, 352.00000, -1880.00000, -69.0, 0.0},
-        {160.00000, -1976.00000, 232.00000, -1872.00000, -69.0, 0.0},
-        {160.00000, -2784.00000, 592.00000, -2128.00000, -69.0, 0.0},
-        {160.00000, -3000.00000, 592.00000, -2784.00000, -69.0, 0.0},
-        {352.00000, -1896.00000, 544.00000, -1864.00000, -69.0, 0.0},
-        {592.00000, -2112.00000, 976.00000, -1896.00000, -69.0, 0.0},
-        {736.00000, -1896.00000, 904.00000, -1864.00000, -69.0, 0.0},
-        {704.00000, -1896.00000, 736.00000, -1728.00000, -69.0, 0.0},
-        {736.00000, -1864.00000, 752.00000, -1728.00000, -69.0, 0.0},
-        {688.00000, -1728.00000, 752.00000, -1480.00000, -69.0, 0.0},
-        {592.00000, -2192.00000, 976.00000, -2112.00000, -69.0, 0.0},
-        {592.00000, -2328.00000, 1008.00000, -2192.00000, -69.0, 0.0},
-        {592.00000, -3000.00000, 1008.00000, -2328.00000, -69.0, 0.0},
-        {1008.00000, -3000.00000, 1072.00000, -2368.00000, -69.0, 0.0},
-        {1008.00000, -2368.00000, 1064.00000, -2320.00000, -69.0, 0.0},
-        {1072.00000, -2672.00000, 1288.00000, -2412.00000, -69.0, 0.0},
-        {1072.00000, -2768.00000, 1288.00000, -2672.00000, -69.0, 0.0},
-        {1072.00000, -3000.00000, 1288.00000, -2768.00000, -69.0, 0.0},
-        {1288.00000, -3000.00000, 1448.00000, -2760.00000, -69.0, 0.0},
-        {1288.00000, -2760.00000, 1392.00000, -2688.00000, -69.0, 0.0},
-        {1448.00000, -3000.00000, 1720.00000, -2754.00000, -69.0, 0.0},
-        {1720.00000, -3000.00000, 2064.00000, -2740.00000, -69.0, 0.0},
-        {2064.00000, -3000.00000, 2144.00000, -2742.00000, -69.0, 0.0},
-        {2144.00000, -3000.00000, 2208.00000, -2700.00000, -69.0, 0.0},
-        {2208.00000, -3000.00000, 2272.00000, -2684.00000, -69.0, 0.0},
-        {2272.00000, -3000.00000, 2376.00000, -2312.00000, -69.0, 0.0},
-        {2376.00000, -2480.00000, 2472.00000, -2240.00000, -69.0, 0.0},
-        {2472.00000, -2376.00000, 2776.00000, -2240.00000, -69.0, 0.0},
-        {2776.00000, -2336.00000, 2856.00000, -2192.00000, -69.0, 0.0},
-        {2808.00000, -2560.00000, 3000.00000, -2336.00000, -69.0, 0.0},
-        {2856.00000, -2336.00000, 3000.00000, -2136.00000, -69.0, 0.0},
-        {2888.00000, -2136.00000, 3000.00000, -1840.00000, -69.0, 0.0},
-        {2872.00000, -1880.00000, 2888.00000, -1840.00000, -69.0, 0.0},
-        {2864.00000, -1840.00000, 3000.00000, -1720.00000, -69.0, 0.0},
-        {2888.00000, -1720.00000, 3000.00000, -1664.00000, -69.0, 0.0},
-        {2896.00000, -1664.00000, 3000.00000, -1592.00000, -69.0, 0.0},
-        {2920.00000, -1592.00000, 3000.00000, -1504.00000, -69.0, 0.0},
-        {2940.00000, -1504.00000, 3000.00000, -1344.00000, -69.0, 0.0},
-        {2908.00000, -1344.00000, 3000.00000, -1096.00000, -69.0, 0.0},
-        {2912.00000, -1096.00000, 3000.00000, -800.00000, -69.0, 0.0},
-        {2918.00000, -800.00000, 3000.00000, -472.00000, -69.0, 0.0},
-        {2872.00000, -472.00000, 3000.00000, -376.00000, -69.0, 0.0},
-        {2912.00000, -376.00000, 3000.00000, -80.00000, -69.0, 0.0},
-        {2864.00000, -376.00000, 2912.00000, -80.00000, -69.0, 0.0},
-        {2560.00000, -2560.00000, 2680.00000, -2456.00000, -69.0, 0.0},
-        {-992.00000, -422.00000, -848.00000, -238.00000, -69.0, 0.0},
-        {-848.00000, -384.00000, -512.00000, -256.00000, -69.0, 0.0},
-        {-512.00000, -400.00000, -320.00000, -272.00000, -69.0, 0.0},
-        {-320.00000, -400.00000, -208.00000, -304.00000, -69.0, 0.0},
-        {-384.00000, -528.00000, -100.00000, -460.00000, -69.0, 0.0},
-        {-384.00000, -704.00000, -64.00000, -528.00000, -69.0, 0.0},
-        {-336.00000, -816.00000, -80.00000, -704.00000, -69.0, 0.0},
-        {-208.00000, -936.00000, -48.00000, -816.00000, -69.0, 0.0},
-        {-48.00000, -936.00000, 144.00000, -874.00000, -69.0, 0.0},
-        {32.00000, -1024.00000, 128.00000, -936.00000, -69.0, 0.0},
-        {-16.00000, -1104.00000, 96.00000, -1024.00000, -69.0, 0.0},
-        {0.00000, -1200.00000, 144.00000, -1104.00000, -69.0, 0.0},
-        {-16.00000, -1296.00000, 128.00000, -1200.00000, -69.0, 0.0},
-        {-16.00000, -1440.00000, 112.00000, -1296.00000, -69.0, 0.0},
-        {0.00000, -1552.00000, 96.00000, -1440.00000, -69.0, 0.0},
-        {-128.00000, -1648.00000, 96.00000, -1552.00000, -69.0, 0.0},
-        {-64.00000, -672.00000, 32.00000, -576.00000, -69.0, 0.0},
-        {-64.00000, -576.00000, 96.00000, -496.00000, -69.0, 0.0},
-        {16.00000, -496.00000, 144.00000, -392.00000, -69.0, 0.0},
-        {144.00000, -448.00000, 240.00000, -384.00000, -69.0, 0.0},
-        {240.00000, -432.00000, 304.00000, -320.00000, -69.0, 0.0},
-        {304.00000, -384.00000, 352.00000, -288.00000, -69.0, 0.0},
-        {352.00000, -332.00000, 400.00000, -252.00000, -69.0, 0.0},
-        {400.00000, -298.00000, 464.00000, -234.00000, -69.0, 0.0},
-        {464.00000, -288.00000, 576.00000, -208.00000, -69.0, 0.0},
-        {576.00000, -272.00000, 688.00000, -192.00000, -69.0, 0.0},
-        {688.00000, -256.00000, 768.00000, -144.00000, -69.0, 0.0},
-        {768.00000, -212.00000, 800.00000, -124.00000, -69.0, 0.0},
-        {800.00000, -180.00000, 976.00000, -92.00000, -69.0, 0.0},
-        {976.00000, -160.00000, 1200.00000, -64.00000, -69.0, 0.0},
-        {1200.00000, -244.00000, 1264.00000, -108.00000, -69.0, 0.0},
-        {1264.00000, -330.00000, 1344.00000, -158.00000, -69.0, 0.0},
-        {1344.00000, -320.00000, 1456.00000, -208.00000, -69.0, 0.0},
-        {1456.00000, -282.00000, 1520.00000, -198.00000, -69.0, 0.0},
-        {1520.00000, -208.00000, 1648.00000, -80.00000, -69.0, 0.0},
-        {1568.00000, -80.00000, 1648.00000, 16.00000, -69.0, 0.0},
-        {1648.00000, -64.00000, 1792.00000, 16.00000, -69.0, 0.0},
-        {1792.00000, -128.00000, 1888.00000, 0.00000, -69.0, 0.0},
-        {1888.00000, -268.00000, 2016.00000, -20.00000, -69.0, 0.0},
-        {2016.00000, -256.00000, 2144.00000, -16.00000, -69.0, 0.0},
-        {2144.00000, -272.00000, 2224.00000, -96.00000, -69.0, 0.0},
-        {2224.00000, -272.00000, 2288.00000, -144.00000, -69.0, 0.0},
-        {2048.00000, -16.00000, 2144.00000, 112.00000, -69.0, 0.0},
-        {2096.00000, 112.00000, 2224.00000, 240.00000, -69.0, 0.0},
-        {2098.00000, 240.00000, 2242.00000, 400.00000, -69.0, 0.0},
-        {2160.00000, 512.00000, 2432.00000, 576.00000, -69.0, 0.0},
-        {2432.00000, 544.00000, 2560.00000, 592.00000, -69.0, 0.0},
-        {2560.00000, 576.00000, 2720.00000, 608.00000, -69.0, 0.0},
-        {2720.00000, 560.00000, 2816.00000, 608.00000, -69.0, 0.0},
-        {2816.00000, 576.00000, 3000.00000, 752.00000, -69.0, 0.0},
-        {-656.00000, 576.00000, -496.00000, 672.00000, -69.0, 0.0},
-        {-740.00000, 672.00000, -484.00000, 784.00000, -69.0, 0.0},
-        {-720.00000, 784.00000, -384.00000, 1008.00000, -69.0, 0.0},
-        {-640.00000, 1008.00000, -400.00000, 1216.00000, -69.0, 0.0},
-        {-880.00000, 1296.00000, -688.00000, 1408.00000, -69.0, 0.0},
-        {-688.00000, 1216.00000, -400.00000, 1424.00000, -69.0, 0.0},
-        {-672.00000, 1424.00000, -448.00000, 1616.00000, -69.0, 0.0},
-        {-832.00000, 1616.00000, -512.00000, 1728.00000, -69.0, 0.0},
-        {-984.00000, 1632.00000, -832.00000, 1712.00000, -69.0, 0.0},
-        {-832.00000, 1728.00000, -576.00000, 2032.00000, -69.0, 0.0},
-        {-1248.00000, 2536.00000, -1088.00000, 2824.00000, -69.0, 40.5}, // not by default
-        {-1088.00000, 2544.00000, -1040.00000, 2800.00000, -69.0, 40.5}, // not by default
-        {-1040.00000, 2544.00000, -832.00000, 2760.00000, -69.0, 40.5}, // not by default
-        {-1088.00000, 2416.00000, -832.00000, 2544.00000, -69.0, 40.5}, // not by default
-        {-1040.00000, 2304.00000, -864.00000, 2416.00000, -69.0, 40.5}, // not by default
-        {-1024.00000, 2144.00000, -864.00000, 2304.00000, -69.0, 40.5}, // not by default
-        {-1072.00000, 2152.00000, -1024.00000, 2264.00000, -69.0, 40.5}, // not by default
-        {-1200.00000, 2114.00000, -1072.00000, 2242.00000, -69.0, 40.5}, // not by default
-        {-976.00000, 2016.00000, -848.00000, 2144.00000, -69.0, 40.5}, // not by default
-        {-864.00000, 2144.00000, -448.00000, 2272.00000, -69.0, 40.5}, // not by default
-        {-700.00000, 2272.00000, -484.00000, 2320.00000, -69.0, 40.5}, // not by default
-        {-608.00000, 2320.00000, -528.00000, 2352.00000, -69.0, 40.5}, // not by default
-        {-848.00000, 2044.00000, -816.00000, 2144.00000, -69.0, 40.5}, // not by default
-        {-816.00000, 2060.00000, -496.00000, 2144.00000, -69.0, 40.5}, // not by default
-        {-604.00000, 2036.00000, -484.00000, 2060.00000, -69.0, 40.5}, // not by default
-        {2376.00000, -3000.00000, 3000.00000, -2688.00000, -69.0, 0.0},
-        {2520.00000, -2688.00000, 3000.00000, -2560.00000, -69.0, 0.0},
-        {-1328.00000, 2082.00000, -1200.00000, 2210.00000, -69.0, 40.5}, // not by default
-        {-1400.00000, 2074.00000, -1328.00000, 2150.00000, -69.0, 40.5}, // not by default
-        {-1248.00000, -144.00000, -992.00000, 208.00000, -69.0, 0.0},
-        {-1176.00000, -432.00000, -992.00000, -144.00000, -69.0, 0.0},
-        {-1792.00000, -592.00000, -1728.00000, -144.00000, -69.0, 0.0},
-        {-1792.00000, 170.00000, -1600.00000, 274.00000, -69.0, 0.0},
-        {-1600.00000, 168.00000, -1256.00000, 208.00000, -69.0, 0.0},
-        {-1574.00000, -44.00000, -1550.00000, 108.00000, -69.0, 0.0},
-        {1928.00000, -1222.00000, 2012.00000, -1178.00000, 16.0, 17.81}, // not by default
-        {-464.00000, -1908.00000, -280.00000, -1832.00000, -69.0, 0.0},
-        {2248.00000, -1182.00000, 2260.00000, -1170.00000, -99.0, -99.0}, // not used | interior
-        {2292.00000, -1432.00000, 2328.00000, -1400.00000, 20.0, 21.97}, // not by default
-        {1888.00000, 1468.00000, 2036.00000, 1700.00000, 0.0, 8.4}, // not by default
-        {2090.00000, 1670.00000, 2146.00000, 1694.00000, -99.0, -99.0}, // not used
-        {2110.00000, 1234.00000, 2178.00000, 1330.00000, 6.5, 7.64}, // not by default
-        {2108.00000, 1084.00000, 2180.00000, 1172.00000, 6.5, 7.64}, // not by default
-        {2506.00000, 1546.00000, 2554.00000, 1586.00000, 6.5, 8.77}, // not by default
-        {1270.00000, -812.00000, 1290.00000, -800.00000, 85.0, 86.48}, // not by default
-        {1084.00000, -684.00000, 1104.00000, -660.00000, 110.0, 111.81}, // not by default
-        {502.00000, -1114.00000, 522.00000, -1098.00000, -99.0, -99.0}, // not used
-        {214.00000, -1208.00000, 246.00000, -1180.00000, 72.0, 73.81}, // not by default
-        {218.00000, -1180.00000, 238.00000, -1172.00000, 72.0, 73.81}, // not by default
-        {178.00000, -1244.00000, 206.00000, -1216.00000, 76.0, 76.86}, // not by default
-        {1744.00000, 2780.00000, 1792.00000, 2868.00000, -99.0, -99.0}, // not used
-        {-2832.00000, 2888.00000, 3000.00000, 3000.00000, -69.0, 0.0},
-        {-2778.00000, -522.00000, -2662.00000, -414.00000, -23.0, 2.6}, // not by default
-        {1520.00000, -252.00000, 1572.00000, -208.00000, -69.0, 0.0},
-        {2922.00000, 752.00000, 3000.00000, 2888.00000, -69.0, 0.0},
-        {-3000.00000, -446.00000, -2910.00000, 354.00000, -69.0, 0.0},
-        {-2434.00000, 2224.00000, -2294.00000, 2340.00000, -69.0, 0.0},
-        {-2294.00000, 2224.00000, -2208.00000, 2312.00000, -69.0, 0.0},
-        {2058.00000, 1868.00000, 2110.00000, 1964.00000, 7.4, 9.43}, // not by default
-        {-3000.00000, 2942.00000, -2832.00000, 3000.00000, -69.0, 0.0},
-        {-550.00000, 2004.00000, -494.00000, 2036.00000, -69.0, 40.5}, // not by default
-        {-896.00000, 842.00000, -776.00000, 954.00000, -69.0, 0.0},
-        {-2240.00000, 1336.00000, -2088.00000, 1432.00000, -69.0, 0.0},
-        {-3000.00000, -822.00000, -2930.00000, -446.00000, -69.0, 0.0},
-        {-2660.00000, 2224.00000, -2520.00000, 2264.00000, -69.0, 0.0},
-        {-378.00000, -460.00000, -138.00000, -400.00000, -69.0, 0.0},
-        {1836.00000, 1468.00000, 1888.00000, 1568.00000, 7.1, 8.4}, // not by default
-        {890.00000, -1106.00000, 902.00000, -1098.00000, -99.0, -99.0}, // not used
-        {1202.00000, -2414.00000, 1278.00000, -2334.00000, 0.0, 8.67}, // not by default
-        {1072.00000, -2412.00000, 1128.00000, -2372.00000, -69.0, 0.0},
-        {-848.00000, -2082.00000, -664.00000, -1866.00000, 2.2, 5.08}, // not by default
-        {-664.00000, -1924.00000, -464.00000, -1864.00000, 2.2, 5.08}, // not by default
-        {-1484.00000, 784.00000, -1424.00000, 840.00000, -69.0, 0.0},
-        {-496.00000, 566.00000, -432.00000, 642.00000, -69.0, 0.0},
-        {250.00000, 2808.00000, 818.00000, 2888.00000, -69.0, 0.0},
-        {2502.00000, -2240.00000, 2670.00000, -2120.00000, -69.0, 0.0},
-        {1270.00000, -780.00000, 1290.00000, -768.00000, -99.0, -99.0}, // not used | interior
-        {88.00000, 544.00000, 120.00000, 572.00000, -69.0, 0.0},
-        {1856.00000, -202.00000, 1888.00000, -158.00000, -69.0, 0.0},
-        {-2048.00000, -962.00000, -2004.00000, -758.00000, -99.0, -99.0}, // not used
-        {2564.00000, 2370.00000, 2604.00000, 2398.00000, 15.6, 16.2}, // not by default
-        {-2522.00000, -310.00000, -2382.00000, -234.00000, -99.0, -99.0}, // not used
-        {2872.00000, -2136.00000, 2888.00000, -2120.00000, -69.0, 0.0},
-        {2760.00000, -2240.00000, 2776.00000, -2232.00000, -69.0, 0.0},
-        {-912.00000, -150.02799, -717.08660, 208.00000, -69.0, 0.0},
-        {-1728.00000, -222.00000, -1361.66967, 170.00000, -69.0, 0.0}
-};
-
-stock IsPlayerInWater(playerid)
-{
-	new Float:x, Float:y, Float:z;
-	GetPlayerPos(playerid, x, y, z);
-	if(CoordsInWater(x, y, z) > 0) return true;
-	return false;
-}
-
-stock CoordsInWater(Float:x, Float:y, Float:z)
-{
-	for(new w; w < MAX_WATER_AREAS; w++)
-	{
-		if(!(wAreas[w][4] == -99.0 && wAreas[w][5] == -99.0))
-		{
-			if((wAreas[w][0] <= x <= wAreas[w][2]) && (wAreas[w][1] <= y <= wAreas[w][3]) && (wAreas[w][4] <= z <= wAreas[w][5])) return 1;
-		}
-	}
-    return 0;
 }
