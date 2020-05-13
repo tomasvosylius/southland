@@ -746,7 +746,7 @@ native gpci(playerid, serial[], len);
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-// #define USING_VIRTUAL_PRIVATE_SERVER
+#define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -2361,7 +2361,7 @@ ptask PT_DeathTimer[1002](playerid)
 		new string[86],
 			seconds, minutes;
 		divmod(PlayerExtra[playerid][peDeath], 60, seconds, minutes);
-		format(string, sizeof string, "_~n~~w~KOMOS BUSENOJE: ~r~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~/die~n~_", seconds, minutes);
+		format(string, sizeof string, "_~n~~w~KOMOS BUSENOJE: ~r~~h~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~~h~/die~n~_", seconds, minutes);
 
 		if(GetPlayerDistanceFromPoint(playerid,
 			PlayerInfo[playerid][pPosX],

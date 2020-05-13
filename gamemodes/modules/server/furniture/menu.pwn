@@ -592,6 +592,7 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
 		new     
 			Float:old_pos[3],
 			Float:old_rot[3],
+			Float:enter_pos[3],
 			E_FURNITURE_PLACE_TYPE:place      = player_FurnPlaceType[playerid],
 			E_FURNITURE_OWNER_TYPE:ownerType  = player_FurnOwnerType[playerid],
 			iter  = player_FurnIter[playerid],
@@ -605,19 +606,57 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
 		new Float:maxRange = FLOAT_NAN;
 		switch(place)
 		{
-			case furniturePlace_Inside:             maxRange = 150.0;
+			case furniturePlace_Inside:
+			{
+				maxRange = 80.0;
+				switch(ownerType)
+				{
+					case furnitureOwner_Garage: {
+						enter_pos[0] = GarageInfo[owner][gExitX];
+						enter_pos[1] = GarageInfo[owner][gExitY];
+						enter_pos[2] = GarageInfo[owner][gExitZ];
+					}
+					case furnitureOwner_House: {
+						enter_pos[0] = HouseInfo[owner][hExitX];
+						enter_pos[1] = HouseInfo[owner][hExitY];
+						enter_pos[2] = HouseInfo[owner][hExitZ];
+					}
+					case furnitureOwner_Business: {
+						enter_pos[0] = BusinessInfo[owner][bExitX];
+						enter_pos[1] = BusinessInfo[owner][bExitY];
+						enter_pos[2] = BusinessInfo[owner][bExitZ];
+					}
+				}
+			}
 			case furniturePlace_Outside:
 			{
 				switch(ownerType)
 				{
-					case furnitureOwner_Garage:     maxRange = FLOAT_NAN;
-					case furnitureOwner_Business:   maxRange = BusinessInfo[owner][bOutFurnitureRange];
-					case furnitureOwner_House:      maxRange = HouseInfo[owner][hOutFurnitureRange];
+					case furnitureOwner_Garage: {
+						enter_pos[0] = GarageInfo[owner][gEnterX];
+						enter_pos[1] = GarageInfo[owner][gEnterY];
+						enter_pos[2] = GarageInfo[owner][gEnterZ];
+						maxRange = FLOAT_NAN;
+					}
+					case furnitureOwner_Business: {
+						maxRange = BusinessInfo[owner][bOutFurnitureRange];
+						enter_pos[0] = HouseInfo[owner][hEnterX];
+						enter_pos[1] = HouseInfo[owner][hEnterY];
+						enter_pos[2] = HouseInfo[owner][hEnterZ];
+					}
+					case furnitureOwner_House: {
+						maxRange = HouseInfo[owner][hOutFurnitureRange];
+						enter_pos[0] = BusinessInfo[owner][bEnterX];
+						enter_pos[1] = BusinessInfo[owner][bEnterY];
+						enter_pos[2] = BusinessInfo[owner][bEnterZ];
+					}
 				}
 			}
 		}
 
-		if(GetDistanceBetweenPoints3D(x, y, z, old_pos[0], old_pos[1], old_pos[2]) > maxRange || maxRange != maxRange)
+		if(GetDistanceBetweenPoints3D(
+			enter_pos[0], enter_pos[1], enter_pos[2],
+			old_pos[0], old_pos[1], old_pos[2]) > maxRange || maxRange != maxRange)
 		{
 			SetDynamicObjectPos(objectid, old_pos[0], old_pos[1], old_pos[2]);
 			SetDynamicObjectRot(objectid, old_rot[0], old_rot[1], old_rot[2]);
