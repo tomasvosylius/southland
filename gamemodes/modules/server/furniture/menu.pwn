@@ -15,7 +15,7 @@ CMD:furniture(playerid, params[])
 		E_FURNITURE_OWNER_TYPE:ownerType,
 		was_inside;
 
-	if( (owner = GetClosestHouse(playerid, 70.0, was_inside, CHECK_TYPE_INSIDE_AND_OUTSIDE)) != NONE && 
+	if( (owner = GetClosestHouse(playerid, 30.0, was_inside, CHECK_TYPE_INSIDE_AND_OUTSIDE)) != NONE && 
         HaveHouseKey(playerid, owner, "P_FurnitureControl"))
 	{
 		ownerType = furnitureOwner_House;
@@ -108,7 +108,7 @@ static _Furniture_Owned_ShowList(playerid, E_FURNITURE_PLACE_TYPE:placeType, E_F
 
 	if(!found)
 	{
-		SendError(playerid, "Baldø %s nëra", placeType == furniturePlace_Inside ? ("viduje") : ("lauke"));
+		SendError(playerid, "Baldø %s nëra.", placeType == furniturePlace_Inside ? ("viduje") : ("lauke"));
 		return _Furniture_Main(playerid, placeType, ownerType, owner);
 	}
 
@@ -203,10 +203,50 @@ static _Furniture_Owned_ChangePosition(playerid, E_FURNITURE_PLACE_TYPE:placeTyp
 	return 1;
 }
 
-static _Furniture_Owned_ChangeName(playerid, E_FURNITURE_PLACE_TYPE:placeType, E_FURNITURE_OWNER_TYPE:ownerType, owner, iter)
+static _Furniture_Owned_ChangeName(playerid, E_FURNITURE_PLACE_TYPE:placeType, E_FURNITURE_OWNER_TYPE:ownerType, owner, iter, error[] = "")
 {
 	dialog_Clear();
+	dialog_AddLine("{F1f1f1}Áveskite naujà baldo pavadinimà.");
+	dialog_AddLine("{F1f1f1}Ðá pavadinimà matysite tik jûs.");
+	dialog_AddErrorLine(error);
 	
+	inline input(response, listitem)
+	{
+		if(response)
+		{
+			if(!(4 <= strlen(dialog_Input()) <= 31))
+				return _Furniture_Owned_ChangeName(playerid, placeType, ownerType, owner, iter, .error = "Pavadinimas turi bûti 4-31 simboliø.");
+		
+			new table[32], furSql;
+			switch(ownerType)
+			{
+				case furnitureOwner_House: { 
+					format(table, 32, "houses_furniture");
+					furSql = HouseFurniture[owner][iter][furId];
+					format(HouseFurniture[owner][iter][furName], 32, dialog_Input());
+				}
+				case furnitureOwner_Business:{ 
+					format(table, 32, "business_furniture");
+					furSql = BusinessFurniture[owner][iter][furId];
+					format(BusinessFurniture[owner][iter][furName], 32, dialog_Input());
+				}
+				case furnitureOwner_Garage:{ 
+					format(table, 32, "garages_furniture");
+					furSql = GarageFurniture[owner][iter][furId];
+					format(GarageFurniture[owner][iter][furName], 32, dialog_Input());
+				}
+			}
+
+			inline updateFurniture()
+			{
+				MsgSuccess(playerid, "Furniture", "Pavadinimas pakeistas.");
+				return 1;
+			}
+			mysql_tquery_inline(chandler, using inline updateFurniture, "UPDATE `%e` SET `Name`='%e' WHERE id='%d'", table, dialog_Input(), furSql);
+		}
+		_Furniture_Owned_ShowDetails(playerid, placeType, ownerType, owner, iter);
+	}
+	dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Baldo redagavimas", "Keisti", "Gráþi");
 	return 1;
 }
 
