@@ -9872,7 +9872,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(GarageInfo[tmpIter[playerid]][gSale] > 0)
 						{
 							GarageInfo[tmpIter[playerid]][gSale] = 0;
-							FixGarageLabels(tmpIter[playerid]);
+							Garage_FixLabels(tmpIter[playerid]);
 							SaveGarageIntEx(tmpIter[playerid], "Sale", 0);
 							log_init(true);
 							log_set_table("logs_garages");
@@ -9896,7 +9896,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					garageid = tmpIter[playerid];
 				if(sscanf(inputtext,"d",price) || price < 0) OnDialogResponse(playerid, DIALOG_GM_MAIN, 1, 0, "");
 				GarageInfo[garageid][gSale] = price;
-				FixGarageLabels(garageid);
+				Garage_FixLabels(garageid);
 				SaveGarageIntEx(garageid, "Sale", price);
 				MsgSuccess(playerid, "GARAÞAS", "Sëkmingai ádëjote garaþà á pardavimà uþ $%d", price);
 				pc_cmd_gmenu(playerid, "");
@@ -20270,7 +20270,7 @@ public GaragesLoad()
 		cache_get_value_name_float(i, "CarExitY", GarageInfo[i][gCarExitY]);
 		cache_get_value_name_float(i, "CarExitZ", GarageInfo[i][gCarExitZ]);
 		cache_get_value_name_float(i, "CarExitA", GarageInfo[i][gCarExitA]);
-		FixGarageLabels(i);
+		Garage_FixLabels(i);
 		Iter_Add(Garage, i);
 
 		call OnGarageLoad(i);
@@ -20279,13 +20279,11 @@ public GaragesLoad()
 	return 1;
 }
 
-stock FixGarageLabels(i)
+stock Garage_FixLabels(i)
 {
-	if(IsValidDynamic3DTextLabel(GarageInfo[i][gLabel]))
-	{
-		DestroyDynamic3DTextLabel(GarageInfo[i][gLabel]);
-	}
+	IsValidDynamic3DTextLabel(GarageInfo[i][gLabel]) && DestroyDynamic3DTextLabel(GarageInfo[i][gLabel]);
 	GarageInfo[i][gLabel] = INVALID_3DTEXT_ID;
+	
 	new string[256];
 	if(GarageInfo[i][gOwner] == 0) format(string, sizeof string, "{FFFFFF}Garaþas parduodamas!\nKaina: $%d (/buygarage){DADADA}\n\n", GarageInfo[i][gPrice]);
 	else format(string, sizeof string, "");
@@ -31884,7 +31882,7 @@ CMD:buygarage(playerid, params[])
 		GarageInfo[garageid][gSale] = 0;
 		GarageInfo[garageid][gOwner] = PlayerInfo[playerid][pId];
 		SaveGarageIntEx(garageid, "Owner", PlayerInfo[playerid][pId]);
-		FixGarageLabels(garageid);
+		Garage_FixLabels(garageid);
 	}
 	else SendWarning(playerid, "Ásitikinkite, kad esate lauke prie garaþo.");
 	return 1;
