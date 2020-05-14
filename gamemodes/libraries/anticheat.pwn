@@ -1767,9 +1767,11 @@ public t_ac__Health()
 		else ac__DeathSpam[playerid] = 0;
 		ac__LastDeath[playerid] = now;
 	#endif
+	
 	ac__IgnoreWeapons[playerid] = 10;
 	ac__PlayerHealth[playerid] = 100.0;
 	FAC_ResetPlayerWeapons(playerid);
+
 	#if !defined _INC_y_hooks
 		#if defined FAC_OnPlayerDeath
 			return FAC_OnPlayerDeath(playerid, killerid, reason);

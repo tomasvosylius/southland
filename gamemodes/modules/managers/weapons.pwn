@@ -160,19 +160,6 @@ new Float:WeaponDamages[] = { // Zala
 	0.0 // Paraðiuta
 };	
 
-
-hook OnPlayerConnect(playerid)
-{
-	ResetPlayerWeapons(playerid);
-	return 1;
-}
-
-hook OnPlayerDeath(playerid, reason, killerid)
-{
-	ResetPlayerWeapons(playerid);
-	return 1;
-}
-
 static 
 	weapon_GiveType[MAX_PLAYERS][13],
 	weapon_UniqueId[MAX_PLAYERS][13];

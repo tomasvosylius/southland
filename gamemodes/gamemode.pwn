@@ -20093,56 +20093,74 @@ stock GetClosestATM(playerid, Float:distance = 5.0)
 	return last_atm;
 }
 
-stock GetClosestGarage(playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
+stock GetClosestGarage(playerid, &was_inside, Float:inside_range = 3.0, Float:outside_range = 50.0)
 {
 	/*
-	 * Funkcija naudojama isgauti artimiausia zaidejo versla
-	 * Returninta verslo array id
+	 * Funkcija naudojama isgauti artimiausia zaidejo garaza
+	 * Returninta garazo array id
 	 */
-	new
-		Float:last_distance = distance,
-		last_garage = INVALID_BUSINESS_ID,
-		last_was_inside = -1,
-		player_virtual = GetPlayerVirtualWorld(playerid),
-		player_interior = GetPlayerInterior(playerid);
+	new 
+		player_vw 			= GetPlayerVirtualWorld(playerid), player_int = GetPlayerInterior(playerid),
+		Float:last_distance = FLOAT_NAN,
+		last_garage 		= NONE,
+		inside 				= 0;
 
-	switch(type)
+	foreach(new g : Garage)
 	{
-		case CHECK_TYPE_INSIDE_AND_OUTSIDE:
+		new Float:tmp;
+		if(
+			(inside_range > 0.0 && inside_range == inside_range)
+			&&
+			(inside <= 1)
+			&& 
+			(player_vw == GarageInfo[g][gVW] && player_int == GarageInfo[g][gInterior])
+			&&
+			(
+				(
+					(tmp = GetPlayerDistanceFromPoint(playerid, GarageInfo[g][gExitX], GarageInfo[g][gExitY], GarageInfo[g][gExitZ])) < last_distance
+					||
+					last_distance != last_distance
+				)
+				&&
+				(
+					tmp < inside_range
+				)
+			)
+		)
 		{
-			foreach(new garageid : Garage)
-			{
-				if( (GetPlayerDistanceFromPoint(playerid, GarageInfo[garageid][gEnterX], GarageInfo[garageid][gEnterY], GarageInfo[garageid][gEnterZ]) <= last_distance && player_virtual == GarageInfo[garageid][gOutVW] && player_interior == GarageInfo[garageid][gExterior] && ((last_was_inside = 2) || last_was_inside == 2)) ||
-					(GetPlayerDistanceFromPoint(playerid, GarageInfo[garageid][gExitX], GarageInfo[garageid][gExitY], GarageInfo[garageid][gExitZ]) <= last_distance && player_virtual == GarageInfo[garageid][gVW] && player_interior == GarageInfo[garageid][gInterior] && ((last_was_inside = 1) || last_was_inside == 1)))
-				{
-					last_distance = (last_was_inside == 1 ? (GetPlayerDistanceFromPoint(playerid, GarageInfo[garageid][gExitX], GarageInfo[garageid][gExitY], GarageInfo[garageid][gExitZ])) : (GetPlayerDistanceFromPoint(playerid, GarageInfo[garageid][gEnterX], GarageInfo[garageid][gEnterY], GarageInfo[garageid][gEnterZ])));
-					last_garage = garageid;
-				}
-			}
+			// Viduje
+			inside = 1;
+			last_distance 	= tmp;
+			last_garage		= g;
 		}
-		case CHECK_TYPE_INSIDE:
+
+
+		else if(
+			(outside_range > 0.0 && outside_range == outside_range)
+			&& 
+			(inside == 2 || inside == 0)
+			&& 
+			(player_vw == GarageInfo[g][gOutVW] && player_int == GarageInfo[g][gExterior])
+			&&
+			(
+				(
+					(tmp = GetPlayerDistanceFromPoint(playerid, GarageInfo[g][gEnterX], GarageInfo[g][gEnterY], GarageInfo[g][gEnterZ])) < last_distance
+					||
+					last_distance != last_distance
+				)
+				&& 
+				(
+					tmp < outside_range
+				)
+			)
+		)
 		{
-			foreach(new garageid : Garage)
-			{
-				if(GetPlayerDistanceFromPoint(playerid, GarageInfo[garageid][gExitX], GarageInfo[garageid][gExitY], GarageInfo[garageid][gExitZ]) <= last_distance && player_virtual == GarageInfo[garageid][gVW] && player_interior == GarageInfo[garageid][gInterior])
-				{
-					last_distance = GetPlayerDistanceFromPoint(playerid, GarageInfo[garageid][gExitX], GarageInfo[garageid][gExitY], GarageInfo[garageid][gExitZ]);
-					last_garage = garageid;
-				}
-			}
-		}
-		case CHECK_TYPE_OUTSIDE:
-		{
-			foreach(new garageid : Garage)
-			{
-				if(GetPlayerDistanceFromPoint(playerid, GarageInfo[garageid][gEnterX], GarageInfo[garageid][gEnterY], GarageInfo[garageid][gEnterZ]) <= last_distance && player_virtual == GarageInfo[garageid][gOutVW] && player_interior == GarageInfo[garageid][gExterior])
-				{
-					last_distance = GetPlayerDistanceFromPoint(playerid, GarageInfo[garageid][gEnterX], GarageInfo[garageid][gEnterY], GarageInfo[garageid][gEnterZ]);
-					last_garage = garageid;
-				}
-			}
+			inside = 2;
+			last_distance 	= tmp;
+			last_garage		= g;
 		}
 	}
+	was_inside = inside;
 	return last_garage;
 }
 
@@ -20163,16 +20181,13 @@ stock GetClosestBusiness(playerid, &was_inside, Float:inside_range = 3.0, Float:
 	{
 		new Float:tmp;
 		if(
+			(inside_range > 0.0 && inside_range == inside_range)
+			&&
+			(inside <= 1)
+			&& 
+			(player_vw == BusinessInfo[b][bVW] && player_int == BusinessInfo[b][bInterior])
+			&&
 			(
-				// Vidus
-				(
-					inside_range > 0.0 && inside_range == inside_range
-				)
-				&&
-				(
-					(inside == 1 || inside == 0) && (inside = 1)
-				)
-				&&
 				(
 					(tmp = GetPlayerDistanceFromPoint(playerid, BusinessInfo[b][bExitX], BusinessInfo[b][bExitY], BusinessInfo[b][bExitZ])) < last_distance
 					||
@@ -20180,37 +20195,43 @@ stock GetClosestBusiness(playerid, &was_inside, Float:inside_range = 3.0, Float:
 				)
 				&&
 				(
-					player_vw == BusinessInfo[b][bVW] && player_int == BusinessInfo[b][bInterior]
+					tmp < inside_range
 				)
 			)
-			||
+		)
+		{
+			// Viduje
+			inside = 1;
+			last_distance 	= tmp;
+			last_business	= b;
+		}
+
+
+		else if(
+			(outside_range > 0.0 && outside_range == outside_range)
+			&& 
+			(inside == 2 || inside == 0)
+			&& 
+			(player_vw == BusinessInfo[b][bOutVW] && player_int == BusinessInfo[b][bExterior])
+			&&
 			(
-				// Laukas
-				(
-					outside_range > 0.0 && outside_range == outside_range
-				)
-				&&
-				(
-					(inside == 2 || inside == 0) && (inside = 2)
-				)
-				&&
 				(
 					(tmp = GetPlayerDistanceFromPoint(playerid, BusinessInfo[b][bEnterX], BusinessInfo[b][bEnterY], BusinessInfo[b][bEnterZ])) < last_distance
 					||
 					last_distance != last_distance
 				)
-				&&
+				&& 
 				(
-					player_vw == BusinessInfo[b][bOutVW] && player_int == BusinessInfo[b][bExterior]
+					tmp < outside_range
 				)
 			)
 		)
 		{
+			inside = 2;
 			last_distance 	= tmp;
 			last_business	= b;
 		}
 	}
-
 	was_inside = inside;
 	return last_business;
 }
@@ -20221,7 +20242,6 @@ stock GetClosestHouse(playerid, &was_inside, Float:inside_range = 3.0, Float:out
 	 * Funkcija naudojama isgauti artimiausia zaidejo nama
 	 * Returninta namo array id
 	 */
-
 	new 
 		player_vw 			= GetPlayerVirtualWorld(playerid), player_int = GetPlayerInterior(playerid),
 		Float:last_distance = FLOAT_NAN,
@@ -20232,6 +20252,62 @@ stock GetClosestHouse(playerid, &was_inside, Float:inside_range = 3.0, Float:out
 	{
 		new Float:tmp;
 		if(
+			(inside_range > 0.0 && inside_range == inside_range)
+			&&
+			(inside <= 1)
+			&& 
+			(player_vw == HouseInfo[h][hVW] && player_int == HouseInfo[h][hInterior])
+			&&
+			(
+				(
+					(tmp = GetPlayerDistanceFromPoint(playerid, HouseInfo[h][hExitX], HouseInfo[h][hExitY], HouseInfo[h][hExitZ])) < last_distance
+					||
+					last_distance != last_distance
+				)
+				&&
+				(
+					tmp < inside_range
+				)
+			)
+		)
+		{
+			// Viduje
+			inside = 1;
+			last_distance 	= tmp;
+			last_house 		= h;
+		}
+
+
+		else if(
+			(outside_range > 0.0 && outside_range == outside_range)
+			&& 
+			(inside == 2 || inside == 0)
+			&& 
+			(player_vw == HouseInfo[h][hOutVW] && player_int == HouseInfo[h][hExterior])
+			&&
+			(
+				(
+					(tmp = GetPlayerDistanceFromPoint(playerid, HouseInfo[h][hEnterX], HouseInfo[h][hEnterY], HouseInfo[h][hEnterZ])) < last_distance
+					||
+					last_distance != last_distance
+				)
+				&& 
+				(
+					tmp < outside_range
+				)
+			)
+		)
+		{
+			inside = 2;
+			last_distance 	= tmp;
+			last_house 		= h;
+		}
+	}
+	was_inside = inside;
+	return last_house;
+}
+
+	/*	if(
 			(
 				// Vidus
 				(
@@ -20279,10 +20355,7 @@ stock GetClosestHouse(playerid, &was_inside, Float:inside_range = 3.0, Float:out
 			last_house		= h;
 		}
 	}
-
-	was_inside = inside;
-	return last_house;
-}
+}*/
 
 stock GetClosestDealerHouse(playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
 {
@@ -27647,7 +27720,7 @@ CMD:ramdoor(playerid, params[])
 		}
 		return 1;
 	}
-	else if((iter = GetClosestGarage(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_GARAGE_ID)
+	else if((iter = GetClosestGarage(playerid, unused, .inside_range = FLOAT_NAN, .outside_range = 5.0)) != NONE)
 	{
 		if(GarageInfo[iter][gLocked] <= 0) return SendWarning(playerid, "Garaþo durys atrakintos.");
 		else
@@ -30514,8 +30587,9 @@ CMD:hmenu(playerid, params[])
 alias:gmenu("garage", "garazas");
 CMD:gmenu(playerid, params[])
 {
-	new garageid = INVALID_GARAGE_ID;
-	if((garageid = GetClosestGarage(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_GARAGE_ID && GarageInfo[garageid][gOwner] == PlayerInfo[playerid][pId])
+	new garageid = NONE, unused;
+	if((garageid = GetClosestGarage(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE && 
+		GarageInfo[garageid][gOwner] == PlayerInfo[playerid][pId])
 	{
 		tmpIter[playerid] = garageid;
 		new string[256];
@@ -30773,9 +30847,9 @@ CMD:buybusiness(playerid, params[])
 }
 CMD:buygarage(playerid, params[])
 {
-	new garageid = INVALID_GARAGE_ID;
+	new garageid = NONE, unused;
 	if(PlayerInfo[playerid][pLevel] < 3) return SendWarning(playerid, "Jûsø lygis nëra 3");
-	if((garageid = GetClosestGarage(playerid, 4.0, CHECK_TYPE_OUTSIDE)) != INVALID_GARAGE_ID)
+	if((garageid = GetClosestGarage(playerid, unused, .inside_range = FLOAT_NAN, .outside_range = 4.0)) != NONE)
 	{
 		if(GarageInfo[garageid][gOwner] > 0 && GarageInfo[garageid][gSale] == 0) return SendError(playerid, "Ðis garaþas turi savininkà ir nëra parduodamas.");
 		if(GarageInfo[garageid][gOwner] == PlayerInfo[playerid][pId]) return 1; // pats savininkas
@@ -31148,7 +31222,8 @@ CMD:lock(playerid, params[])
 		else InfoBox(playerid, "UZRAKINOTE", "VERSLA");
 		return 1;
 	}
-	else if((itterid = GetClosestGarage(playerid, 4.0)) != INVALID_GARAGE_ID && GarageInfo[itterid][gOwner] == PlayerInfo[playerid][pId])
+	else if((itterid = GetClosestGarage(playerid, unused, .inside_range = 4.0, .outside_range = 4.0)) != NONE &&
+			GarageInfo[itterid][gOwner] == PlayerInfo[playerid][pId])
 	{
 		GarageInfo[itterid][gLocked] = !GarageInfo[itterid][gLocked];
 		SaveGarageIntEx(itterid, "Locked", GarageInfo[itterid][gLocked]);

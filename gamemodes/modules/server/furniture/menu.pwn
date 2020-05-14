@@ -19,7 +19,7 @@ CMD:furniture(playerid, params[])
 				playerid, 
 				.was_inside 	= was_inside,
 				.inside_range  	= 50.0,
-				.outside_range 	= 4.0)) != NONE 
+				.outside_range 	= 8.0)) != NONE 
 		&& 
         HaveHouseKey(playerid, owner, "P_FurnitureControl"))
 	{
@@ -27,24 +27,24 @@ CMD:furniture(playerid, params[])
 	}
 	else if((owner = GetClosestBusiness(
 				playerid, 
+				.was_inside		= was_inside,
 				.inside_range 	= 50.0,
-				.outside_range	= 4.0,
-				.was_inside		= was_inside)) != NONE
+				.outside_range	= 8.0)) != NONE
 			&& 
             HaveBusinessKey(playerid, owner, "P_FurnitureControl"))
 	{
 		ownerType = furnitureOwner_Business;
-	}/*
+	}
 	else if((owner = GetClosestGarage(
 				playerid,
+				.was_inside		= was_inside,
 				.inside_range	= 70.0,
-				.outside_range	= FLOAT_NAN,
-				.was_inside		= was_inside)) != NONE 
+				.outside_range	= FLOAT_NAN)) != NONE 
 			&&
             GarageInfo[owner][gOwner] == PlayerInfo[playerid][pId])
 	{
 		ownerType = furnitureOwner_Garage;
-	}*/
+	}
 
 	switch(was_inside)
 	{	
@@ -64,6 +64,15 @@ static _Furniture_Main(playerid, E_FURNITURE_PLACE_TYPE:placeType, E_FURNITURE_O
 	dialog_AddLine("Perþiûrëti esamus baldus");
 	dialog_AddLine("Pirkti baldus");
 
+	new title[56];
+	switch(ownerType)
+	{
+		case furnitureOwner_House: 		format(title, 56, "baldai (namo numeris: %d)", HouseInfo[owner][hId]);
+		case furnitureOwner_Business: 	format(title, 56, "baldai (verslo numeris: %d)", BusinessInfo[owner][bId]);
+		case furnitureOwner_Garage: 	format(title, 56, "baldai (garaþo numeris: %d)", GarageInfo[owner][gId]);
+	}
+	strins(title, placeType == furniturePlace_Inside ? ("Vidaus ") : ("Lauko "), 0);
+
 	inline select(response, listitem)
 	{
 		if(response)
@@ -72,8 +81,7 @@ static _Furniture_Main(playerid, E_FURNITURE_PLACE_TYPE:placeType, E_FURNITURE_O
 			dialog_Row("Pirkti baldus")				return _Furniture_Buy_ShowCats(playerid, placeType, ownerType, owner);
 		}
 	}
-	dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, 
-		va_return("%s baldai", placeType == furniturePlace_Inside ? ("Vidaus") : ("Lauko")), "Tæsti", "Atðaukti");
+	dialog_Show(playerid, using inline select, DIALOG_STYLE_LIST, title, "Tæsti", "Atðaukti");
 	return 1;
 }
 
@@ -227,8 +235,8 @@ static _Furniture_Owned_ChangeName(playerid, E_FURNITURE_PLACE_TYPE:placeType, E
 	{
 		if(response)
 		{
-			if(!(4 <= strlen(dialog_Input()) <= 31))
-				return _Furniture_Owned_ChangeName(playerid, placeType, ownerType, owner, iter, .error = "Pavadinimas turi bûti 4-31 simboliø.");
+			if(!(1 <= strlen(dialog_Input()) <= 31))
+				return _Furniture_Owned_ChangeName(playerid, placeType, ownerType, owner, iter, .error = "Pavadinimas turi bûti 1-31 simboliø.");
 		
 			new table[32], furSql;
 			switch(ownerType)
@@ -592,20 +600,61 @@ static _Furniture_EditObject(playerid, E_FURNITURE_PLACE_TYPE:placeType, E_FURNI
 	player_FurnPlaceType[playerid]		= placeType;
 	
 	EditDynamicObject(playerid, object);
+
+	if(placeType == furniturePlace_Outside)
+	{
+		DisablePlayerRaceCheckpoint(playerid);
+
+		_SetFurnitureCP(playerid, ownerType, owner);
+		SendFormat(playerid, 0xbababaff, "Baldø statymo riba paþymëta aplink jus.");
+	}
+
 	SendFormat(playerid, 0xbababaff, "Pastatykite baldà á norimà vietà.");
 	return 1;
 }
+stock _SetFurnitureCP(playerid, E_FURNITURE_OWNER_TYPE:ownerType, owner)
+{
+	new Float:maxRange, Float:building_pos[3];
+	switch(ownerType)
+	{
+		case furnitureOwner_Business: {
+			maxRange = BusinessInfo[owner][bOutFurnitureRange];
+			building_pos[0] = BusinessInfo[owner][bEnterX];
+			building_pos[1] = BusinessInfo[owner][bEnterY];
+			building_pos[2] = BusinessInfo[owner][bEnterZ];
+		}
+		case furnitureOwner_House: {
+			maxRange = HouseInfo[owner][hOutFurnitureRange];
+			building_pos[0] = HouseInfo[owner][hEnterX];
+			building_pos[1] = HouseInfo[owner][hEnterY];
+			building_pos[2] = HouseInfo[owner][hEnterZ];
+		}
+	}
+
+	SetPlayerRaceCheckpoint(playerid, 2, building_pos[0], building_pos[1], building_pos[2], 0.0, 0.0, 0.0, .size = maxRange);
+	return 1;
+}
+
 
 /** Events */
 hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
 {
     if(!player_EditingFurniture[playerid]) return 1;
+	else 
+	{
+		if(response == EDIT_RESPONSE_FINAL || response == EDIT_RESPONSE_CANCEL)
+		{
+			DisablePlayerRaceCheckpoint(playerid);
+			player_EditingFurniture[playerid] = false;
+		}
+	}
+
 	if(response == EDIT_RESPONSE_FINAL)
 	{
 		new     
 			Float:old_pos[3],
 			Float:old_rot[3],
-			Float:enter_pos[3],
+			Float:building_pos[3],
 			E_FURNITURE_PLACE_TYPE:place      = player_FurnPlaceType[playerid],
 			E_FURNITURE_OWNER_TYPE:ownerType  = player_FurnOwnerType[playerid],
 			iter  = player_FurnIter[playerid],
@@ -625,19 +674,19 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
 				switch(ownerType)
 				{
 					case furnitureOwner_Garage: {
-						enter_pos[0] = GarageInfo[owner][gExitX];
-						enter_pos[1] = GarageInfo[owner][gExitY];
-						enter_pos[2] = GarageInfo[owner][gExitZ];
+						building_pos[0] = GarageInfo[owner][gExitX];
+						building_pos[1] = GarageInfo[owner][gExitY];
+						building_pos[2] = GarageInfo[owner][gExitZ];
 					}
 					case furnitureOwner_House: {
-						enter_pos[0] = HouseInfo[owner][hExitX];
-						enter_pos[1] = HouseInfo[owner][hExitY];
-						enter_pos[2] = HouseInfo[owner][hExitZ];
+						building_pos[0] = HouseInfo[owner][hExitX];
+						building_pos[1] = HouseInfo[owner][hExitY];
+						building_pos[2] = HouseInfo[owner][hExitZ];
 					}
 					case furnitureOwner_Business: {
-						enter_pos[0] = BusinessInfo[owner][bExitX];
-						enter_pos[1] = BusinessInfo[owner][bExitY];
-						enter_pos[2] = BusinessInfo[owner][bExitZ];
+						building_pos[0] = BusinessInfo[owner][bExitX];
+						building_pos[1] = BusinessInfo[owner][bExitY];
+						building_pos[2] = BusinessInfo[owner][bExitZ];
 					}
 				}
 			}
@@ -647,29 +696,29 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
 				{
 					case furnitureOwner_Garage: {
 						maxRange = FLOAT_NAN;
-						enter_pos[0] = GarageInfo[owner][gEnterX];
-						enter_pos[1] = GarageInfo[owner][gEnterY];
-						enter_pos[2] = GarageInfo[owner][gEnterZ];
+						building_pos[0] = GarageInfo[owner][gEnterX];
+						building_pos[1] = GarageInfo[owner][gEnterY];
+						building_pos[2] = GarageInfo[owner][gEnterZ];
 					}
 					case furnitureOwner_Business: {
 						maxRange = BusinessInfo[owner][bOutFurnitureRange];
-						enter_pos[0] = BusinessInfo[owner][bEnterX];
-						enter_pos[1] = BusinessInfo[owner][bEnterY];
-						enter_pos[2] = BusinessInfo[owner][bEnterZ];
+						building_pos[0] = BusinessInfo[owner][bEnterX];
+						building_pos[1] = BusinessInfo[owner][bEnterY];
+						building_pos[2] = BusinessInfo[owner][bEnterZ];
 					}
 					case furnitureOwner_House: {
 						maxRange = HouseInfo[owner][hOutFurnitureRange];
-						enter_pos[0] = HouseInfo[owner][hEnterX];
-						enter_pos[1] = HouseInfo[owner][hEnterY];
-						enter_pos[2] = HouseInfo[owner][hEnterZ];
+						building_pos[0] = HouseInfo[owner][hEnterX];
+						building_pos[1] = HouseInfo[owner][hEnterY];
+						building_pos[2] = HouseInfo[owner][hEnterZ];
 					}
 				}
 			}
 		}
 
 		if(GetDistanceBetweenPoints3D(
-			enter_pos[0], enter_pos[1], enter_pos[2],
-			old_pos[0], old_pos[1], old_pos[2]) > maxRange || maxRange != maxRange)
+			building_pos[0], building_pos[1], building_pos[2],
+			x, y, z) > maxRange || maxRange != maxRange)
 		{
 			SetDynamicObjectPos(objectid, old_pos[0], old_pos[1], old_pos[2]);
 			SetDynamicObjectRot(objectid, old_rot[0], old_rot[1], old_rot[2]);
@@ -728,5 +777,6 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
 hook OnPlayerConnect(playerid)
 {
 	player_FurnCat[playerid] = 0;
+	player_EditingFurniture[playerid] = false;
 	return 1;
 }
