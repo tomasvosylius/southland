@@ -8444,7 +8444,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 0:
 					{
 						// stotys
-						new string[4084];
+						new string[2024];
 						for(new i = 0; i < sizeof RadioStations; i++)
 						{
 							format(string, sizeof string, "%s%s\n", string, RadioStations[i][stationName]);
@@ -12404,7 +12404,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						// perziureti visas
 						if(HaveAdminPermission(playerid, "EditParkings"))
 						{
-							new string[4020] = "Nr.\tPavadinimas (MySQL ID)\tVieta\n",
+							new string[2024] = "Nr.\tPavadinimas (MySQL ID)\tVieta\n",
 								line[64],
 								i,
 								zone[28];
