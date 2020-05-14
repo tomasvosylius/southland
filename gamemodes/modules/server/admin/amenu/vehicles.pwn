@@ -370,13 +370,16 @@ static _Vehicles_SavePosition(playerid, vehicleid)
     GetVehicleZAngle(vehicleid, a);
     GetVehicleColor(vehicleid, col1, col2);
 
-    SaveServerVehicleFloatEx(vehicleid, "X", x);
-    SaveServerVehicleFloatEx(vehicleid, "Y", y);
-    SaveServerVehicleFloatEx(vehicleid, "Z", z);
-    SaveServerVehicleFloatEx(vehicleid, "A", a);
-    
     newvehicleid = CreateVehicle(model, x, y, z, a, col1, col2, VehicleInfo[vehicleid][vRespawnTime], VehicleInfo[vehicleid][vAddSiren]);
     VehicleInfo[newvehicleid] = VehicleInfo[vehicleid];
+    PutFactionWeaponsInVehicle(newvehicleid);
+    Vehicle_SetServerNumberPlate(newvehicleid);
+    Vehicle_SetUnitLabel(newvehicleid, VehicleInfo[vehicleid][vUnitText]);
+    
+    SaveServerVehicleFloatEx(newvehicleid, "X", x);
+    SaveServerVehicleFloatEx(newvehicleid, "Y", y);
+    SaveServerVehicleFloatEx(newvehicleid, "Z", z);
+    SaveServerVehicleFloatEx(newvehicleid, "A", a);
 
     DestroyVehicle(vehicleid);
     MsgSuccess(playerid, "TRANSPORTAS", "Vieta sëkmingai iðsaugota.");
@@ -387,7 +390,6 @@ static _Vehicles_SavePosition(playerid, vehicleid)
     log_set_values("'%d','%e','(AM) Pakeite automobilio vieta','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), VehicleInfo[newvehicleid][vId]);
     log_commit();
 
-    
     _Vehicles_Main(playerid);
     return 1;
 }

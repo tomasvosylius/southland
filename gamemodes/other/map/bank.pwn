@@ -5,8 +5,8 @@ hook OnGameModeInit()
 	new tmpobjid;
 	//tmpobjid = CreateDynamicObject(19479,1472.635,-1258.712,14.606,0.000,0.000,179.999,-1,-1,-1,400.000,400.000);
 	//SetDynamicObjectMaterialText(tmpobjid, 0, "ZE", 130, "Quartz MS", 45, 0, 0xFFFFFFFF, 0x00000000, 0);
-	tmpobjid = CreateDynamicObject(19479,1472.635,-1256.860,14.606,0.000,0.000,179.999,-1,-1,-1,400.000,400.000);
-	SetDynamicObjectMaterialText(tmpobjid, 0, "M{6dc800}A{ffffff}ZE", 130, "Quartz MS", 45, 0, 0xFFFFFFFF, 0x00000000, 0);
+	// tmpobjid = CreateDynamicObject(19479,1472.635,-1256.860,14.606,0.000,0.000,179.999,-1,-1,-1,400.000,400.000);
+	// SetDynamicObjectMaterialText(tmpobjid, 0, "M{6dc800}A{ffffff}ZE", 130, "Quartz MS", 45, 0, 0xFFFFFFFF, 0x00000000, 0);
 	//tmpobjid = CreateDynamicObject(19479,1472.635,-1257.671,14.636,0.000,0.000,179.999,-1,-1,-1,400.000,400.000);
 	//SetDynamicObjectMaterialText(tmpobjid, 0, "A", 130, "Quartz MS", 45, 0, 0xFF1E90FF, 0x00000000, 0);
 	tmpobjid = CreateDynamicObject(19479,1472.635,-1256.871,13.806,0.000,0.000,179.999,-1,-1,-1,400.000,400.000);

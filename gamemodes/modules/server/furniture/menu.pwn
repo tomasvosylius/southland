@@ -15,22 +15,35 @@ CMD:furniture(playerid, params[])
 		E_FURNITURE_OWNER_TYPE:ownerType,
 		was_inside;
 
-	if( (owner = GetClosestHouse(playerid, 30.0, was_inside, CHECK_TYPE_INSIDE_AND_OUTSIDE)) != NONE && 
+	if( (owner = GetClosestHouse(
+				playerid, 
+				.was_inside 	= was_inside,
+				.inside_range  	= 50.0,
+				.outside_range 	= 4.0)) != NONE 
+		&& 
         HaveHouseKey(playerid, owner, "P_FurnitureControl"))
 	{
 		ownerType = furnitureOwner_House;
 	}
-	/*else if((owner = GetClosestBusiness(playerid, 70.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID && 
+	else if((owner = GetClosestBusiness(
+				playerid, 
+				.inside_range 	= 50.0,
+				.outside_range	= 4.0,
+				.was_inside		= was_inside)) != NONE
+			&& 
             HaveBusinessKey(playerid, owner, "P_FurnitureControl"))
 	{
-		tmpType_Salon[playerid] = 2;
-		tmpIter[playerid] = owner;
-	}
-	else if((owner = GetClosestGarage(playerid, 70.0,   CHECK_TYPE_INSIDE)) != INVALID_GARAGE_ID &&
+		ownerType = furnitureOwner_Business;
+	}/*
+	else if((owner = GetClosestGarage(
+				playerid,
+				.inside_range	= 70.0,
+				.outside_range	= FLOAT_NAN,
+				.was_inside		= was_inside)) != NONE 
+			&&
             GarageInfo[owner][gOwner] == PlayerInfo[playerid][pId])
 	{
-		tmpType_Salon[playerid] = 3;
-		tmpIter[playerid] = owner;
+		ownerType = furnitureOwner_Garage;
 	}*/
 
 	switch(was_inside)
@@ -633,22 +646,22 @@ hook OnPlayerEditDynObject(playerid, objectid, response, Float:x, Float:y, Float
 				switch(ownerType)
 				{
 					case furnitureOwner_Garage: {
+						maxRange = FLOAT_NAN;
 						enter_pos[0] = GarageInfo[owner][gEnterX];
 						enter_pos[1] = GarageInfo[owner][gEnterY];
 						enter_pos[2] = GarageInfo[owner][gEnterZ];
-						maxRange = FLOAT_NAN;
 					}
 					case furnitureOwner_Business: {
 						maxRange = BusinessInfo[owner][bOutFurnitureRange];
-						enter_pos[0] = HouseInfo[owner][hEnterX];
-						enter_pos[1] = HouseInfo[owner][hEnterY];
-						enter_pos[2] = HouseInfo[owner][hEnterZ];
-					}
-					case furnitureOwner_House: {
-						maxRange = HouseInfo[owner][hOutFurnitureRange];
 						enter_pos[0] = BusinessInfo[owner][bEnterX];
 						enter_pos[1] = BusinessInfo[owner][bEnterY];
 						enter_pos[2] = BusinessInfo[owner][bEnterZ];
+					}
+					case furnitureOwner_House: {
+						maxRange = HouseInfo[owner][hOutFurnitureRange];
+						enter_pos[0] = HouseInfo[owner][hEnterX];
+						enter_pos[1] = HouseInfo[owner][hEnterY];
+						enter_pos[2] = HouseInfo[owner][hEnterZ];
 					}
 				}
 			}

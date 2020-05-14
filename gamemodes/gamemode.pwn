@@ -64,7 +64,7 @@ native gpci(playerid, serial[], len);
 // ==============================================================================
 // Serveris
 #define CODE_VERSION 		1.2.2
-#define CODE_VERSION_P 		1147
+#define CODE_VERSION_P 		1220
 #define SERVER_DEBUG_LEVEL 	3 		// [0:nieko] [1:errorai, gm klaidos] [2:visi callbackai] [3:funkcijos]
 //#define BETA_TEST_MODE 	// galima /reportbug naudot
 
@@ -158,8 +158,11 @@ native gpci(playerid, serial[], len);
 #define DEFAULT_STUDIO_NUMBER 			5555
 #define DEFAULT_TAXI_NUMBER 			4114
 #define DEFAULT_TAXI_LICENCE_PRICE		3000
-#define DEFAULT_PLAYER_COLOR			0x99999911
 #define DEFAULT_CAR_RENT_PRICE			8
+
+#define DEFAULT_PLAYER_COLOR			0x99999911
+#define DEFAULT_PD_PLAYER_COLOR			0x4871F7ff // pd /duty spalva
+#define DEFAULT_FD_PLAYER_COLOR			0xe45b5bff // fd /duty spalva
 
 #define WARNS_TO_BAN 					3
 #define TIME_TO_DELETE_DROPS			18000 // 5val.  	60sec= 1mmin // kas kiek UNIX sec issitrins visi objektai
@@ -242,26 +245,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_TRUNK 					26
 #define DIALOG_TRUNK_ITEM 				27
 #define DIALOG_INVENTORY_GIVE			28
-#define DIALOG_FM_MAIN					29
-#define DIALOG_FM_RANKS_AND_USERS		30
-#define DIALOG_FM_INVENTORY 			31
-#define DIALOG_FM_USERS_MAIN			32
-#define DIALOG_FM_USER_ADD 				33
-#define DIALOG_FM_USER_EDIT 			34
-#define DIALOG_FM_RANKS_MAIN 			35
-#define DIALOG_FM_RANK_EDIT				36
-#define DIALOG_FM_BUDGET_MAIN 			37
-#define DIALOG_FM_BUDGET_TAKE 			38
-#define DIALOG_FM_BUDGET_PUT 			39
-#define DIALOG_FM_VEHICLES_MAIN			40
-#define DIALOG_FM_VEHICLES_LIST			41
-#define DIALOG_FM_VEHICLES_SHOP			42
-#define DIALOG_FM_VEHICLE_EDIT 			43
-#define DIALOG_FM_VEHICLE_SET_RANK		44
-#define DIALOG_FM_VEHICLE_SET_UNIT 		45
-#define DIALOG_FM_WEAPONS_MAIN 			46
-#define DIALOG_FM_USER_RANK				47
-#define DIALOG_FM_WEAPONS_TYPE			48
 #define DIALOG_HOUSE_INVENTORY			50
 #define DIALOG_HOUSE_INVENTORY_ITEM 	51
 #define DIALOG_BUSINESS_INVENTORY		52
@@ -270,7 +253,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_REPORTS_LIST				55
 #define DIALOG_REPORT_ACTION			56
 #define DIALOG_REPORT_REASON 			57
-#define DIALOG_FM_VEHICLE_COLOR			58
 #define DIALOG_WEAPON_STORE				59
 #define DIALOG_CLOTHES_MAIN				60
 #define DIALOG_CLOTHES_LIST 			61
@@ -436,7 +418,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_PAY_FINE 					311
 #define DIALOG_PAY_FINE_TYPE 				312
 #define DIALOG_WEAPON_TRUNK 				316
-#define DIALOG_FM_USER_PRIVILEGES 			317
 #define DIALOG_GPS 							321
 #define DIALOG_VEHICLE_SCRAP 				322
 #define DIALOG_BUY_WEAPONS_MAIN 			323
@@ -447,7 +428,6 @@ native gpci(playerid, serial[], len);
 #define DIALOG_VEHICLE_AUDIO_VOLUME 		328
 
 #define DIALOG_BM_ENTER_PRICE_EDIT 			330
-//#define dialoglast #define lastdialog #define last dialog
 // ==============================================================================
 // Darbai
 #define JOB_MECHANIC					1
@@ -1918,11 +1898,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 
 
 /** Maps */
-//#include "core\map\newbie.pwn"
-//#include "core\map\alhambra_replacement.pwn"
-// #include "core\map\empty_houses.pwn"
-
-/*#include "other\map\vm.pwn"
+#include "other\map\vm.pwn"
 #include "other\map\vm_corner.pwn"
 #include "other\map\corona247.pwn"
 #include "other\map\mechanics2.pwn"
@@ -1941,11 +1917,14 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other\map\bank.pwn"
 #include "other\map\train_ganton.pwn"
 #include "other\map\train_jefferson.pwn"
-#include "other\map\pier.pwn"*/
+#include "other\map\pier.pwn"
 
+// Unused ones
+//#include "core\map\newbie.pwn"
+//#include "core\map\alhambra_replacement.pwn"
+// #include "core\map\empty_houses.pwn"
 // #include "other\map\mechanics.pwn"
 // #include "other\map\china_town.pwn"
-
 // #include "other\map\central_hotel.pwn"
 // #include "core\map\squatters.pwn"
 // #include "core\map\ganton_basketball.pwn"
@@ -2020,6 +1999,13 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\server\admin\amenu/factions.pwn"
 #include "modules\server\admin\amenu/business.pwn"
 #include "modules\server\admin\amenu/carshops.pwn"
+
+// Fmenu
+#include "modules\server\factions\fmenu/main.pwn"
+#include "modules\server\factions\fmenu/budget.pwn"
+#include "modules\server\factions\fmenu/vehicles.pwn"
+#include "modules\server\factions\fmenu/ranks.pwn"
+#include "modules\server\factions\fmenu/workers.pwn"
 
 // Furniture
 #include "modules\server\furniture/list.pwn"
@@ -2212,7 +2198,8 @@ ptask PT_VehicleSpeedo[200](playerid)
 
 	if(	!IsPlayerInAnyVehicle(playerid) || 
 		(vehicleid = OldVehicle[playerid]) != GetPlayerVehicleID(playerid) || 
-		GetPlayerVehicleSeat(playerid) != 0)
+		GetPlayerVehicleSeat(playerid) != 0 ||
+		!IsValidVehicle(vehicleid))
 	{
 		(Recalculate_Mileage[playerid] > 0) && (Recalculate_Mileage[playerid] = 0);
 		return;
@@ -4938,7 +4925,7 @@ public OnPlayerText(playerid, text[])
 		if(strlen(PlayerInfo[playerid][pForumName])) format(name, sizeof name, "%s", PlayerInfo[playerid][pForumName]);
 		else format(name, sizeof name, "%s", GetPlayerNameEx(playerid));
 
-		SendAdminMessage(0xFFFDA1FF, false, "[%s %s(%d)]: %s", GetGroupName(PlayerGroups[playerid][0]), name, playerid, text);
+		SendAdminMessage(0x75E173ff, false, "[%s %s(%d)]: %s", GetGroupName(PlayerGroups[playerid][0]), name, playerid, text);
 		return 0;
 	}
 	else if(
@@ -12931,896 +12918,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				pc_cmd_wepstore(playerid, "");
 			}
 		}
-		case DIALOG_PLAYER_OPTIONS:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					// speedo
-					case 0:
-					{
-						TextdrawDisabled_Speedo{playerid} = !TextdrawDisabled_Speedo{playerid};
-						if(TextdrawDisabled_Speedo{playerid}) Speedo_Hide(playerid);
-						SaveAccountOption(playerid, "TextdrawDisabled_Speedo", TextdrawDisabled_Speedo{playerid});
-					}
-					case 1:
-					{
-						TextdrawDisabled_JailTimer{playerid} = !TextdrawDisabled_JailTimer{playerid};
-						if(TextdrawDisabled_JailTimer{playerid} && ShowingJailTimer{playerid}) HideJailTimer(playerid);
-						SaveAccountOption(playerid, "TextdrawDisabled_JailTimer", TextdrawDisabled_JailTimer{playerid});
-					}
-					case 2:
-					{
-						TextdrawDisabled_InfoBar{playerid} = !TextdrawDisabled_InfoBar{playerid};
-						if(TextdrawDisabled_InfoBar{playerid} && ShowingInfoBar{playerid}) HideInfoBar(playerid);
-						SaveAccountOption(playerid, "TextdrawDisabled_InfoBar", TextdrawDisabled_InfoBar{playerid});
-					}
-					case 3:
-					{
-						TextdrawDisabled_Tips{playerid} = !TextdrawDisabled_Tips{playerid};
-						SaveAccountOption(playerid, "TextdrawDisabled_Tips", TextdrawDisabled_Tips{playerid});
-					}
-				}
-				pc_cmd_screen(playerid, "");
-			}
-		}
-		case DIALOG_FM_MAIN:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					// rankai ir zmones
-					ShowPlayerDialog(playerid, DIALOG_FM_RANKS_AND_USERS, DIALOG_STYLE_LIST, "Frakcijos rangai ir nariai", "Nariø valdymas\nRangø tvarkymas", "Tæsti", "Atðaukti");
-				}
-				else if(listitem == 1)
-				{
-					// inventorius
-					ShowPlayerDialog(playerid, DIALOG_FM_INVENTORY, DIALOG_STYLE_LIST, "Frakcijos inventorius", "Biudþetas\nTr. priemonës\nGinklai", "Tæsti", "Atðaukti");
-				}
-			}
-		}
-		case DIALOG_FM_RANKS_AND_USERS:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					// nariai
-					new string[86];
-					mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_data` WHERE Faction = '%d'", PlayerInfo[playerid][pFaction]);
-					mysql_tquery(chandler, string, "FactionUsersLoaded", "d", playerid);
-				}
-				else if(listitem == 1)
-				{
-					// rankai
-					MsgInfo(playerid, "FRAKCIJA", "Pasirinkite rangà, kurio pavadinimà norite pakeisti.");
-					new string[248],
-						factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]),
-						line[126];
-					if(factionid != -1)
-					{
-						for(new rank = 0; rank < MAX_FACTION_RANKS; rank++)
-						{
-							if(!strlen(FactionRankNames[factionid][rank])) { break; }
-							format(line, sizeof line, "%s\n", FactionRankNames[factionid][rank]);
-							strcat(string, line);
-						}
-						ShowPlayerDialog(playerid, DIALOG_FM_RANKS_MAIN, DIALOG_STYLE_LIST, "Frakcijos rangai", string, "Pervadinti", "Atðaukti");
-					}
-				}
-			}
-			else pc_cmd_fmenu(playerid, "");
-		}
-		case DIALOG_FM_USERS_MAIN:
-		{
-			if(response)
-			{
-				tmpSelected[playerid] = listitem;
-				if(tmpArray[playerid][listitem] == INVALID_PLAYER_ID)
-				{
-					ShowPlayerDialog(playerid, DIALOG_FM_USER_ADD, DIALOG_STYLE_INPUT, "Frakcijos nariai", "{E4E4E4}Áveskite pilnà þaidëjo vardà, kurá norite priimti á frakcijà.", "Tæsti", "Atðaukti");
-				}
-				else
-				{
-					new string[256],
-						selected = tmpArray[playerid][listitem],
-						workerid = FindPlayerBySql(selected);
-					format(string, sizeof string, "%s [%s]\n{FFFFFF}Keisti rangà\nKeisti privilegijas\n{CE3F3F}Iðmesti", GetNameBySql(selected), (workerid == INVALID_PLAYER_ID ? ("{D16464}atsijungæs") : ("{8AD164}prisijungæs")));
-					ShowPlayerDialog(playerid, DIALOG_FM_USER_EDIT, DIALOG_STYLE_LIST, "Frakcijos nariai", string, "Tæsti", "Atðaukti");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_MAIN, 1, 0, "");
-		}
-		case DIALOG_FM_USER_ADD:
-		{
-			if(response)
-			{
-				new name[24];
-				if(sscanf(inputtext,"s[24]",name)) return OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
-				new receiverid = FindPlayerByName(name);
-				if(receiverid == INVALID_PLAYER_ID)
-				{
-					new string[126];
-					mysql_format(chandler, string, sizeof string, "SELECT id,Name FROM `players_data` WHERE Name = '%e'", name);
-					mysql_tquery(chandler, string, "PlayerFactionAddLoad", "d", playerid);
-				}
-				else
-				{
-					new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-					if(factionid == -1) return 0;
-					if(PlayerInfo[receiverid][pFaction] != 0)
-					{
-						MsgError(playerid, "FRAKCIJA", "Þaidëjas jau yra frakcijoje.");
-						pc_cmd_fmenu(playerid, "");
-						return 1;
-					}
-					PlayerInfo[receiverid][pJob] = 0;
-					PlayerInfo[receiverid][pFaction] = PlayerInfo[playerid][pFaction];
-					PlayerInfo[receiverid][pJobLevel] = 1;
-					PlayerInfo[receiverid][pFactionLeader] = 0;
-					SaveAccountIntEx(receiverid, "Faction", PlayerInfo[receiverid][pFaction]);
-					SaveAccountIntEx(receiverid, "JobLevel", 1);
-					MsgSuccess(receiverid, "FRAKCIJA", "%s pridëjo jus á frakcijà \"%s\"", GetPlayerNameEx(playerid), FactionInfo[factionid][fName]);
-					MsgSuccess(playerid, "FRAKCIJA", "Priëmëte %s á frakcijà.", GetPlayerNameEx(receiverid));
-					pc_cmd_fmenu(playerid, "");
-					log_init(true);
-					log_set_table("logs_factions");
-					log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ReceiverId`,`ReceiverName`");
-					log_set_values("'%d','%e','%d','%e','(FM) Prieme i frakcija','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), LogPlayerId(receiverid), LogPlayerName(receiverid));
-					log_commit();
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_RANKS_AND_USERS, 1, 0, "");
-		}
-		case DIALOG_FM_USER_PRIVILEGES:
-		{
-			if(response)
-			{
-				new workerid = tmpArray[playerid][tmpSelected[playerid]],
-					receiverid = FindPlayerBySql(workerid),
-					string[126];
-				log_init(true);
-				log_set_table("logs_factions");
-				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ReceiverId`,`ReceiverName`");
-				switch(listitem)
-				{
-					case 0:
-					{
-						// swta
-						mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET `FactionPermission1` = 1  - `FactionPermission1` WHERE id = '%d'", workerid);
-						mysql_fquery(chandler, string, "FactionSaved");
-						log_set_values("'%d','%e','%d','%e','(FM) Pakeite 1 grupes nustatyma darbuotojui','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), workerid, GetNameBySql(workerid));
-					}
-					case 1:
-					{
-						// detective
-						mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET `FactionPermission2` = 1  - `FactionPermission2` WHERE id = '%d'", workerid);
-						mysql_fquery(chandler, string, "FactionSaved");
-						log_set_values("'%d','%e','%d','%e','(FM) Pakeite 1 grupes nustatyma darbuotojui','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), workerid, GetNameBySql(workerid));
-					}
-					case 2:
-					{
-						// spec
-						mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET `FactionPermission3` = 1  - `FactionPermission3` WHERE id = '%d'", workerid);
-						mysql_fquery(chandler, string, "FactionSaved");
-						log_set_values("'%d','%e','%d','%e','(FM) Pakeite 1 grupes nustatyma darbuotojui','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), workerid, GetNameBySql(workerid));
-					}
-				}
-				if(IsPlayerConnected(receiverid) && PlayerInfo[receiverid][pFaction] == PlayerInfo[playerid][pFaction])
-				{
-					PlayerInfo[receiverid][pFactionPermissions][listitem] = !PlayerInfo[playerid][pFactionPermissions][listitem];
-					MsgSuccess(receiverid, "FRAKCIJA", "Jûsø frakcijos grupë buvo %s", PlayerInfo[playerid][pFactionPermissions][listitem] > 0 ? ("uþdëta") : ("nuimta"));
-				}
-				MsgSuccess(playerid, "FRAKCIJA", "Nustatymai darbuotojui atnaujinti.");
-				OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
-
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_FM_USER_EDIT:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// nieko
-						OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
-					}
-					case 1:
-					{
-						ShowPlayerDialog(playerid, DIALOG_FM_USER_RANK, DIALOG_STYLE_INPUT, "Frakcijos nariai", "{E4E4E4}Áveskite naujà rangà frakcijos nariui.", "Tæsti", "Atðaukti");
-					}
-					case 2:
-					{
-						// keisti priv
-						new workerid = tmpArray[playerid][tmpSelected[playerid]],
-							perm[3],
-							string[256],
-							factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]),
-							type = (factionid == -1 ? (0) : FactionInfo[factionid][fType]);
-						if(type != FACTION_TYPE_POLICE) return OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
-						mysql_format(chandler, string, sizeof string, "SELECT FactionPermission1, FactionPermission2, FactionPermission3 FROM `players_data` WHERE id = '%d'", workerid);
-						new Cache:result = mysql_query(chandler, string, true);
-						cache_set_active(result);
-						if(cache_num_rows())
-						{
-							cache_get_value_name_int(0, "FactionPermission1", perm[0]);
-							cache_get_value_name_int(0, "FactionPermission2", perm[1]);
-							cache_get_value_name_int(0, "FactionPermission3", perm[2]);
-							format(string, sizeof string, "%s SWAT\n%s detektyvà\n%s spec. komandas", perm[0] > 0 ? ("Nuimti") : ("Uþdëti"), perm[1] > 0 ? ("Nuimti") : ("Uþdëti"), perm[2] > 0 ? ("Nuimti") : ("Uþdëti"));
-							ShowPlayerDialog(playerid, DIALOG_FM_USER_PRIVILEGES, DIALOG_STYLE_LIST, "Frakcijos nariai", string, "Tæsti", "Atðaukti");
-						}
-						cache_delete(result);
-					}
-					case 3:
-					{
-						new workerid = tmpArray[playerid][tmpSelected[playerid]],
-							receiverid,
-							factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]),
-							type = (factionid == -1 ? (0) : (FactionInfo[factionid][fType]));
-						if((receiverid = FindPlayerBySql(workerid)) != INVALID_PLAYER_ID)
-						{
-							if(factionid != -1)
-							{
-								MsgError(receiverid, "FRAKCIJA", "%s iðmetë jus ið frakcijos %s.", GetPlayerNameEx(playerid), FactionInfo[factionid][fName]);
-							}
-							if(type == FACTION_TYPE_POLICE)
-							{
-								for(new i = 0; i < 3; i++)
-								{
-									PlayerInfo[receiverid][pFactionPermissions][i] = 0;
-								}
-								if(IsValidDynamic3DTextLabel(PlayerExtra[receiverid][pePoliceBadgeText]))
-								{
-									DestroyDynamic3DTextLabel(PlayerExtra[receiverid][pePoliceBadgeText]);
-								}
-								PlayerExtra[receiverid][pePoliceBadgeText] = INVALID_3DTEXT_ID;
-							}
-
-									
-							PlayerInfo[receiverid][pFaction] = 0;
-							PlayerInfo[receiverid][pFactionLeader] = 0;
-							PlayerInfo[receiverid][pJobLevel] = 0;
-							PlayerInfo[receiverid][pPoliceBadge] = 0;
-						
-							IsValidDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]) && DestroyDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]);
-							PlayerExtra[playerid][pePoliceBadgeText] = INVALID_3DTEXT_ID;
-							
-
-							new channel = PlayerInfo[receiverid][pRadioChannel];
-							if((900 <= channel < 950) || (950 <= channel < 1000) || (1000 <= channel < 1050)) PlayerInfo[receiverid][pRadioChannel] = 0;
-							SaveAccountIntEx(receiverid, "Faction", 0);
-							SaveAccountIntEx(receiverid, "FactionLeader", 0);
-							SaveAccountIntEx(receiverid, "JobLevel", 0);
-							SaveAccountIntEx(receiverid, "PoliceBadge", 0);
-
-							SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
-							SetPlayerArmour(receiverid, 0.0);
-							ResetServerSidedWeapons(receiverid);
-
-							PlayerExtra[receiverid][peTazer] = 0;
-						}
-						else
-						{
-							new string[256];
-							mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET Faction = '0', FactionPermission1 = '0', FactionPermission2 = '0', FactionPermission3 = '0', JobLevel = '0', PoliceBadge = '0', RadioChannel = '0' WHERE id = '%d'", workerid);
-							mysql_fquery(chandler, string, "WorkerDeleted");
-						}
-						MsgWarning(playerid, "FRAKCIJA", "Iðmetëte %s ið frakcijos.", GetNameBySql(workerid));
-						log_init(true);
-						log_set_table("logs_factions");
-						log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`FactionId`,`FactionName`,`ActionText`");
-						log_set_values("'%d','%e','%d','%e','%d','%e','(FM) Ismete is frakcijos'", LogPlayerId(playerid), LogPlayerName(playerid), workerid, GetNameBySql(workerid), GetFactionName(factionid, false), FactionInfo[factionid][fId]);
-						log_commit();
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_RANKS_AND_USERS, 1, 0, "");
-		}
-		case DIALOG_FM_USER_RANK:
-		{
-			if(response)
-			{
-				new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-				if(factionid == -1) return 0;
-				new rankid;
-				if(sscanf(inputtext,"d",rankid) || rankid < 1) return OnDialogResponse(playerid, DIALOG_FM_USER_EDIT, 1, 1, "");
-				if(!strlen(FactionRankNames[factionid][rankid-1]) || rankid > MAX_FACTION_RANKS)
-				{
-					// tokio ranko nera
-					MsgError(playerid, "FRAKCIJA", "Tokio rango nëra.");
-					return OnDialogResponse(playerid, DIALOG_FM_USER_EDIT, 1, 1, "");
-				}
-				new workerid = tmpArray[playerid][tmpSelected[playerid]],
-					receiverid;
-				if((receiverid = FindPlayerBySql(workerid)) != INVALID_PLAYER_ID)
-				{
-					//if(receiverid == playerid) return 0; lol
-					MsgSuccess(receiverid, "FRAKCIJA", "%s pakeitë jûsø rangà á %s", GetPlayerNameEx(playerid), FactionRankNames[factionid][rankid-1]);
-					PlayerInfo[receiverid][pJobLevel] = rankid;
-					SaveAccountIntEx(receiverid, "JobLevel", rankid);
-					if(!strlen(FactionRankNames[factionid][rankid]) || rankid == MAX_FACTION_RANKS) // ar sitas rank yra max
-					{
-						PlayerInfo[receiverid][pFactionLeader] = 1;
-						SaveAccountIntEx(receiverid, "FactionLeader", 1);
-					}
-				}
-				else
-				{
-					new string[126];
-					mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET JobLevel = '%d' WHERE id = '%d'", rankid, workerid);
-					mysql_fquery(chandler, string, "WorkerDeleted");
-					if(!strlen(FactionRankNames[factionid][rankid]) || rankid == MAX_FACTION_RANKS) // ar sitas rank yra max
-					{
-						mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET FactionLeader = '1' WHERE id = '%d'", workerid);
-						mysql_fquery(chandler, string, "WorkerDeleted");
-					}
-				}
-				MsgSuccess(playerid, "FRAKCIJA", "Pakeitëte %s rangà á %s", GetNameBySql(workerid), FactionRankNames[factionid][rankid-1]);
-				log_init(true);
-				log_set_table("logs_factions");
-				log_set_keys("`PlayerId`,`PlayerName`,`ReceiverId`,`ReceiverName`,`FactionId`,`FactionName`,`ActionText`,`ExtraString`");
-				log_set_values("'%d','%e','%d','%e','%d','%e','(FM) Pakeite ranga','%e'", LogPlayerId(playerid), LogPlayerName(playerid), workerid, GetNameBySql(workerid), GetFactionName(factionid, false), FactionInfo[factionid][fId], FactionRankNames[factionid][rankid-1]);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_FM_RANKS_MAIN:
-		{
-			if(response)
-			{
-				new string[126],
-					factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-				if(factionid == -1) return 0;
-				format(string, sizeof string, "{E4E4E4}Áveskite naujà rango {57AAD6}%s (%d){E4E4E4} pavadinimà.", FactionRankNames[factionid][listitem], listitem+1);
-				tmpSelected[playerid] = listitem;
-				ShowPlayerDialog(playerid, DIALOG_FM_RANK_EDIT, DIALOG_STYLE_INPUT, "Frakcijos rangai", string, "Keisti", "Atðaukti");
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_MAIN, 1, 0, "");
-		}
-		case DIALOG_FM_RANK_EDIT:
-		{
-			if(response)
-			{
-				// keicia rnako pavadinima
-				if(!strlen(inputtext)) return OnDialogResponse(playerid, DIALOG_FM_RANKS_MAIN, 1, tmpSelected[playerid], "");
-				new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]),
-					string[256];
-				if(factionid == -1) return 0;
-				MsgSuccess(playerid, "FRAKCIJA", "Pervadinote %d rangà á %s", tmpSelected[playerid]+1, inputtext);
-				mysql_format(chandler, string, sizeof string, "UPDATE `factions_ranks` SET Name = '%e' WHERE FactionId = '%d' AND Name = '%e' AND Rank = '%d'", inputtext, FactionInfo[factionid][fId], FactionRankNames[factionid][tmpSelected[playerid]], tmpSelected[playerid]);
-				mysql_fquery(chandler, string, "FactionSaved");
-				format(FactionRankNames[factionid][tmpSelected[playerid]], 24, inputtext);
-				pc_cmd_fmenu(playerid, "");
-				log_init(true);
-				log_set_table("logs_factions");
-				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`");
-				log_set_values("'%d','%e','%d','%e','%d','%e','(FM) Pervadino ranga','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), GetFactionName(factionid, false), FactionInfo[factionid][fId], tmpSelected[playerid]+1, inputtext);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_RANKS_AND_USERS, 1, 1, "");
-		}
-		case DIALOG_FM_INVENTORY:
-		{
-			if(response)
-			{
-				switch(listitem)
-				{
-					case 0:
-					{
-						// biudzetas
-						new string[126],
-							factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-						if(factionid == -1) return 0;
-						format(string, sizeof string, "Frakcijos biudþete: {AFEE9E}$%d\n{8BDA76}Padëti á biudþetà\n{E47059}Paimti ið biudþeto", FactionInfo[factionid][fBudget]);
-						ShowPlayerDialog(playerid, DIALOG_FM_BUDGET_MAIN, DIALOG_STYLE_LIST, "Frakcijos biudþetas", string, "Tæsti", "Atðaukti");
-					}
-					case 1:
-					{
-						// tr. priemones
-						ShowPlayerDialog(playerid, DIALOG_FM_VEHICLES_MAIN, DIALOG_STYLE_LIST, "Frakcijos inventorius", "Turimos tr. priemonës\nTr. priemoniø pirkimas", "Tæsti", "Atðaukti");
-					}
-					case 2:
-					{
-						// ginklai
-						new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-						if(factionid == -1) return 0;
-						if(FactionInfo[factionid][fType] != FACTION_TYPE_POLICE)
-						{
-							OnDialogResponse(playerid, DIALOG_FM_MAIN, 1, 1, "");
-							return MsgWarning(playerid, "FRAKCIJA", "Jûsø frakcija ðios funkcijos neturi.");
-						}
-						new string[126];
-						new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount");
-						format(string, sizeof string, "Ginklai, amunicija: %d%%\nUniformos, aprangos: %d%%\nSpecialiøjø operacijø ir kita áranga: %d%%\nPapildyti ginkluotæ", floatround(FactionInfo[factionid][fWares][0]*onepercent, floatround_ceil), floatround(FactionInfo[factionid][fWares][1]*onepercent, floatround_ceil), floatround(FactionInfo[factionid][fWares][2]*onepercent, floatround_ceil));
-						ShowPlayerDialog(playerid, DIALOG_FM_WEAPONS_MAIN, DIALOG_STYLE_LIST, "Frakcijos ginklai", string, "Tæsti", "Atðaukti");
-					}
-				}
-			}
-			else pc_cmd_fmenu(playerid, "");
-		}
-		case DIALOG_FM_WEAPONS_MAIN:
-		{
-			if(GetGVarInt("EnabledPoliceWeaponUsage"))
-			{
-				if(response)
-				{
-					if(0 <= listitem <= 2) return OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 2, "");
-					if(listitem == 3)
-					{
-						// paimti nauju ginklu
-						ShowPlayerDialog(playerid, DIALOG_FM_WEAPONS_TYPE, DIALOG_STYLE_LIST, "Frakcijos ginklai", "Ginklø bei amunicijos atsargø papildymas\nUniformos, apranga, spec. inventorius\nSpecialiøjø operacijø ir kita áranga", "Tæsti", "Atðaukti");
-					}
-				}
-				else OnDialogResponse(playerid, DIALOG_FM_MAIN, 1, 1, "");
-			}
-		}
-		case DIALOG_FM_WEAPONS_TYPE:
-		{
-			if(response)
-			{
-				if(!IsPlayerInAnyVehicle(playerid)) return InfoBox(playerid, IB_NOT_IN_VEHICLE);
-				if(VehicleTrunkSpace[GetVehicleModel(GetPlayerVehicleID(playerid))-400] < TRUNKS_SPACE_POLICE_WEAPONS)
-				{
-					MsgWarning(playerid, "UÞSAKYMAS", "Tr. priemonë nepakankamai talpi.");
-					return pc_cmd_fmenu(playerid, "");
-				}
-				new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-				if(listitem == 0)
-				{
-					// ginklai ammo
-					new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount");
-					new Float:currentpercent = floatround(FactionInfo[factionid][fWares][0]*onepercent, floatround_ceil);
-					if(currentpercent > 10.0)
-					{
-						MsgError(playerid, "FRAKCIJA", "Jûs dar turite daugiau nei 10proc. amunicijos.");
-						return 1;
-					}
-					if(FactionInfo[factionid][fBudget] < DEFAULT_POLICE_WEAPONS_PRICE) return InfoBox(playerid, "NEPAKANKAMAI", "PINIGU BIUDZETE");
-					SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_PD_WEAPONS_AMMO, DEFAULT_POLICE_WEAPON_BUY_SPOT, 2.3);
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x009AB5FF, true, "-------------------------------------------------------");
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x32B9D0FF, true, "DISPEÈERINË: {82CDDA}Ginklø, bei amunicijos atsargos paruoðtos paëmimui.");
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x32B9D0FF, true, "DISPEÈERINË: {82CDDA}Vieta - sandëliai.");
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x009AB5FF, true, "-------------------------------------------------------");
-					SendFormat(playerid, 0x39A8D7FF, "[UÞSAKYMAS] {4FB3DF}Nuvykite á sandëli, paþymëtà þemëlapyje ir paimkite uþsakymà.");
-					SendFormat(playerid, 0x4FB3DFFF, "Jûsø tr. priemonë turi bûti pakankamai talpi (rekomenduotina autobusiukas).");
-				}
-				else if(listitem == 1)
-				{
-					// skinai
-					new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount");
-					new Float:currentpercent = floatround(FactionInfo[factionid][fWares][0]*onepercent, floatround_ceil);
-					if(currentpercent > 10.0)
-					{
-						MsgError(playerid, "FRAKCIJA", "Jûs dar turite daugiau nei 10proc. amunicijos.");
-						return 1;
-					}
-					if(FactionInfo[factionid][fBudget] < DEFAULT_POLICE_SKINS_PRICE) return InfoBox(playerid, "NEPAKANKAMAI", "PINIGU BIUDZETE");
-					SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_PD_SKINS, DEFAULT_POLICE_WEAPON_BUY_SPOT, 2.3);
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x009AB5FF, true, "-------------------------------------------------------");
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x32B9D0FF, true, "DISPEÈERINË: {82CDDA}Uniformø, aprangos, spec. inventoriaus atsargos paruoðtos paëmimui.");
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x32B9D0FF, true, "DISPEÈERINË: {82CDDA}Vieta - sandëliai.");
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x009AB5FF, true, "-------------------------------------------------------");
-					SendFormat(playerid, 0x39A8D7FF, "[UÞSAKYMAS] {4FB3DF}Nuvykite á sandëli, paþymëtà þemëlapyje ir paimkite uþsakymà.");
-					SendFormat(playerid, 0x4FB3DFFF, "Jûsø tr. priemonë turi bûti pakankamai talpi (rekomenduotina autobusiukas).");
-				}
-				else if(listitem == 2)
-				{
-					// special forces
-					new Float:onepercent = 100.0/GetGVarInt("AddPDWaresAmount");
-					new Float:currentpercent = floatround(FactionInfo[factionid][fWares][0]*onepercent, floatround_ceil);
-					if(currentpercent > 10.0)
-					{
-						MsgError(playerid, "FRAKCIJA", "Jûs dar turite daugiau nei 10proc. amunicijos.");
-						return 1;
-					}
-					if(FactionInfo[factionid][fBudget] < DEFAULT_POLICE_SPECIAL_PRICE) return InfoBox(playerid, "NEPAKANKAMAI", "PINIGU BIUDZETE");
-					SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_PD_SPECIAL, DEFAULT_POLICE_WEAPON_BUY_SPOT, 2.3);
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x009AB5FF, true, "-------------------------------------------------------");
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x32B9D0FF, true, "DISPEÈERINË: {82CDDA}Uniformø, aprangos, spec. inventoriaus atsargos paruoðtos paëmimui.");
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x32B9D0FF, true, "DISPEÈERINË: {82CDDA}Vieta - sandëliai.");
-					SendFactionMessage(PlayerInfo[playerid][pFaction], 0x009AB5FF, true, "-------------------------------------------------------");
-					SendFormat(playerid, 0x39A8D7FF, "[UÞSAKYMAS] {4FB3DF}Nuvykite á sandëli, paþymëtà þemëlapyje ir paimkite uþsakymà.");
-					SendFormat(playerid, 0x4FB3DFFF, "Jûsø tr. priemonë turi bûti pakankamai talpi (rekomenduotina autobusiukas).");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 2, "");
-		}
-		case DIALOG_FM_VEHICLES_MAIN:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					// turimos
-					new playerfaction = PlayerInfo[playerid][pFaction],
-						id,
-						string[4024] = "{BABABA}Nr.\t{BABABA}Modelis\t{BABABA}Numeriai\n{FFFFFF}",
-						line[86];
-					foreach(new vehicleid : Vehicle)
-					{
-						if(VehicleInfo[vehicleid][vFaction] == playerfaction)
-						{
-							tmpArray[playerid][id] = vehicleid;
-							id++;
-							format(line, sizeof line, "%d.\t%s\t%s\n", id, GetModelName(GetVehicleModel(vehicleid)), VehicleInfo[vehicleid][vNumbers]);
-							strcat(string, line);
-						}
-					}
-					if(id == 0)
-					{
-						MsgError(playerid, "FRAKCIJA", "Tr. priemoniø nëra.");
-					}
-					else ShowPlayerDialog(playerid, DIALOG_FM_VEHICLES_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Frakcijos tr. priemonës", string, "Tæsti", "Atðaukti");
-				}
-				else
-				{
-					// pirkimas
-					new string[126],
-						factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-					if(factionid == -1) return 1;
-					MsgInfo(playerid, "FRAKCIJA", "Nupirkta transporto priemonë atsiras jûsø pozicijoje!");
-					mysql_format(chandler, string, sizeof string, "SELECT `Model`,`Price`,`id` FROM `sell_vehicles_factions` WHERE FactionType = '%d'", FactionInfo[factionid][fType]);
-					mysql_tquery(chandler, string, "FactionSellListLoaded", "d", playerid);
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_MAIN, 1, 1, "");
-		}
-		case DIALOG_FM_VEHICLES_SHOP:
-		{
-			if(response)
-			{
-				new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]),
-					price,
-					model,
-					string[126];
-				if(factionid == -1) return 0;
-				mysql_format(chandler, string, sizeof string, "SELECT `Price`,`Model` FROM `sell_vehicles_factions` WHERE id = '%d'", tmpArray[playerid][listitem]);
-				new Cache:result = mysql_query(chandler, string, true);
-				cache_get_value_name_int(0, "Price", price);
-				cache_get_value_name_int(0, "Model", model);
-				cache_delete(result);
-				if(FactionInfo[factionid][fBudget] < price)
-				{
-					InfoBox(playerid, "NEPAKANKAMAI", "PINIGU BIUDZETE");
-					return OnDialogResponse(playerid, DIALOG_FM_VEHICLES_MAIN, 1, 1, "");
-				}
-				FactionInfo[factionid][fBudget] -= price;
-				SaveFactionIntEx(factionid, "Budget", FactionInfo[factionid][fBudget]);
-				new Float:x, Float:y, Float:z, Float:a;
-				GetPlayerPos(playerid, x, y, z);
-				GetPlayerFacingAngle(playerid, a);
-				AddServerVehicle(model, factionid, -1, playerid, x+1.0, y+1.0, z, a, 32, 32, price, .added_by_admin = false);
-				MsgSuccess(playerid, "FRAKCIJA", "Nupirkote %s uþ $%d savo frakcijai.", GetModelName(model), price);
-				log_init(true);
-				log_set_table("logs_factions");
-				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','%d','%e','(FM) Nupirko automobili','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), GetFactionName(factionid, false), FactionInfo[factionid][fId], model, price);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 1, "");
-		}
-		case DIALOG_FM_VEHICLES_LIST:
-		{
-			if(response)
-			{
-				tmpSelected[playerid] = listitem;
-				new vehicleid = tmpArray[playerid][listitem],
-					string[256],
-					factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-				if(factionid == -1) return 0;
-				if(VehicleInfo[vehicleid][vFaction] != PlayerInfo[playerid][pFaction]) return pc_cmd_fmenu(playerid, "");
-				if(VehicleInfo[vehicleid][vRequiredLevel] <= 0) VehicleInfo[vehicleid][vRequiredLevel] = 1;
-				format(string, sizeof string, "{BABABA}Nustatymas\t{BABABA}Dabartinë reikðmë\nRida\t{D9EB80}%0.2f\n{FFFFFF}Minimalus rangas\t{D9EB80}%s (%d)\n{FFFFFF}Ekipaþas\t{D9EB80}%s\n{FFFFFF}Iðsaugoti pozicijà\nPerdaþyti\n{D54B4B}Parduoti tr. priemonæ", VehicleInfo[vehicleid][vKM], FactionRankNames[factionid][VehicleInfo[vehicleid][vRequiredLevel]-1], VehicleInfo[vehicleid][vRequiredLevel], VehicleInfo[vehicleid][vUnitText]);
-				ShowPlayerDialog(playerid, DIALOG_FM_VEHICLE_EDIT, DIALOG_STYLE_TABLIST_HEADERS, "Frakcijos tr. priemonës", string, "Tæsti", "Atðaukti");
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 1, "");
-		}
-		case DIALOG_FM_VEHICLE_EDIT:
-		{
-			if(response)
-			{
-				if(listitem == 0)
-				{
-					OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-				}
-				if(listitem == 1)
-				{
-					// minimalus rangas
-					MsgInfo(playerid, "FRAKCIJA", "Pasirinkite rangà, nuo kurio leisite vairuoti %s", GetModelName(GetVehicleModel(tmpArray[playerid][tmpSelected[playerid]])));
-					new string[1024],
-						factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-					for(new i = 0; i < MAX_FACTION_RANKS; i++)
-					{
-						if(!strlen(FactionRankNames[factionid][i])) { break; }
-						format(string, sizeof string, "%s%s (%d)\n", string, FactionRankNames[factionid][i], i+1);
-					}
-					ShowPlayerDialog(playerid, DIALOG_FM_VEHICLE_SET_RANK, DIALOG_STYLE_LIST, "Frakcijos tr. priemonës", string, "Tæsti", "Atðaukti");
-				}
-				else if(listitem == 2)
-				{
-					// ekipazas
-					new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-					if(FactionInfo[factionid][fType] == FACTION_TYPE_POLICE || FactionInfo[factionid][fType] == FACTION_TYPE_FIRE)
-					{
-						ShowPlayerDialog(playerid, DIALOG_FM_VEHICLE_SET_UNIT, DIALOG_STYLE_INPUT, "Frakcijos tr. priemonës", "{E4E4E4}Ávesktite ekipaþo pavadinimà, kurá rodys ant tr. priemonës\n{B4B4B4}Norëdami iðtrinti esamà, nieko neáveskite.", "Tæsti", "Atðaukti");
-					}
-					else OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], ""), MsgError(playerid, "FRAKCIJA", "Jûsø frakcija ðios funkcijos neturi.");
-				}
-				else if(listitem == 3)
-				{
-					// pos change
-					if(!IsPlayerInAnyVehicle(playerid)) return InfoBox(playerid, IB_NOT_IN_VEHICLE), OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-					new vehicleid = GetPlayerVehicleID(playerid);
-					if(VehicleInfo[vehicleid][vFaction] != PlayerInfo[playerid][pFaction]) return OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-					else
-					{
-						new Float:x, Float:y, Float:z, Float:a, model, color1, color2, id, addsiren, respawntime, addtype, string[126], price, Float:km,
-							factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-						GetVehiclePos(vehicleid, x, y, z);
-						GetVehicleZAngle(vehicleid, a);
-						GetVehicleColor(vehicleid, color1, color2);
-						VehicleInfo[vehicleid][vSyncX] = x;
-						VehicleInfo[vehicleid][vSyncY] = y;
-						VehicleInfo[vehicleid][vSyncZ] = z;
-						VehicleInfo[vehicleid][vSyncA] = a;
-						id = VehicleInfo[vehicleid][vId];
-						addtype = VehicleInfo[vehicleid][vExtraId];
-						addsiren = VehicleInfo[vehicleid][vAddSiren];
-						respawntime = VehicleInfo[vehicleid][vRespawnTime];
-						price = VehicleInfo[vehicleid][vPrice];
-						km = VehicleInfo[vehicleid][vKM];
-						model = GetVehicleModel(vehicleid);
-						format(string, sizeof string, VehicleInfo[vehicleid][vUnitText]);
-						DestroyVehicle(vehicleid);
-						
-						Vehicle_ResetTrunkWeapons(vehicleid);
-
-						new newvehicleid = AddServerVehicle(model, factionid, -1, playerid, x, y, z, a, color1, color2, price, addsiren, respawntime, .added_by_admin = !!addtype, .add_to_mysql = false);
-						VehicleInfo[newvehicleid][vId] = id;
-						VehicleInfo[newvehicleid][vKM] = km;
-						PutFactionWeaponsInVehicle(newvehicleid);
-
-						if(strlen(string))
-						{
-							new Float:mx, Float:mz, Float:my;
-							GetVehicleModelInfo(GetVehicleModel(newvehicleid), VEHICLE_MODEL_INFO_SIZE, mx, my, mz);
-							VehicleInfo[newvehicleid][vUnitLabel] = CreateDynamic3DTextLabel(string, 0xFFFFFFFF, 0.425*mx, (-0.45*my), (-0.1*mz), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
-						}
-
-						Vehicle_SetServerNumberPlate(vehicleid);
-
-						mysql_format(chandler, string, sizeof string, "UPDATE `vehicles_server` SET X='%f',Y='%f',Z='%f',A='%f' WHERE id = '%d'", x, y, z, a, VehicleInfo[newvehicleid][vId]);
-						mysql_fquery(chandler, string, "FactionVehiclePosUpdate");
-						OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-						MsgSuccess(playerid, "FRAKCIJA", "Tr. priemonës pozicija iðsaugota.");
-
-						log_init(true);
-						log_set_table("logs_factions");
-						log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`");
-						log_set_values("'%d','%e','%d','%e','(FM) Atnaujino automobilio pozicija','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), VehicleInfo[newvehicleid][vId]);
-						log_commit();
-					}
-				}
-				else if(listitem == 4)
-				{
-					// perdazyti
-					ShowPlayerDialog(playerid, DIALOG_FM_VEHICLE_COLOR, DIALOG_STYLE_INPUT, "Frakcijos tr. priemonës", "{E4E4E4}Áveskite tr. priemonës spalvas\nPvz.: 0 0, 251 32", "Keisti", "Atðaukti");
-				}
-				else if(listitem == 5)
-				{
-					// parduoti
-					new vehicleid = tmpArray[playerid][tmpSelected[playerid]],
-						factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-					if(factionid == -1) return 1;
-					if(IsValidVehicle(vehicleid) && VehicleInfo[vehicleid][vFaction] == PlayerInfo[playerid][pFaction])
-					{
-						if(VehicleInfo[vehicleid][vExtraId] == 1)
-						{
-							// pridejo adminas, negalim parduoti
-							MsgError(playerid, "FRAKCIJA", "Ðios tr. priemonës parduoti negalite.");
-							return 1;
-						}
-
-						FactionInfo[factionid][fBudget] += VehicleInfo[vehicleid][vPrice];
-						new string[126],
-							money = VehicleInfo[vehicleid][vPrice] - floatround(VehicleInfo[vehicleid][vKM]/200.0);
-
-						log_init(true);
-						log_set_table("logs_factions");
-						log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`Amount`");
-						log_set_values("'%d','%e','%d','%e','(FM) Pardave automobili','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), VehicleInfo[vehicleid][vId], money);
-						log_commit();
-
-						if(money < 0) money = 0;
-						mysql_format(chandler, string, sizeof string, "DELETE FROM `vehicles_server` WHERE id = '%d'", VehicleInfo[vehicleid][vId]);
-						mysql_fquery(chandler, string, "VehicleDeletedEx");
-						DestroyVehicle(vehicleid);
-						MsgSuccess(playerid, "FRAKCIJA", "Tr. priemonë parduota, gavote $%d.", money);
-					}
-				}
-			}
-			else
-			{
-				OnDialogResponse(playerid, DIALOG_FM_VEHICLES_MAIN, 1, 0, "");
-			}
-		}
-		case DIALOG_FM_VEHICLE_COLOR:
-		{
-			if(response)
-			{
-				new col1, col2;
-				if(sscanf(inputtext,"dd",col1,col2)) return OnDialogResponse(playerid, DIALOG_FM_VEHICLE_EDIT, 1, 4, "");
-				new vehicleid = tmpArray[playerid][tmpSelected[playerid]];
-				if(IsValidVehicle(vehicleid))
-				{
-					ChangeVehicleColor(vehicleid, col1, col2);
-					SaveServerVehicleIntEx(vehicleid, "Color1", col1);
-					SaveServerVehicleIntEx(vehicleid, "Color2", col2);
-					MsgSuccess(playerid, "FRAKCIJA", "Tr. priemonë perdaþyta.");
-					OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-				}
-				log_init(true);
-				log_set_table("logs_factions");
-				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','%d','%e','Perdaze automobili','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), VehicleInfo[vehicleid][vId], col1);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_FM_VEHICLE_SET_RANK:
-		{
-			if(response)
-			{
-				new vehicleid = tmpArray[playerid][tmpSelected[playerid]],
-					factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-				VehicleInfo[vehicleid][vRequiredLevel] = listitem+1;
-				SaveServerVehicleIntEx(vehicleid, "RequiredLevel", listitem+1);
-				/*new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];
-				for(new i = 0; i < MAX_VEHICLE_WEAPON_SLOTS; i++) VehicleWeaponsInventory[vehicleid][i] = __reset_Trunk;
-				PutFactionWeaponsInVehicle(vehicleid);*/
-				MsgSuccess(playerid, "FRAKCIJA", "Nustatëte minimalø rangà á %s tr. priemonei %s", FactionRankNames[factionid][listitem], GetModelName(GetVehicleModel(vehicleid)));
-				pc_cmd_fmenu(playerid, "");
-				log_init(true);
-				log_set_table("logs_factions");
-				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`Amount`");
-				log_set_values("'%d','%e','%d','%e','Pakeite automobilio ranga','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), VehicleInfo[vehicleid][vId], listitem+1);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_FM_VEHICLE_SET_UNIT:
-		{
-			if(response)
-			{
-				new vehicleid = tmpArray[playerid][tmpSelected[playerid]];
-				if(IsValidVehicle(vehicleid))
-				{
-					if(!strlen(inputtext))
-					{
-						if(strlen(VehicleInfo[vehicleid][vUnitText]))
-						{
-							// sena istrinam
-							if(IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]))
-							{
-								DestroyDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]);
-							}
-							VehicleInfo[vehicleid][vUnitLabel] = INVALID_3DTEXT_ID;
-							log_init(true);
-							log_set_table("logs_factions");
-							log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`");
-							log_set_values("'%d','%e','%d','%e','(FM) Pasalino automobilio unit','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), VehicleInfo[vehicleid][vId], VehicleInfo[vehicleid][vUnitText]);
-							log_commit();
-
-							format(VehicleInfo[vehicleid][vUnitText], 1, "");
-							MsgSuccess(playerid, "FRAKCIJA", "Sëkmingai paðalinote ekipaþo pavadinimà.");
-							OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-
-							new string[256];
-							mysql_format(chandler, string, sizeof string, "UPDATE `vehicles_server` SET Unit = '' WHERE id = '%d'", VehicleInfo[vehicleid][vId]);
-							mysql_fquery(chandler, string, "VehicleSavedEx");
-						}
-						else OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-					}
-					else
-					{
-						// ivede
-						if(IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]))
-						{
-							UpdateDynamic3DTextLabelText(VehicleInfo[vehicleid][vUnitLabel], 0xFFFFFFFF, inputtext);
-						}
-						else
-						{
-							new Float:x, Float:z, Float:y;
-							GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, x, y, z);
-							VehicleInfo[vehicleid][vUnitLabel] = CreateDynamic3DTextLabel(inputtext, 0xFFFFFFFF, 0.425*x, (-0.45*y), (-0.1*z), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
-						}
-						format(VehicleInfo[vehicleid][vUnitText], 15, inputtext);
-						Streamer_Update(playerid);
-
-						log_init(true);
-						log_set_table("logs_factions");
-						log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`,`ExtraString`");
-						log_set_values("'%d','%e','%d','%e','(FM) Pakeite automobilio unit','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), VehicleInfo[vehicleid][vId], inputtext);
-						log_commit();
-
-						new string[256];
-						mysql_format(chandler, string, sizeof string, "UPDATE `vehicles_server` SET Unit = '%e' WHERE id = '%d'", inputtext, VehicleInfo[vehicleid][vId]);
-						mysql_fquery(chandler, string, "VehicleSavedEx");
-
-						MsgSuccess(playerid, "FRAKCIJA", "Sëkmingai atnaujinote ekipaþà: \"%s\"", inputtext);
-					}
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_VEHICLES_LIST, 1, tmpSelected[playerid], "");
-		}
-		case DIALOG_FM_BUDGET_MAIN:
-		{
-			if(response)
-			{
-				if(listitem == 0) OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 0, "");
-				if(listitem == 1)
-				{
-					new string[126];
-					format(string, sizeof string, "{E4E4E4}Áveskite kieká pinigø, kurá norite padëti á biudþetà.\nRankose turite: {AFEE9E}$%d", GetPlayerMoney(playerid));
-					ShowPlayerDialog(playerid, DIALOG_FM_BUDGET_PUT, DIALOG_STYLE_INPUT, "Frakcijos biudþetas", string, "Tæsti", "Atðaukti");
-				}
-				else if(listitem == 2)
-				{
-					new string[126],
-						factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-					format(string, sizeof string, "{E4E4E4}Áveskite kieká pinigø, kurá norite nuimti ið biudþeto.\nDabar yra: {AFEE9E}$%d", FactionInfo[factionid][fBudget]);
-					ShowPlayerDialog(playerid, DIALOG_FM_BUDGET_TAKE, DIALOG_STYLE_INPUT, "Frakcijos biudþetas", string, "Tæsti", "Atðaukti");
-				}
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_MAIN, 1, 1, "");
-		}
-
-		case DIALOG_FM_BUDGET_PUT:
-		{
-			if(response)
-			{
-				new amount, factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-				if(sscanf(inputtext,"d",amount)) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "");
-				if(GetPlayerMoney(playerid) < amount || amount < 0) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "") , InfoBox(playerid, IB_NOT_ENOUGH_MONEY, amount);
-				FactionInfo[factionid][fBudget] += amount;
-				GivePlayerMoney(playerid, -amount);
-				MsgSuccess(playerid, "FRAKCIJA", "Padëjote $%d á frakcijos biudþetà.", amount);
-				OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 1, "");
-				SaveFactionIntEx(factionid, "Budget", FactionInfo[factionid][fBudget]);
-				log_init(true);
-				log_set_table("logs_factions");
-				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`Amount`");
-				log_set_values("'%d','%e','%d','%e','(FM) Padejo i frakcijos biudzeta','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), amount);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 0, "");
-		}
-		case DIALOG_FM_BUDGET_TAKE:
-		{
-			if(response)
-			{
-				new amount, factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-				if(sscanf(inputtext,"d",amount)) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 2, "");
-				if(FactionInfo[factionid][fBudget] < amount || amount < 0) return OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 2, "") , InfoBox(playerid, "NEPAKANKAMAI", "PINIGU BIUDZETE");
-				FactionInfo[factionid][fBudget] -= amount;
-				GivePlayerMoney(playerid, amount);
-				MsgSuccess(playerid, "FRAKCIJA", "Paëmete $%d ið frakcijos biudþeto.", amount);
-				OnDialogResponse(playerid, DIALOG_FM_BUDGET_MAIN, 1, 2, "");
-				SaveFactionIntEx(factionid, "Budget", FactionInfo[factionid][fBudget]);
-				log_init(true);
-				log_set_table("logs_factions");
-				log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`Amount`");
-				log_set_values("'%d','%e','%d','%e','(FM) Paeme is frakcijos biudzeto','%d'", LogPlayerId(playerid), LogPlayerName(playerid), FactionInfo[factionid][fId], GetFactionName(factionid, false), amount);
-				log_commit();
-			}
-			else OnDialogResponse(playerid, DIALOG_FM_INVENTORY, 1, 0, "");
-		}
 		case DIALOG_MECHANIC_SELECT_COLORS:
 		{
 			if(response)
@@ -14401,47 +13498,6 @@ public BankHistoryLoad(playerid)
 	return 1;
 }
 
-forward PlayerFactionAddLoad(playerid);
-public PlayerFactionAddLoad(playerid)
-{
-	#if SERVER_DEBUG_LEVEL >= 3
-		printf("[debug] PlayerFactionAddLoad(%s)", GetPlayerNameEx(playerid));
-	#endif
-	if(!cache_num_rows())
-	{
-		SendWarning(playerid, "Toks þaidëjas nerastas.");
-		OnDialogResponse(playerid, DIALOG_FM_USERS_MAIN, 1, tmpSelected[playerid], "");
-	}
-	else
-	{
-		new id, name[24];
-		cache_get_value_name_int(0, "id", id);
-		cache_get_value_name(0, "Name", name);
-		new string[126];
-		new Cache:sys_mem = cache_save();
-		mysql_format(chandler, string, sizeof string, "SELECT NULL FROM `players_data` WHERE id = '%d' AND Faction = '%d'", id, PlayerInfo[playerid][pFaction]);
-		new Cache:result = mysql_query(chandler, string, true);
-		cache_set_active(result);
-		if(cache_num_rows())
-		{
-			MsgError(playerid, "FRAKCIJA", "Þaidëjas jau frakcijoje.");
-			cache_delete(result);
-			cache_set_active(sys_mem);
-			return 1;
-		}
-		cache_delete(result);
-		cache_set_active(sys_mem);
-		mysql_format(chandler, string, sizeof string, "UPDATE `players_data` SET Faction = '%d', JobLevel = '1', FactionLeader = '0', Job = '0' WHERE id = '%d'", PlayerInfo[playerid][pFaction], id);
-		mysql_fquery(chandler, string, "PlayerAddedToFaction");
-		MsgSuccess(playerid, "FRAKCIJA", "Priëmëte %s á frakcijà", name);
-		log_init(true);
-		log_set_table("logs_factions");
-		log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ReceiverId`,`ReceiverName`");
-		log_set_values("'%d','%e','%d','%e','(FM) Prieme i frakcija','%d','%e'", LogPlayerId(playerid), LogPlayerName(playerid), PlayerInfo[playerid][pFaction], GetFactionName(PlayerInfo[playerid][pFaction]), id, name);
-		log_commit();
-	}
-	return 1;
-}
 
 thread(DealerGunAdded);
 thread(DealerDrugAdded);
@@ -14452,15 +13508,11 @@ thread(SalonVehicleAdd);
 thread(SalonVehicleDeleted);
 thread(BankLogAdd);
 thread(SalonUpdated);
-thread(SalonDeleted);
-thread(BusinessDeleted);
 thread(BusinessUpdated);
 thread(HouseDeleted);
 thread(HouseUpdated);
 thread(DealerHouseDeleted);
 thread(DealerHouseUpdated);
-thread(PlayerAddedToFaction);
-thread(FactionVehiclePosUpdate);
 
 forward RoomersLoad(playerid);
 public RoomersLoad(playerid)
@@ -14927,82 +13979,6 @@ public FactionSalonVehiclesLoad(playerid)
 	strcat(string, "\nPridëti");
 	ShowPlayerDialog(playerid, DIALOG_AM_FACTION_SALONS_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Parduodamos tr. priemonës frakcijoms", string, "Redaguoti", "Atðaukti");
 	tmpTexture_MarkStart_CP[playerid] = rows;
-	return 1;
-}
-
-forward FactionSellListLoaded(playerid);
-public FactionSellListLoaded(playerid)
-{
-	#if SERVER_DEBUG_LEVEL >= 3
-		printf("[debug] FactionSellListLoaded(%s)", GetPlayerNameEx(playerid));
-	#endif
-	new rows = cache_num_rows(),
-		price, id, model,
-		string[2024] = "Modelis\tKaina\n";
-	for(new i = 0; i < rows; i++)
-	{
-		cache_get_value_name_int(i, "id", id);
-		cache_get_value_name_int(i, "Price", price);
-		cache_get_value_name_int(i, "Model", model);
-		tmpArray[playerid][i] = id;
-		format(string, sizeof string, "%s{FFFFFF}%s\t{449947}$%d\n", string, GetModelName(model), price);
-	}
-	ShowPlayerDialog(playerid, DIALOG_FM_VEHICLES_SHOP, DIALOG_STYLE_TABLIST_HEADERS, "Frakcijos tr. priemoniø pirkimas", string, "Pirkti", "Atðaukti");
-	return 1;
-}
-
-forward FactionUsersLoaded(playerid);
-public FactionUsersLoaded(playerid)
-{
-	#if SERVER_DEBUG_LEVEL >= 3
-		printf("[debug] FactionUsersLoaded(%s)", GetPlayerNameEx(playerid));
-	#endif
-	new workerid,
-		workerlevel,
-		workername[24],
-		line[86],
-		string[2024] = "{BABABA}Vardas\t{BABABA}Rangas\t{BABABA}Statusas{FFFFFF}\n",
-		status[24],
-		workerrank[24],
-		bool:warned,
-		rows = cache_num_rows(),
-		factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-	for(new i = 0; i < rows; i++)
-	{
-		cache_get_value_name_int(i, "id", workerid);
-		cache_get_value_name_int(i, "JobLevel", workerlevel);
-		tmpArray[playerid][i] = workerid;
-		if((workerid = FindPlayerBySql(workerid)) != INVALID_PLAYER_ID)
-		{
-			format(status, sizeof status, "{6ACC4F}prisijungæs");
-			GetPlayerName(workerid, workername, sizeof workername);
-			workerid = 1;
-		}
-		else
-		{
-			format(status, sizeof status, "{CC4F4F}atsijungæs");
-			cache_get_value_name(i, "Name", workername);
-			workerid = 2;
-		}
-		if(workerlevel > 0 && workerlevel <= MAX_FACTION_RANKS)
-		{
-			format(workerrank, sizeof workerrank, (strlen(FactionRankNames[factionid][workerlevel-1]) ? (FactionRankNames[factionid][workerlevel-1]) : ("ranko nëra")));
-		}
-		else
-		{
-			format(workerrank, sizeof workerrank, "{ERROR}");
-			if(!warned)
-			{
-				MsgError(playerid, "FRAKCIJA", "Klaida jûsø frakcijos nariø rankuose. Praðome ðiems nariams nustatyti rankus ið naujo arba juos iðmesti.");
-			}
-			warned = true;
-		}
-		format(line, sizeof line, "\r%s%s\t%s(%d)\t%s\n\r", (workerid == 1 ? ("{F7F7F7}") : ("{D7D7D7}")), workername, workerrank, workerlevel, status);
-		strcat(string, line);
-	}
-	strcat(string, "Priimti naujà nará");
-	tmpArray[playerid][rows] = INVALID_PLAYER_ID;
-	ShowPlayerDialog(playerid, DIALOG_FM_USERS_MAIN, DIALOG_STYLE_TABLIST_HEADERS, "Frakcijos nariai", string, "Tæsti", "Atðaukti");
 	return 1;
 }
 
@@ -16066,6 +15042,7 @@ stock PlayerPhoneHangup(playerid, bool:crashed = false)
 	{
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 	}
+
 	DetachPhone(playerid);
 	if(PhoneInfo[playerid][phoneRinging] != INVALID_PLAYER_ID)
 	{
@@ -16161,9 +15138,12 @@ stock PlayerPhoneHangup(playerid, bool:crashed = false)
 	{
 		// kalbasi su kazkuo
 		new receiverid = PhoneInfo[playerid][phoneTalkingTo];
+		if(0 <= receiverid <= MAX_PLAYERS && IsPlayerConnected(receiverid))
+		{
+			SetPlayerSpecialAction(receiverid, SPECIAL_ACTION_NONE);
+			DetachPhone(receiverid);
+		}
 
-		SetPlayerSpecialAction(receiverid, SPECIAL_ACTION_NONE);
-		DetachPhone(receiverid);
 
 		SendFormat(playerid, 0x80DFABFF, "Padëjote ragelá.");
 		if(PhoneInfo[playerid][phoneCallOwner] > 0)
@@ -17931,13 +16911,13 @@ stock Inventory_ShowActionSelect(playerid, type, iter, slot, itemid)
 		{
 			new 
 				put_to_type = -1, put_to_iter = -1, unused;
-			if((put_to_iter = GetClosestHouse(playerid, 50.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID) 
+			if((put_to_iter = GetClosestHouse(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE) 
 				put_to_type = INVENTORY_TYPE_HOUSE;
 
 			else if((put_to_iter = GetClosestDealerHouse(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID) 
 				put_to_type = INVENTORY_TYPE_DEALER_HOUSE;
 
-			else if((put_to_iter = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+			else if((put_to_iter = GetClosestBusiness(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE)
 				put_to_type = INVENTORY_TYPE_BUSINESS;
 			
 			if(put_to_type != -1 && put_to_iter != -1)
@@ -20485,13 +19465,10 @@ public ServerVehiclesLoad()
 		cache_get_value_name_int(i, "AddedType", VehicleInfo[vehicleid][vExtraId]);
 		cache_get_value_name(i, "Unit", VehicleInfo[vehicleid][vUnitText], 15);
 		cache_get_value_name_float(i, "KM", VehicleInfo[vehicleid][vKM]);
+		
 		PutFactionWeaponsInVehicle(vehicleid);
-		if(strlen(VehicleInfo[vehicleid][vUnitText]))
-		{
-			new Float:mx, Float:mz, Float:my;
-			GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, mx, my, mz);
-			VehicleInfo[vehicleid][vUnitLabel] = CreateDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitText], 0xFFFFFFFF, 0.425*mx, (-0.45*my), (-0.1*mz), 15.0, INVALID_PLAYER_ID, vehicleid, 1);
-		}
+		Vehicle_SetUnitLabel(vehicleid, VehicleInfo[vehicleid][vUnitText]);
+		
 		VehicleInfo[vehicleid][vFuel] = float(VehicleFuelCapacityList[model-400]);
 		VehicleInfo[vehicleid][vSyncX] = x;
 		VehicleInfo[vehicleid][vSyncY] = y;
@@ -20503,6 +19480,39 @@ public ServerVehiclesLoad()
 		Vehicle_SetServerNumberPlate(vehicleid);
 	}
 	printf("[load] %d serverio tr. priemoniu", rows);
+	return 1;
+}
+
+stock Vehicle_SetUnitLabel(vehicleid, unit[])
+{
+	if(strlen(unit) <= 0)
+	{
+		IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]) && DestroyDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]);
+		VehicleInfo[vehicleid][vUnitLabel] = INVALID_3DTEXT_ID;
+		return 1;
+	}
+
+	if(IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]))
+	{
+		UpdateDynamic3DTextLabelText(VehicleInfo[vehicleid][vUnitLabel], 0xFFFFFFFF, unit);
+	}
+	else
+	{
+		new Float:x, Float:z, Float:y;
+		GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, x, y, z);
+		VehicleInfo[vehicleid][vUnitLabel] = CreateDynamic3DTextLabel(
+				unit,
+				0xFFFFFFFF,
+				0.425*x,
+				(-0.45*y),
+				(-0.1*z),
+				15.0,
+				INVALID_PLAYER_ID,
+				vehicleid, 
+				1
+		);
+	}
+	format(VehicleInfo[vehicleid][vUnitText], 15, unit);
 	return 1;
 }
 
@@ -21083,104 +20093,6 @@ stock GetClosestATM(playerid, Float:distance = 5.0)
 	return last_atm;
 }
 
-stock GetClosestBusinessInCoords(Float:x, Float:y, Float:z, playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
-{
-	new
-		Float:last_distance = distance,
-		last_business = INVALID_BUSINESS_ID,
-		last_was_inside = -1,
-		player_virtual = GetPlayerVirtualWorld(playerid),
-		player_interior = GetPlayerInterior(playerid);
-
-	switch(type)
-	{
-		case CHECK_TYPE_INSIDE_AND_OUTSIDE:
-		{
-			foreach(new businessid : Business)
-			{
-				if( (GetDistanceBetweenPoints3D(x, y, z, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ]) <= last_distance && player_virtual == BusinessInfo[businessid][bOutVW] && player_interior == BusinessInfo[businessid][bExterior] && ((last_was_inside = 2) || last_was_inside == 2)) ||
-					(GetDistanceBetweenPoints3D(x, y, z, BusinessInfo[businessid][bExitX], BusinessInfo[businessid][bExitY], BusinessInfo[businessid][bExitZ]) <= last_distance && player_virtual == BusinessInfo[businessid][bVW] && player_interior == BusinessInfo[businessid][bInterior] && ((last_was_inside = 1) || last_was_inside == 1)))
-				{
-					last_distance = (last_was_inside == 1 ? (GetDistanceBetweenPoints3D(x, y, z, BusinessInfo[businessid][bExitX], BusinessInfo[businessid][bExitY], BusinessInfo[businessid][bExitZ])) : (GetDistanceBetweenPoints3D(x, y, z, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ])));
-					last_business = businessid;
-				}
-			}
-		}
-		case CHECK_TYPE_INSIDE:
-		{
-			foreach(new businessid : Business)
-			{
-				if(GetDistanceBetweenPoints3D(x, y, z, BusinessInfo[businessid][bExitX], BusinessInfo[businessid][bExitY], BusinessInfo[businessid][bExitZ]) <= last_distance && player_virtual == BusinessInfo[businessid][bVW] && player_interior == BusinessInfo[businessid][bInterior])
-				{
-					last_distance = GetDistanceBetweenPoints3D(x, y, z, BusinessInfo[businessid][bExitX], BusinessInfo[businessid][bExitY], BusinessInfo[businessid][bExitZ]);
-					last_business = businessid;
-				}
-			}
-		}
-		case CHECK_TYPE_OUTSIDE:
-		{
-			foreach(new businessid : Business)
-			{
-				if(GetDistanceBetweenPoints3D(x, y, z, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ]) <= last_distance && player_virtual == BusinessInfo[businessid][bOutVW] && player_interior == BusinessInfo[businessid][bExterior])
-				{
-					last_distance = GetDistanceBetweenPoints3D(x, y, z, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ]);
-					last_business = businessid;
-				}
-			}
-		}
-	}
-	return last_business;
-}
-
-stock GetClosestGarageInCoords(Float:x, Float:y, Float:z, playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
-{
-	new
-		Float:last_distance = distance,
-		last_garage = INVALID_GARAGE_ID,
-		last_was_inside = -1,
-		player_virtual = GetPlayerVirtualWorld(playerid),
-		player_interior = GetPlayerInterior(playerid);
-
-	switch(type)
-	{
-		case CHECK_TYPE_INSIDE_AND_OUTSIDE:
-		{
-			foreach(new garageid : Garage)
-			{
-				if( (GetDistanceBetweenPoints3D(x, y, z, GarageInfo[garageid][gEnterX], GarageInfo[garageid][gEnterY], GarageInfo[garageid][gEnterZ]) <= last_distance && player_virtual == GarageInfo[garageid][gOutVW] && player_interior == GarageInfo[garageid][gExterior] && ((last_was_inside = 2) || last_was_inside == 2)) ||
-					(GetDistanceBetweenPoints3D(x, y, z, GarageInfo[garageid][gExitX], GarageInfo[garageid][gExitY], GarageInfo[garageid][gExitZ]) <= last_distance && player_virtual == GarageInfo[garageid][gVW] && player_interior == GarageInfo[garageid][gInterior] && ((last_was_inside = 1) || last_was_inside == 1)))
-				{
-					last_distance = (last_was_inside == 1 ? (GetDistanceBetweenPoints3D(x, y, z, GarageInfo[garageid][gExitX], GarageInfo[garageid][gExitY], GarageInfo[garageid][gExitZ])) : (GetDistanceBetweenPoints3D(x, y, z, GarageInfo[garageid][gEnterX], GarageInfo[garageid][gEnterY], GarageInfo[garageid][gEnterZ])));
-					last_garage = garageid;
-				}
-			}
-		}
-		case CHECK_TYPE_INSIDE:
-		{
-			foreach(new garageid : Garage)
-			{
-				if(GetDistanceBetweenPoints3D(x, y, z, GarageInfo[garageid][gExitX], GarageInfo[garageid][gExitY], GarageInfo[garageid][gExitZ]) <= last_distance && player_virtual == GarageInfo[garageid][gVW] && player_interior == GarageInfo[garageid][gInterior])
-				{
-					last_distance = GetDistanceBetweenPoints3D(x, y, z, GarageInfo[garageid][gExitX], GarageInfo[garageid][gExitY], GarageInfo[garageid][gExitZ]);
-					last_garage = garageid;
-				}
-			}
-		}
-		case CHECK_TYPE_OUTSIDE:
-		{
-			foreach(new garageid : Garage)
-			{
-				if(GetDistanceBetweenPoints3D(x, y, z, GarageInfo[garageid][gEnterX], GarageInfo[garageid][gEnterY], GarageInfo[garageid][gEnterZ]) <= last_distance && player_virtual == GarageInfo[garageid][gOutVW] && player_interior == GarageInfo[garageid][gExterior])
-				{
-					last_distance = GetDistanceBetweenPoints3D(x, y, z, GarageInfo[garageid][gEnterX], GarageInfo[garageid][gEnterY], GarageInfo[garageid][gEnterZ]);
-					last_garage = garageid;
-				}
-			}
-		}
-	}
-	return last_garage;
-}
-
 stock GetClosestGarage(playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
 {
 	/*
@@ -21233,157 +20145,142 @@ stock GetClosestGarage(playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_
 	}
 	return last_garage;
 }
-stock GetClosestBusiness(playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
+
+stock GetClosestBusiness(playerid, &was_inside, Float:inside_range = 3.0, Float:outside_range = 50.0)
 {
 	/*
 	 * Funkcija naudojama isgauti artimiausia zaidejo versla
 	 * Returninta verslo array id
 	 */
-	new
-		Float:last_distance = distance,
-		last_business = INVALID_BUSINESS_ID,
-		last_was_inside = -1,
-		player_virtual = GetPlayerVirtualWorld(playerid),
-		player_interior = GetPlayerInterior(playerid);
 
-	switch(type)
+	new 
+		player_vw 			= GetPlayerVirtualWorld(playerid), player_int = GetPlayerInterior(playerid),
+		Float:last_distance = FLOAT_NAN,
+		last_business 		= NONE,
+		inside 				= 0;
+
+	foreach(new b : Business)
 	{
-		case CHECK_TYPE_INSIDE_AND_OUTSIDE:
+		new Float:tmp;
+		if(
+			(
+				// Vidus
+				(
+					inside_range > 0.0 && inside_range == inside_range
+				)
+				&&
+				(
+					(inside == 1 || inside == 0) && (inside = 1)
+				)
+				&&
+				(
+					(tmp = GetPlayerDistanceFromPoint(playerid, BusinessInfo[b][bExitX], BusinessInfo[b][bExitY], BusinessInfo[b][bExitZ])) < last_distance
+					||
+					last_distance != last_distance
+				)
+				&&
+				(
+					player_vw == BusinessInfo[b][bVW] && player_int == BusinessInfo[b][bInterior]
+				)
+			)
+			||
+			(
+				// Laukas
+				(
+					outside_range > 0.0 && outside_range == outside_range
+				)
+				&&
+				(
+					(inside == 2 || inside == 0) && (inside = 2)
+				)
+				&&
+				(
+					(tmp = GetPlayerDistanceFromPoint(playerid, BusinessInfo[b][bEnterX], BusinessInfo[b][bEnterY], BusinessInfo[b][bEnterZ])) < last_distance
+					||
+					last_distance != last_distance
+				)
+				&&
+				(
+					player_vw == BusinessInfo[b][bOutVW] && player_int == BusinessInfo[b][bExterior]
+				)
+			)
+		)
 		{
-			foreach(new businessid : Business)
-			{
-				if( (GetPlayerDistanceFromPoint(playerid, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ]) <= last_distance && player_virtual == BusinessInfo[businessid][bOutVW] && player_interior == BusinessInfo[businessid][bExterior] && ((last_was_inside = 2) || last_was_inside == 2)) ||
-					(GetPlayerDistanceFromPoint(playerid, BusinessInfo[businessid][bExitX], BusinessInfo[businessid][bExitY], BusinessInfo[businessid][bExitZ]) <= last_distance && player_virtual == BusinessInfo[businessid][bVW] && player_interior == BusinessInfo[businessid][bInterior] && ((last_was_inside = 1) || last_was_inside == 1)))
-				{
-					last_distance = (last_was_inside == 1 ? (GetPlayerDistanceFromPoint(playerid, BusinessInfo[businessid][bExitX], BusinessInfo[businessid][bExitY], BusinessInfo[businessid][bExitZ])) : (GetPlayerDistanceFromPoint(playerid, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ])));
-					last_business = businessid;
-				}
-			}
-		}
-		case CHECK_TYPE_INSIDE:
-		{
-			foreach(new businessid : Business)
-			{
-				if(GetPlayerDistanceFromPoint(playerid, BusinessInfo[businessid][bExitX], BusinessInfo[businessid][bExitY], BusinessInfo[businessid][bExitZ]) <= last_distance && player_virtual == BusinessInfo[businessid][bVW] && player_interior == BusinessInfo[businessid][bInterior])
-				{
-					last_distance = GetPlayerDistanceFromPoint(playerid, BusinessInfo[businessid][bExitX], BusinessInfo[businessid][bExitY], BusinessInfo[businessid][bExitZ]);
-					last_business = businessid;
-				}
-			}
-		}
-		case CHECK_TYPE_OUTSIDE:
-		{
-			foreach(new businessid : Business)
-			{
-				if(GetPlayerDistanceFromPoint(playerid, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ]) <= last_distance && player_virtual == BusinessInfo[businessid][bOutVW] && player_interior == BusinessInfo[businessid][bExterior])
-				{
-					last_distance = GetPlayerDistanceFromPoint(playerid, BusinessInfo[businessid][bEnterX], BusinessInfo[businessid][bEnterY], BusinessInfo[businessid][bEnterZ]);
-					last_business = businessid;
-				}
-			}
+			last_distance 	= tmp;
+			last_business	= b;
 		}
 	}
+
+	was_inside = inside;
 	return last_business;
 }
-stock GetClosestHouseInCoords(Float:x, Float:y, Float:z, playerid, Float:distance = 5.0, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
-{
-	new
-		Float:last_distance = distance,
-		last_house = INVALID_HOUSE_ID,
-		last_was_inside = -1,
-		player_virtual = GetPlayerVirtualWorld(playerid),
-		player_interior = GetPlayerInterior(playerid);
 
-	switch(type)
-	{
-		case CHECK_TYPE_INSIDE_AND_OUTSIDE:
-		{
-			foreach(new houseid : House)
-			{
-				if( (GetDistanceBetweenPoints3D(x, y, z, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ]) <= last_distance && player_virtual == HouseInfo[houseid][hOutVW] && player_interior == HouseInfo[houseid][hExterior] && ((last_was_inside = 2) || last_was_inside == 2)) ||
-					(GetDistanceBetweenPoints3D(x, y, z, HouseInfo[houseid][hExitX], HouseInfo[houseid][hExitY], HouseInfo[houseid][hExitZ]) <= last_distance && player_virtual == HouseInfo[houseid][hVW] && player_interior == HouseInfo[houseid][hInterior] && ((last_was_inside = 1) || last_was_inside == 1)))
-				{
-					last_distance = (last_was_inside == 1 ? (GetDistanceBetweenPoints3D(x, y, z, HouseInfo[houseid][hExitX], HouseInfo[houseid][hExitY], HouseInfo[houseid][hExitZ])) : (GetDistanceBetweenPoints3D(x, y, z, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ])));
-					last_house = houseid;
-				}
-			}
-		}
-		case CHECK_TYPE_INSIDE:
-		{
-			foreach(new houseid : House)
-			{
-				if(GetDistanceBetweenPoints3D(x, y, z, HouseInfo[houseid][hExitX], HouseInfo[houseid][hExitY], HouseInfo[houseid][hExitZ]) <= last_distance && player_virtual == HouseInfo[houseid][hVW] && player_interior == HouseInfo[houseid][hInterior])
-				{
-					last_distance = GetDistanceBetweenPoints3D(x, y, z, HouseInfo[houseid][hExitX], HouseInfo[houseid][hExitY], HouseInfo[houseid][hExitZ]);
-					last_house = houseid;
-				}
-			}
-		}
-		case CHECK_TYPE_OUTSIDE:
-		{
-			foreach(new houseid : House)
-			{
-				if(GetDistanceBetweenPoints3D(x, y, z, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ]) <= last_distance && player_virtual == HouseInfo[houseid][hOutVW] && player_interior == HouseInfo[houseid][hExterior])
-				{
-					last_distance = GetDistanceBetweenPoints3D(x, y, z, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ]);
-					last_house = houseid;
-				}
-			}
-		}
-	}
-	return last_house;
-}
-stock GetClosestHouse(playerid, Float:distance = 5.0, &was_inside, type = CHECK_TYPE_INSIDE_AND_OUTSIDE)
+stock GetClosestHouse(playerid, &was_inside, Float:inside_range = 3.0, Float:outside_range = 50.0)
 {
 	/*
 	 * Funkcija naudojama isgauti artimiausia zaidejo nama
 	 * Returninta namo array id
 	 */
-	new
-		Float:last_distance = distance,
-		last_house = INVALID_HOUSE_ID,
-		last_was_inside = -1, // 1 - true, 2 - false
-		player_virtual = GetPlayerVirtualWorld(playerid),
-		player_interior = GetPlayerInterior(playerid);
 
-	switch(type)
+	new 
+		player_vw 			= GetPlayerVirtualWorld(playerid), player_int = GetPlayerInterior(playerid),
+		Float:last_distance = FLOAT_NAN,
+		last_house 			= NONE,
+		inside 				= 0;
+
+	foreach(new h : House)
 	{
-		case CHECK_TYPE_INSIDE_AND_OUTSIDE:
+		new Float:tmp;
+		if(
+			(
+				// Vidus
+				(
+					inside_range > 0.0 && inside_range == inside_range
+				)
+				&&
+				(
+					(inside == 1 || inside == 0) && (inside = 1)
+				)
+				&&
+				(
+					(tmp = GetPlayerDistanceFromPoint(playerid, HouseInfo[h][hExitX], HouseInfo[h][hExitY], HouseInfo[h][hExitZ])) < last_distance
+					||
+					last_distance != last_distance
+				)
+				&&
+				(
+					player_vw == HouseInfo[h][hVW] && player_int == HouseInfo[h][hInterior]
+				)
+			)
+			||
+			(
+				// Laukas
+				(
+					outside_range > 0.0 && outside_range == outside_range
+				)
+				&&
+				(
+					(inside == 2 || inside == 0) && (inside = 2)
+				)
+				&&
+				(
+					(tmp = GetPlayerDistanceFromPoint(playerid, HouseInfo[h][hEnterX], HouseInfo[h][hEnterY], HouseInfo[h][hEnterZ])) < last_distance
+					||
+					last_distance != last_distance
+				)
+				&&
+				(
+					player_vw == HouseInfo[h][hOutVW] && player_int == HouseInfo[h][hExterior]
+				)
+			)
+		)
 		{
-			foreach(new houseid : House)
-			{
-				if( (GetPlayerDistanceFromPoint(playerid, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ]) <= last_distance && player_virtual == HouseInfo[houseid][hOutVW] && player_interior == HouseInfo[houseid][hExterior] && ((last_was_inside = 2) || last_was_inside == 2)) ||
-					(GetPlayerDistanceFromPoint(playerid, HouseInfo[houseid][hExitX], HouseInfo[houseid][hExitY], HouseInfo[houseid][hExitZ]) <= last_distance && player_virtual == HouseInfo[houseid][hVW] && player_interior == HouseInfo[houseid][hInterior] && ((last_was_inside = 1) || last_was_inside == 1)))
-				{
-					last_distance = (last_was_inside == 1 ? (GetPlayerDistanceFromPoint(playerid, HouseInfo[houseid][hExitX], HouseInfo[houseid][hExitY], HouseInfo[houseid][hExitZ])) : (GetPlayerDistanceFromPoint(playerid, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ])));
-					last_house = houseid;
-				}
-			}
-		}
-		case CHECK_TYPE_INSIDE:
-		{
-			foreach(new houseid : House)
-			{
-				if(GetPlayerDistanceFromPoint(playerid, HouseInfo[houseid][hExitX], HouseInfo[houseid][hExitY], HouseInfo[houseid][hExitZ]) <= last_distance && player_virtual == HouseInfo[houseid][hVW] && player_interior == HouseInfo[houseid][hInterior])
-				{
-					last_distance = GetPlayerDistanceFromPoint(playerid, HouseInfo[houseid][hExitX], HouseInfo[houseid][hExitY], HouseInfo[houseid][hExitZ]);
-					last_house = houseid;
-				}
-			}
-		}
-		case CHECK_TYPE_OUTSIDE:
-		{
-			foreach(new houseid : House)
-			{
-				if(GetPlayerDistanceFromPoint(playerid, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ]) <= last_distance && player_virtual == HouseInfo[houseid][hOutVW] && player_interior == HouseInfo[houseid][hExterior])
-				{
-					last_distance = GetPlayerDistanceFromPoint(playerid, HouseInfo[houseid][hEnterX], HouseInfo[houseid][hEnterY], HouseInfo[houseid][hEnterZ]);
-					last_house = houseid;
-				}
-			}
+			last_distance 	= tmp;
+			last_house		= h;
 		}
 	}
-	was_inside = last_was_inside;
+
+	was_inside = inside;
 	return last_house;
 }
 
@@ -24720,8 +23617,8 @@ CMD:r(playerid, params[])
 	if(channel <= 0) return SendWarning(playerid, "Nesate nustatæs kanalo (/setchannel)");
 	if(sscanf(params,"s[128]",text)) return SendUsage(playerid, "/r [tekstas]");
 	if(PlayerExtra[playerid][peDeath] > 0) return SendWarning(playerid, "Esate komos bûsenoje.");
-	format(string, sizeof string, "[CH: %d] %s sako: %s", channel, GetPlayerNameEx(playerid, true, true), text);
-	SendRadioChat(channel, 0x6969C1FF, string);
+	format(string, sizeof string, "**[CH: %d] %s: %s", channel, GetPlayerNameEx(playerid, true, true), text);
+	SendRadioChat(channel, 0xE0D76FFF, string);
 	log_init(true);
 	log_set_table("logs_radiochat");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraString`,`ExtraId`");
@@ -24766,7 +23663,6 @@ CMD:b(playerid, params[])
 	log_commit();
 	return 1;
 }
-
 
 
 flags:ucp(CMD_TYPE_ALLOW_NEWBIE);
@@ -26905,7 +25801,7 @@ CMD:afriskproperty(playerid, params[])
 	log_init(true);
 	log_set_table("logs_admins");
 	log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ReceiverId`");
-	if((iter = GetClosestHouse(playerid, 60.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
+	if((iter = GetClosestHouse(playerid, unused, .inside_range = 50.0, .outside_range = 5.0)) != NONE)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Namo inventorius:");
 		for(new i = 0; i < MAX_HOUSE_INVENTORY_SLOTS; i++)
@@ -26917,7 +25813,7 @@ CMD:afriskproperty(playerid, params[])
 		log_commit();
 		return 1;
 	}
-	else if((iter = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	else if((iter = GetClosestBusiness(playerid, unused, .inside_range = 60.0, .outside_range = 5.0)) != NONE)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Verslo inventorius:");
 		for(new i = 0; i < MAX_BUSINESS_INVENTORY_SLOTS; i++)
@@ -26957,7 +25853,7 @@ CMD:friskproperty(playerid, params[])
 	log_init(true);
 	log_set_table("logs_factions");
 	log_set_keys("`PlayerId`,`PlayerName`,`FactionId`,`FactionName`,`ActionText`,`ExtraId`");
-	if((iter = GetClosestHouse(playerid, 60.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
+	if((iter = GetClosestHouse(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Namo inventorius:");
 		for(new i = 0; i < MAX_HOUSE_INVENTORY_SLOTS; i++)
@@ -26970,7 +25866,7 @@ CMD:friskproperty(playerid, params[])
 		rp_me(playerid, _, "padaro namo kratà.");
 		return 1;
 	}
-	else if((iter = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	else if((iter = GetClosestBusiness(playerid, unused, .inside_range = 60.0, .outside_range = 5.0)) != NONE)
 	{
 		SendFormat(playerid, 0xa74e4eff, "Verslo inventorius:");
 		for(new i = 0; i < MAX_BUSINESS_INVENTORY_SLOTS; i++)
@@ -27437,7 +26333,7 @@ CMD:a(playerid, params[])
 		name[24 + 1];
 	if(strlen(PlayerInfo[playerid][pForumName])) format(name, sizeof name, "%s", PlayerInfo[playerid][pForumName]);
 	else format(name, sizeof name, "%s", GetPlayerNameEx(playerid));
-	SendAdminMessage(0xFFFDA1FF, false, "[%s %s(%d)]: %s", GetGroupName(PlayerGroups[playerid][0]), name, playerid, string);
+	SendAdminMessage(0x75E173ff, false, "[%s %s(%d)]: %s", GetGroupName(PlayerGroups[playerid][0]), name, playerid, string);
 	return 1;
 }
 stock IsPlayerInMD(playerid)
@@ -28383,9 +27279,11 @@ CMD:checkbusiness(playerid, params[])
 {
 	new
 		factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]),
-		businessid = GetClosestBusiness(playerid, 5.0, CHECK_TYPE_OUTSIDE);
+		unused,
+		businessid = GetClosestBusiness(playerid, unused, .inside_range = 0.0, .outside_range = 5.0);
+
 	if(factionid == -1 || FactionInfo[factionid][fType] != FACTION_TYPE_GOVERNMENT) return SendWarning(playerid, "Jûsø frakcija ðios funkcijos neturi.");
-	if(businessid == INVALID_BUSINESS_ID) return InfoBox(playerid, IB_NOT_IN_HOUSE_OR_BUSINESS);
+	if(businessid == NONE) return InfoBox(playerid, IB_NOT_IN_HOUSE_OR_BUSINESS);
 	else
 	{
 		new
@@ -28729,7 +27627,7 @@ CMD:ramdoor(playerid, params[])
 	new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
 	if(FactionInfo[factionid][fType] != FACTION_TYPE_POLICE || factionid == -1) return SendError(playerid, "Jûsø frakcija ðios funkcijos neturi.");
 	new iter, unused;
-	if((iter = GetClosestHouse(playerid, 5.0, unused, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
+	if((iter = GetClosestHouse(playerid, unused, .inside_range = FLOAT_NAN, .outside_range = 4.0)) != NONE)
 	{
 		if(HouseInfo[iter][hLocked] <= 0) return SendWarning(playerid, "Namo durys atrakintos.");
 		else
@@ -28739,7 +27637,7 @@ CMD:ramdoor(playerid, params[])
 		}
 		return 1;
 	}
-	else if((iter = GetClosestBusiness(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_BUSINESS_ID)
+	else if((iter = GetClosestBusiness(playerid, unused, .inside_range = FLOAT_NAN, .outside_range = 5.0)) != NONE)
 	{
 		if(BusinessInfo[iter][bLocked] <= 0) return SendWarning(playerid, "Verslo durys atrakintos.");
 		else
@@ -29130,7 +28028,7 @@ CMD:f(playerid, params[])
 		log_commit();
 
 		format(string, sizeof string, "(( %s %s: %s ))", FactionRankNames[factionid][PlayerInfo[playerid][pJobLevel]-1], GetPlayerNameEx(playerid), string);
-		SendFactionMessage(PlayerInfo[playerid][pFaction], 0x4CF0F3FF, false, string);
+		SendFactionMessage(PlayerInfo[playerid][pFaction], 0x6969C1FF, false, string);
 	}
 	return 1;
 }
@@ -29241,18 +28139,6 @@ CMD:setunit(playerid, params[])
 	return 1;
 }
 
-CMD:fmenu(playerid, params[])
-{
-	if(PlayerInfo[playerid][pFaction] == 0) return InfoBox(playerid, IB_NOT_IN_FACTION);
-	new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
-	if(factionid != -1)
-	{
-		if(PlayerInfo[playerid][pFactionLeader] < 1) return SendWarning(playerid, "Nesate lyderis.");
-		ShowPlayerDialog(playerid, DIALOG_FM_MAIN, DIALOG_STYLE_LIST, "FRAKCIJA", "Rangai ir nariai\nInventorius", "Tæsti", "Atðaukti");
-	}
-	return 1;
-}
-
 thread(BanAdd);
 thread(LockAccAdd);
 
@@ -29270,7 +28156,8 @@ CMD:hinv(playerid, params[])
 {
 	new houseid = INVALID_HOUSE_ID,
 		unused;
-	if((houseid = GetClosestHouse(playerid, 50.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, houseid, .check_only_owner = true))
+	if((houseid = GetClosestHouse(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE && 
+		HaveHouseKey(playerid, houseid, .check_only_owner = true))
 	{
 		Inventory_ShowItems(playerid, INVENTORY_TYPE_HOUSE, houseid);
 	}
@@ -29279,8 +28166,10 @@ CMD:hinv(playerid, params[])
 }
 CMD:binv(playerid, params[])
 {
-	new businessid = INVALID_BUSINESS_ID;
-	if((businessid = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID && HaveBusinessKey(playerid, businessid, .check_only_owner = true))
+	new businessid = INVALID_BUSINESS_ID,
+		unused;
+	if((businessid = GetClosestBusiness(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE && 
+		HaveBusinessKey(playerid, businessid, .check_only_owner = true))
 	{
 		Inventory_ShowItems(playerid, INVENTORY_TYPE_BUSINESS, businessid);
 	}
@@ -29529,7 +28418,7 @@ CMD:setspawn(playerid, params[])
 		// namas
 		new houseid = INVALID_HOUSE_ID,
 			unused;
-		if((houseid = GetClosestHouse(playerid, 5.0, unused, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
+		if((houseid = GetClosestHouse(playerid, unused, .inside_range = FLOAT_NAN, .outside_range = 5.0)) != NONE)
 		{
 			if(HaveHouseKey(playerid, houseid))
 			{
@@ -29546,8 +28435,8 @@ CMD:setspawn(playerid, params[])
 	}
 	else if(!strcmp(type,"verslas",true))
 	{
-		new businessid = INVALID_BUSINESS_ID;
-		if((businessid = GetClosestBusiness(playerid, 5.0, CHECK_TYPE_OUTSIDE)) != INVALID_BUSINESS_ID)
+		new businessid = NONE, unused;
+		if((businessid = GetClosestBusiness(playerid, unused, .inside_range = FLOAT_NAN, .outside_range = 5.0)) != NONE)
 		{
 			if(HaveBusinessKey(playerid, businessid))
 			{
@@ -29618,36 +28507,49 @@ CMD:leavefaction(playerid, params[])
 {
 	if(PlayerInfo[playerid][pFaction] > 0)
 	{
-		PlayerInfo[playerid][pFaction] =
-		PlayerInfo[playerid][pJobLevel] =
-		PlayerInfo[playerid][pJobXP] =
-		PlayerInfo[playerid][pRadioChannel] =
-		PlayerInfo[playerid][pPoliceBadge] = 0;
-
-		HideInfoBar(playerid);
-
-		for(new i = 0; i < 3; i++)
+		if(Player_LeaveFaction(playerid))
 		{
-			PlayerInfo[playerid][pFactionPermissions][i] = 0;
+			MsgSuccess(playerid, "FRAKCIJA", "Sëkmingai palikote frakcijà.");
 		}
-		
-		new channel = PlayerInfo[playerid][pRadioChannel];
-  		if((900 <= channel < 950) || (950 <= channel < 1000) || (1000 <= channel < 1050)) PlayerInfo[playerid][pRadioChannel] = 0;
-		MsgSuccess(playerid, "FRAKCIJA", "Sëkmingai palikote frakcijà.");
-		if(IsValidDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]))
-		{
-			DestroyDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]);
-		}
-		PlayerExtra[playerid][pePoliceBadgeText] = INVALID_3DTEXT_ID;
-
-		SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
-		SetPlayerArmour(playerid, 0.0);
-		ResetServerSidedWeapons(playerid);
 	}
 	else
 	{
 		SendError(playerid, "Nesate frakcijoje.");
 	}
+	return 1;
+}
+
+stock Player_LeaveFaction(playerid)
+{
+	new factionid = GetFactionArrayIndexById(PlayerInfo[playerid][pFaction]);
+	if(factionid == -1) return 0;
+
+	// Badge & unit
+	for(new i = 0; i < 3; i++) PlayerInfo[playerid][pFactionPermissions][i] = 0;
+
+	PlayerInfo[playerid][pFaction] = 
+	PlayerInfo[playerid][pFactionLeader] = 
+	PlayerInfo[playerid][pJobLevel] = 
+	PlayerInfo[playerid][pPoliceBadge] = 0;
+
+	SetPlayerColor(playerid, DEFAULT_PLAYER_COLOR);
+	SetPlayerArmour(playerid, 0.0);
+	ResetServerSidedWeapons(playerid);
+
+	// UI stuff
+	HideInfoBar(playerid);
+
+	IsValidDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]) && DestroyDynamic3DTextLabel(PlayerExtra[playerid][pePoliceBadgeText]);
+	PlayerExtra[playerid][pePoliceBadgeText] = INVALID_3DTEXT_ID;
+	PlayerExtra[playerid][peTazer] = 0;
+
+	new channel = PlayerInfo[playerid][pRadioChannel];
+	if((900 <= channel < 950) || (950 <= channel < 1000) || (1000 <= channel < 1050)) PlayerInfo[playerid][pRadioChannel] = 0;
+
+	SaveAccountIntEx(playerid, "Faction", 0);
+	SaveAccountIntEx(playerid, "FactionLeader", 0);
+	SaveAccountIntEx(playerid, "JobLevel", 0);
+	SaveAccountIntEx(playerid, "PoliceBadge", 0);
 	return 1;
 }
 
@@ -30672,13 +29574,45 @@ CMD:afurniture(playerid, params[])
 alias:screen("options","textdraws");
 CMD:screen(playerid, params[])
 {
-	new string[256];
-	format(string, sizeof string, "{BABABA}Pasirinkimas\t{BABABA}Dabartinë reikðmë\nSpidometras\t%s\n{FFFFFF}Kalëjimo laikas\t%s\n{FFFFFF}Racijos informacija\t%s",
-		!TextdrawDisabled_Speedo{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
-		!TextdrawDisabled_JailTimer{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"),
-		!TextdrawDisabled_InfoBar{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
+	SettingsMenu_Main(playerid);
+	return 1;
+}
 
-	ShowPlayerDialog(playerid, DIALOG_PLAYER_OPTIONS, DIALOG_STYLE_TABLIST_HEADERS, "Textdraw valdymas", string, "Keisti", "Atðaukti");
+static SettingsMenu_Main(playerid)
+{
+	dialog_Clear();
+	dialog_AddLine("{BABABA}Pasirinkimas\t{BABABA}Dabartinë reikðmë");
+	dialog_AddLine("{FFFFFF}Spidometras\t%s", !TextdrawDisabled_Speedo{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
+	dialog_AddLine("{FFFFFF}Kalëjimo laikas\t%s", !TextdrawDisabled_JailTimer{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
+	dialog_AddLine("{FFFFFF}Racijos informacija\t%s", !TextdrawDisabled_InfoBar{playerid} ? ("{36D33B}ájungtas") : ("{E9413B}iðjungtas"));
+
+	inline optionSelect(response, listitem)
+	{
+		if(response)
+		{
+			// speedo
+			dialog_Row("Spidometras")
+			{
+				TextdrawDisabled_Speedo{playerid} = !TextdrawDisabled_Speedo{playerid};
+				if(TextdrawDisabled_Speedo{playerid}) Speedo_Hide(playerid);
+				SaveAccountOption(playerid, "TextdrawDisabled_Speedo", TextdrawDisabled_Speedo{playerid});
+			}
+			dialog_Row("Kalëjimo laikas")
+			{
+				TextdrawDisabled_JailTimer{playerid} = !TextdrawDisabled_JailTimer{playerid};
+				if(TextdrawDisabled_JailTimer{playerid} && ShowingJailTimer{playerid}) HideJailTimer(playerid);
+				SaveAccountOption(playerid, "TextdrawDisabled_JailTimer", TextdrawDisabled_JailTimer{playerid});
+			}
+			dialog_Row("Racijos informacija")
+			{
+				TextdrawDisabled_InfoBar{playerid} = !TextdrawDisabled_InfoBar{playerid};
+				if(TextdrawDisabled_InfoBar{playerid} && ShowingInfoBar{playerid}) HideInfoBar(playerid);
+				SaveAccountOption(playerid, "TextdrawDisabled_InfoBar", TextdrawDisabled_InfoBar{playerid});
+			}
+		}
+		return 1;
+	}
+	dialog_Show(playerid, using inline optionSelect, DIALOG_STYLE_TABLIST_HEADERS, "Textdraw valdymas", "Keisti", "Atðaukti");
 	return 1;
 }
 
@@ -31474,19 +30408,19 @@ CMD:duty(playerid, params[])
 							{
 								if(!IsPlayerInPD(playerid)) return SendWarning(playerid, "Nesate policijos departamente.");
 								SendFormat(playerid, 0xF1F1F1FF, "Persirengimui galite naudoti /pdclothes, ginklams /wepstore");
-								SetPlayerColor(playerid, 0x4435E6FF);
+								SetPlayerColor(playerid, DEFAULT_PD_PLAYER_COLOR);
 								PlayerInfo[playerid][pJobDuty] = 1;
 								SetPlayerArmour(playerid, 100.0);
-								//SendFormatToAll(0x4435E6FF, "Pareigûnas %s pradëjo darbà (/call 911).", GetPlayerNameEx(playerid, true));
+								//SendFormatToAll(DEFAULT_PD_PLAYER_COLOR, "Pareigûnas %s pradëjo darbà (/call 911).", GetPlayerNameEx(playerid, true));
 							}
 						}
 						case FACTION_TYPE_FIRE:
 						{
 							if(!IsPlayerInMD(playerid)) return SendWarning(playerid, "Nesate medicinos departamente.");
 							SendFormat(playerid, 0xF1F1F1FF, "Persirengimui galite naudoti /mdclothes");
-							SetPlayerColor(playerid, 0xC12323FF);
+							SetPlayerColor(playerid, DEFAULT_FD_PLAYER_COLOR);
 							PlayerInfo[playerid][pJobDuty] = 1;
-							//SendFormatToAll(0xC12323FF, "Medikas %s pradëjo darbà (/call 911).", GetPlayerNameEx(playerid, true));
+							//SendFormatToAll(DEFAULT_FD_PLAYER_COLOR, "Medikas %s pradëjo darbà (/call 911).", GetPlayerNameEx(playerid, true));
 						}
 					}
 				}
@@ -31512,7 +30446,9 @@ CMD:changeclothes(playerid, params[])
 {
 	new iter = INVALID_HOUSE_ID,
 		unused;
-	if((iter = GetClosestHouse(playerid, 60.0, unused, CHECK_TYPE_INSIDE)) == INVALID_HOUSE_ID) return InfoBox(playerid, IB_NOT_IN_HOUSE_OR_BUSINESS);
+	if((iter = GetClosestHouse(playerid, unused, .inside_range = 60.0, .outside_range = FLOAT_NAN)) == NONE)
+		return InfoBox(playerid, IB_NOT_IN_HOUSE_OR_BUSINESS);
+
 	if(!HaveHouseKey(playerid, iter)) return InfoBox(playerid, IB_NOT_IN_HOUSE_OR_BUSINESS);
 	if(HouseInfo[iter][hUpdateClothes] <= 0) return SendWarning(playerid, "Neturite tinkamos árangos.");
 	else ShowModelSelectionMenu(playerid, clskinslist, "Apranga");
@@ -31522,7 +30458,7 @@ CMD:eat(playerid, params[])
 {
 	new iter = -1,
 		unused;
-	if((iter = GetClosestHouse(playerid, 50.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID)
+	if((iter = GetClosestHouse(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		if(HouseInfo[iter][hUpdateEat] > 0)
 		{
@@ -31539,7 +30475,7 @@ CMD:eat(playerid, params[])
 			SendWarning(playerid, "Namas neturi ðio atnaujinimo.");
 		}
 	}
-	else if((iter = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	else if((iter = GetClosestBusiness(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		if(BusinessInfo[iter][bUpdateEat] > 0)
 		{
@@ -31564,7 +30500,8 @@ CMD:hmenu(playerid, params[])
 {
 	new houseid = INVALID_HOUSE_ID,
 		unused;
-	if((houseid = GetClosestHouse(playerid, 50.0, unused, CHECK_TYPE_INSIDE)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, houseid, .check_only_owner = true))
+	if((houseid = GetClosestHouse(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE && 
+		HaveHouseKey(playerid, houseid, .check_only_owner = true))
 	{
 		tmpIter[playerid] = houseid;
 		new string[256];
@@ -31672,7 +30609,7 @@ CMD:renthouse(playerid, params[])
 		cache_delete(result);
 		new houseid,
 			unused;
-		if((houseid = GetClosestHouse(playerid, 5.0, unused, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
+		if((houseid = GetClosestHouse(playerid, unused, .inside_range = FLOAT_NAN, .outside_range = 5.0)) != NONE)
 		{
 			if(HouseInfo[houseid][hOwner] == PlayerInfo[playerid][pId]) return SendError(playerid, "Ðio namo savininkas esate jûs.");
 			if(HouseInfo[houseid][hRent] > 0)
@@ -31709,7 +30646,7 @@ CMD:buyhouse(playerid, params[])
 	new houseid = INVALID_HOUSE_ID,
 		unused;
 	if(PlayerInfo[playerid][pLevel] < 3) return SendWarning(playerid, "Jûsø lygis nëra 3");
-	if((houseid = GetClosestHouse(playerid, 4.0, unused, CHECK_TYPE_OUTSIDE)) != INVALID_HOUSE_ID)
+	if((houseid = GetClosestHouse(playerid, unused, .inside_range = FLOAT_NAN, .outside_range = 4.0)) != NONE)
 	{
 		if(HouseInfo[houseid][hOwner] > 0 && HouseInfo[houseid][hSale] == 0) return SendError(playerid, "Ðis namas turi savininkà ir nëra parduodamas.");
 		if(HouseInfo[houseid][hOwner] == PlayerInfo[playerid][pId]) return 1; // pats savininkas
@@ -31768,7 +30705,9 @@ alias:buybusiness("buybiz");
 CMD:buybusiness(playerid, params[])
 {
 	new businessid = INVALID_BUSINESS_ID,
-		count = CountPlayerBusiness(playerid);
+		count = CountPlayerBusiness(playerid),
+		unused;
+
 	if(PlayerInfo[playerid][pLevel] < 3) return SendWarning(playerid, "Jûsø lygis nëra 3");
 	if((PlayerInfo[playerid][pDonator] == DONATOR_NONE && count >= MAX_BUSINESS_FOR_PLAYER) ||
 		(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && count >= MAX_BUSINESS_FOR_PLAYER_BRONZE) ||
@@ -31778,7 +30717,7 @@ CMD:buybusiness(playerid, params[])
 		SendWarning(playerid, "Jûs negalite turëti daugiau verslø! (Jau turite %d)", count);
 		return 1;
 	}
-	if((businessid = GetClosestBusiness(playerid, 4.0, CHECK_TYPE_OUTSIDE)) != INVALID_BUSINESS_ID)
+	if((businessid = GetClosestBusiness(playerid, unused, .inside_range = FLOAT_NAN, .outside_range = 4.0)) != NONE)
 	{
 		if(BusinessInfo[businessid][bOwner] > 0 && BusinessInfo[businessid][bSale] == 0) return SendError(playerid, "Ðis verslas turi savininkà ir nëra parduodamas.");
 		if(BusinessInfo[businessid][bOwner] == PlayerInfo[playerid][pId]) return 1; // pats savininkas
@@ -31892,8 +30831,8 @@ alias:buy("shop");
 CMD:buy(playerid, params[])
 {
 	// versle
-	new businessid = INVALID_BUSINESS_ID;
-	if((businessid = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	new businessid = NONE, unused;
+	if((businessid = GetClosestBusiness(playerid, unused, .inside_range = 60.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		if(InArray(BusinessInfo[businessid][bType], BUSINESS_TYPE_FUEL, BUSINESS_TYPE_SHOP))
 		{
@@ -31924,8 +30863,8 @@ CMD:buy(playerid, params[])
 alias:buyfood("food","buydrink");
 CMD:buyfood(playerid, params[])
 {
-	new businessid = INVALID_BUSINESS_ID;
-	if((businessid = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	new businessid = NONE, unused;
+	if((businessid = GetClosestBusiness(playerid, unused, .inside_range = 60.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		if(InArray(BusinessInfo[businessid][bType], BUSINESS_TYPE_BAR))
 		{
@@ -32025,8 +30964,8 @@ CMD:buyfood(playerid, params[])
 }
 CMD:buyweapons(playerid, params[])
 {
-	new businessid = INVALID_BUSINESS_ID;
-	if((businessid = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	new businessid = NONE, unused;
+	if((businessid = GetClosestBusiness(playerid, unused, .inside_range = 60.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		if(InArray(BusinessInfo[businessid][bType], BUSINESS_TYPE_WEAPONS))
 		{
@@ -32044,8 +30983,8 @@ CMD:buyweapons(playerid, params[])
 }
 CMD:buyclothes(playerid, params[])
 {
-	new businessid = INVALID_BUSINESS_ID;
-	if((businessid = GetClosestBusiness(playerid, 60.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	new businessid = NONE, unused;
+	if((businessid = GetClosestBusiness(playerid, unused, .inside_range = 60.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		if(GetFreeClothesSlot(playerid) == -1) return SendWarning(playerid, "Nëra vietos drabuþiø inventoriuje.");
 		if(InArray(BusinessInfo[businessid][bType], BUSINESS_TYPE_CLOTHES))
@@ -32100,11 +31039,13 @@ CMD:cad(playerid, params[])
 {
 	new 
 		string[256],
-		businessid;
+		businessid,
+		unused;
+
 	if(sscanf(params,"s[256]",string)) return SendUsage(playerid, "/cad [tekstas]");
 	if(GetPlayerMoney(playerid) < DEFAULT_AD_PRICE*2) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, DEFAULT_AD_PRICE);
 	if(PlayerExtra[playerid][peAdCooldown]+60 > gettime() && PlayerInfo[playerid][pDonator] <= 0) return SendWarning(playerid, "/cad galite naudoti kas minutæ.");
-	if((businessid = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	if((businessid = GetClosestBusiness(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		if(HaveBusinessKey(playerid, businessid))
 		{
@@ -32129,8 +31070,8 @@ CMD:cad(playerid, params[])
 
 CMD:bslogan(playerid, params[])
 {
-	new businessid = INVALID_BUSINESS_ID;
-	if((businessid = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	new businessid = NONE, unused;
+	if((businessid = GetClosestBusiness(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		if(HaveBusinessKey(playerid, businessid))
 		{
@@ -32159,8 +31100,8 @@ CMD:bslogan(playerid, params[])
 alias:bmenu("business","verslas");
 CMD:bmenu(playerid, params[])
 {
-	new businessid = INVALID_BUSINESS_ID;
-	if((businessid = GetClosestBusiness(playerid, 50.0, CHECK_TYPE_INSIDE)) != INVALID_BUSINESS_ID)
+	new businessid = NONE, unused;
+	if((businessid = GetClosestBusiness(playerid, unused, .inside_range = 50.0, .outside_range = FLOAT_NAN)) != NONE)
 	{
 		if(HaveBusinessKey(playerid, businessid))
 		{
@@ -32184,7 +31125,8 @@ CMD:lock(playerid, params[])
 {
 	new itterid,
 		unused;
-	if((itterid = GetClosestHouse(playerid, 4.0, unused)) != INVALID_HOUSE_ID && HaveHouseKey(playerid, itterid))
+	if((itterid = GetClosestHouse(playerid, unused, .inside_range = 4.0, .outside_range = 4.0)) != NONE && 
+		HaveHouseKey(playerid, itterid))
 	{
 		HouseInfo[itterid][hLocked] = !HouseInfo[itterid][hLocked];
 		SaveHouseIntEx(itterid, "Locked", HouseInfo[itterid][hLocked]);
@@ -32197,7 +31139,8 @@ CMD:lock(playerid, params[])
 		pc_cmd_v(playerid, "lock");
 		return 1;
 	}
-	else if((itterid = GetClosestBusiness(playerid, 4.0)) != INVALID_BUSINESS_ID && HaveBusinessKey(playerid, itterid))
+	else if((itterid = GetClosestBusiness(playerid, unused, .inside_range = 4.0, .outside_range = 4.0)) != NONE && 
+			HaveBusinessKey(playerid, itterid))
 	{
 		BusinessInfo[itterid][bLocked] = !BusinessInfo[itterid][bLocked];
 		SaveBusinessIntEx(itterid, "Locked", BusinessInfo[itterid][bLocked]);

@@ -61,7 +61,6 @@ hook OnHouseLoad(house)
 
 hook OnBusinessLoad(house)
 {
-
     _Furniture_Load(furnitureOwner_Business, house);
     return 1;
 }
