@@ -458,14 +458,13 @@ static _CarShops_Cars_Main(playerid, salon)
     dialog_Clear();
     dialog_AddLine("{BABABA}Nr.\t{BABABA}Modelis\t{BABABA}Reikalingas remëjo lygis\t{BABABA}Kaina");
     new salonSql = SalonData[salon][salonId],
-        line[32],
         i;
     foreach(new sell : SellVehicle)
     {
         if(SellVehicleData[sell][sellvehicleSalon] == salonSql)
         {
             i++;
-            dialog_AddLine(line, sizeof line, "%d.\t%s\t%d\t$%d", 
+            dialog_AddLine("%d.\t%s\t%d\t$%d", 
                 i,
                 GetModelName(SellVehicleData[sell][sellvehicleModel]),
                 SellVehicleData[sell][sellvehicleDonator],

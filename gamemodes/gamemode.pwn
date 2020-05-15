@@ -5428,7 +5428,7 @@ stock SpawnPlayerEx(playerid, type = 0, bool:set = false)
 	}
 	else
 	{
-		SetSpawnInfo(playerid, playerid, skin, -5583.91357, 1529.52417, 5.12383, 0.0, 0, 0, 0, 0, 0, 0);
+		SetSpawnInfo(playerid, playerid, skin, 2092.4, -1784.6, 13.5, 0.0, 0, 0, 0, 0, 0, 0);
 	}
 	if(set) PlayerInfo[playerid][pCurrentStatus] = PLAYER_STATUS_DEFAULT;
 	return SpawnPlayer(playerid);
@@ -27146,6 +27146,7 @@ public DragTimer(playerid, receiverid)
 	return 1;
 }
 
+alias:weptrunk("wt");
 CMD:weptrunk(playerid, params[])
 {
 	new
@@ -29682,6 +29683,7 @@ static SettingsMenu_Main(playerid)
 				if(TextdrawDisabled_InfoBar{playerid} && ShowingInfoBar{playerid}) HideInfoBar(playerid);
 				SaveAccountOption(playerid, "TextdrawDisabled_InfoBar", TextdrawDisabled_InfoBar{playerid});
 			}
+			SettingsMenu_Main(playerid);
 		}
 		return 1;
 	}

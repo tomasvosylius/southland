@@ -186,6 +186,7 @@ static _Business_ShowDetails(playerid, business)
     dialog_AddLine("Pavadinimas\t%.14s%s", BusinessInfo[business][bName], strlen(BusinessInfo[business][bName]) > 14 ? ("...") : (""));
     dialog_AddLine("Kaina\t$%d", BusinessInfo[business][bPrice]);
     dialog_AddLine("Savininkas\t%s", GetNameBySql(BusinessInfo[business][bOwner]));
+    dialog_AddLine("Lauko furniture range\t%0.1f", BusinessInfo[business][bOutFurnitureRange]);
     dialog_AddLine("Keisti áëjimo vietà");
     dialog_AddLine("Keisti iðëjimo vietà");
     dialog_AddLine("Iðvalyti baldus");
@@ -205,6 +206,7 @@ static _Business_ShowDetails(playerid, business)
             dialog_Row("Pavadinimas")                               return _Business_ChangeName(playerid, business);
             dialog_Row("Kaina")                                     return _Business_ChangePrice(playerid, business);
             dialog_Row("Savininkas")                                return _Business_ChangeOwner(playerid, business);
+            dialog_Row("Lauko furniture range")                     return _Business_ChangeFurnitureRange(playerid, business);
             dialog_Row("Keisti áëjimo vietà")                       return _Business_ChangeEnter(playerid, business);
             dialog_Row("Keisti iðëjimo vietà")                      return _Business_ChangeExit(playerid, business);
             dialog_Row("Iðvalyti baldus")                           return _Business_ClearFurniture(playerid, business);
@@ -223,6 +225,49 @@ static _Business_ShowDetails(playerid, business)
     return 1;
 }
 
+
+static _Business_ChangeFurnitureRange(playerid, business, error[] = "")
+{
+    if(!HaveAdminPermission(playerid, "EditBusinessOwner"))
+    {
+        InfoBox(playerid, IB_NO_PRIVILEGE);
+        return _Business_ShowDetails(playerid, business);
+    }
+    dialog_Clear();
+    dialog_AddLine("{FFFFFF}Áveskite naujà verslo lauko furniture spindulá.");
+    dialog_AddLine("{FFFFFF}Pvz. 20.0");
+    dialog_AddErrorLine(error);
+    inline input(response, listitem)
+    {
+        if(response)
+        {
+            new Float:range;
+            if(sscanf(dialog_Input(),"f",range) || range < 0.0)
+                return _Business_ChangeFurnitureRange(playerid, business, .error = "Blogai ávestas skaièius.");
+            
+            BusinessInfo[business][bOutFurnitureRange] = range;
+            
+            inline updateBusiness()
+            {
+                MsgSuccess(playerid, "Verslai", "Pakeitëte verslo lauko furniture range á %.1f", range);
+                return 1;
+            }
+            mysql_tquery_inline(chandler, using inline updateBusiness, "\
+                UPDATE `business_data` SET OutFurnitureRange = '%f' WHERE id = '%d'",
+                range, BusinessInfo[business][bId]
+            );
+            
+            log_init(true);
+            log_set_table("logs_admins");
+            log_set_keys("`PlayerId`,`PlayerName`,`ActionText`,`ExtraId`,`Amount`");
+            log_set_values("'%d','%e','(AM) Pakeite verslo fur.range','%d','%d'", LogPlayerId(playerid), LogPlayerName(playerid), BusinessInfo[business][bId], floatround(range));
+            log_commit();
+        }
+        _Business_ShowDetails(playerid, business);
+    }
+    dialog_Show(playerid, using inline input, DIALOG_STYLE_INPUT, "Verslo redagavimas", "Keisti", "Atðaukti");
+    return 1;
+}
 
 static _Business_ChangeName(playerid, business, error[] = "")
 {
