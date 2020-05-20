@@ -597,7 +597,7 @@ hook OnGameModeInit()
 	MongoluRetex[20] = CreateDynamicObject(19447, 1405.24, -14.76, 1001.70,   0.00, 0.00, 0.00);
 	MongoluRetex[21] = CreateDynamicObject(19447, 1408.35, -14.84, 1001.70,   0.00, 0.00, 0.00);
 	MongoluRetex[22] = CreateDynamicObject(19355, 1410.00, -19.62, 1001.70,   0.00, 0.00, 90.00);
-	// MongoluRetex[23] = CreateDynamicObject(19355, 1410.00, -19.63, 1001.70,   0.00, 0.00, 90.00);
+	MongoluRetex[23] = CreateDynamicObject(19355, 1410.00, -19.63, 1001.70,   0.00, 0.00, 90.00);
 	MongoluRetex[24] = CreateDynamicObject(19355, 1400.30, -29.25, 1001.70,   0.00, 0.00, 90.00);
 	MongoluRetex[25] = CreateDynamicObject(19355, 1388.98, -30.68, 1001.70,   0.00, 0.00, 0.00);
 	MongoluRetex[26] = CreateDynamicObject(19355, 1397.10, -22.82, 1001.70,   0.00, 0.00, 90.00);
@@ -649,7 +649,7 @@ hook OnGameModeInit()
 	SetDynamicObjectMaterial(MongoluRetex[20],0,18028,"cj_bar2","GB_nastybar03");
 	SetDynamicObjectMaterial(MongoluRetex[21],0,18028,"cj_bar2","GB_nastybar03");
 	SetDynamicObjectMaterial(MongoluRetex[22],0,18028,"cj_bar2","GB_nastybar03");
-	// SetDynamicObjectMaterial(MongoluRetex[23],0,17504,"eastlstr_lae2","mural07_LA");
+	SetDynamicObjectMaterial(MongoluRetex[23],0,17504,"eastlstr_lae2","mural07_LA");
 	SetDynamicObjectMaterial(MongoluRetex[24],0,18028,"cj_bar2","GB_nastybar03");
 	SetDynamicObjectMaterial(MongoluRetex[25],0,18028,"cj_bar2","GB_nastybar03");
 	SetDynamicObjectMaterial(MongoluRetex[26],0,18028,"cj_bar2","GB_nastybar03");

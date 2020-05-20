@@ -1905,7 +1905,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other\map\lspd_renew.pwn"
 #include "other\map\detailings.pwn"
 #include "other\map\misc.pwn"
-#include "other\map\interiors.pwn"
 #include "other\map\school.pwn"
 #include "other\map\docks.pwn"
 #include "other\map\willowfield_garage.pwn"
@@ -1918,6 +1917,13 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other\map\train_ganton.pwn"
 #include "other\map\train_jefferson.pwn"
 #include "other\map\pier.pwn"
+#include "other\map\bridge_hospital.pwn"
+#include "other\map\courts.pwn"
+#include "other\map\used_cars.pwn"
+
+#include "other\map\interiors/interiors.pwn"
+#include "other\map\interiors/pd.pwn"
+#include "other\map\interiors/md.pwn"
 
 // Unused ones
 //#include "core\map\newbie.pwn"
@@ -2172,8 +2178,8 @@ public OnGameModeInit()
 
 	CreateDynamic3DTextLabel("Þvejybos vieta\nNaudokite /fishing", 0xFFFFFFFF, 2938.95, -1996.96, 3.07, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
 	CreateDynamic3DTextLabel("Þuvø supirktuvë\nNaudokite /sellfishes", 0xBABABAFF, 2900.65, -1934.49, 11.91, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
-	CreateDynamic3DTextLabel("/bell", 0xBABABAFF, 2264.5288,-69.9861,1024.6013, 2.85, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
-	CreateDynamic3DTextLabel("/pdclothes\n/wepstore\n/vest", 0xBABABAFF, 2271.5259,-73.5560,1024.3364, 2.85, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
+	CreateDynamic3DTextLabel("/bell", 0xBABABAFF, 330.1826,-128.2011,-86.8736, 2.85, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
+	CreateDynamic3DTextLabel("/pdclothes\n/wepstore\n/vest", 0xBABABAFF, 359.1204,-108.0858,-90.1036, 2.85, INVALID_PLAYER_ID, INVALID_VEHICLE_ID);
 	// AddStaticVehicle(538, 1902.83, -1953.91, 13.50, 0.0, 0, 0);
 
 	Iter_Init(PlayerDamages);
@@ -26411,14 +26417,19 @@ CMD:a(playerid, params[])
 }
 stock IsPlayerInMD(playerid)
 {
-	if(playerid > -1) return true;
-	else return false;
+	if(IsPlayerInRangeOfPoint(playerid, 190.0, -30.1, 151.6, 999.0)) return true;
+	return false;
 }
 stock IsPlayerInPD(playerid)
 {
 	if(	IsPlayerInRangeOfPoint(playerid, 100.0, 247.72, 69.94, 1003.64) ||
 		IsPlayerInRangeOfPoint(playerid, 100.0, 2275.43, -65.92, 1024.03) || 
-		IsPlayerInRangeOfPoint(playerid, 200.0, 2029.57, 2952.76, 6010.15)) return true;
+		IsPlayerInRangeOfPoint(playerid, 200.0, 2029.57, 2952.76, 6010.15) ||
+		IsPlayerInRangeOfPoint(playerid, 90.0, 330.1826,-128.2011,-86.8736) || // turbo pd
+		IsPlayerInRangeOfPoint(playerid, 90.0, 359.1204,-108.0858,-90.1036) // turbo pd
+	) {
+		return true;
+	}
 	return false;
 }
 
