@@ -2093,6 +2093,7 @@ public t_ac__WeaponsTimer()
 	{
 		if(!IsPlayerConnected(playerid) || 
 			!_FAC_IsPlayerStatePlaying(playerid)) continue; 
+			
 		if(ac__IgnoreWeapons[playerid] > 0)
 		{
 			if((ac__IgnoreWeapons[playerid] -= 1) > 0) continue; 

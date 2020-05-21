@@ -787,6 +787,7 @@ native gpci(playerid, serial[], len);
 #define AC_ENABLE_PICKUP_TELEPORT	true
 #define AC_ENABLE_TELEPORTER		false
 #define AC_ENABLE_VW_INT			false
+#define AC_WEAPONS_CHECK_ALWAYS		false
 
 // ==============================================================================
 // Projekto pavadinimas ir pns
