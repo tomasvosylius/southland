@@ -1753,6 +1753,7 @@ public t_ac__Health()
 	public OnPlayerDeath(playerid, killerid, reason)
 #endif
 {
+	printf("FAC_OnPlayerDeath");
 	#if AC_ENABLE_FAKEKILL 
 		new 
 			now = gettime();
@@ -1768,7 +1769,6 @@ public t_ac__Health()
 		ac__LastDeath[playerid] = now;
 	#endif
 	
-	ac__IgnoreWeapons[playerid] = 10;
 	ac__PlayerHealth[playerid] = 100.0;
 	FAC_ResetPlayerWeapons(playerid);
 
@@ -2091,12 +2091,13 @@ public t_ac__WeaponsTimer()
 		playerWeapon;
 	AC_playerloop(playerid)
 	{
-		if(!IsPlayerConnected(playerid)) continue; 
+		if(!IsPlayerConnected(playerid) || 
+			!_FAC_IsPlayerStatePlaying(playerid)) continue; 
 		if(ac__IgnoreWeapons[playerid] > 0)
 		{
-			ac__IgnoreWeapons[playerid] -- ;
-			if(ac__IgnoreWeapons[playerid] > 0) continue; 
+			if((ac__IgnoreWeapons[playerid] -= 1) > 0) continue; 
 		}
+
 		#if AC_WEAPONS_CHECK_ALWAYS
 			#pragma unused playerWeapon
 			for(new slot = 0; slot < 13; slot++)
@@ -2131,7 +2132,7 @@ public FAC_OnPlayerWeaponChanged(playerid, newweapon, oldweapon)
 			new 
 				l_data[2];
 			GetPlayerWeaponData(playerid, slot, l_data[0], l_data[1]);
-			if(l_data[0] <= 0)
+			if(l_data[0] <= 0 || l_data[1] <= 0)
 			{
 				FAC_ResetPlayerWeaponSlotData(playerid, slot);
 			}
@@ -2164,11 +2165,18 @@ stock FAC_CheckWeaponCheat(playerid, id, bool:byslot, line = 0)
 				ac__PlayerWeapons[playerid][slot][e_ac_WeaponId], ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo]
 			);
 
-			ac__IgnoreWeapons[playerid] = 3;
 			FAC_ResetPlayerWeapons(playerid);
 
 			_FAC_CheatDetected(playerid, CHEAT_WEAPON, l_data[0], l_data[1]);
 			return true;
+		}
+		else if(l_data[1] <= 0 && l_data[0] > 0)
+		{
+			FAC_ResetPlayerWeaponSlotData(playerid, slot);
+		}
+		else 
+		{
+			ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] = l_data[1];
 		}
 	}
 	return false;
@@ -2184,18 +2192,15 @@ stock FAC_ResetPlayerWeaponSlotData(playerid, slot)
 
 stock FAC_ResetPlayerWeapons(playerid)
 {
-	new 
-		result = ResetPlayerWeapons(playerid);
-
+	printf("FAC_ResetPlayerWeapons(%d)", playerid);
 	for(new slot = 0; slot < 13; slot++)
 	{
 		ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] = 
 		ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] = 0;
 	}
+	ac__IgnoreWeapons[playerid] = 6;
 	ac__LastWeapon[playerid] = 0;
-	ac__IgnoreWeapons[playerid] = 3;
-
-	return result;
+	return ResetPlayerWeapons(playerid);
 }
 
 stock RemovePlayerWeapon(playerid, weapon)
@@ -2286,7 +2291,7 @@ stock FAC_SetPlayerAmmo(playerid, weaponid, ammo)
 		{
 			ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] += ammo;
 		}
-		ac__IgnoreWeapons[playerid] = 3;
+		ac__IgnoreWeapons[playerid] = 4;
 	}
 	return result;
 }
@@ -2310,7 +2315,7 @@ stock FAC_GivePlayerWeapon(playerid, weaponid, ammo)
 			ac__PlayerWeapons[playerid][slot][e_ac_WeaponAmmo] = ammo;
 		}
 		ac__PlayerWeapons[playerid][slot][e_ac_WeaponId] = weaponid;
-		ac__IgnoreWeapons[playerid] = 3;
+		ac__IgnoreWeapons[playerid] = 4;
 		new ret = GivePlayerWeapon(playerid, weaponid, ammo);
 		return ret;
 	}

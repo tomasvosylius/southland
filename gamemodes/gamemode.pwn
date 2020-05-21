@@ -26,7 +26,7 @@
 
 #include <a_mysql>
 
-#include <FileManager>
+// #include <FileManager>
 #include <streamer>
 #include <crashdetect>
 #include <YSI_Data\y_iterate>
@@ -2186,10 +2186,6 @@ public OnGameModeInit()
 
 	// ==============================================================================
 	BlockGarages(.text = "X");
-
-	// Timers
-	// ==============================================================================
-	SetTimer("SecondTimer", 1000, true);
 	return 1;
 }
 
@@ -2672,8 +2668,7 @@ ptask PT_JobTaskSecond[998](playerid)
 	}
 }
 
-forward SecondTimer();
-public SecondTimer()
+task T_SecondTimer[1000]()
 {
 	new rand,
 		bool:changeEffect,
@@ -17999,7 +17994,7 @@ stock EngineTurning(playerid)
 			}
 			else
 			{
-				new turn_time = 1200 +
+				new turn_time = 600 +
 								floatround((VehicleInfo[vehicleid][vBatteryStatus] > 90.0 ? 0.0 : (100-VehicleInfo[vehicleid][vBatteryStatus])*28)) +
 								floatround((VehicleInfo[vehicleid][vEngineStatus] > 50.0 ? 0.0 : (100-VehicleInfo[vehicleid][vEngineStatus])*20));
 				
