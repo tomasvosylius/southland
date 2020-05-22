@@ -2214,9 +2214,12 @@ ptask PT_VehicleSpeedo[200](playerid)
 	}	
 	
 	// Sedi masinoje.
-	new speed = GetVehicleSpeed(vehicleid);
+	new speed = GetVehicleSpeed(vehicleid),
+		model = GetVehicleModel(vehicleid);
+	if(!(400 <= model <= 611)) return;
 
 	GetVehiclePos(vehicleid, currentX, currentY, distance);
+
 
 	if((Recalculate_Mileage[playerid] += 1) >= 5)
 	{
@@ -2246,7 +2249,7 @@ ptask PT_VehicleSpeedo[200](playerid)
 			VehicleInfo[vehicleid][vKM] += distance/500.0;
 			VehicleInfo[vehicleid][vLastMileageX] = currentX,
 			VehicleInfo[vehicleid][vLastMileageY] = currentY;
-			consumption = VehicleFuelUsageList[GetVehicleModel(vehicleid)-400] * 3;
+			consumption = VehicleFuelUsageList[model-400] * 3;
 			if(VehicleInfo[vehicleid][vFuel] > 0.0)
 			{
 				if(VehicleInfo[vehicleid][vFuel] < consumption) VehicleInfo[vehicleid][vFuel] = 0;
@@ -2264,7 +2267,11 @@ ptask PT_VehicleSpeedo[200](playerid)
 		if(VehicleInfo[vehicleid][vFuel] >= 0.0)
 		{
 			format(string, sizeof string, "DEGALAI: %s", 
-				ConvertFuelToString(VehicleInfo[vehicleid][vFuel], VehicleFuelCapacityList[GetVehicleModel(vehicleid)-400]));
+				ConvertFuelToString(
+					VehicleInfo[vehicleid][vFuel],
+					VehicleFuelCapacityList[model - 400]
+				)
+			);
 		}
 		Speedo_Update(playerid, .fuel_level = string);
 	}
@@ -17549,6 +17556,7 @@ stock ConvertFuelToString(Float:fuellevel, Float:fuelcapacity)
 {
 	new fuel = floatround(((fuellevel*10) / fuelcapacity), floatround_round),
 		string[16];
+
 	if(fuel <= 0) string = " ";
 	else for(new i = 0; i < fuel; i++) strcat(string, "I");
 
@@ -26858,13 +26866,13 @@ CMD:megaphone(playerid, params[])
 		{
 			case FACTION_TYPE_POLICE:
 			{
-				format(string, sizeof string, "[ %s:o<  %s !!! ]", GetPlayerNameEx(playerid, true), string);
+				format(string, sizeof string, "[ %s:o< %s!!! ]", GetPlayerNameEx(playerid, true), string);
 				ProxDetector(50.0, playerid, string, 0xFF6666FF, 0xFF6666FF, 0xFF6666FF, 0xFF6666FF, 0xFF6666);
 				return 1;
 			}
 			case FACTION_TYPE_FIRE:
 			{
-				format(string, sizeof string, "[ %s:o<  %s !!! ]", GetPlayerNameEx(playerid, true), string);
+				format(string, sizeof string, "[ %s:o< %s!!! ]", GetPlayerNameEx(playerid, true), string);
 				ProxDetector(50.0, playerid, string, 0xFF6666FF, 0xFF6666FF, 0xFF6666FF, 0xFF6666FF, 0xFF6666);
 				return 1;
 			}

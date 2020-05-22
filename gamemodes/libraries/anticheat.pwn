@@ -1873,13 +1873,21 @@ stock FAC_SetPlayerArmour(playerid, Float:armour)
 
 stock FAC_GetPlayerHealth(playerid, &Float:health)
 {
-	health = ac__PlayerHealth[playerid];
+	#if AC_ENABLE_HEALTH
+		health = ac__PlayerHealth[playerid];
+	#else 
+		GetPlayerHealth(playerid, health);
+	#endif
 	return 1;
 }
 
 stock FAC_GetPlayerArmour(playerid, &Float:armour)
 {
-	armour = ac__PlayerArmour[playerid];
+	#if AC_ENABLE_HEALTH
+		armour = ac__PlayerArmour[playerid];
+	#else 
+		GetPlayerArmour(playerid, armour);
+	#endif
 	return 1;
 }
 
@@ -1908,6 +1916,10 @@ stock FAC_CheckPlayerHealth(playerid)
 			ac__PlayerHealth[playerid] = health;
 		}
 	}
+	else
+	{
+		ac__PlayerHealth[playerid] = health;
+	}
 
 	if(armour > ac__PlayerArmour[playerid] && armour > 0.0)
 	{
@@ -1925,6 +1937,10 @@ stock FAC_CheckPlayerHealth(playerid)
 			FAC_ResetArmourIgnore(playerid);
 			ac__PlayerArmour[playerid] = armour;
 		}
+	}
+	else 
+	{
+		ac__PlayerArmour[playerid] = armour;
 	}
 	return 1;
 }
