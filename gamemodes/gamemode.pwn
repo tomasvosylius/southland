@@ -7797,6 +7797,9 @@ stock Login_ChangePassword_NewPsw(playerid)
 			format(string, 60, "%s%s", dialog_Input(), PlayerInfo[playerid][pSalt]);
 			WP_Hash(salted, sizeof salted, string);
 
+			printf("[log] %s(%d) [IP: %s] pakeite slaptazodi: %s",
+				GetPlayerNameEx(playerid), PlayerInfo[playerid][pUserId], GetPlayerIpEx(playerid), string);
+
 			inline updatePsw()
 			{
 				SendClientMessage(playerid, 0x00ff00f1, "Slaptaþodis pakeistas! Prisijunkite ið naujo.");
