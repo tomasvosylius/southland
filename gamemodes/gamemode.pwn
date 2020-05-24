@@ -7805,13 +7805,15 @@ stock User_Register_Show(playerid)
 	dialog_AddLine("Prisijungus galësite kurti atskirus veikëjus ir juos valdyti!");
 	dialog_SkipLine();
 	dialog_AddLine("{d78484}Slaptaþodis turi bûti nuo 6 iki 30 simboliø.");
-	dialog_AddLine("{d78484}Slaptaþodis privalo turëti didþiøjø raidþiø!");
+	// dialog_AddLine("{d78484}Slaptaþodis privalo turëti maþøjø ir didþiøjø raidþiø!");
 
 	inline inputPassword(response, listitem)
 	{
 		if(response)
 		{
-			if(!CheckPasswordComplexity(dialog_Input(), -1)) return User_Register_Show(playerid);
+			// if(!CheckPasswordComplexity(dialog_Input(), -1))
+			if(!(6 <= strlen(dialog_Input()) <= 30))
+				return User_Register_Show(playerid);
 			
 			GenerateSalt(PlayerInfo[playerid][pSalt], GetPlayerIpEx(playerid), 30);
 			format(PlayerInfo[playerid][pPassword], 130, dialog_Input());
