@@ -1899,13 +1899,16 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 
 
 /** Maps */
+#include "other\map\interiors/interiors.pwn"
+#include "other\map\interiors/pd.pwn"
+#include "other\map\interiors/md.pwn"
+
 #include "other\map\vm.pwn"
 #include "other\map\vm_corner.pwn"
 #include "other\map\corona247.pwn"
 #include "other\map\mechanics2.pwn"
 #include "other\map\lspd_renew.pwn"
 #include "other\map\detailings.pwn"
-#include "other\map\misc.pwn"
 #include "other\map\school.pwn"
 #include "other\map\docks.pwn"
 #include "other\map\willowfield_garage.pwn"
@@ -1921,10 +1924,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other\map\bridge_hospital.pwn"
 #include "other\map\courts.pwn"
 #include "other\map\used_cars.pwn"
-
-#include "other\map\interiors/interiors.pwn"
-#include "other\map\interiors/pd.pwn"
-#include "other\map\interiors/md.pwn"
+#include "other\map\misc.pwn"
 
 // Unused ones
 //#include "core\map\newbie.pwn"
@@ -16249,6 +16249,47 @@ forward OnPlayerPutInventoryItem(playerid, slotid, to_type, to_itter);
 forward OnPlayerTakeInventoryItem(playerid, from_type, from_itter, from_slot);
 forward OnPlayerGiveInventoryItem(playerid, slotid);
 */
+
+CMD:passcig(playerid, params[], help)
+{
+	new receiverid;
+	if(sscanf(params,"u", receiverid) || !IsPlayerConnected(receiverid)) return SendUsage(playerid, "/passcig [þaidëjas]");
+	if(!CheckPlayerid(receiverid) || playerid == receiverid) return InfoBox(playerid, IB_WRONG_PLAYER);
+	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 2.0) || IsPlayerSpectatedBy(playerid, receiverid)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
+
+	new action = GetPlayerSpecialAction(playerid);
+	switch(action)
+	{
+		case SPECIAL_ACTION_SMOKE_CIGGY:
+		{
+			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+			SetPlayerSpecialAction(receiverid, action);
+			rp_me(playerid, _, "perduoda cigaretæ %s.", GetPlayerNameEx(receiverid, .roleplay = true));
+		}
+		default: SendError(playerid, "Nerûkai cigaretës.");
+	}
+	return 1;
+}
+CMD:passbottle(playerid, params[], help)
+{
+	new receiverid;
+	if(sscanf(params,"u", receiverid) || !IsPlayerConnected(receiverid)) return SendUsage(playerid, "/passbottle [þaidëjas]");
+	if(!CheckPlayerid(receiverid) || playerid == receiverid) return InfoBox(playerid, IB_WRONG_PLAYER);
+	if(!IsPlayerInRangeOfPlayer(playerid, receiverid, 2.0) || IsPlayerSpectatedBy(playerid, receiverid)) return InfoBox(playerid, IB_NOT_CLOSE_PLAYER);
+
+	new action = GetPlayerSpecialAction(playerid);
+	switch(action)
+	{
+		case SPECIAL_ACTION_DRINK_SPRUNK, SPECIAL_ACTION_DRINK_WINE, SPECIAL_ACTION_DRINK_BEER:
+		{
+			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+			SetPlayerSpecialAction(receiverid, action);
+			rp_me(playerid, _, "perduoda butelá %s.", GetPlayerNameEx(receiverid, .roleplay = true));
+		}
+		default: SendError(playerid, "Neturi butelio.");
+	}
+	return 1;
+}
 
 public OnPlayerPutInventoryItem(playerid, slotid, to_type, to_itter)
 {

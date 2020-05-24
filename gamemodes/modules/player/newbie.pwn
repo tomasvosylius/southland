@@ -24,10 +24,10 @@ static
             {2118.7241,-1774.8286,13.3920}
         },
         {
-            "~w~Cia igysi vairavimo ~y~teises.",
-            3.5,
-            {2085.1387,-1947.1952,18.6166},
-            {2058.8369,-1906.4808,16.0266}
+            "~w~Cia gali isigyti pirma ~y~automobili.",
+            4.0,
+            {1963.0898,-1877.3273,16.2001},
+            {1926.2198,-1866.7648,13.5600}
         },
         {
             "~w~Noredamas pilti degalus, degalineje naudok komanda ~y~/fill~w~",

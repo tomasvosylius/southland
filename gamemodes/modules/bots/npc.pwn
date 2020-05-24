@@ -62,7 +62,7 @@ hook OnPlayerSpawn(playerid)
             }
             else if(strfind(ret_GetPlayerName(playerid), "Traukinys_1") != -1)
             {
-                metroVehicle = AddStaticVehicle(538, 0.0, 0.0, 7.0, 0.0, -1, -1);
+                metroVehicle = AddStaticVehicleEx(538, 0.0, 0.0, 7.0, 0.0, 1, 1, 0);
                 PutPlayerInVehicle(playerid, metroVehicle, 0);
                 return 1;
             }

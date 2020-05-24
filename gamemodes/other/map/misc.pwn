@@ -14,17 +14,6 @@ hook OnPlayerConnect(playerid)
 hook OnGameModeInit()
 {
 	new tmpobjid;
-	
-	// Degalines nematomi Idlewood aptvarai
-	tmpobjid = CreateDynamicObject(19445, 1942.29529, -1774.96631, 14.29397,   0.00000, 0.00000, 0.00000, -1, -1, -1, 60.0, 60.0);
-	SetDynamicObjectMaterial(tmpobjid, 0, 0, "none", "none", 0x00000000);
-	tmpobjid = CreateDynamicObject(19445, 1942.27905, -1770.35022, 14.29397,   0.00000, 0.00000, 0.00000, -1, -1, -1, 60.0, 60.0);
-	SetDynamicObjectMaterial(tmpobjid, 0, 0, "none", "none", 0x00000000);
-	tmpobjid = CreateDynamicObject(19445, 1941.02747, -1770.39246, 14.29397,   0.00000, 0.00000, 0.00000, -1, -1, -1, 60.0, 60.0);
-	SetDynamicObjectMaterial(tmpobjid, 0, 0, "none", "none", 0x00000000);
-	tmpobjid = CreateDynamicObject(19445, 1941.03162, -1775.25244, 14.29397,   0.00000, 0.00000, 0.00000, -1, -1, -1, 60.0, 60.0);
-	SetDynamicObjectMaterial(tmpobjid, 0, 0, "none", "none", 0x00000000);
-
 	// turbo mc
 	CreateObject(1468, 2609.22559, -1091.73889, 69.86719,   3.13290, 0.00076, -3.05433);
 	CreateObject(1468, 2614.52002, -1092.00977, 69.86720,   0.00000, 0.00080, 358.59351);
@@ -248,4 +237,15 @@ hook OnGameModeInit()
 	tmpobjid = CreateDynamicObject(615,1208.750,-793.022,82.019,0.000,0.000,0.000,-1,-1,-1,120.000,120.000);
 	tmpobjid = CreateDynamicObject(615,1200.870,-820.662,78.229,0.000,0.000,0.000,-1,-1,-1,120.000,120.000);
 	tmpobjid = CreateDynamicObject(615,1202.360,-780.362,87.569,0.000,0.000,0.000,-1,-1,-1,120.000,120.000);
+
+	// Degalines nematomi Idlewood aptvarai
+	tmpobjid = CreateDynamicObject(19445, 1942.29529, -1774.96631, 14.29397,   0.00000, 0.00000, 0.00000, -1, -1, -1, 60.0, 60.0);
+	SetDynamicObjectMaterial(tmpobjid, 0, 0, "none", "none", 0x00000000);
+	tmpobjid = CreateDynamicObject(19445, 1942.27905, -1770.35022, 14.29397,   0.00000, 0.00000, 0.00000, -1, -1, -1, 60.0, 60.0);
+	SetDynamicObjectMaterial(tmpobjid, 0, 0, "none", "none", 0x00000000);
+	tmpobjid = CreateDynamicObject(19445, 1941.02747, -1770.39246, 14.29397,   0.00000, 0.00000, 0.00000, -1, -1, -1, 60.0, 60.0);
+	SetDynamicObjectMaterial(tmpobjid, 0, 0, "none", "none", 0x00000000);
+	tmpobjid = CreateDynamicObject(19445, 1941.03162, -1775.25244, 14.29397,   0.00000, 0.00000, 0.00000, -1, -1, -1, 60.0, 60.0);
+	SetDynamicObjectMaterial(tmpobjid, 0, 0, "none", "none", 0x00000000);
+	return 1;
 }
