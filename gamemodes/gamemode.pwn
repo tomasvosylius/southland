@@ -59,7 +59,7 @@
 #define ZMSG_HYPHEN_START		"... "
 #include <zmessage>
 
-native WP_Hash(buffer[], len, const str[]);
+native WP_Hash(bufferd[], len, const str[]);
 native gpci(playerid, serial[], len);
 // ==============================================================================
 // Serveris
@@ -237,7 +237,6 @@ native gpci(playerid, serial[], len);
 // ==============================================================================
 // Dialogai
 #define DIALOG_NONE 					0
-#define DIALOG_PASSWORD 				1
 #define DIALOG_CARGO_LIST				21
 #define DIALOG_MECHANIC_SELECT_COLORS	23
 #define DIALOG_INVENTORY				24
@@ -769,13 +768,13 @@ native gpci(playerid, serial[], len);
 #define AC_ENABLE_AIRBREAK			true
 #define AC_ENABLE_HEALTH			true
 #define AC_ENABLE_SPEED				true
-#define AC_ENABLE_INV				true
+#define AC_ENABLE_INV				false
 #define AC_ENABLE_JETPACK			false
 #define AC_ENABLE_DIALOGS			false
 #define AC_ENABLE_FLOOD				false
 #define AC_ENABLE_NPC				false
-#define AC_ENABLE_FAKEKILL			true
-#define AC_ENABLE_RAPIDFIRE			true
+#define AC_ENABLE_FAKEKILL			false
+#define AC_ENABLE_RAPIDFIRE			false
 #define AC_ENABLE_WARP_INTO_CAR		true
 #define AC_ENABLE_AIMBOT			true
 #define AC_ENABLE_TROLLBOSS			true
@@ -784,7 +783,7 @@ native gpci(playerid, serial[], len);
 #define AC_ENABLE_GOGGLES_FIX		true
 #define AC_ENABLE_SEAT_CHANGER		true
 #define AC_ENABLE_CAR_CHANGER		true
-#define AC_ENABLE_PICKUP_TELEPORT	true
+#define AC_ENABLE_PICKUP_TELEPORT	false
 #define AC_ENABLE_TELEPORTER		false
 #define AC_ENABLE_VW_INT			false
 #define AC_WEAPONS_CHECK_ALWAYS		false
@@ -2070,6 +2069,7 @@ stock sd_SetPlayerSkin(playerid, skin)
     #define _ALS_SetPlayerSkin
 #endif 
 #define SetPlayerSkin sd_SetPlayerSkin
+
 
 amx_wastetimer()
 {
@@ -5923,7 +5923,7 @@ public LoginHalt(playerid)
 	new string[256];
 	mysql_format(chandler, string, sizeof string, "\
 		SELECT id,Salt,NameChanges,NumberChanges,PlateChanges,Donator,DonatorTime,\
-		Group1,Group2,Group3 \
+		NeedsPswChange,Group1,Group2,Group3 \
 		FROM `users_data` WHERE Name = '%e'", GetPlayerNameEx(playerid));
 	mysql_tquery(chandler, string, "CheckUserName", "d", playerid);
 	return 1;
@@ -5934,11 +5934,13 @@ public CheckUserName(playerid)
 {
 	if(cache_num_rows())
 	{
+		new needsPswChange;
 		cache_get_value_name_int(0, "id", PlayerInfo[playerid][pUserId]);
 		cache_get_value_name_int(0, "NameChanges", PlayerInfo[playerid][pNameChanges]);
 		cache_get_value_name_int(0, "NumberChanges", PlayerInfo[playerid][pNumberChanges]);
 		cache_get_value_name_int(0, "PlateChanges", PlayerInfo[playerid][pPlateChanges]);
 		cache_get_value_name_int(0, "DonatorTime", PlayerInfo[playerid][pDonatorTime]);
+		cache_get_value_name_int(0, "NeedsPswChange", needsPswChange);
 
 		new fetch_string[12];
 		for(new i = 0; i < MAX_PLAYER_GROUPS; i++)
@@ -5970,7 +5972,12 @@ public CheckUserName(playerid)
 		else
 		{
 			cache_get_value_name(0, "Salt", PlayerInfo[playerid][pSalt], 30);
-			Login_ShowPassword(playerid);
+
+			if(needsPswChange > 0)
+			{
+				Login_ChangePassword_Discord(playerid);
+			}
+			else Login_ShowPassword(playerid);
 		}
 	}
 	else
@@ -7726,11 +7733,95 @@ stock User_Login_ShowAnswerInput(playerid, question[])
 	return 1;
 }
 
+stock Login_ChangePassword_Discord(playerid, error[] = "", attempt = 0)
+{
+	dialog_Clear();
+	dialog_AddLine("{f9f9f9}Buvo gautas praðymas pakeisti jûsø slaptaþodá.");
+	dialog_AddLine("{f9f9f9}Pirmiausia áveskite kodà, kurá gavote á discord.");
+	dialog_AddErrorLine(error);
+
+	if(attempt >= 5) return Kick(playerid);
+
+	inline updatePswChangeNeed() return 1;
+	mysql_tquery_inline(chandler, using inline updatePswChangeNeed, "\
+		UPDATE `users_data` SET NeedsPswChange='0' WHERE NeedsPswChange='1' AND id ='%d'",
+		PlayerInfo[playerid][pUserId]
+	);
+
+	inline inputDCCode(response, listitem)
+	{
+		if(response)
+		{
+			inline selectDiscordCode()
+			{
+				if(cache_num_rows())
+				{
+					Login_ChangePassword_NewPsw(playerid);
+				}
+				else 
+				{
+					Login_ChangePassword_Discord(playerid, .error = "Neteisingai ávestas kodas.", .attempt = attempt + 1);
+				}
+				return 1;
+			}
+			mysql_tquery_inline(chandler, using inline selectDiscordCode, "\
+				SELECT NULL FROM `users_data` WHERE id = '%d' AND DiscordCode = '%e'", 
+			 	PlayerInfo[playerid][pUserId], dialog_Input()
+			);	
+		}
+		else Kick(playerid);
+	}
+	dialog_Show(playerid, using inline inputDCCode, DIALOG_STYLE_INPUT, "Slapt. keitimas 1/2", "Toliau", "Iðeiti");
+	return 1;
+}
+
+stock Login_ChangePassword_NewPsw(playerid)
+{
+	if(!strlen(PlayerInfo[playerid][pSalt]))
+		return SendError(playerid, "Atsirado klaida.") , KickEx(playerid);
+
+	dialog_Clear();
+	dialog_AddLine("{f9f9f9}Áveskite naujà slaptaþodá (6-30 simboliø):");
+
+	inline inputNewPassword(response, listitem)
+	{
+		if(response)
+		{
+			if(!(6 <= strlen(dialog_Input()) <= 30))
+				return Login_ChangePassword_NewPsw(playerid);
+			
+			new 
+				string[256],
+				salted[130];
+
+			format(string, 60, "%s%s", dialog_Input(), PlayerInfo[playerid][pSalt]);
+			WP_Hash(salted, sizeof salted, string);
+
+			inline updatePsw()
+			{
+				SendClientMessage(playerid, 0x00ff00f1, "Slaptaþodis pakeistas! Prisijunkite ið naujo.");
+				KickEx(playerid);
+				return 1;
+			}
+			mysql_tquery_inline(chandler, using inline updatePsw, "\
+				UPDATE `users_data` SET Password='%e' WHERE id='%d'",
+				salted, PlayerInfo[playerid][pUserId]
+			);
+		}
+		else Kick(playerid);
+	}
+	dialog_Show(playerid, using inline inputNewPassword, DIALOG_STYLE_PASSWORD, "Slapt. keitimas 2/2", "Pakeisti", "Iðeiti");
+	return 1;
+}
+
+
 stock Login_ShowPassword(playerid)
 {
 	dialog_Clear();
 	dialog_AddLine("{F4BF2E}Sveiki sugráþæ á Southland Roleplay!");
 	dialog_AddLine("{f9f9f9}Norëdami tæsti þaidimà, praðome ávesti vartotojo slaptaþodá:");
+	dialog_SkipLine();
+	dialog_AddLine("{b1b1b1}Pamirðote slaptaþodá? Discord serveryje paraðykite {f9f9f9}!password");
 
 	inline userInputPassword(response, listitem)
 	{
@@ -7746,7 +7837,7 @@ stock Login_ShowPassword(playerid)
 			WP_Hash(salted, sizeof salted, string);
 			
 			mysql_format(chandler, string, sizeof string, "\
-				SELECT RegisterIp,DiscordCode,DiscordVerified,TutorialDone \
+				SELECT RegisterIp,DiscordVerified,TutorialDone,NeedsPswChange \
 				FROM \
 				`users_data` WHERE id = '%d' AND Password = '%e'", 
 				PlayerInfo[playerid][pUserId], salted
@@ -24146,6 +24237,7 @@ CMD:jetpack(playerid, params[])
 	return 1;
 }
 
+flags:aod(CMD_TYPE_ADMIN);
 CMD:aod(playerid, params[], help) return pc_cmd_aduty(playerid, "");
 flags:aduty(CMD_TYPE_ADMIN);
 CMD:aduty(playerid, params[])
@@ -24398,7 +24490,6 @@ public OnDonationLoad(playerid, userid)
 				SaveUserIntEx(PlayerInfo[playerid][pUserId], "Donator", PlayerInfo[playerid][pDonator]);
 				SaveUserIntEx(PlayerInfo[playerid][pUserId], "DonatorTime", PlayerInfo[playerid][pDonatorTime]);
 
-
 				PlayerInfo[playerid][pNameChanges] += 2;
 				PlayerInfo[playerid][pNumberChanges] += 2;
 				PlayerInfo[playerid][pPlateChanges] += 2;
@@ -24460,16 +24551,28 @@ public OnDonationLoad(playerid, userid)
 				PlayerInfo[playerid][pNameChanges] += 1;
 				format(service, sizeof service, "Atblokavimas");
 			}
-			else if(strcmp(type, "50k",true) == 0)
+			else if(strcmp(type, "10k",true) == 0)
 			{
 				if(PlayerInfo[playerid][pId] <= 0)
 				{
-					SendError(playerid, "Paslaugos \"50'000$\" atsiimti negalite, nes nesate pasirinkæs veikëjo!");
+					SendError(playerid, "Paslaugos \"10'000$\" atsiimti negalite, nes nesate pasirinkæs veikëjo!");
 				}
 				else
 				{
-					GivePlayerMoney(playerid, 50000);
-					format(service, sizeof service, "50'000$");
+					GivePlayerMoney(playerid, 10000);
+					format(service, sizeof service, "10'000$");
+				}
+			}
+			else if(strcmp(type, "20k",true) == 0)
+			{
+				if(PlayerInfo[playerid][pId] <= 0)
+				{
+					SendError(playerid, "Paslaugos \"20'000$\" atsiimti negalite, nes nesate pasirinkæs veikëjo!");
+				}
+				else
+				{
+					GivePlayerMoney(playerid, 20000);
+					format(service, sizeof service, "20'000$");
 				}
 			}
 			else if(strcmp(type, "100k",true) == 0)
@@ -24482,18 +24585,6 @@ public OnDonationLoad(playerid, userid)
 				{
 					GivePlayerMoney(playerid, 100000);
 					format(service, sizeof service, "100'000$");
-				}
-			}
-			else if(strcmp(type, "200k",true) == 0)
-			{
-				if(PlayerInfo[playerid][pId] <= 0)
-				{
-					SendError(playerid, "Paslaugos \"200'000$\" atsiimti negalite, nes nesate pasirinkæs veikëjo!");
-				}
-				else
-				{
-					GivePlayerMoney(playerid, 200000);
-					format(service, sizeof service, "200'000$");
 				}
 			}
 			else if(strcmp(type, "500k",true) == 0)

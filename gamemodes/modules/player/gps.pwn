@@ -13,6 +13,7 @@ static Places[][E_PLACES_LIST] = {
     {"Þvejybos vieta", 2864.02, -1966.27, 11.11},
     {"Vairavimo mokykla", 2058.3345,-1923.9935,13.5469},
     {"Tr. priemoniø parduotuvë", 2132.10, -1147.88, 24.44},
+    {"Pigus transportas", 1921.7295,-1865.4683,13.56},
     {"Bankas", 1459.83, -1266.29, 13.55}
 };
 

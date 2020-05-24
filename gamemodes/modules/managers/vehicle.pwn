@@ -1353,6 +1353,15 @@ new Float:VehicleFuelUsageList[212] = {
 	0.004818, // Utility Trailer
 };
 
+stock IsModelTrain(model)
+{
+	switch(model)
+	{
+		case 537,538,569,570: return true;
+	}
+	return false;
+}
+
 stock IsModelTrailer(model)
 {
 	switch(model)
@@ -1544,6 +1553,9 @@ stock VHS_DestroyVehicle(vehicleid)
 	#if SERVER_DEBUG_LEVEL >= 2 
 		printf("[destroy] DestroyVehicle(%d, %d) called", vehicleid, GetVehicleModel(vehicleid));
 	#endif
+
+	if(IsValidVehicle(vehicleid) && IsModelTrain(GetVehicleModel(vehicleid))) return false;
+
 	new __reset_VehicleInfo[E_VEHICLE_DATA];
 	if(IsValidDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel])) DestroyDynamic3DTextLabel(VehicleInfo[vehicleid][vUnitLabel]);
 	for(new i = 0; i < 4; i++)
@@ -1565,12 +1577,12 @@ stock VHS_DestroyVehicle(vehicleid)
 	return DestroyVehicle(vehicleid);
 }
 
-#if defined _ALS_CreateVehicle 
-	#undef CreateVehicle
+#if defined _ALS_DestroyVehicle 
+	#undef DestroyVehicle
 #else
-	#define _ALS_CreateVehicle
+	#define _ALS_DestroyVehicle
 #endif
-#define CreateVehicle VHS_CreateVehicle
+#define DestroyVehicle VHS_DestroyVehicle
 
 
 stock GetModelName(model)
