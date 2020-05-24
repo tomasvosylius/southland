@@ -28,13 +28,14 @@
 
 // #include <FileManager>
 #include <streamer>
+#include <timerfix>
 #include <crashdetect>
 #include <YSI_Data\y_iterate>
 #include <YSI_Coding\y_va>
 #include <YSI_Coding\y_inline>
-#include <YSI_Coding\y_timers>
 #include <YSI_Coding\y_stringhash>
 #include <YSI_Visual\y_dialog>
+#include <YSI_Coding\y_timers>
 #include <sscanf2>
 #include <pawn.CMD>
 #include <md5>
@@ -1897,7 +1898,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 };
 
 
-
 /** Maps */
 #include "other\map\interiors/interiors.pwn"
 #include "other\map\interiors/pd.pwn"
@@ -1984,7 +1984,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "modules\player\ui/loadbar.pwn"
 
 /** Server modules */
-#include "modules\bots/npc.pwn"
+// #include "modules\bots/npc.pwn"
 #include "modules\server/inventory.pwn"
 #include "modules\server/graffiti.pwn"
 #include "modules\server/boombox.pwn"
@@ -2187,122 +2187,154 @@ public OnGameModeInit()
 
 	// ==============================================================================
 	BlockGarages(.text = "X");
+
+	// ==============================================================================
+	SetTimer("PT_VehicleSpeedo", 200, true);
+	SetTimer("PT_MaxSpeed", 300, true);
+	SetTimer("PT_CommandSpam", 750, true);
+	SetTimer("PT_MuteSecond", 999, true);
+	SetTimer("PT_DeathTimer", 1002, true);
+	SetTimer("PT_CheckJetpack", 500, true);
+	SetTimer("PT_JailSecond", 1000, true);
+	SetTimer("PT_Unfreeze", 1000, true);
+	SetTimer("PT_PhoneSecond", 1000, true);
+	SetTimer("PT_CommandUsage", 1342, true);
+	SetTimer("PT_JobTaskSecond", 998, true);
+	SetTimer("PT_RentMinute", 59988, true);
+	SetTimer("PT_DonatorCheck", 12450, true);
+	SetTimer("PT_PhoneTalkMinute", 60001, true);
+	SetTimer("PT_BusinessFreeEnter", 60000, true);
+	SetTimer("PT_CharCreationSecond", 1000, true);
+
+	SetTimer("T_SecondTimer", 1000, true);
+	SetTimer("T_MinuteTimer", 60000, true);
 	return 1;
 }
 
 static Recalculate_Mileage[MAX_PLAYERS] = {0,...};
-ptask PT_VehicleSpeedo[200](playerid)
+// ptask PT_VehicleSpeedo[200](playerid)
+forward PT_VehicleSpeedo();
+public PT_VehicleSpeedo()
 {
 	// spidometras ir masinos
-
-	new vehicleid,
-		Float:consumption, Float:currentX, Float:currentY, Float:distance,
-		string[26];
-
-	if(	!IsPlayerInAnyVehicle(playerid) || 
-		(vehicleid = OldVehicle[playerid]) != GetPlayerVehicleID(playerid) || 
-		GetPlayerVehicleSeat(playerid) != 0 ||
-		!IsValidVehicle(vehicleid))
+	foreach(new playerid : Player)
 	{
-		(Recalculate_Mileage[playerid] > 0) && (Recalculate_Mileage[playerid] = 0);
-		return;
-	}
-	if(!VehicleHaveEngine(GetVehicleModel(vehicleid)) || !VehicleInfo[vehicleid][vEngined])
-	{
-		// Transportas neturi variklio
-		return;
-	}	
-	
-	// Sedi masinoje.
-	new speed = GetVehicleSpeed(vehicleid),
-		model = GetVehicleModel(vehicleid);
-	if(!(400 <= model <= 611)) return;
+		new vehicleid,
+			Float:consumption, Float:currentX, Float:currentY, Float:distance,
+			string[26];
 
-	GetVehiclePos(vehicleid, currentX, currentY, distance);
-
-
-	if((Recalculate_Mileage[playerid] += 1) >= 5)
-	{
-		Recalculate_Mileage[playerid] = 0;
-		/**
-		 * Praejo pilna viena sekunde
-		 */
-		if(Checkpoint[playerid] == CHECKPOINT_TYPE_DMV && tmpEditing_Component_DMV[playerid] > 0)
+		if(	!IsPlayerInAnyVehicle(playerid) || 
+			(vehicleid = OldVehicle[playerid]) != GetPlayerVehicleID(playerid) || 
+			GetPlayerVehicleSeat(playerid) != 0 ||
+			!IsValidVehicle(vehicleid))
 		{
-			if(speed > 100 && !(30 <= PlayerExtra[playerid][peSpeedLimit] <= 80))
-			{
-				PlayerExtra[playerid][peDMVSpeed]++;
-			}
+			(Recalculate_Mileage[playerid] > 0) && (Recalculate_Mileage[playerid] = 0);
+			continue;
 		}
-
-		if((distance = GetDistanceBetweenPoints3D(
-							VehicleInfo[vehicleid][vLastMileageX],
-							VehicleInfo[vehicleid][vLastMileageY],
-							0.0, 
-							currentX,
-							currentY,
-							0.0)) > 0.2)
+		if(!VehicleHaveEngine(GetVehicleModel(vehicleid)) || !VehicleInfo[vehicleid][vEngined])
 		{
-			/**
-			 * Skaiciuojame masinos rida, jei praejo 1 sekunde ir nuvaziavo kazkiek.
-			 */
-			VehicleInfo[vehicleid][vKM] += distance/500.0;
-			VehicleInfo[vehicleid][vLastMileageX] = currentX,
-			VehicleInfo[vehicleid][vLastMileageY] = currentY;
-			consumption = VehicleFuelUsageList[model-400] * 3;
-			if(VehicleInfo[vehicleid][vFuel] > 0.0)
-			{
-				if(VehicleInfo[vehicleid][vFuel] < consumption) VehicleInfo[vehicleid][vFuel] = 0;
-				else VehicleInfo[vehicleid][vFuel] -= consumption;
-			}
-			if(VehicleInfo[vehicleid][vFuel] <= 0.0)
-			{
-				ChangeVehicleEngineStatus(playerid, vehicleid);
-			}
-		}
+			// Transportas neturi variklio
+			continue;
+		}	
 		
-		format(string, sizeof string, "RIDA: %0.1fKM", VehicleInfo[vehicleid][vKM]);
-		Speedo_Update(playerid, .km_string = string);
+		// Sedi masinoje.
+		new speed = GetVehicleSpeed(vehicleid),
+			model = GetVehicleModel(vehicleid);
+		if(!(400 <= model <= 611)) continue;
 
-		if(VehicleInfo[vehicleid][vFuel] >= 0.0)
+		GetVehiclePos(vehicleid, currentX, currentY, distance);
+
+
+		if((Recalculate_Mileage[playerid] += 1) >= 5)
 		{
-			format(string, sizeof string, "DEGALAI: %s", 
-				ConvertFuelToString(
-					VehicleInfo[vehicleid][vFuel],
-					VehicleFuelCapacityList[model - 400]
-				)
-			);
-		}
-		Speedo_Update(playerid, .fuel_level = string);
-	}
+			Recalculate_Mileage[playerid] = 0;
+			/**
+			* Praejo pilna viena sekunde
+			*/
+			if(Checkpoint[playerid] == CHECKPOINT_TYPE_DMV && tmpEditing_Component_DMV[playerid] > 0)
+			{
+				if(speed > 100 && !(30 <= PlayerExtra[playerid][peSpeedLimit] <= 80))
+				{
+					PlayerExtra[playerid][peDMVSpeed]++;
+				}
+			}
 
-	format(string, sizeof string, "GREITIS: %dKM/H", speed);
-	Speedo_Update(playerid, .speed_string = string);
+			if((distance = GetDistanceBetweenPoints3D(
+								VehicleInfo[vehicleid][vLastMileageX],
+								VehicleInfo[vehicleid][vLastMileageY],
+								0.0, 
+								currentX,
+								currentY,
+								0.0)) > 0.2)
+			{
+				/**
+				* Skaiciuojame masinos rida, jei praejo 1 sekunde ir nuvaziavo kazkiek.
+				*/
+				VehicleInfo[vehicleid][vKM] += distance/500.0;
+				VehicleInfo[vehicleid][vLastMileageX] = currentX,
+				VehicleInfo[vehicleid][vLastMileageY] = currentY;
+				consumption = VehicleFuelUsageList[model-400] * 3;
+				if(VehicleInfo[vehicleid][vFuel] > 0.0)
+				{
+					if(VehicleInfo[vehicleid][vFuel] < consumption) VehicleInfo[vehicleid][vFuel] = 0;
+					else VehicleInfo[vehicleid][vFuel] -= consumption;
+				}
+				if(VehicleInfo[vehicleid][vFuel] <= 0.0)
+				{
+					ChangeVehicleEngineStatus(playerid, vehicleid);
+				}
+			}
+			
+			format(string, sizeof string, "RIDA: %0.1fKM", VehicleInfo[vehicleid][vKM]);
+			Speedo_Update(playerid, .km_string = string);
+
+			if(VehicleInfo[vehicleid][vFuel] >= 0.0)
+			{
+				format(string, sizeof string, "DEGALAI: %s", 
+					ConvertFuelToString(
+						VehicleInfo[vehicleid][vFuel],
+						VehicleFuelCapacityList[model - 400]
+					)
+				);
+			}
+			Speedo_Update(playerid, .fuel_level = string);
+		}
+
+		format(string, sizeof string, "GREITIS: %dKM/H", speed);
+		Speedo_Update(playerid, .speed_string = string);
+	}
+	return 1;
 }
 
 
 thread(JailReset);
 
 // 	SetTimer("MaxSpeedTimer", 300, true);
-ptask PT_MaxSpeed[300](playerid)
+// ptask PT_MaxSpeed[300](playerid)
+forward PT_MaxSpeed();
+public PT_MaxSpeed()
 {
-	if(GetPlayerVehicleSeat(playerid) == 0)
+	foreach(new playerid : Player)
 	{
-		new vehicleid = GetPlayerVehicleID(playerid);
-		if(VehicleInfo[vehicleid][vEngined])
+		if(GetPlayerVehicleSeat(playerid) == 0)
 		{
-			new speed = GetVehicleSpeed(vehicleid),
-				model = GetVehicleModel(vehicleid);
-			if(
-				(PlayerExtra[playerid][peSpeedLimit] > 0 && speed > PlayerExtra[playerid][peSpeedLimit])
-				||
-				(IsModelShitty(model) && speed > GetMaxShittyCarSpeed(model))
-			)
+			new vehicleid = GetPlayerVehicleID(playerid);
+			if(VehicleInfo[vehicleid][vEngined])
 			{
-				SetVehicleSpeed(vehicleid, speed - 20);
+				new speed = GetVehicleSpeed(vehicleid),
+					model = GetVehicleModel(vehicleid);
+				if(
+					(PlayerExtra[playerid][peSpeedLimit] > 0 && speed > PlayerExtra[playerid][peSpeedLimit])
+					||
+					(IsModelShitty(model) && speed > GetMaxShittyCarSpeed(model))
+				)
+				{
+					SetVehicleSpeed(vehicleid, speed - 20);
+				}
 			}
 		}
 	}
+	return 1;
 }
 
 stock IsModelShitty(model)
@@ -2318,365 +2350,422 @@ stock GetMaxShittyCarSpeed(model)
 	return 100;
 }
 
-ptask PT_CommandSpam[750](playerid)
+// ptask PT_CommandSpam[750](playerid)
+forward PT_CommandSpam();
+public PT_CommandSpam()
 {
-	// SPAM
-	if(PlayerExtra[playerid][peSpamTime] > 0)
+	foreach(new playerid : Player)
 	{
-		PlayerExtra[playerid][peSpamTime]--;
+		// SPAM
+		if(PlayerExtra[playerid][peSpamTime] > 0)
+		{
+			PlayerExtra[playerid][peSpamTime]--;
+		}
 	}
+	return 1;
 }
 
-ptask PT_MuteSecond[999](playerid)
+// ptask PT_MuteSecond[999](playerid)
+forward PT_MuteSecond();
+public PT_MuteSecond()
 {
 	// Mute
-	if(PlayerExtra[playerid][peMuted] > 0)
+	foreach(new playerid : Player)
 	{
-		if((PlayerExtra[playerid][peMuted]--) <= 0)
+		if(PlayerExtra[playerid][peMuted] > 0)
 		{
-			SendFormat(playerid, 0x6A68FFFF, "Uþtildymas baigësi.");
+			if((PlayerExtra[playerid][peMuted]--) <= 0)
+			{
+				SendFormat(playerid, 0x6A68FFFF, "Uþtildymas baigësi.");
+			}
 		}
 	}
+	return 1;
 }
-ptask PT_DeathTimer[1002](playerid)
+
+// ptask PT_DeathTimer[1002](playerid)
+forward PT_DeathTimer();
+public PT_DeathTimer()
 {
 	// Deathscreen
-	static
-		player_DeathWarnings[MAX_PLAYERS];
-	
-	if(	PlayerExtra[playerid][peDeath] >= DEFAULT_DEATH_TIME_SECONDS && 
-		player_DeathWarnings[playerid] > 0)
+	foreach(new playerid : Player)
 	{
-		// resetiname pati pirma karta visus pozicijos keitimo ispejimus
-		player_DeathWarnings[playerid] = 0;
-	}
-
-	if(PlayerExtra[playerid][peDeath] > 0)
-	{
-		PlayerExtra[playerid][peDeath]--;
-
-		new string[86],
-			seconds, minutes;
-		divmod(PlayerExtra[playerid][peDeath], 60, seconds, minutes);
-		format(string, sizeof string, "_~n~~w~KOMOS BUSENOJE: ~r~~h~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~~h~/die~n~_", seconds, minutes);
-
-		if(GetPlayerDistanceFromPoint(playerid,
-			PlayerInfo[playerid][pPosX],
-			PlayerInfo[playerid][pPosY],
-			PlayerInfo[playerid][pPosZ]) >= 4.0)
-		{
-			SetPlayerPos(playerid, PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ]);
-			if((player_DeathWarnings[playerid] += 1) >= 15)
-			{
-				KickPlayer(playerid, "Sistema", "AirBreak (mirus)");
-				return;
-			}
-		}
-
-		PlayerTextDrawSetString(playerid, DeathScreenTD[playerid], string);
-		ApplyAnimation(playerid, "CRACK", "crckdeth2", 4.0, 1, 0, 0, 0, 0 );
+		static
+			player_DeathWarnings[MAX_PLAYERS];
 		
-		if(PlayerExtra[playerid][peDeath] == 0)
+		if(	PlayerExtra[playerid][peDeath] >= DEFAULT_DEATH_TIME_SECONDS && 
+			player_DeathWarnings[playerid] > 0)
 		{
-			SetPlayerHealth(playerid, 0);
+			// resetiname pati pirma karta visus pozicijos keitimo ispejimus
+			player_DeathWarnings[playerid] = 0;
 		}
-	}
-}
 
-ptask PT_CheckJetpack[500](playerid)
-{
-	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK)
-	{
-		if(!IsPlayerInAnyAdminGroup(playerid))
+		if(PlayerExtra[playerid][peDeath] > 0)
 		{
-			BanPlayer(playerid, "Sistema", "JetPack");
-			return;
-		}
-		else if(!PlayerInfo[playerid][pAdminDuty])
-		{
-			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-		}
-	}
-}
+			PlayerExtra[playerid][peDeath]--;
 
-ptask PT_JailSecond[1000](playerid)
-{
-	if(PlayerInfo[playerid][pJailType] > 0)
-	{
-		PlayerInfo[playerid][pJailTime]--;
-		UpdateJailTimer(playerid);
-		if(PlayerInfo[playerid][pJailTime] <= 0)
-		{
-			HideJailTimer(playerid);
-			GameTextForPlayer(playerid, "~w~Esate ~g~paleidziamas~n~~w~is kalejimo", 6000, 1);
-			SetPlayerVirtualWorld(playerid, 0);
-			SetPlayerInterior(playerid, 0);
-			switch(PlayerInfo[playerid][pJailType])
+			new string[86],
+				seconds, minutes;
+			divmod(PlayerExtra[playerid][peDeath], 60, seconds, minutes);
+			format(string, sizeof string, "_~n~~w~KOMOS BUSENOJE: ~r~~h~%02d:%02d~n~~w~NOREDAMI MIRTI, RASYKITE ~r~~h~/die~n~_", seconds, minutes);
+
+			if(GetPlayerDistanceFromPoint(playerid,
+				PlayerInfo[playerid][pPosX],
+				PlayerInfo[playerid][pPosY],
+				PlayerInfo[playerid][pPosZ]) >= 4.0)
 			{
-				case 1:
+				SetPlayerPos(playerid, PlayerInfo[playerid][pPosX], PlayerInfo[playerid][pPosY], PlayerInfo[playerid][pPosZ]);
+				if((player_DeathWarnings[playerid] += 1) >= 15)
 				{
-					// arestine
-					SetPlayerPos(playerid, GetGVarFloat("UnarrestX"), GetGVarFloat("UnarrestY"), GetGVarFloat("UnarrestZ"));
-					SetPlayerVirtualWorld(playerid, GetGVarInt("UnarrestVW"));
-					SetPlayerInterior(playerid, GetGVarInt("UnarrestInt"));
-				}
-				case 2:
-				{
-					// kalejimas
-					SetPlayerPos(playerid, GetGVarFloat("UnjailX"), GetGVarFloat("UnjailY"), GetGVarFloat("UnjailZ"));
-					SetPlayerVirtualWorld(playerid, GetGVarInt("UnjailVW"));
-					SetPlayerInterior(playerid, GetGVarInt("Unjailnt"));
-				}
-				case 3:
-				{
-					// ooc jail
-					SetPlayerPos(playerid, GetGVarFloat("OOCUnjailX"), GetGVarFloat("OOCUnjailY"), GetGVarFloat("OOCUnjailZ"));
-					SetPlayerVirtualWorld(playerid, GetGVarInt("OOCUnjailVW"));
-					SetPlayerInterior(playerid, GetGVarInt("OOCUnjailnt"));
+					KickPlayer(playerid, "Sistema", "AirBreak (mirus)");
+					continue;
 				}
 			}
-			new string[126];
-			mysql_format(chandler, string, sizeof string, "UPDATE `players_jails` SET Valid = '0' WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
-			mysql_fquery(chandler, string, "JailReset");
-			PlayerInfo[playerid][pJailTime] = 0;
-			PlayerInfo[playerid][pJailType] = 0;
-			log_init(true);
-			log_set_table("logs_players");
-			log_set_keys("`PlayerId`,`PlayerName`,`ActionText`");
-			log_set_values("'%d','%e','Buvo paleistas is kalejimo'", LogPlayerId(playerid), LogPlayerName(playerid));
-			log_commit();
-		}
-		else if(PlayerInfo[playerid][pCurrentStatus] == PLAYER_STATUS_DEFAULT)
-		{
-			new Float:x, Float:y, Float:z;
-			GetPlayerPos(playerid, x, y, z);
-			// gal airbrk naudoja
-			switch(PlayerInfo[playerid][pJailType])
+
+			PlayerTextDrawSetString(playerid, DeathScreenTD[playerid], string);
+			ApplyAnimation(playerid, "CRACK", "crckdeth2", 4.0, 1, 0, 0, 0, 0 );
+			
+			if(PlayerExtra[playerid][peDeath] == 0)
 			{
-				case 1:
-				{
-					// arestine
-					if(!IsPlayerInRangeOfPoint(playerid, 50.0, GetGVarFloat("ArrestSpawnX"), GetGVarFloat("ArrestSpawnY"), GetGVarFloat("ArrestSpawnZ")))
-					{
-						KickPlayer(playerid, "Sistema", "Air-break");
-					}
-				}
-				case 2:
-				{
-					// kalejimas
-					if(!IsPlayerInRangeOfPoint(playerid, 300.0, 168.75, 1415.69, 10.63) && !IsPlayerInRangeOfPoint(playerid, 200.0, GetGVarFloat("JailSpawnX"), GetGVarFloat("JailSpawnY"), GetGVarFloat("JailSpawnZ")))
-					{
-						KickPlayer(playerid, "Sistema", "Air-break");
-					}
-				}
-				case 3:
-				{
-					// ooc
-					if(!IsPlayerInRangeOfPoint(playerid, 150.0, GetGVarFloat("OOCJailSpawnX"), GetGVarFloat("OOCJailSpawnY"), GetGVarFloat("OOCJailSpawnZ")))
-					{
-						KickPlayer(playerid, "Sistema", "Air-break");
-					}
-				}
+				SetPlayerHealth(playerid, 0);
 			}
 		}
 	}
+	return 1;
 }
 
-ptask PT_Unfreeze[1000](playerid) 
+// ptask PT_CheckJetpack[500](playerid)
+forward PT_CheckJetpack();
+public PT_CheckJetpack()
+{
+	foreach(new playerid : Player)
+	{
+		if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK)
+		{
+			if(!IsPlayerInAnyAdminGroup(playerid))
+			{
+				BanPlayer(playerid, "Sistema", "JetPack");
+				continue;
+			}
+			else if(!PlayerInfo[playerid][pAdminDuty])
+			{
+				SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+			}
+		}
+	}
+	return 1;
+}
+
+// ptask PT_JailSecond[1000](playerid)
+forward PT_JailSecond();
+public PT_JailSecond()
+{
+	foreach(new playerid : Player)
+	{
+		if(PlayerInfo[playerid][pJailType] > 0)
+		{
+			PlayerInfo[playerid][pJailTime]--;
+			UpdateJailTimer(playerid);
+			if(PlayerInfo[playerid][pJailTime] <= 0)
+			{
+				HideJailTimer(playerid);
+				GameTextForPlayer(playerid, "~w~Esate ~g~paleidziamas~n~~w~is kalejimo", 6000, 1);
+				SetPlayerVirtualWorld(playerid, 0);
+				SetPlayerInterior(playerid, 0);
+				switch(PlayerInfo[playerid][pJailType])
+				{
+					case 1:
+					{
+						// arestine
+						SetPlayerPos(playerid, GetGVarFloat("UnarrestX"), GetGVarFloat("UnarrestY"), GetGVarFloat("UnarrestZ"));
+						SetPlayerVirtualWorld(playerid, GetGVarInt("UnarrestVW"));
+						SetPlayerInterior(playerid, GetGVarInt("UnarrestInt"));
+					}
+					case 2:
+					{
+						// kalejimas
+						SetPlayerPos(playerid, GetGVarFloat("UnjailX"), GetGVarFloat("UnjailY"), GetGVarFloat("UnjailZ"));
+						SetPlayerVirtualWorld(playerid, GetGVarInt("UnjailVW"));
+						SetPlayerInterior(playerid, GetGVarInt("Unjailnt"));
+					}
+					case 3:
+					{
+						// ooc jail
+						SetPlayerPos(playerid, GetGVarFloat("OOCUnjailX"), GetGVarFloat("OOCUnjailY"), GetGVarFloat("OOCUnjailZ"));
+						SetPlayerVirtualWorld(playerid, GetGVarInt("OOCUnjailVW"));
+						SetPlayerInterior(playerid, GetGVarInt("OOCUnjailnt"));
+					}
+				}
+				new string[126];
+				mysql_format(chandler, string, sizeof string, "UPDATE `players_jails` SET Valid = '0' WHERE PlayerId = '%d'", PlayerInfo[playerid][pId]);
+				mysql_fquery(chandler, string, "JailReset");
+				PlayerInfo[playerid][pJailTime] = 0;
+				PlayerInfo[playerid][pJailType] = 0;
+				log_init(true);
+				log_set_table("logs_players");
+				log_set_keys("`PlayerId`,`PlayerName`,`ActionText`");
+				log_set_values("'%d','%e','Buvo paleistas is kalejimo'", LogPlayerId(playerid), LogPlayerName(playerid));
+				log_commit();
+			}
+			else if(PlayerInfo[playerid][pCurrentStatus] == PLAYER_STATUS_DEFAULT)
+			{
+				new Float:x, Float:y, Float:z;
+				GetPlayerPos(playerid, x, y, z);
+				// gal airbrk naudoja
+				switch(PlayerInfo[playerid][pJailType])
+				{
+					case 1:
+					{
+						// arestine
+						if(!IsPlayerInRangeOfPoint(playerid, 50.0, GetGVarFloat("ArrestSpawnX"), GetGVarFloat("ArrestSpawnY"), GetGVarFloat("ArrestSpawnZ")))
+						{
+							KickPlayer(playerid, "Sistema", "Air-break");
+						}
+					}
+					case 2:
+					{
+						// kalejimas
+						if(!IsPlayerInRangeOfPoint(playerid, 300.0, 168.75, 1415.69, 10.63) && !IsPlayerInRangeOfPoint(playerid, 200.0, GetGVarFloat("JailSpawnX"), GetGVarFloat("JailSpawnY"), GetGVarFloat("JailSpawnZ")))
+						{
+							KickPlayer(playerid, "Sistema", "Air-break");
+						}
+					}
+					case 3:
+					{
+						// ooc
+						if(!IsPlayerInRangeOfPoint(playerid, 150.0, GetGVarFloat("OOCJailSpawnX"), GetGVarFloat("OOCJailSpawnY"), GetGVarFloat("OOCJailSpawnZ")))
+						{
+							KickPlayer(playerid, "Sistema", "Air-break");
+						}
+					}
+				}
+			}
+		}
+	}
+	return 1;
+}
+
+// ptask PT_Unfreeze[1000](playerid) 
+forward PT_Unfreeze();
+public PT_Unfreeze()
 {
 	// Sutvarkom uzsaldyma
-	if(PlayerFreeze[playerid] > 0)
+	foreach(new playerid : Player)
 	{
-		PlayerFreeze[playerid]--;
-		if(PlayerFreeze[playerid] == 0)
+		if(PlayerFreeze[playerid] > 0)
 		{
-			TogglePlayerControllable(playerid, 1);
+			PlayerFreeze[playerid]--;
+			if(PlayerFreeze[playerid] == 0)
+			{
+				TogglePlayerControllable(playerid, 1);
+			}
 		}
 	}
+	return 1;
 }
 
-ptask PT_PhoneSecond[1000](playerid)
+// ptask PT_PhoneSecond[1000](playerid)
+forward PT_PhoneSecond();
+public PT_PhoneSecond()
 {
-	if(PhoneInfo[playerid][phoneRingingTime] > 0)
+	foreach(new playerid : Player)
 	{
-		PhoneInfo[playerid][phoneRingingTime]--;
-		if(PhoneInfo[playerid][phoneRingingTime] <= 0)
+		if(PhoneInfo[playerid][phoneRingingTime] > 0)
 		{
-			// baiges galimas sujungimo laikas
-			if(PhoneInfo[playerid][phoneRinging] == INVALID_PLAYER_ID)
+			PhoneInfo[playerid][phoneRingingTime]--;
+			if(PhoneInfo[playerid][phoneRingingTime] <= 0)
 			{
-				// skambino neteisingu numeriu, arba rodem 3 sek jau BUSY
-				if(PhoneInfo[playerid][phoneRingType] == 0)
+				// baiges galimas sujungimo laikas
+				if(PhoneInfo[playerid][phoneRinging] == INVALID_PLAYER_ID)
 				{
+					// skambino neteisingu numeriu, arba rodem 3 sek jau BUSY
+					if(PhoneInfo[playerid][phoneRingType] == 0)
+					{
+						if(GetESCType(playerid) == ESC_TYPE_PHONE)
+						{
+							// sedi telefone
+							PhoneTD_Hide(playerid, PHONE_PAGE_CALLING);
+							PhoneTD_Show(playerid, PHONE_PAGE_MAIN);
+						}
+						else PhoneTD_Hide(playerid);
+					}
+					else
+					{
+						if(GetESCType(playerid) == ESC_TYPE_PAYPHONE)
+						{
+							PayPhoneTD_Prepare(playerid);
+							PayPhoneTD_Show(playerid);
+						}
+					}
+				}
+				else
+				{
+					// skambino kazkam, nepakele.
+					new receiverid = PhoneInfo[playerid][phoneRinging];
+					if(IsPlayerConnected(receiverid))
+					{
+						// tam kuriam skambino viska pasalinam
+						PhoneInfo[receiverid][phoneRinging] = INVALID_PLAYER_ID;
+						PhoneInfo[receiverid][phoneRingingTime] = 0;
+						if(GetESCType(receiverid) == ESC_TYPE_PHONE)
+						{
+							// sedi telefone
+							PhoneTD_Hide(receiverid, PHONE_PAGE_CALLING);
+							PhoneTD_Show(receiverid, PHONE_PAGE_MAIN);
+						}
+						else PhoneTD_Hide(receiverid);
+					}
+					// dabar 3 sekundes rodysim BUSY
+					PhoneInfo[playerid][phoneRingingTime] = 3;
+					PhoneInfo[playerid][phoneRinging] = INVALID_PLAYER_ID;
+					if(PhoneInfo[playerid][phoneRingType] != 0)
+					{
+						if(GetESCType(playerid) == ESC_TYPE_PAYPHONE)
+						{
+							PayPhoneTD_Prepare(playerid);
+							PayPhoneTD_Show(playerid);
+						}
+					}
+				}
+				if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USECELLPHONE) SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+			}
+		}
+		if(PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
+		{
+			new receiverid = PhoneInfo[playerid][phoneTalkingTo],
+				minutes, seconds,
+				string[12];
+			if(!InArray(receiverid, 911, DEFAULT_MECHANIC_NUMBER, DEFAULT_TAXI_NUMBER))
+			{
+				if(!IsPlayerConnected(receiverid))// || GetPlayerMobileAreaStrenght(playerid) == 0)
+				{
+					PhoneInfo[playerid][phoneTalkingTo] =
+					PhoneInfo[receiverid][phoneTalkingTo] = INVALID_PLAYER_ID;
+					PhoneInfo[playerid][phoneCallOwner] =
+					PhoneInfo[receiverid][phoneCallOwner] =
+					PhoneInfo[playerid][phoneEstimated] =
+					PhoneInfo[receiverid][phoneEstimated] = 0;
+					
+					SendFormat(playerid, 0xE77B33FF, "Ryðys nutrûko!");
+					if(IsPlayerConnected(receiverid)) SendFormat(receiverid, 0xE77B33FF, "Ryðys nutrûko!");
+
+					if(GetESCType(receiverid) == ESC_TYPE_PHONE)
+					{
+						PhoneTD_Hide(receiverid, PHONE_PAGE_CALL);
+						PhoneTD_Show(receiverid, PHONE_PAGE_MAIN);
+					}
+					else PhoneTD_Hide(receiverid);
+
 					if(GetESCType(playerid) == ESC_TYPE_PHONE)
 					{
-						// sedi telefone
-						PhoneTD_Hide(playerid, PHONE_PAGE_CALLING);
+						PhoneTD_Hide(playerid, PHONE_PAGE_CALL);
 						PhoneTD_Show(playerid, PHONE_PAGE_MAIN);
 					}
 					else PhoneTD_Hide(playerid);
 				}
 				else
 				{
-					if(GetESCType(playerid) == ESC_TYPE_PAYPHONE)
-					{
-						PayPhoneTD_Prepare(playerid);
-						PayPhoneTD_Show(playerid);
-					}
+					PhoneInfo[playerid][phoneEstimated]++;
+					divmod(PhoneInfo[playerid][phoneEstimated], 60, minutes, seconds);
+					format(string, sizeof string, "%02d:%02d", minutes, seconds);
+					PlayerTextDrawSetString(playerid, Phone_Estimated[playerid], string);
 				}
-			}
-			else
-			{
-				// skambino kazkam, nepakele.
-				new receiverid = PhoneInfo[playerid][phoneRinging];
-				if(IsPlayerConnected(receiverid))
-				{
-					// tam kuriam skambino viska pasalinam
-					PhoneInfo[receiverid][phoneRinging] = INVALID_PLAYER_ID;
-					PhoneInfo[receiverid][phoneRingingTime] = 0;
-					if(GetESCType(receiverid) == ESC_TYPE_PHONE)
-					{
-						// sedi telefone
-						PhoneTD_Hide(receiverid, PHONE_PAGE_CALLING);
-						PhoneTD_Show(receiverid, PHONE_PAGE_MAIN);
-					}
-					else PhoneTD_Hide(receiverid);
-				}
-				// dabar 3 sekundes rodysim BUSY
-				PhoneInfo[playerid][phoneRingingTime] = 3;
-				PhoneInfo[playerid][phoneRinging] = INVALID_PLAYER_ID;
-				if(PhoneInfo[playerid][phoneRingType] != 0)
-				{
-					if(GetESCType(playerid) == ESC_TYPE_PAYPHONE)
-					{
-						PayPhoneTD_Prepare(playerid);
-						PayPhoneTD_Show(playerid);
-					}
-				}
-			}
-			if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USECELLPHONE) SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-		}
-	}
-	if(PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
-	{
-		new receiverid = PhoneInfo[playerid][phoneTalkingTo],
-			minutes, seconds,
-			string[12];
-		if(!InArray(receiverid, 911, DEFAULT_MECHANIC_NUMBER, DEFAULT_TAXI_NUMBER))
-		{
-			if(!IsPlayerConnected(receiverid))// || GetPlayerMobileAreaStrenght(playerid) == 0)
-			{
-				PhoneInfo[playerid][phoneTalkingTo] =
-				PhoneInfo[receiverid][phoneTalkingTo] = INVALID_PLAYER_ID;
-				PhoneInfo[playerid][phoneCallOwner] =
-				PhoneInfo[receiverid][phoneCallOwner] =
-				PhoneInfo[playerid][phoneEstimated] =
-				PhoneInfo[receiverid][phoneEstimated] = 0;
-				
-				SendFormat(playerid, 0xE77B33FF, "Ryðys nutrûko!");
-				if(IsPlayerConnected(receiverid)) SendFormat(receiverid, 0xE77B33FF, "Ryðys nutrûko!");
-
-				if(GetESCType(receiverid) == ESC_TYPE_PHONE)
-				{
-					PhoneTD_Hide(receiverid, PHONE_PAGE_CALL);
-					PhoneTD_Show(receiverid, PHONE_PAGE_MAIN);
-				}
-				else PhoneTD_Hide(receiverid);
-
-				if(GetESCType(playerid) == ESC_TYPE_PHONE)
-				{
-					PhoneTD_Hide(playerid, PHONE_PAGE_CALL);
-					PhoneTD_Show(playerid, PHONE_PAGE_MAIN);
-				}
-				else PhoneTD_Hide(playerid);
-			}
-			else
-			{
-				PhoneInfo[playerid][phoneEstimated]++;
-				divmod(PhoneInfo[playerid][phoneEstimated], 60, minutes, seconds);
-				format(string, sizeof string, "%02d:%02d", minutes, seconds);
-				PlayerTextDrawSetString(playerid, Phone_Estimated[playerid], string);
 			}
 		}
 	}
+	return 1;
 }
 
-ptask PT_CommandUsage[1342](playerid)
+// ptask PT_CommandUsage[1342](playerid)
+forward PT_CommandUsage();
+public PT_CommandUsage()
 {
-	// padarom, kad jei prie bankomato, rasytu naudokite /atm
-	if(!SeenATMCommand{playerid} && GetESCType(playerid) != ESC_TYPE_ATM)
+	foreach(new playerid : Player)
 	{
-		foreach(new atm : ATM)
+		// padarom, kad jei prie bankomato, rasytu naudokite /atm
+		if(!SeenATMCommand{playerid} && GetESCType(playerid) != ESC_TYPE_ATM)
 		{
-			if(IsPlayerInRangeOfPoint(playerid, 1.5, ATMs[atm][atmX], ATMs[atm][atmY], ATMs[atm][atmZ]))
+			foreach(new atm : ATM)
 			{
-				SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis bankomatu, raðykite /atm");
-				SeenATMCommand{playerid} = true;
-				return;
+				if(IsPlayerInRangeOfPoint(playerid, 1.5, ATMs[atm][atmX], ATMs[atm][atmY], ATMs[atm][atmZ]))
+				{
+					SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis bankomatu, raðykite /atm");
+					SeenATMCommand{playerid} = true;
+					continue;
+				}
 			}
 		}
-	}
-	// degalines irgi
-	if(!SeenFillCommand{playerid} && IsPlayerInAnyVehicle(playerid))
-	{
-		foreach(new businessid : Business)
+		// degalines irgi
+		if(!SeenFillCommand{playerid} && IsPlayerInAnyVehicle(playerid))
 		{
-			if(BusinessInfo[businessid][bType] == BUSINESS_TYPE_FUEL)
+			foreach(new businessid : Business)
 			{
-				new Float:fillX, Float:fillY, Float:fillZ;
-				if(	(fillX = BusinessInfo[businessid][bExtraX]) != 0.0 && 
-					(fillY = BusinessInfo[businessid][bExtraY]) != 0.0 && 
-					(fillZ = BusinessInfo[businessid][bExtraZ]) != 0.0)
+				if(BusinessInfo[businessid][bType] == BUSINESS_TYPE_FUEL)
 				{
-					if(IsPlayerInRangeOfPoint(playerid, 10.0, fillX, fillY, fillZ))
+					new Float:fillX, Float:fillY, Float:fillZ;
+					if(	(fillX = BusinessInfo[businessid][bExtraX]) != 0.0 && 
+						(fillY = BusinessInfo[businessid][bExtraY]) != 0.0 && 
+						(fillZ = BusinessInfo[businessid][bExtraZ]) != 0.0)
 					{
-						SendFormat(playerid, 0xDBDBDBFF, "Norëdami pilti degalus, raðykite /fill");
-						SeenFillCommand{playerid} = true;
-						return;
+						if(IsPlayerInRangeOfPoint(playerid, 10.0, fillX, fillY, fillZ))
+						{
+							SendFormat(playerid, 0xDBDBDBFF, "Norëdami pilti degalus, raðykite /fill");
+							SeenFillCommand{playerid} = true;
+							continue;
+						}
 					}
 				}
 			}
 		}
-	}
-	// payphone irgi
-	if(!SeenPayPhoneCommand{playerid} && GetESCType(playerid) != ESC_TYPE_PAYPHONE)
-	{
-		foreach(new pp : PayPhone)
+		// payphone irgi
+		if(!SeenPayPhoneCommand{playerid} && GetESCType(playerid) != ESC_TYPE_PAYPHONE)
 		{
-			if(IsPlayerInRangeOfPoint(playerid, 1.5, PayPhoneInfo[pp][payPhoneX], PayPhoneInfo[pp][payPhoneY], PayPhoneInfo[pp][payPhoneZ]))
+			foreach(new pp : PayPhone)
 			{
-				SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis taksofonu, raðykite /ucall");
-				SeenPayPhoneCommand{playerid} = true;
-				return;
+				if(IsPlayerInRangeOfPoint(playerid, 1.5, PayPhoneInfo[pp][payPhoneX], PayPhoneInfo[pp][payPhoneY], PayPhoneInfo[pp][payPhoneZ]))
+				{
+					SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis taksofonu, raðykite /ucall");
+					SeenPayPhoneCommand{playerid} = true;
+					continue;
+				}
 			}
 		}
 	}
+	return 1;
 }
 
-ptask PT_JobTaskSecond[998](playerid)
+// ptask PT_JobTaskSecond[998](playerid)
+forward PT_JobTaskSecond();
+public PT_JobTaskSecond()
 {
-	// Nuimam darbo sekunde atliekamo
-	new playerjobtime = PlayerInfo[playerid][pJobActionTime];
-	if(playerjobtime != 0)
+	foreach(new playerid : Player)
 	{
-		new minutes, seconds, toptext[56];
-		if(playerjobtime > 0)
+		// Nuimam darbo sekunde atliekamo
+		new playerjobtime = PlayerInfo[playerid][pJobActionTime];
+		if(playerjobtime != 0)
 		{
-			PlayerInfo[playerid][pJobActionTime]--;
-			playerjobtime--;
-			divmod(PlayerInfo[playerid][pJobActionTime], 60, minutes, seconds);
-			format(toptext, sizeof toptext, "~n~LAIKAS: %02d:%02d", minutes, seconds);
-		}
-		format(toptext, sizeof toptext, "UZDUOTIS: %s%s", GetJobTaskNameById(PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction]), toptext);
-		JobGUI_Update(playerid, toptext);
-		if(playerjobtime == 0)
-		{
-			OnPlayerJobTimeExpired(playerid, PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction], PlayerInfo[playerid][pJobCurrentType]);
+			new minutes, seconds, toptext[56];
+			if(playerjobtime > 0)
+			{
+				PlayerInfo[playerid][pJobActionTime]--;
+				playerjobtime--;
+				divmod(PlayerInfo[playerid][pJobActionTime], 60, minutes, seconds);
+				format(toptext, sizeof toptext, "~n~LAIKAS: %02d:%02d", minutes, seconds);
+			}
+			format(toptext, sizeof toptext, "UZDUOTIS: %s%s", GetJobTaskNameById(PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction]), toptext);
+			JobGUI_Update(playerid, toptext);
+			if(playerjobtime == 0)
+			{
+				OnPlayerJobTimeExpired(playerid, PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction], PlayerInfo[playerid][pJobCurrentType]);
+			}
 		}
 	}
+	return 1;
 }
 
-task T_SecondTimer[1000]()
+// task T_SecondTimer[1000]()
+forward T_SecondTimer();
+public T_SecondTimer()
 {
 	new rand,
 		bool:changeEffect,
@@ -2787,27 +2876,33 @@ thread(OldReportsReset);
 thread(UnbanTimeReduce);
 thread(UnbanValidSet);
 
-ptask PT_RentMinute[59988](playerid)
+// ptask PT_RentMinute[59988](playerid)
+forward PT_RentMinute();
+public PT_RentMinute()
 {
-	if(IsValidVehicle(RentedVeh[playerid]) && RentedBy[RentedVeh[playerid]] == playerid)
+	foreach(new playerid : Player)
 	{
-		GivePlayerMoney(playerid, -DEFAULT_CAR_RENT_PRICE);
-		if(GetPlayerMoney(playerid) < DEFAULT_CAR_RENT_PRICE)
+		if(IsValidVehicle(RentedVeh[playerid]) && RentedBy[RentedVeh[playerid]] == playerid)
 		{
-			Rent_Cancel(playerid);
-			SendError(playerid, "Tr. priemonës nuomai nebeuþtenka pinigø.");
-		}
-
-		if(RentTimeUnused[playerid] > 0)
-		{
-			RentTimeUnused[playerid]--;
-			if(RentTimeUnused[playerid] <= 0)
+			GivePlayerMoney(playerid, -DEFAULT_CAR_RENT_PRICE);
+			if(GetPlayerMoney(playerid) < DEFAULT_CAR_RENT_PRICE)
 			{
-				SendFormat(playerid, -1, "Nuomos sutartis nutraukta, kadangi negráþote á tr. priemonæ per 10min.");
 				Rent_Cancel(playerid);
+				SendError(playerid, "Tr. priemonës nuomai nebeuþtenka pinigø.");
+			}
+
+			if(RentTimeUnused[playerid] > 0)
+			{
+				RentTimeUnused[playerid]--;
+				if(RentTimeUnused[playerid] <= 0)
+				{
+					SendFormat(playerid, -1, "Nuomos sutartis nutraukta, kadangi negráþote á tr. priemonæ per 10min.");
+					Rent_Cancel(playerid);
+				}
 			}
 		}
 	}
+	return 1;
 }
 
 task T_ClearDroppedItems[61024]()
@@ -2833,48 +2928,70 @@ task T_ClearDroppedItems[61024]()
 			}
 		}
 	}
+	return 1;
 }
 
-ptask PT_DonatorCheck[12450](playerid)
+// ptask PT_DonatorCheck[12450](playerid)
+forward PT_DonatorCheck();
+public PT_DonatorCheck()
 {
-	new unix = gettime();
-	if(unix > PlayerInfo[playerid][pDonatorTime] + TIME_TO_RESET_DONATOR && PlayerInfo[playerid][pDonator] > 0)
+	foreach(new playerid : Player)
 	{
-		PlayerInfo[playerid][pDonator] = 0;
-		PlayerInfo[playerid][pDonatorTime] = 0;
+		new unix = gettime();
+		if(unix > PlayerInfo[playerid][pDonatorTime] + TIME_TO_RESET_DONATOR && PlayerInfo[playerid][pDonator] > 0)
+		{
+			PlayerInfo[playerid][pDonator] = 0;
+			PlayerInfo[playerid][pDonatorTime] = 0;
 
-		SendFormat(playerid, 0xbababa, "JÛSØ REMËJO STATUSAS BAIGË GALIOTI!");
+			SendFormat(playerid, 0xbababa, "JÛSØ REMËJO STATUSAS BAIGË GALIOTI!");
+		}
 	}
+	return 1;
 }
 
-ptask PT_PhoneTalkMinute[60001](playerid)
+// ptask PT_PhoneTalkMinute[60001](playerid)
+forward PT_PhoneTalkMinute();
+public PT_PhoneTalkMinute()
 {
 	// Kalba telefonu, nuimam 1$
-	if(PhoneInfo[playerid][phoneCallOwner] > 0 && PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
+	foreach(new playerid : Player)
 	{
-		// nuimam jam saibu
-		GivePlayerMoney(playerid, -1);
-		if(GetPlayerMoney(playerid) <= 0)
+		if(PhoneInfo[playerid][phoneCallOwner] > 0 && PhoneInfo[playerid][phoneTalkingTo] != INVALID_PLAYER_ID)
 		{
-			PlayerPhoneHangup(playerid);
+			// nuimam jam saibu
+			GivePlayerMoney(playerid, -1);
+			if(GetPlayerMoney(playerid) <= 0)
+			{
+				PlayerPhoneHangup(playerid);
+			}
 		}
 	}
+	return 1;
 }
 
-ptask PT_BusinessFreeEnter[60000](playerid)
+// ptask PT_BusinessFreeEnter[60000](playerid)
+forward PT_BusinessFreeEnter();
+public PT_BusinessFreeEnter()
 {
-	// Nemokamos verslo iejimo minutes
-	foreach(new businessid : Business)
+	foreach(new playerid : Player)
 	{
-		// verslai
-		if(PlayerNoEnterPriceBusiness[playerid][businessid] > 0) { 
-			// I sita versla gali ieiti nemokamai
-			PlayerNoEnterPriceBusiness[playerid][businessid] -- ;
+		// Nemokamos verslo iejimo minutes
+		foreach(new businessid : Business)
+		{
+			// verslai
+			if(PlayerNoEnterPriceBusiness[playerid][businessid] > 0) { 
+				// I sita versla gali ieiti nemokamai
+				PlayerNoEnterPriceBusiness[playerid][businessid] -- ;
+			}
 		}
+
 	}
+	return 1;
 }
 
-task T_MinuteTimer[60000]()
+// task T_MinuteTimer[60000]()
+forward T_MinuteTimer();
+public T_MinuteTimer()
 {
 	new unix = gettime();
 
@@ -5281,7 +5398,10 @@ public OnPlayerSpawn(playerid)
 		}
 		PlayerExtra[playerid][peDeathLabel] = INVALID_3DTEXT_ID;
 	}
-	if(GetPlayerSkin(playerid) != PlayerInfo[playerid][pSkin]) SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
+	if(GetPlayerSkin(playerid) != PlayerInfo[playerid][pSkin])
+	{
+		SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
+	}
 	return 1;
 }
 
@@ -6106,12 +6226,18 @@ hook OnPlayerLeaveCharSelect(playerid)
 	return 1;
 }
 
-ptask PT_CharCreationSecond[1000](playerid)
+// ptask PT_CharCreationSecond[1000](playerid)
+forward PT_CharCreationSecond();
+public PT_CharCreationSecond()
 {
-	if(player_WaitCharTextdraw[playerid] > 0)
+	foreach(new playerid : Player)
 	{
-		player_WaitCharTextdraw[playerid]--;
+		if(player_WaitCharTextdraw[playerid] > 0)
+		{
+			player_WaitCharTextdraw[playerid]--;
+		}
 	}
+	return 1;
 }
 
 stock ShowPlayerLeaveConfirm(playerid)
@@ -24253,6 +24379,14 @@ flags:rac(CMD_TYPE_ADMIN);
 CMD:rac(playerid, params[])
 {
 	new used[MAX_VEHICLES];
+	foreach(new npc : NPC)
+	{
+		if(IsPlayerInAnyVehicle(npc)) used[GetPlayerVehicleID(npc)] = 1;
+	}
+	foreach(new npc : Bot)
+	{
+		if(IsPlayerInAnyVehicle(npc)) used[GetPlayerVehicleID(npc)] = 1;
+	}
 	foreach(new receiverid : Player)
 	{
 		if(IsPlayerInAnyVehicle(receiverid)) used[GetPlayerVehicleID(receiverid)] = 1;
