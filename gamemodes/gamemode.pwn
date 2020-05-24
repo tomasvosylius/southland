@@ -2205,18 +2205,18 @@ ptask PT_VehicleSpeedo[200](playerid)
 		!IsValidVehicle(vehicleid))
 	{
 		(Recalculate_Mileage[playerid] > 0) && (Recalculate_Mileage[playerid] = 0);
-		return;
+		return 1;
 	}
 	if(!VehicleHaveEngine(GetVehicleModel(vehicleid)) || !VehicleInfo[vehicleid][vEngined])
 	{
 		// Transportas neturi variklio
-		return;
+		return 1;
 	}	
 	
 	// Sedi masinoje.
 	new speed = GetVehicleSpeed(vehicleid),
 		model = GetVehicleModel(vehicleid);
-	if(!(400 <= model <= 611)) return;
+	if(!(400 <= model <= 611)) return 1;
 
 	GetVehiclePos(vehicleid, currentX, currentY, distance);
 
@@ -2278,6 +2278,7 @@ ptask PT_VehicleSpeedo[200](playerid)
 
 	format(string, sizeof string, "GREITIS: %dKM/H", speed);
 	Speedo_Update(playerid, .speed_string = string);
+	return 1;
 }
 
 
@@ -2303,6 +2304,7 @@ ptask PT_MaxSpeed[300](playerid)
 			}
 		}
 	}
+	return 1;
 }
 
 stock IsModelShitty(model)
@@ -2325,6 +2327,7 @@ ptask PT_CommandSpam[750](playerid)
 	{
 		PlayerExtra[playerid][peSpamTime]--;
 	}
+	return 1;
 }
 
 ptask PT_MuteSecond[999](playerid)
@@ -2337,6 +2340,7 @@ ptask PT_MuteSecond[999](playerid)
 			SendFormat(playerid, 0x6A68FFFF, "Uþtildymas baigësi.");
 		}
 	}
+	return 1;
 }
 ptask PT_DeathTimer[1002](playerid)
 {
@@ -2369,7 +2373,7 @@ ptask PT_DeathTimer[1002](playerid)
 			if((player_DeathWarnings[playerid] += 1) >= 15)
 			{
 				KickPlayer(playerid, "Sistema", "AirBreak (mirus)");
-				return;
+				return 1;
 			}
 		}
 
@@ -2381,6 +2385,7 @@ ptask PT_DeathTimer[1002](playerid)
 			SetPlayerHealth(playerid, 0);
 		}
 	}
+	return 1;
 }
 
 ptask PT_CheckJetpack[500](playerid)
@@ -2390,13 +2395,14 @@ ptask PT_CheckJetpack[500](playerid)
 		if(!IsPlayerInAnyAdminGroup(playerid))
 		{
 			BanPlayer(playerid, "Sistema", "JetPack");
-			return;
+			return 1;
 		}
 		else if(!PlayerInfo[playerid][pAdminDuty])
 		{
 			SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 		}
 	}
+	return 1;
 }
 
 ptask PT_JailSecond[1000](playerid)
@@ -2480,6 +2486,7 @@ ptask PT_JailSecond[1000](playerid)
 			}
 		}
 	}
+	return 1;
 }
 
 ptask PT_Unfreeze[1000](playerid) 
@@ -2493,6 +2500,7 @@ ptask PT_Unfreeze[1000](playerid)
 			TogglePlayerControllable(playerid, 1);
 		}
 	}
+	return 1;
 }
 
 ptask PT_PhoneSecond[1000](playerid)
@@ -2599,6 +2607,7 @@ ptask PT_PhoneSecond[1000](playerid)
 			}
 		}
 	}
+	return 1;
 }
 
 ptask PT_CommandUsage[1342](playerid)
@@ -2612,7 +2621,7 @@ ptask PT_CommandUsage[1342](playerid)
 			{
 				SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis bankomatu, raðykite /atm");
 				SeenATMCommand{playerid} = true;
-				return;
+				return 1;
 			}
 		}
 	}
@@ -2632,7 +2641,7 @@ ptask PT_CommandUsage[1342](playerid)
 					{
 						SendFormat(playerid, 0xDBDBDBFF, "Norëdami pilti degalus, raðykite /fill");
 						SeenFillCommand{playerid} = true;
-						return;
+						return 1;
 					}
 				}
 			}
@@ -2647,10 +2656,11 @@ ptask PT_CommandUsage[1342](playerid)
 			{
 				SendFormat(playerid, 0xDBDBDBFF, "Norëdami naudotis taksofonu, raðykite /ucall");
 				SeenPayPhoneCommand{playerid} = true;
-				return;
+				return 1;
 			}
 		}
 	}
+	return 1;
 }
 
 ptask PT_JobTaskSecond[998](playerid)
@@ -2674,6 +2684,7 @@ ptask PT_JobTaskSecond[998](playerid)
 			OnPlayerJobTimeExpired(playerid, PlayerInfo[playerid][pJob], PlayerInfo[playerid][pJobCurrentAction], PlayerInfo[playerid][pJobCurrentType]);
 		}
 	}
+	return 1;
 }
 
 task T_SecondTimer[1000]()
@@ -2808,6 +2819,7 @@ ptask PT_RentMinute[59988](playerid)
 			}
 		}
 	}
+	return 1;
 }
 
 task T_ClearDroppedItems[61024]()
@@ -2833,6 +2845,7 @@ task T_ClearDroppedItems[61024]()
 			}
 		}
 	}
+	return 1;
 }
 
 ptask PT_DonatorCheck[12450](playerid)
@@ -2845,6 +2858,7 @@ ptask PT_DonatorCheck[12450](playerid)
 
 		SendFormat(playerid, 0xbababa, "JÛSØ REMËJO STATUSAS BAIGË GALIOTI!");
 	}
+	return 1;
 }
 
 ptask PT_PhoneTalkMinute[60001](playerid)
@@ -2859,6 +2873,7 @@ ptask PT_PhoneTalkMinute[60001](playerid)
 			PlayerPhoneHangup(playerid);
 		}
 	}
+	return 1;
 }
 
 ptask PT_BusinessFreeEnter[60000](playerid)
@@ -2872,6 +2887,7 @@ ptask PT_BusinessFreeEnter[60000](playerid)
 			PlayerNoEnterPriceBusiness[playerid][businessid] -- ;
 		}
 	}
+	return 1;
 }
 
 task T_MinuteTimer[60000]()
@@ -6112,6 +6128,7 @@ ptask PT_CharCreationSecond[1000](playerid)
 	{
 		player_WaitCharTextdraw[playerid]--;
 	}
+	return 1;
 }
 
 stock ShowPlayerLeaveConfirm(playerid)
@@ -7788,6 +7805,7 @@ stock User_Register_Show(playerid)
 	dialog_AddLine("Prisijungus galësite kurti atskirus veikëjus ir juos valdyti!");
 	dialog_SkipLine();
 	dialog_AddLine("{d78484}Slaptaþodis turi bûti nuo 6 iki 30 simboliø.");
+	dialog_AddLine("{d78484}Slaptaþodis privalo turëti didþiøjø raidþiø!");
 
 	inline inputPassword(response, listitem)
 	{
