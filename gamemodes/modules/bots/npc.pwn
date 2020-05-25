@@ -13,7 +13,7 @@ hook OnGameModeInit()
 timer T_JoinNPCS[5000]()
 {
     ConnectNPC("Lektuvas_1", "at400_ls");
-    ConnectNPC("Traukinys_1", "train_ls");
+    // ConnectNPC("Traukinys_1", "train_ls");
 }
 
 hook OnPlayerConnect(playerid)
@@ -40,6 +40,7 @@ hook OnPlayerSpawn(playerid)
 {
     if(IsPlayerNPC(playerid))
     {
+
         new ip[32],
             server_ip[64+1];
 	    GetServerVarAsString("bind", server_ip, 64);
@@ -54,18 +55,21 @@ hook OnPlayerSpawn(playerid)
         }
         else 
         {
+            SetPlayerColor(playerid, 0xffffffff);
             if(strfind(ret_GetPlayerName(playerid), "Lektuvas_1") != -1)
             {
+                SetPlayerSkin(playerid, 61);
                 planeVehicle = CreateVehicle(577, 0.0, 0.0, 7.0, 0.0, -1, -1, 0);
                 PutPlayerInVehicle(playerid, planeVehicle, 0);
                 return 1;
             }
-            else if(strfind(ret_GetPlayerName(playerid), "Traukinys_1") != -1)
+            /*else if(strfind(ret_GetPlayerName(playerid), "Traukinys_1") != -1)
             {
+                SetPlayerSkin(playerid, 7);
                 metroVehicle = AddStaticVehicleEx(538, 0.0, 0.0, 7.0, 0.0, 1, 1, 0);
                 PutPlayerInVehicle(playerid, metroVehicle, 0);
                 return 1;
-            }
+            }*/
         }
     }
     return 1;

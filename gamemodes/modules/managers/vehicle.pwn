@@ -1494,6 +1494,8 @@ stock VHS_LinkVehicleToInterior(vehicleid, interiorid)
 
 stock VHS_SetVehicleToRespawn(vehicleid)
 {
+	printf("[debug] VHS_SetVehicleToRespawn(%d)", vehicleid);
+
 	if(vehicleid != INVALID_VEHICLE_ID)
 	{
 		new __reset_Trunk[E_FACTION_TRUNK_WEAPONS_DATA];

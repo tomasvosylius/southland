@@ -3642,7 +3642,10 @@ public OnPlayerStreamIn(playerid, forplayerid)
 
 public OnVehicleStreamIn(vehicleid, forplayerid)
 {
-	SetVehicleParamsForPlayer(vehicleid, forplayerid, 0, VehicleInfo[vehicleid][vLocked]);
+	if(!IsModelTrailer(GetVehicleModel(vehicleid)))
+	{
+		SetVehicleParamsForPlayer(vehicleid, forplayerid, 0, VehicleInfo[vehicleid][vLocked]);
+	}
 	return 1;
 }
 
@@ -24292,6 +24295,10 @@ CMD:rfc(playerid, params[])
 	if(sscanf(params,"d",mysql) || (mysql < 0 && mysql != -1 && mysql != -2)) return SendUsage(playerid, "/rfc [frakcijos MySQL id (/factionslist)]");
 	if((factionid = GetFactionArrayIndexById(mysql)) == -1 && mysql != -1 && mysql != -2) return SendError(playerid, "Tokios frakcijos nëra.");
 	new used[MAX_VEHICLES];
+	foreach(new bot : Bot)
+	{
+		if(IsPlayerInAnyVehicle(bot)) used[GetPlayerVehicleID(bot)] = 1;
+	}
 	foreach(new receiverid : Player)
 	{
 		if(IsPlayerInAnyVehicle(receiverid)) used[GetPlayerVehicleID(receiverid)] = 1;
@@ -24343,6 +24350,10 @@ CMD:rjc(playerid, params[])
 	if(sscanf(params,"d",mysql) || mysql < 0) return SendUsage(playerid, "/rjc [darbo MySQL id (/jobslist)]");
 	if((jobid = GetJobArrayIndexById(mysql)) == -1) return SendError(playerid, "Tokio darbo nëra.");
 	new used[MAX_VEHICLES];
+	foreach(new bot : Bot)
+	{
+		if(IsPlayerInAnyVehicle(bot)) used[GetPlayerVehicleID(bot)] = 1;
+	}
 	foreach(new receiverid : Player)
 	{
 		if(IsPlayerInAnyVehicle(receiverid)) used[GetPlayerVehicleID(receiverid)] = 1;
@@ -24368,6 +24379,14 @@ flags:rac(CMD_TYPE_ADMIN);
 CMD:rac(playerid, params[])
 {
 	new used[MAX_VEHICLES];
+	foreach(new bot : Bot)
+	{
+		if(IsPlayerInAnyVehicle(bot)) used[GetPlayerVehicleID(bot)] = 1;
+	}
+	foreach(new bot : NPC)
+	{
+		if(IsPlayerInAnyVehicle(bot)) used[GetPlayerVehicleID(bot)] = 1;
+	}
 	foreach(new receiverid : Player)
 	{
 		if(IsPlayerInAnyVehicle(receiverid)) used[GetPlayerVehicleID(receiverid)] = 1;
@@ -26714,6 +26733,10 @@ CMD:respawncars(playerid, params[])
 	else if(PlayerInfo[playerid][pFactionLeader] <= 0) return SendWarning(playerid, "Nesate frakcijos lyderis.");
 
 
+	foreach(new bot : Bot)
+	{
+		if(IsPlayerInAnyVehicle(bot)) used[GetPlayerVehicleID(bot)] = 1;
+	}
 	foreach(new receiverid : Player)
 	{
 		if(IsPlayerInAnyVehicle(receiverid)) used[GetPlayerVehicleID(receiverid)] = 1;
