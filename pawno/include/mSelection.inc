@@ -1,3 +1,4 @@
+#include <YSI_Coding\y_hooks>
 //
 // Model Selection using previews. For SA-MP 0.3x and above.
 // - D0erfler 2013
@@ -18,20 +19,20 @@ forward OnPlayerModelSelection(playerid, response, listid, modelid);
 forward OnPlayerModelSelectionEx(playerid, response, extraid, modelid);
 
 // settings static lists
-#define mS_TOTAL_ITEMS         	2000 // Max amount of items from all lists
+#define mS_TOTAL_ITEMS         	1000 // Max amount of items from all lists
 #define mS_TOTAL_LISTS			20 // Max amount of lists
 #define mS_TOTAL_ROT_ZOOM		100 // Max amount of items using extra information like zoom or rotations
 
 // settings dynamic per player lists
-#define mS_CUSTOM_MAX_ITEMS		200
+#define mS_CUSTOM_MAX_ITEMS		20
 new gCustomList[MAX_PLAYERS][mS_CUSTOM_MAX_ITEMS];
 
 #define mS_INVALID_LISTID		mS_TOTAL_LISTS
 #define mS_CUSTOM_LISTID		(mS_TOTAL_LISTS+1)
 
-#define mS_NEXT_TEXT   "Kitas"
-#define mS_PREV_TEXT   "Atgal"
-#define mS_CANCEL_TEXT   "Atsaukti"
+#define mS_NEXT_TEXT   "Nast"
+#define mS_PREV_TEXT   "Poprz"
+#define mS_CANCEL_TEXT   "Anuluj"
 
 #define mS_SELECTION_ITEMS 		21
 #define mS_ITEMS_PER_LINE  		7
@@ -413,7 +414,7 @@ stock mS_DestroySelectionMenu(playerid)
 
 //------------------------------------------------
 
-public OnPlayerConnect(playerid)
+hook OnPlayerConnect(playerid)
 {
 	// Init all of the textdraw related globals
     gHeaderTextDrawId[playerid] = PlayerText:INVALID_TEXT_DRAW;
@@ -429,9 +430,10 @@ public OnPlayerConnect(playerid)
 	
 	gItemAt[playerid] = 0;
 	
-	return CallLocalFunction("MP_OPC", "i", playerid);
+	// return CallLocalFunction("MP_OPC", "i", playerid);
+	return 1;
 }
-
+/*
 #if defined _ALS_OnPlayerConnect
 	#undef OnPlayerConnect
 #else
@@ -439,13 +441,13 @@ public OnPlayerConnect(playerid)
 #endif
 #define OnPlayerConnect MP_OPC
 
-forward MP_OPC(playerid);
+forward MP_OPC(playerid);*/
 
 //-------------------------------------------
 // Even though only Player* textdraws are used in this script,
 // OnPlayerClickTextDraw is still required to handle ESC
 
-public OnPlayerClickTextDraw(playerid, Text:clickedid)
+hook OnPlayerClickTD(playerid, Text:clickedid)
 {
    	if(GetPVarInt(playerid, "mS_ignore_next_esc") == 1) {
 		SetPVarInt(playerid, "mS_ignore_next_esc", 0);
@@ -472,9 +474,10 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
         return 1;
 	}
 	
-	return CallLocalFunction("MP_OPCTD", "ii", playerid, _:clickedid);
+	// return CallLocalFunction("MP_OPCTD", "ii", playerid, _:clickedid);
+	return 1;
 }
-
+/*
 #if defined _ALS_OnPlayerClickTextDraw
 	#undef OnPlayerClickTextDraw
 #else
@@ -482,17 +485,105 @@ public OnPlayerClickTextDraw(playerid, Text:clickedid)
 #endif
 #define OnPlayerClickTextDraw MP_OPCTD
 
-forward MP_OPCTD(playerid, Text:clickedid);
+forward MP_OPCTD(playerid, Text:clickedid);*/
 
 //------------------------------------------------
-/*
-public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
-{*/
+
+hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
+{
+	if(GetPVarInt(playerid, "mS_list_active") == 0 || (GetTickCount()-GetPVarInt(playerid, "mS_list_time")) < 200 /* Disable instant selection */) return CallLocalFunction("MP_OPCPTD", "ii", playerid, _:playertextid);
+
+	new curpage = GetPVarInt(playerid, "mS_list_page");
 	
-	/*
+	// Handle: cancel button
+	if(playertextid == gCancelButtonTextDrawId[playerid]) {
+		new listID = mS_GetPlayerCurrentListID(playerid);
+		if(listID == mS_CUSTOM_LISTID)
+		{
+			new extraid = GetPVarInt(playerid, "mS_custom_extraid");
+			HideModelSelectionMenu(playerid);
+			CallLocalFunction("OnPlayerModelSelectionEx", "dddd", playerid, 0, extraid, -1);
+			PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
+		}
+		else
+		{
+			HideModelSelectionMenu(playerid);
+			CallLocalFunction("OnPlayerModelSelection", "dddd", playerid, 0, listID, -1);
+			PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
+		}
+		return 1;
+	}
+		
+	// Handle: next button
+	if(playertextid == gNextButtonTextDrawId[playerid]) {
+		new listID = mS_GetPlayerCurrentListID(playerid);
+		if(listID == mS_CUSTOM_LISTID)
+		{			
+			if(curpage < (mS_GetNumberOfPagesEx(playerid) - 1)) {
+				SetPVarInt(playerid, "mS_list_page", curpage + 1);
+				mS_ShowPlayerMPs(playerid);
+				mS_UpdatePageTextDraw(playerid);
+				PlayerPlaySound(playerid, 1083, 0.0, 0.0, 0.0);
+			} else {
+				PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
+			}
+		}
+		else
+		{
+			if(curpage < (mS_GetNumberOfPages(listID) - 1)) {
+				SetPVarInt(playerid, "mS_list_page", curpage + 1);
+				mS_ShowPlayerMPs(playerid);
+				mS_UpdatePageTextDraw(playerid);
+				PlayerPlaySound(playerid, 1083, 0.0, 0.0, 0.0);
+			} else {
+				PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
+			}
+		}
+		return 1;
+	}
+	
+	// Handle: previous button
+	if(playertextid == gPrevButtonTextDrawId[playerid]) {
+	    if(curpage > 0) {
+	    	SetPVarInt(playerid, "mS_list_page", curpage - 1);
+	    	mS_ShowPlayerMPs(playerid);
+	    	mS_UpdatePageTextDraw(playerid);
+	    	PlayerPlaySound(playerid, 1084, 0.0, 0.0, 0.0);
+		} else {
+		    PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
+		}
+		return 1;
+	}
+	
+	// Search in the array of textdraws used for the items
+	new x=0;
+	while(x != mS_SELECTION_ITEMS) {
+	    if(playertextid == gSelectionItems[playerid][x]) {
+			new listID = mS_GetPlayerCurrentListID(playerid);
+			if(listID == mS_CUSTOM_LISTID)
+			{
+				PlayerPlaySound(playerid, 1083, 0.0, 0.0, 0.0);
+				new item_id = gSelectionItemsTag[playerid][x];
+				new extraid = GetPVarInt(playerid, "mS_custom_extraid");
+				HideModelSelectionMenu(playerid);
+				CallLocalFunction("OnPlayerModelSelectionEx", "dddd", playerid, 1, extraid, item_id);
+				return 1;
+			}
+			else
+			{
+				PlayerPlaySound(playerid, 1083, 0.0, 0.0, 0.0);
+				new item_id = gSelectionItemsTag[playerid][x];
+				HideModelSelectionMenu(playerid);
+				CallLocalFunction("OnPlayerModelSelection", "dddd", playerid, 1, listID, item_id);
+				return 1;
+			}
+		}
+		x++;
+	}
+	
 	return CallLocalFunction("MP_OPCPTD", "ii", playerid, _:playertextid);
 }
-
+/*
 #if defined _ALS_OnPlayerClickPlayerTD
 	#undef OnPlayerClickPlayerTextDraw
 #else
@@ -534,7 +625,7 @@ stock LoadModelSelectionMenu(f_name[])
 		idxx = 0;
 		if(!line[0]) continue;
 		new mID = strval( mS_strtok(line,idxx) );
-		if(0 <= mID < 30000)
+		if(0 <= mID < 20000)
 		{
 			gItemList[tmp_ItemAmount][mS_ITEM_MODEL] = mID;
 		

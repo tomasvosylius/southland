@@ -1128,6 +1128,8 @@ static _MDC_CreatePlayerTextdraws(playerid)
 
 static _MDC_DestroyPlayerTextdraws(playerid)
 {
+	if(!player_UI_Created[playerid]) return 1;
+
 	PlayerTextDrawDestroy(playerid, MDC_HeaderText[playerid]);
 	PlayerTextDrawDestroy(playerid, MDC_HeaderName[playerid]);
 	PlayerTextDrawDestroy(playerid, MDC_Main_Skin[playerid]);
@@ -1286,6 +1288,8 @@ stock MDC_SetName(playerid, name[], bool:show = false)
 
 stock MDC_ShowPage(playerid, page, bool:update_variables = true)
 {
+	printmdc("MDC_ShowPage(%s, %d, %d)", GetPlayerNameEx(playerid), page, _:update_variables);
+
 	if(update_variables) MDC__Player_Data[playerid][pMdcActivePage] = page;
 	switch(page)
 	{
@@ -2100,6 +2104,7 @@ public OnFetchWantedPlayerData(playerid, id)
 
 mdc_called OnLookupActionSelected(playerid, action)
 {
+	printmdc("OnLookupActionSelected(%s, %d)", GetPlayerNameEx(playerid), action);
 	new 
 		page = MDC__Player_Data[playerid][pMdcActivePage],
 		string[256];
@@ -2196,6 +2201,7 @@ public OnFetchCrimes(playerid)
 
 mdc_called OnWantedPageBack(playerid, current_page)
 {
+	printmdc("OnWantedPageBack(%s, %d)", GetPlayerNameEx(playerid), current_page);
 	new string[126];
 	mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_wanted` WHERE Active = '1' LIMIT "#MAX_WANTED_PER_PAGE_SELECT" OFFSET %d", MAX_WANTED_PER_PAGE*(current_page-1) );
 	mysql_tquery(chandler, string, "OnFetchWantedList", "dd", playerid, current_page-1);
@@ -2203,6 +2209,7 @@ mdc_called OnWantedPageBack(playerid, current_page)
 }
 mdc_called OnWantedPageNext(playerid, current_page)
 {
+	printmdc("OnWantedPageNext(%s, %d)", GetPlayerNameEx(playerid), current_page);
 	new string[126];
 	mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_wanted` WHERE Active = '1' LIMIT "#MAX_WANTED_PER_PAGE_SELECT" OFFSET %d", MAX_WANTED_PER_PAGE*(current_page+1));
 	mysql_tquery(chandler, string, "OnFetchWantedList", "dd", playerid, current_page+1);
@@ -2236,6 +2243,7 @@ public OnFetchRecordData(playerid, page, lookupid)
 
 mdc_called OnRecordGoBack(playerid)
 {
+	printmdc("OnRecordGoBack(%s)", GetPlayerNameEx(playerid));
 	new 
 		page = MDC__Player_Data[playerid][pMdcActivePage];
 	switch(page)
@@ -2264,6 +2272,7 @@ mdc_called OnRecordGoBack(playerid)
 
 mdc_called OnRecordSelected(playerid, record)
 {
+	printmdc("OnRecordSelected(%s, %d)", GetPlayerNameEx(playerid), record);
 	new 
 		string[126],
 		page = MDC__Player_Data[playerid][pMdcActivePage],
@@ -2289,6 +2298,7 @@ mdc_called OnRecordSelected(playerid, record)
 
 mdc_called OnCellsOpenAll(playerid)
 {
+	printmdc("OnCellsOpenAll(%s)", GetPlayerNameEx(playerid));
 	for(new c = 0; c < sizeof PrisonCells; c++)
 	{
 		Cell_Open(c);
@@ -2299,6 +2309,7 @@ mdc_called OnCellsOpenAll(playerid)
 
 mdc_called OnCellsCloseAll(playerid)
 {
+	printmdc("OnCellsCloseAll(%s)", GetPlayerNameEx(playerid));
 	for(new c = 0; c < sizeof PrisonCells; c++)
 	{
 		Cell_Close(c);
@@ -2309,6 +2320,7 @@ mdc_called OnCellsCloseAll(playerid)
 
 mdc_called OnCellSelected(playerid, cell)
 {
+	printmdc("OnCellSelected(%s, %d)", GetPlayerNameEx(playerid), cell);
 	new cell_string[22];
 	if(PrisonCells[cell][cellDoorOpened])
 	{
@@ -2327,6 +2339,7 @@ mdc_called OnCellSelected(playerid, cell)
 
 mdc_called OnWantedDeleteSelected(playerid, selected)
 {
+	printmdc("OnWantedDeleteSelected(%s, %d)", GetPlayerNameEx(playerid), selected);
 	new 
 		string[126],
 		id = MDC__Player_Data[playerid][pMdcWantedPlayers][selected];
@@ -2341,6 +2354,7 @@ mdc_called OnWantedDeleteSelected(playerid, selected)
 
 mdc_called OnWantedClearSelected(playerid)
 {
+	printmdc("OnWantedClearSelected(%s)", GetPlayerNameEx(playerid));
 	format(MDC__Player_Data[playerid][pMdcWantedReason], 9, "Neivesta");
 	format(MDC__Player_Data[playerid][pMdcWantedName], 9, "Neivesta");
 	format(MDC__Player_Data[playerid][pMdcWantedLooks], 9, "Neivesta");
@@ -2358,30 +2372,35 @@ mdc_called OnWantedClearSelected(playerid)
 
 mdc_called OnWantedInputNameSelected(playerid, page)
 {
+	printmdc("OnWantedInputNameSelected(%s, %d)", GetPlayerNameEx(playerid), page);
 	MDC_Wanted_InputName(playerid);
 	return 1;
 }
 
 mdc_called OnWantedInputSeenSelected(playerid, page)
 {
+	printmdc("OnWantedInputSeenSelected(%s, %d)", GetPlayerNameEx(playerid), page);
 	MDC_Wanted_InputSeen(playerid);
 	return 1;
 }
 
 mdc_called OnWantedInputReasonSelected(playerid, page)
 {
+	printmdc("OnWantedInputReasonSelected(%s, %d)", GetPlayerNameEx(playerid), page);
 	MDC_Wanted_InputReason(playerid);
 	return 1;
 }
 
 mdc_called OnWantedInputLooksSelected(playerid, page)
 {
+	printmdc("OnWantedInputLooksSelected(%s, %d)", GetPlayerNameEx(playerid), page);
 	MDC_Wanted_InputLooks(playerid);
 	return 1;
 }
 
 mdc_called OnWantedPlayerSelected(playerid, selected)
 {
+	printmdc("OnWantedPlayerSelected(%s, %d)", GetPlayerNameEx(playerid), selected);
 	new 
 		string[126],
 		id = MDC__Player_Data[playerid][pMdcWantedPlayers][selected];
@@ -2393,6 +2412,7 @@ mdc_called OnWantedPlayerSelected(playerid, selected)
 
 mdc_called OnMenuButtonPress(playerid, page)
 {
+	printmdc("OnMenuButtonPress(%s, %d)", GetPlayerNameEx(playerid), page);
 	new active = MDC__Player_Data[playerid][pMdcActivePage];
 	if(page != active)
 	{
@@ -2407,6 +2427,7 @@ mdc_called OnMenuButtonPress(playerid, page)
 
 mdc_called OnExitPress(playerid)
 {
+	printmdc("OnExitPress(%s)", GetPlayerNameEx(playerid));
 	MDC_HideForPlayer(playerid);
 	CancelSelectTextDraw(playerid);
 	return 1;
@@ -2415,6 +2436,7 @@ mdc_called OnExitPress(playerid)
 
 mdc_called OnSearchTextPress(playerid, page)
 {
+	printmdc("OnSearchTextPress(%s, %d)", GetPlayerNameEx(playerid), page);
 	switch(page)
 	{
 		case MDC_PLAYERS, MDC_PLAYER_STATS:
@@ -2436,6 +2458,7 @@ mdc_called OnSearchTextPress(playerid, page)
 
 mdc_called OnSearchPress(playerid, page, inputtext[])
 {
+	printmdc("OnSearchPress(%s, %d, %s)", GetPlayerNameEx(playerid), page, inputtext);
 	switch(page)
 	{
 		case MDC_PLAYERS, MDC_PLAYER_STATS:
@@ -2477,6 +2500,7 @@ mdc_called OnSearchPress(playerid, page, inputtext[])
 
 mdc_called Response(playerid, type, response, inputid, listitem, inputtext[])
 {
+	printmdc("Response(%s, %d, %d, %s)", GetPlayerNameEx(playerid), type, inputtext);
 	switch(type)
 	{
 		case 1:
@@ -2608,6 +2632,7 @@ mdc_called Response(playerid, type, response, inputid, listitem, inputtext[])
 
 mdc_called OnWantedEditSelected(playerid, selected)
 {
+	printmdc("OnWantedEditSelected(%s, %d)", GetPlayerNameEx(playerid), selected);
 	new bool:cancel = false;
 	if(strlen(MDC__Player_Data[playerid][pMdcWantedName]) < 4 || strlen(MDC__Player_Data[playerid][pMdcWantedName]) > 24) SendWarning(playerid, "Vardas turi bûti nuo 4 iki 24 simboliø (arba \"neivesta\")."), cancel = true;
 	if(strlen(MDC__Player_Data[playerid][pMdcWantedReason]) < 4 || strlen(MDC__Player_Data[playerid][pMdcWantedReason]) > 108) SendWarning(playerid, "Prieþastis turi bûti nuo 4 iki 108 simboliø (arba \"neivesta\")."), cancel = true;
@@ -2627,6 +2652,7 @@ mdc_called OnWantedEditSelected(playerid, selected)
 
 mdc_called OnWantedAddSelected(playerid, selected)
 {
+	printmdc("OnWantedAddSelected(%s, %d)", GetPlayerNameEx(playerid), selected);
 	new bool:cancel = false;
 	if(strlen(MDC__Player_Data[playerid][pMdcWantedName]) < 4 || strlen(MDC__Player_Data[playerid][pMdcWantedName]) > 24) SendWarning(playerid, "Vardas turi bûti nuo 4 iki 24 simboliø (arba \"neivesta\")."), cancel = true;
 	if(strlen(MDC__Player_Data[playerid][pMdcWantedReason]) < 4 || strlen(MDC__Player_Data[playerid][pMdcWantedReason]) > 108) SendWarning(playerid, "Prieþastis turi bûti nuo 4 iki 108 simboliø (arba \"neivesta\")."), cancel = true;
@@ -2648,6 +2674,7 @@ mdc_called OnWantedAddSelected(playerid, selected)
 
 mdc_called OnWantedGoAdd(playerid)
 {
+	printmdc("OnWantedGoAdd(%s)", GetPlayerNameEx(playerid));
 	MDC_HidePage(playerid, MDC__Player_Data[playerid][pMdcActivePage]);
 	MDC_ShowPage(playerid, MDC_WANTED_ADD, .update_variables = true);
 	return 1;
@@ -2655,6 +2682,7 @@ mdc_called OnWantedGoAdd(playerid)
 
 mdc_called OnCCTVSelect(playerid, cctv)
 {
+	printmdc("OnCCTVSelect(%s, %d)", GetPlayerNameEx(playerid), cctv);
 	if(CCTV_StartStream(playerid, cctv))
 	{
 		MDC_HidePage(playerid, MDC__Player_Data[playerid][pMdcActivePage], .update_variables = true);

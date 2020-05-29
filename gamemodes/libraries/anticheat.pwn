@@ -2250,15 +2250,15 @@ stock RemovePlayerWeaponInSlot(playerid, remove)
 	printf("RemovePlayerWeaponInSlot: %d [slot: %d]", playerid, remove);
 	/**
 		Removing su SetPlayerAmmo,
-		o veliau timeryje tikrint, jei ammo = 0, bet weaponid > 0, nustatyti WeaponId=0.
+		o veliau timeryje tikrint, jei ammo = 0, bet weaponid > 0, nustatyti WeaponId=0. [neveikia su byta, lazda, kastetu kazkodel]
 	*/
+	/*GetPlayerWeaponData(playerid, remove, data[0], data[1]);
+	return FAC_SetPlayerAmmo(playerid, data[0], 0);*/
 
 	new 	
-		data[2];
+		data[13][2];
 
-	GetPlayerWeaponData(playerid, remove, data[0], data[1]);
-	return FAC_SetPlayerAmmo(playerid, data[0], 0);
-/*	for(new slot = 0; slot < 13; slot++)
+	for(new slot = 0; slot < 13; slot++)
 	{
 		if(slot != remove) GetPlayerWeaponData(playerid, slot, data[slot][0], data[slot][1]);
 	}
@@ -2269,7 +2269,7 @@ stock RemovePlayerWeaponInSlot(playerid, remove)
 	{
 		if(slot != remove) FAC_GivePlayerWeapon(playerid, data[slot][0], data[slot][1]);
 	}
-	return 1;*/
+	return 1;
 }
 
 stock FAC_GetWeaponSlot(weaponid)

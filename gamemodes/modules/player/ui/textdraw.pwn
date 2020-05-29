@@ -191,7 +191,8 @@ new PlayerText:vShop_CarName[MAX_PLAYERS][3],
 	PlayerText:vShop_Model[MAX_PLAYERS][3],
 	PlayerText:vShop_BuyBase[MAX_PLAYERS],
 	PlayerText:vShop_BuyText[MAX_PLAYERS],
-	PlayerText:vShop_ModelBase[MAX_PLAYERS][3];
+	PlayerText:vShop_ModelBase[MAX_PLAYERS][3],
+	bool:player_VehShop_Created[MAX_PLAYERS];
 
 new PlayerText:JailTimeTD_Time[MAX_PLAYERS];
 
@@ -213,13 +214,16 @@ new	PlayerText:VL_RowText[MAX_PLAYERS][4],
 	PlayerText:VL_FindText[MAX_PLAYERS][4],
 	PlayerText:VL_SpawnText[MAX_PLAYERS][4],
 	PlayerText:VL_NextBase[MAX_PLAYERS],
-	PlayerText:VL_PrevBase[MAX_PLAYERS];
+	PlayerText:VL_PrevBase[MAX_PLAYERS],
+	bool:player_VehList_Created[MAX_PLAYERS];
+
 
 new PlayerText:TaxometerTD[MAX_PLAYERS];
 
 new PlayerText:InfoBar[MAX_PLAYERS];
 
-new PlayerText:MechTune_BasePart[MAX_PLAYERS][18];
+new PlayerText:MechTune_BasePart[MAX_PLAYERS][18],
+	bool:player_MechTune_Created[MAX_PLAYERS];
 
 new PlayerText:DMV_LicenseModel[MAX_PLAYERS],
 	PlayerText:DMV_InfoLeft[MAX_PLAYERS],
@@ -1273,8 +1277,22 @@ stock MechTune_Create_Global()
 	TextDrawSetShadow(MechTune_TextHidraulics, 0);
 }
 
+stock MechTune_Destroy_Player(playerid)
+{
+	if(!player_MechTune_Created[playerid]) return 1;
+
+	for(new b = 0; b < sizeof MechTune_BasePart[]; b++)
+	{
+		PlayerTextDrawDestroy(playerid, MechTune_BasePart[playerid][b]);
+	}
+
+	player_MechTune_Created[playerid] = false;
+	return 1;
+}
 stock MechTune_Create_Player(playerid)
 {
+	if(player_MechTune_Created[playerid]) return 1;
+
 	MechTune_BasePart[playerid][0] = CreatePlayerTextDraw(playerid, 144.238098, 120.866699, "LD_SPAC:white");
 	MechTune_BasePart[playerid][1] = CreatePlayerTextDraw(playerid, 199.857101, 120.866699, "LD_SPAC:white");
 	MechTune_BasePart[playerid][2] = CreatePlayerTextDraw(playerid, 255.476150, 120.866699, "LD_SPAC:white");
@@ -1307,6 +1325,9 @@ stock MechTune_Create_Player(playerid)
 		PlayerTextDrawSetShadow(playerid, MechTune_BasePart[playerid][i], 0);
 		PlayerTextDrawSetSelectable(playerid, MechTune_BasePart[playerid][i], true);
 	}
+
+	player_MechTune_Created[playerid] = true;
+	return 1;
 }
 
 stock VLTextdraw_Create_Global()
@@ -1356,11 +1377,29 @@ stock VLTextdraw_Create_Global()
 	return 1;
 }
 
+stock VLTextdraw_Destroy_Player(playerid)
+{
+	if(!player_VehList_Created[playerid]) return 1;
+
+	for(new td = 0; td < sizeof VL_RowText[]; td++) PlayerTextDrawDestroy(playerid, VL_RowText[playerid][td]);
+	for(new td = 0; td < sizeof VL_SpawnBox[]; td++) PlayerTextDrawDestroy(playerid, VL_SpawnBox[playerid][td]);
+	for(new td = 0; td < sizeof VL_FindBox[]; td++) PlayerTextDrawDestroy(playerid, VL_FindBox[playerid][td]);	
+	for(new td = 0; td < sizeof VL_ModelBase[]; td++) PlayerTextDrawDestroy(playerid, VL_ModelBase[playerid][td]);
+	for(new td = 0; td < sizeof VL_ModelName[]; td++) PlayerTextDrawDestroy(playerid, VL_ModelName[playerid][td]);
+	for(new td = 0; td < sizeof VL_FindText[]; td++) PlayerTextDrawDestroy(playerid, VL_FindText[playerid][td]);
+	for(new td = 0; td < sizeof VL_SpawnText[]; td++) PlayerTextDrawDestroy(playerid, VL_SpawnText[playerid][td]);
+	PlayerTextDrawDestroy(playerid, VL_NextBase[playerid]);
+	PlayerTextDrawDestroy(playerid, VL_PrevBase[playerid]);
+	player_VehList_Created[playerid] = false;
+	return 1;
+}
 stock VLTextdraw_Create_Player(playerid)
 {
 	/*
 	 * Funkcija, sukurianti masinu listo textdrawus.
 	 */
+	if(player_VehList_Created[playerid]) return 1;
+
 	VL_ModelName[playerid][0] = CreatePlayerTextDraw(playerid, 150.000000, 173.000000, "Infernus");
 	VL_ModelBase[playerid][0] = CreatePlayerTextDraw(playerid, 93.000000, 90.000000, "");
 	VL_RowText[playerid][0] = CreatePlayerTextDraw(playerid, 148.000000, 199.000000, "NUMERIAI:_ADSX1231~n~DEGALAI:_120L~n~RIDA:_120000KM~n~DRAUDIMAS:_5~n~SIGNALIZACIJA:_1~n~UZRAKTO_LYGIS:_3");
@@ -1504,6 +1543,7 @@ stock VLTextdraw_Create_Player(playerid)
 		PlayerTextDrawSetShadow(playerid, VL_FindText[playerid][i], 0);
 	}
 
+	player_VehList_Created[playerid] = true;
 	return 1;
 }
 
@@ -1587,11 +1627,28 @@ stock VShop_Create_Global()
 }
 
 
+stock VShop_Destroy_Player(playerid)
+{
+	if(!player_VehShop_Created[playerid]) return 1;
+	
+	for(new td = 0; td < sizeof vShop_CarName[]; td++) PlayerTextDrawDestroy(playerid, vShop_CarName[playerid][td]);
+	for(new td = 0; td < sizeof vShop_CarStats[]; td++) PlayerTextDrawDestroy(playerid, vShop_CarStats[playerid][td]);
+	for(new td = 0; td < sizeof vShop_CarPrice[]; td++) PlayerTextDrawDestroy(playerid, vShop_CarPrice[playerid][td]);
+	for(new td = 0; td < sizeof vShop_Model[]; td++) PlayerTextDrawDestroy(playerid, vShop_Model[playerid][td]);
+	for(new td = 0; td < sizeof vShop_ModelBase[]; td++) PlayerTextDrawDestroy(playerid, vShop_ModelBase[playerid][td]);
+	PlayerTextDrawDestroy(playerid, vShop_BuyBase[playerid]);
+	PlayerTextDrawDestroy(playerid, vShop_BuyText[playerid]);
+
+	player_VehShop_Created[playerid] = false;
+	return 1;
+}
 stock VShop_Create_Player(playerid)
 {
 	/*
 	 * Funkcija, kuri sukuria textdrawus auto salono.
 	 */
+	if(player_VehShop_Created[playerid]) return 1;
+
 	vShop_ModelBase[playerid][0] = CreatePlayerTextDraw(playerid, 102.714294, 97.400047, "LD_SPAC:white");
 	vShop_ModelBase[playerid][1] = CreatePlayerTextDraw(playerid, 239.857147, 96.973381, "LD_SPAC:white");
 	vShop_ModelBase[playerid][2] = CreatePlayerTextDraw(playerid, 378.54834, 96.973381, "LD_SPAC:white");
@@ -1693,6 +1750,8 @@ stock VShop_Create_Player(playerid)
 		PlayerTextDrawSetShadow(playerid, vShop_ModelBase[playerid][i], 0);
 		PlayerTextDrawSetSelectable(playerid, vShop_ModelBase[playerid][i], true);
 	}
+
+	player_VehShop_Created[playerid] = true;
 	return 1;
 }
 
@@ -3647,6 +3706,9 @@ stock CharCreateTD_Create_Player(playerid)
 hook OnPlayerConnect(playerid)
 {
 	player_SpamBar_Showed[playerid] = false;
+	player_VehList_Created[playerid] = false;
+	player_VehShop_Created[playerid] = false;
+	player_MechTune_Created[playerid] = false;
 
 	TaxometerTD[playerid] = CreatePlayerTextDraw(playerid, 45.047412, 326.106597, "Taksometras:_0.00$");
 	PlayerTextDrawLetterSize(playerid, TaxometerTD[playerid], 0.172952, 0.998400);

@@ -757,7 +757,7 @@ native gpci(playerid, serial[], len);
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-#define USING_VIRTUAL_PRIVATE_SERVER
+// #define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
@@ -5889,9 +5889,6 @@ public OnPlayerConnect(playerid)
 		}
 		DMV_Create_Player(playerid);
 		JailTimeTD_Create_Player(playerid);
-		MechTune_Create_Player(playerid);
-		VLTextdraw_Create_Player(playerid);
-		VShop_Create_Player(playerid);
 		WarningTD_Create_Player(playerid);
 		SpamBarTD_Create_Player(playerid);
 		PhoneTD_Create_Player(playerid);
@@ -16196,6 +16193,7 @@ stock AddServerVehicle(model, factionid, jobid, addedby, Float:x, Float:y, Float
 
 stock ShowPlayerMechTune(playerid)
 {
+	MechTune_Create_Player(playerid);
 
 	TextDrawShowForPlayer(playerid, MechTune_Base);
 	TextDrawShowForPlayer(playerid, MechTune_TextTop);
@@ -16249,13 +16247,11 @@ stock ShowPlayerMechTune(playerid)
 
 stock HidePlayerMechTune(playerid)
 {
+	MechTune_Destroy_Player(playerid);
 
 	TextDrawHideForPlayer(playerid, MechTune_Base);
 	TextDrawHideForPlayer(playerid, MechTune_TextTop);
-	for(new i = 0; i < 18; i++)
-	{
-		PlayerTextDrawHide(playerid, MechTune_BasePart[playerid][i]);
-	}
+	
 	TextDrawHideForPlayer(playerid, MechTune_BuyBase);
 	TextDrawHideForPlayer(playerid, MechTune_CancelBase);
 	TextDrawHideForPlayer(playerid, MechTune_BuyText);
@@ -17190,32 +17186,26 @@ stock IsItemDrug(itemid)
 
 stock HidePlayerVehicleShop(playerid)
 {
+	VShop_Destroy_Player(playerid);
+
 	TextDrawHideForPlayer(playerid, vShop_Base);
 	TextDrawHideForPlayer(playerid, vShop_Name);
-	for(new i = 0; i < 3; i++)
-	{
-		PlayerTextDrawHide(playerid, vShop_ModelBase[playerid][i]);
-		PlayerTextDrawHide(playerid, vShop_CarName[playerid][i]);
-		PlayerTextDrawHide(playerid, vShop_CarStats[playerid][i]);
-		PlayerTextDrawHide(playerid, vShop_CarPrice[playerid][i]);
-		PlayerTextDrawHide(playerid, vShop_Model[playerid][i]);
-	}
-	PlayerTextDrawHide(playerid, vShop_BuyBase[playerid]);
-	PlayerTextDrawHide(playerid, vShop_BuyText[playerid]);
+	
 	TextDrawHideForPlayer(playerid, vShop_NextBase);
 	TextDrawHideForPlayer(playerid, vShop_Next);
 	TextDrawHideForPlayer(playerid, vShop_PrevBase);
 	TextDrawHideForPlayer(playerid, vShop_Prev);
-	PlayerTextDrawColor(playerid, vShop_BuyBase[playerid], 3815326);
+	
 	if(tmpSelected[playerid] != -1)
 	{
-		PlayerTextDrawColor(playerid, vShop_ModelBase[playerid][tmpSelected[playerid]], 4473343);
 		memsetex(tmpArray[playerid], VEHICLE_ARRAY_LIMIT, 0); //for(new i = 0; i < VEHICLE_ARRAY_LIMIT; i++) tmpArray[playerid][i] = 0;
 	}
 	return 1;
 }
 stock ShowVehicleShop(playerid, bool:show_body, ...)
 {
+	VShop_Create_Player(playerid);
+
 	new
 		string[150];
 
@@ -17317,6 +17307,8 @@ stock GetVehicleModelEngineType(model)
 
 stock ShowVehicleList(playerid, ...)
 {
+	VLTextdraw_Create_Player(playerid); // auto check inside
+
 	new
 		string[222],
 		sql_id,
@@ -20993,19 +20985,12 @@ stock HidePlayerVehicleList(playerid)
 	#endif
 	TextDrawHideForPlayer(playerid, VL_Base);
 	TextDrawHideForPlayer(playerid, VL_PageText);
-	PlayerTextDrawHide(playerid, VL_NextBase[playerid]);
-	PlayerTextDrawHide(playerid, VL_PrevBase[playerid]);
 	for(new i = 0; i < 4; i++)
 	{
-		PlayerTextDrawHide(playerid, VL_ModelBase[playerid][i]);
-		PlayerTextDrawHide(playerid, VL_ModelName[playerid][i]);
 		TextDrawHideForPlayer(playerid, VL_RowBase[i]);
-		PlayerTextDrawHide(playerid, VL_RowText[playerid][i]);
-		PlayerTextDrawHide(playerid, VL_SpawnBox[playerid][i]);
-		PlayerTextDrawHide(playerid, VL_SpawnText[playerid][i]);
-		PlayerTextDrawHide(playerid, VL_FindBox[playerid][i]);
-		PlayerTextDrawHide(playerid, VL_FindText[playerid][i]);
 	}
+	VLTextdraw_Destroy_Player(playerid);
+
 	for(new i = 0; i < sizeof tmpArray[]; i++) tmpArray[playerid][i] = 0;
 	return 1;
 }
@@ -22626,382 +22611,319 @@ hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 	#if SERVER_DEBUG_LEVEL >= 2
 		printf("[debug] OnPlayerClickPlayerTextDraw(%s, %d)", GetPlayerNameEx(playerid), _:playertextid);
 	#endif
-	for(new td = 0; td < MAX_WANTED_PER_PAGE; td++)
-	{
-		if(playertextid == MDC_Wanted_Name[playerid][td])
-		{
-			MDC_Call(OnWantedPlayerSelected, playerid, td);
-			return 1;
-		}
-	}
 
 	static
 		last_V_Get[MAX_PLAYERS];
-
-	for(new td = 0; td < 4; td++)
+	if(GetESCType(playerid) == ESC_TYPE_VLIST)
 	{
-		if(playertextid == VL_FindBox[playerid][td])
+		/**
+			Veh list
+		
+		 */
+		for(new td = 0; td < 4; td++)
 		{
-			new vehiclesql = tmpArray[playerid][(tmpPage_Object[playerid]*4)-(4-td)];
-			foreach(new vehicleid : Vehicle)
+			if(playertextid == VL_FindBox[playerid][td])
 			{
-				if(VehicleInfo[vehicleid][vId] == vehiclesql && !IsVehicleServer(vehicleid))
+				new vehiclesql = tmpArray[playerid][(tmpPage_Object[playerid]*4)-(4-td)];
+				foreach(new vehicleid : Vehicle)
 				{
-					if(VehicleInfo[vehicleid][vLock] >= DEFAULT_LOCK_NEEDED_TO_FIND)
+					if(VehicleInfo[vehicleid][vId] == vehiclesql && !IsVehicleServer(vehicleid))
 					{
-						new Float:x, Float:y, Float:z;
-						GetVehiclePos(vehicleid, x, y, z);
-						SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_VEHICLE, x, y, z);
-						SendFormat(playerid, 0xD9D9D9FF, "Paþymëjote tr. priemonæ þemëlapyje.");
+						if(VehicleInfo[vehicleid][vLock] >= DEFAULT_LOCK_NEEDED_TO_FIND)
+						{
+							new Float:x, Float:y, Float:z;
+							GetVehiclePos(vehicleid, x, y, z);
+							SetPlayerCheckpointEx(playerid, CHECKPOINT_TYPE_VEHICLE, x, y, z);
+							SendFormat(playerid, 0xD9D9D9FF, "Paþymëjote tr. priemonæ þemëlapyje.");
+						}
+						return 1;
 					}
+				}
+				return 1;
+			}
+			if(playertextid == VL_SpawnBox[playerid][td])
+			{
+				if(gettime() - last_V_Get[playerid] <= 2)
+				{
+					SendWarning(playerid, "Palaukite!");
+					return 1;
+				}
+
+				new vehiclesql = tmpArray[playerid][(tmpPage_Object[playerid]*4)-(4-td)];
+				if(	(PlayerInfo[playerid][pDonator] == DONATOR_NONE && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS) || 
+					(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_BRONZE) || 
+					(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_SILVER) ||
+					(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_GOLD)
+				)
+				{
+					new string[300];
+					mysql_format(chandler, string, sizeof string, "SELECT \
+						vdb.*, \
+						COUNT(var.id) AS CrimesCount \
+					FROM vehicles_data vdb \
+					LEFT JOIN vehicles_arrested var ON vdb.id = var.VehicleId AND var.Valid = 1 \
+					WHERE vdb.id = '%d' AND vdb.SpawnedId = '0' GROUP BY vdb.id", vehiclesql);
+					//mysql_format(chandler, string, sizeof string, "SELECT *,COUNT FROM `vehicles_data` WHERE id = '%d'", tmpArray[playerid][(tmpPage_Object[playerid]*4)-(4-td)]);
+					mysql_tquery(chandler, string, "VehicleGet", "dd", playerid, td);
+				}
+				else
+				{
+					SendError(playerid, "Negalite iðparkuoti daugiau transporto priemoniø.");
+				}
+
+				last_V_Get[playerid] = gettime();
+				return 1;
+			}
+		}
+
+		if(playertextid == VL_NextBase[playerid])
+		{
+			new newpage = tmpPage_Object[playerid]+1;
+			if(tmpArray[playerid][((newpage*4)-4)] != 0)
+			{
+				tmpPage_Object[playerid] = newpage;
+				ShowVehicleList(playerid, tmpArray[playerid][(newpage*4)-4], tmpArray[playerid][(newpage*4)-3], tmpArray[playerid][(newpage*4)-2], tmpArray[playerid][(newpage*4)-1]);
+			}
+			return 1;
+		}
+		if(playertextid == VL_PrevBase[playerid])
+		{
+			new backpage = tmpPage_Object[playerid]-1;
+			if(backpage != 0)
+			{
+				tmpPage_Object[playerid] = backpage;
+				ShowVehicleList(playerid, tmpArray[playerid][(backpage*4)-4], tmpArray[playerid][(backpage*4)-3], tmpArray[playerid][(backpage*4)-2], tmpArray[playerid][(backpage*4)-1]);
+			}
+			return 1;
+		}
+	}
+
+	if(GetESCType(playerid) == ESC_TYPE_VSHOP)
+	{
+		/**
+			Veh shop
+		
+		 */
+		for(new i = 0; i < 3; i++)
+		{
+			if(playertextid == vShop_ModelBase[playerid][i])
+			{
+				if(tmpSelected[playerid] != i)
+				{
+					if(tmpSelected[playerid] != -1)
+					{
+						PlayerTextDrawHide(playerid, vShop_ModelBase[playerid][tmpSelected[playerid]]);
+						PlayerTextDrawColor(playerid, vShop_ModelBase[playerid][tmpSelected[playerid]], 4473343);
+						PlayerTextDrawShow(playerid, vShop_ModelBase[playerid][tmpSelected[playerid]]);
+					}
+					tmpSelected[playerid] = i;
+					PlayerTextDrawHide(playerid, vShop_ModelBase[playerid][i]);
+					PlayerTextDrawHide(playerid, vShop_BuyBase[playerid]);
+					PlayerTextDrawHide(playerid, vShop_BuyText[playerid]);
+
+					PlayerTextDrawColor(playerid, vShop_BuyBase[playerid], 0x006560FF);
+					PlayerTextDrawColor(playerid, vShop_ModelBase[playerid][i], 0x006560FF);
+					PlayerTextDrawColor(playerid, vShop_BuyText[playerid], -1);
+					PlayerTextDrawSetSelectable(playerid, vShop_BuyBase[playerid], 1);
+
+					PlayerTextDrawShow(playerid, vShop_ModelBase[playerid][i]);
+					PlayerTextDrawShow(playerid, vShop_BuyBase[playerid]);
+					PlayerTextDrawShow(playerid, vShop_BuyText[playerid]);
 					return 1;
 				}
 			}
-			return 1;
 		}
-		if(playertextid == VL_SpawnBox[playerid][td])
+		if(playertextid == vShop_BuyBase[playerid])
 		{
-			if(gettime() - last_V_Get[playerid] <= 2)
+			if(tmpSelected[playerid] != -1)
 			{
-				SendWarning(playerid, "Palaukite!");
-				return 1;
+				new price = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehiclePrice];
+				if(GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
+				new donator_requirement = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehicleDonator];
+				if(PlayerInfo[playerid][pDonator] < donator_requirement) return SendWarning(playerid, "Ðiai tr. priemonei reikalingas %d remëjo lygis.", donator_requirement);
+				new model = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehicleModel];
+				if(PlayerInfo[playerid][pHaveCars] >= MAX_OWNED_VEHICLES) return SendWarning(playerid, "Jau turite "#MAX_OWNED_VEHICLES" tr. priemoniø.");
+				BuyVehicle(playerid, model, GetModelName(model), price, VehicleShopColors[random(sizeof VehicleShopColors)], VehicleShopColors[random(sizeof VehicleShopColors)], 0, tmpType_Salon[playerid], donator_requirement);
+				GivePlayerMoney(playerid, -price);
 			}
-
-			new vehiclesql = tmpArray[playerid][(tmpPage_Object[playerid]*4)-(4-td)];
-			if(	(PlayerInfo[playerid][pDonator] == DONATOR_NONE && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS) || 
-				(PlayerInfo[playerid][pDonator] == DONATOR_BRONZE && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_BRONZE) || 
-				(PlayerInfo[playerid][pDonator] == DONATOR_SILVER && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_SILVER) ||
-				(PlayerInfo[playerid][pDonator] == DONATOR_GOLD && PlayerInfo[playerid][pCarsSpawned] < MAX_SPAWNED_CARS_GOLD)
-			)
+			return 1;
+		}
+	}
+	if(GetESCType(playerid) == ESC_TYPE_PAYPHONE)
+	{
+		/**
+			Payphone
+		
+		 */
+		if(playertextid == PayPhoneTD_Action[playerid][0])
+		{
+			// skambinti
+			if(PhoneInfo[playerid][phoneTalkingTo] == INVALID_PLAYER_ID)
 			{
-				new string[300];
-				mysql_format(chandler, string, sizeof string, "SELECT \
-					vdb.*, \
-				    COUNT(var.id) AS CrimesCount \
-				FROM vehicles_data vdb \
-				LEFT JOIN vehicles_arrested var ON vdb.id = var.VehicleId AND var.Valid = 1 \
-				WHERE vdb.id = '%d' AND vdb.SpawnedId = '0' GROUP BY vdb.id", vehiclesql);
-				//mysql_format(chandler, string, sizeof string, "SELECT *,COUNT FROM `vehicles_data` WHERE id = '%d'", tmpArray[playerid][(tmpPage_Object[playerid]*4)-(4-td)]);
-				mysql_tquery(chandler, string, "VehicleGet", "dd", playerid, td);
+				if(strlen(tmpPassword[playerid]))
+				{
+					new number = strval(tmpPassword[playerid]);
+					if(number != PlayerInfo[playerid][pPhoneNumber] && number != GetPayPhoneNumber(PhoneInfo[playerid][phoneRingType]-1))
+					{
+						PlayerPayPhoneCall(playerid, PhoneInfo[playerid][phoneRingType], number);
+					}
+				}
 			}
-			else
-			{
-				SendError(playerid, "Negalite iðparkuoti daugiau transporto priemoniø.");
-			}
-
-			last_V_Get[playerid] = gettime();
 			return 1;
 		}
-	}
-	for(new c = 0; c < sizeof PrisonCells; c++)
-	{
-		if(playertextid == MDC_Prison_CellStatus[playerid][c])
-		{
-			MDC_Call(OnCellSelected, playerid, c);
-			return 1;
-		}
-	}
-	if(playertextid == MDC_WantedAddEdit_Name[playerid])
-	{
-		MDC_Call(OnWantedInputNameSelected, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
-		return 1;
-	}
-	if(playertextid == MDC_Lookup_Action1[playerid])
-	{
-		MDC_Call(OnLookupActionSelected, playerid, 1);
-		return 1;
-	}
-	if(playertextid == MDC_Lookup_Action2[playerid])
-	{
-		MDC_Call(OnLookupActionSelected, playerid, 2);
-		return 1;
-	}
-	if(playertextid == MDC_Lookup_Action3[playerid])
-	{
-		MDC_Call(OnLookupActionSelected, playerid, 3);
-		return 1;
-	}
-	for(new i = 0; i < MAX_RECORDS_PER_PAGE; i++)
-	{
-		if(playertextid == MDC_Record_Name[playerid][i])
-		{
-			MDC_Call(OnRecordSelected, playerid, i);
-			return 1;
-		}
-	}
-	if(playertextid == MDC_WantedAddEdit_Action1[playerid])
-	{
-		if(MDC__Player_Data[playerid][pMdcActivePage] == MDC_WANTED_EDIT)
-		{
-			MDC_Call(OnWantedEditSelected, playerid, MDC__Player_Data[playerid][pMdcWantedSelected]);
-		}
-		else
-		{
-			MDC_Call(OnWantedAddSelected, playerid, MDC__Player_Data[playerid][pMdcWantedSelected]);
-		}
-		return 1;
-	}
-	if(playertextid == MDC_WantedAddEdit_Action2[playerid])
-	{
-		if(MDC__Player_Data[playerid][pMdcActivePage] == MDC_WANTED_EDIT)
+		if(playertextid == PayPhoneTD_Action[playerid][1])
 		{
 			// istrinti
-			MDC_Call(OnWantedDeleteSelected, playerid, MDC__Player_Data[playerid][pMdcWantedSelected]);
-		}
-		else
-		{
-			// isvalyti
-			MDC_Call(OnWantedClearSelected, playerid);
-		}
-		return 1;
-	}
-	if(playertextid == MDC_WantedAddEdit_Looks[playerid])
-	{
-		MDC_Call(OnWantedInputLooksSelected, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
-		return 1;
-	}
-	if(playertextid == MDC_WantedAddEdit_Reason[playerid])
-	{
-		MDC_Call(OnWantedInputReasonSelected, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
-		return 1;
-	}
-	if(playertextid == MDC_Wanted_Back[playerid])
-	{
-		MDC_Call(OnWantedPageBack, playerid, MDC__Player_Data[playerid][pMdcWantedPage]);
-		return 1;
-	}
-	if(playertextid == MDC_Wanted_Next[playerid])
-	{
-		MDC_Call(OnWantedPageNext, playerid, MDC__Player_Data[playerid][pMdcWantedPage]);
-		return 1;
-	}
-	if(playertextid == MDC_WantedAddEdit_Seen[playerid])
-	{
-		MDC_Call(OnWantedInputSeenSelected, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
-		return 1;
-	}
-	if(playertextid == vShop_BuyBase[playerid])
-	{
-		if(tmpSelected[playerid] != -1)
-		{
-			new price = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehiclePrice];
-			if(GetPlayerMoney(playerid) < price) return InfoBox(playerid, IB_NOT_ENOUGH_MONEY, price);
-			new donator_requirement = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehicleDonator];
-			if(PlayerInfo[playerid][pDonator] < donator_requirement) return SendWarning(playerid, "Ðiai tr. priemonei reikalingas %d remëjo lygis.", donator_requirement);
-			new model = SellVehicleData[tmpArray[playerid][tmpPage_Object[playerid]*3-(3-tmpSelected[playerid])]][sellvehicleModel];
-			if(PlayerInfo[playerid][pHaveCars] >= MAX_OWNED_VEHICLES) return SendWarning(playerid, "Jau turite "#MAX_OWNED_VEHICLES" tr. priemoniø.");
-			BuyVehicle(playerid, model, GetModelName(model), price, VehicleShopColors[random(sizeof VehicleShopColors)], VehicleShopColors[random(sizeof VehicleShopColors)], 0, tmpType_Salon[playerid], donator_requirement);
-			GivePlayerMoney(playerid, -price);
-		}
-		return 1;
-	}
-	if(playertextid == VL_NextBase[playerid])
-	{
-		new newpage = tmpPage_Object[playerid]+1;
-		if(tmpArray[playerid][((newpage*4)-4)] != 0)
-		{
-			tmpPage_Object[playerid] = newpage;
-			ShowVehicleList(playerid, tmpArray[playerid][(newpage*4)-4], tmpArray[playerid][(newpage*4)-3], tmpArray[playerid][(newpage*4)-2], tmpArray[playerid][(newpage*4)-1]);
-		}
-		return 1;
-	}
-	if(playertextid == VL_PrevBase[playerid])
-	{
-		new backpage = tmpPage_Object[playerid]-1;
-		if(backpage != 0)
-		{
-			tmpPage_Object[playerid] = backpage;
-			ShowVehicleList(playerid, tmpArray[playerid][(backpage*4)-4], tmpArray[playerid][(backpage*4)-3], tmpArray[playerid][(backpage*4)-2], tmpArray[playerid][(backpage*4)-1]);
-		}
-		return 1;
-	}
-	for(new i = 0; i < 3; i++)
-	{
-		if(playertextid == vShop_ModelBase[playerid][i])
-		{
-			if(tmpSelected[playerid] != i)
+			if(PhoneInfo[playerid][phoneTalkingTo] == INVALID_PLAYER_ID)
 			{
-				if(tmpSelected[playerid] != -1)
+				format(tmpPassword[playerid], 1, "");
+				PlayerTextDrawSetString(playerid, PayPhoneTD_Input[playerid], "_");
+			}
+			return 1;
+		}
+	}
+	if(GetESCType(playerid) == ESC_TYPE_MECHTUNE)
+	{
+		/**
+			Mech tune
+		
+		 */
+		for(new i = 0; i < 18; i++)
+		{
+			if(playertextid == MechTune_BasePart[playerid][i])
+			{
+				if(tmpSelected[playerid] != 0)
 				{
-					PlayerTextDrawHide(playerid, vShop_ModelBase[playerid][tmpSelected[playerid]]);
-					PlayerTextDrawColor(playerid, vShop_ModelBase[playerid][tmpSelected[playerid]], 4473343);
-					PlayerTextDrawShow(playerid, vShop_ModelBase[playerid][tmpSelected[playerid]]);
+					PlayerTextDrawHide(playerid, MechTune_BasePart[playerid][tmpSelected[playerid]-1]);
+					PlayerTextDrawColor(playerid, MechTune_BasePart[playerid][tmpSelected[playerid]-1], 65);
+					PlayerTextDrawShow(playerid, MechTune_BasePart[playerid][tmpSelected[playerid]-1]);
 				}
-				tmpSelected[playerid] = i;
-				PlayerTextDrawHide(playerid, vShop_ModelBase[playerid][i]);
-				PlayerTextDrawHide(playerid, vShop_BuyBase[playerid]);
-				PlayerTextDrawHide(playerid, vShop_BuyText[playerid]);
-
-				PlayerTextDrawColor(playerid, vShop_BuyBase[playerid], 0x006560FF);
-				PlayerTextDrawColor(playerid, vShop_ModelBase[playerid][i], 0x006560FF);
-				PlayerTextDrawColor(playerid, vShop_BuyText[playerid], -1);
-				PlayerTextDrawSetSelectable(playerid, vShop_BuyBase[playerid], 1);
-
-				PlayerTextDrawShow(playerid, vShop_ModelBase[playerid][i]);
-				PlayerTextDrawShow(playerid, vShop_BuyBase[playerid]);
-				PlayerTextDrawShow(playerid, vShop_BuyText[playerid]);
+				tmpSelected[playerid] = i+1;
+				PlayerTextDrawHide(playerid, MechTune_BasePart[playerid][i]);
+				PlayerTextDrawColor(playerid, MechTune_BasePart[playerid][i], 0xFFFFFF99);
+				PlayerTextDrawShow(playerid, MechTune_BasePart[playerid][i]);
 				return 1;
 			}
 		}
 	}
-	if(playertextid == PayPhoneTD_Action[playerid][0])
+
+	if(GetESCType(playerid) == ESC_TYPE_MDC)
 	{
-		// skambinti
-		if(PhoneInfo[playerid][phoneTalkingTo] == INVALID_PLAYER_ID)
+		/**
+			MDC
+		
+		 */
+		for(new td = 0; td < MAX_WANTED_PER_PAGE; td++)
 		{
-			if(strlen(tmpPassword[playerid]))
+			if(playertextid == MDC_Wanted_Name[playerid][td])
 			{
-				new number = strval(tmpPassword[playerid]);
-				if(number != PlayerInfo[playerid][pPhoneNumber] && number != GetPayPhoneNumber(PhoneInfo[playerid][phoneRingType]-1))
-				{
-					PlayerPayPhoneCall(playerid, PhoneInfo[playerid][phoneRingType], number);
-				}
-			}
-		}
-		return 1;
-	}
-	if(playertextid == PayPhoneTD_Action[playerid][1])
-	{
-		// istrinti
-		if(PhoneInfo[playerid][phoneTalkingTo] == INVALID_PLAYER_ID)
-		{
-			format(tmpPassword[playerid], 1, "");
-			PlayerTextDrawSetString(playerid, PayPhoneTD_Input[playerid], "_");
-		}
-		return 1;
-	}
-	if(playertextid == MDC_Lookup_SearchText[playerid])
-	{
-		MDC_Call(OnSearchTextPress, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
-		return 1;
-	}
-	for(new i = 0; i < 18; i++)
-	{
-		if(playertextid == MechTune_BasePart[playerid][i])
-		{
-			if(tmpSelected[playerid] != 0)
-			{
-				PlayerTextDrawHide(playerid, MechTune_BasePart[playerid][tmpSelected[playerid]-1]);
-				PlayerTextDrawColor(playerid, MechTune_BasePart[playerid][tmpSelected[playerid]-1], 65);
-				PlayerTextDrawShow(playerid, MechTune_BasePart[playerid][tmpSelected[playerid]-1]);
-			}
-			tmpSelected[playerid] = i+1;
-			PlayerTextDrawHide(playerid, MechTune_BasePart[playerid][i]);
-			PlayerTextDrawColor(playerid, MechTune_BasePart[playerid][i], 0xFFFFFF99);
-			PlayerTextDrawShow(playerid, MechTune_BasePart[playerid][i]);
-			return 1;
-		}
-	}
-	for(new i = 0, limit = MDC__Textdraw_Data[mdcButtonsCount]; i < limit; i++)
-	{
-		if(playertextid == MDC_ButtonBox[playerid][i])
-		{
-			MDC_Call(OnMenuButtonPress, playerid, MDC__Buttons_Data[i][mdcButtonActionId]);
-			return 1;
-		}
-	}
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////
-	// mSelection.inc
-	if(GetPVarInt(playerid, "mS_list_active") == 0 || (GetTickCount()-GetPVarInt(playerid, "mS_list_time")) < 200 /* Disable instant selection */) return CallLocalFunction("MP_OPCPTD", "ii", playerid, _:playertextid);
-	new curpage = GetPVarInt(playerid, "mS_list_page");
-	// Handle: cancel button
-	if(playertextid == gCancelButtonTextDrawId[playerid]) {
-		new listID = mS_GetPlayerCurrentListID(playerid);
-		if(listID == mS_CUSTOM_LISTID)
-		{
-			new extraid = GetPVarInt(playerid, "mS_custom_extraid");
-			HideModelSelectionMenu(playerid);
-			CallLocalFunction("OnPlayerModelSelectionEx", "dddd", playerid, 0, extraid, -1);
-			PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
-		}
-		else
-		{
-			HideModelSelectionMenu(playerid);
-			CallLocalFunction("OnPlayerModelSelection", "dddd", playerid, 0, listID, -1);
-			PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
-		}
-		return 1;
-	}
-	// Handle: next button
-	if(playertextid == gNextButtonTextDrawId[playerid]) {
-		new listID = mS_GetPlayerCurrentListID(playerid);
-		if(listID == mS_CUSTOM_LISTID)
-		{
-			if(curpage < (mS_GetNumberOfPagesEx(playerid) - 1)) {
-				SetPVarInt(playerid, "mS_list_page", curpage + 1);
-				mS_ShowPlayerMPs(playerid);
-				mS_UpdatePageTextDraw(playerid);
-				PlayerPlaySound(playerid, 1083, 0.0, 0.0, 0.0);
-			} else {
-				PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
-			}
-		}
-		else
-		{
-			if(curpage < (mS_GetNumberOfPages(listID) - 1)) {
-				SetPVarInt(playerid, "mS_list_page", curpage + 1);
-				mS_ShowPlayerMPs(playerid);
-				mS_UpdatePageTextDraw(playerid);
-				PlayerPlaySound(playerid, 1083, 0.0, 0.0, 0.0);
-			} else {
-				PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
-			}
-		}
-		return 1;
-	}
-	// Handle: previous button
-	if(playertextid == gPrevButtonTextDrawId[playerid]) {
-	    if(curpage > 0) {
-	    	SetPVarInt(playerid, "mS_list_page", curpage - 1);
-	    	mS_ShowPlayerMPs(playerid);
-	    	mS_UpdatePageTextDraw(playerid);
-	    	PlayerPlaySound(playerid, 1084, 0.0, 0.0, 0.0);
-		} else {
-		    PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
-		}
-		return 1;
-	}
-	// Search in the array of textdraws used for the items
-	new x=0;
-	while(x != mS_SELECTION_ITEMS) {
-	    if(playertextid == gSelectionItems[playerid][x]) {
-			new listID = mS_GetPlayerCurrentListID(playerid);
-			if(listID == mS_CUSTOM_LISTID)
-			{
-				PlayerPlaySound(playerid, 1083, 0.0, 0.0, 0.0);
-				new item_id = gSelectionItemsTag[playerid][x];
-				new extraid = GetPVarInt(playerid, "mS_custom_extraid");
-				HideModelSelectionMenu(playerid);
-				CallLocalFunction("OnPlayerModelSelectionEx", "dddd", playerid, 1, extraid, item_id);
+				MDC_Call(OnWantedPlayerSelected, playerid, td);
 				return 1;
+			}
+		}
+		for(new c = 0; c < sizeof PrisonCells; c++)
+		{
+			if(playertextid == MDC_Prison_CellStatus[playerid][c])
+			{
+				MDC_Call(OnCellSelected, playerid, c);
+				return 1;
+			}
+		}
+		if(playertextid == MDC_WantedAddEdit_Name[playerid])
+		{
+			MDC_Call(OnWantedInputNameSelected, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
+			return 1;
+		}
+		if(playertextid == MDC_Lookup_Action1[playerid])
+		{
+			MDC_Call(OnLookupActionSelected, playerid, 1);
+			return 1;
+		}
+		if(playertextid == MDC_Lookup_Action2[playerid])
+		{
+			MDC_Call(OnLookupActionSelected, playerid, 2);
+			return 1;
+		}
+		if(playertextid == MDC_Lookup_Action3[playerid])
+		{
+			MDC_Call(OnLookupActionSelected, playerid, 3);
+			return 1;
+		}
+		for(new i = 0; i < MAX_RECORDS_PER_PAGE; i++)
+		{
+			if(playertextid == MDC_Record_Name[playerid][i])
+			{
+				MDC_Call(OnRecordSelected, playerid, i);
+				return 1;
+			}
+		}
+		if(playertextid == MDC_WantedAddEdit_Action1[playerid])
+		{
+			if(MDC__Player_Data[playerid][pMdcActivePage] == MDC_WANTED_EDIT)
+			{
+				MDC_Call(OnWantedEditSelected, playerid, MDC__Player_Data[playerid][pMdcWantedSelected]);
 			}
 			else
 			{
-				PlayerPlaySound(playerid, 1083, 0.0, 0.0, 0.0);
-				new item_id = gSelectionItemsTag[playerid][x];
-				HideModelSelectionMenu(playerid);
-				CallLocalFunction("OnPlayerModelSelection", "dddd", playerid, 1, listID, item_id);
+				MDC_Call(OnWantedAddSelected, playerid, MDC__Player_Data[playerid][pMdcWantedSelected]);
+			}
+			return 1;
+		}
+		if(playertextid == MDC_WantedAddEdit_Action2[playerid])
+		{
+			if(MDC__Player_Data[playerid][pMdcActivePage] == MDC_WANTED_EDIT)
+			{
+				// istrinti
+				MDC_Call(OnWantedDeleteSelected, playerid, MDC__Player_Data[playerid][pMdcWantedSelected]);
+			}
+			else
+			{
+				// isvalyti
+				MDC_Call(OnWantedClearSelected, playerid);
+			}
+			return 1;
+		}
+		if(playertextid == MDC_WantedAddEdit_Looks[playerid])
+		{
+			MDC_Call(OnWantedInputLooksSelected, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
+			return 1;
+		}
+		if(playertextid == MDC_WantedAddEdit_Reason[playerid])
+		{
+			MDC_Call(OnWantedInputReasonSelected, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
+			return 1;
+		}
+		if(playertextid == MDC_Wanted_Back[playerid])
+		{
+			MDC_Call(OnWantedPageBack, playerid, MDC__Player_Data[playerid][pMdcWantedPage]);
+			return 1;
+		}
+		if(playertextid == MDC_Wanted_Next[playerid])
+		{
+			MDC_Call(OnWantedPageNext, playerid, MDC__Player_Data[playerid][pMdcWantedPage]);
+			return 1;
+		}
+		if(playertextid == MDC_WantedAddEdit_Seen[playerid])
+		{
+			MDC_Call(OnWantedInputSeenSelected, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
+			return 1;
+		}
+
+		if(playertextid == MDC_Lookup_SearchText[playerid])
+		{
+			MDC_Call(OnSearchTextPress, playerid, MDC__Player_Data[playerid][pMdcActivePage]);
+			return 1;
+		}
+		for(new i = 0, limit = MDC__Textdraw_Data[mdcButtonsCount]; i < limit; i++)
+		{
+			if(playertextid == MDC_ButtonBox[playerid][i])
+			{
+				MDC_Call(OnMenuButtonPress, playerid, MDC__Buttons_Data[i][mdcButtonActionId]);
 				return 1;
 			}
 		}
-		x++;
 	}
+	
 	return 1;
 }
 
