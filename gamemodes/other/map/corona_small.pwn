@@ -221,7 +221,7 @@ hook OnGameModeInit()
 
 	// graffiti
 	tmpobjid = CreateDynamicObject(17969,1942.042,-1989.677,14.593,0.000,0.000,-90.000,-1,-1,-1,50.0,50.0);
-	tmpobjid = CreateDynamicObject(4227,1929.151,-2013.284,13.493,0.000,0.000,-90.000,-1,-1,-1,50.0,50.0);
+	// tmpobjid = CreateDynamicObject(4227,1929.151,-2013.284,13.493,0.000,0.000,-90.000,-1,-1,-1,50.0,50.0);
 }
 
 hook OnPlayerConnect(playerid)

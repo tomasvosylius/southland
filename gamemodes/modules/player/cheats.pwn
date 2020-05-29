@@ -1,4 +1,15 @@
 
+public OnPlayerAirbreak(playerid)
+{
+    printf("OnPlayerAirbreak(%s)", GetPlayerNameEx(playerid));
+    if(IsPlayerInAnyAdminGroup(playerid))
+    {
+        SendFormat(playerid, 0xbababaff, "Air-break detected.");
+    }
+    else KickPlayer(playerid, "Sistema", "Air-Break");    
+    return 1;
+}
+
 public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
 {
     printf("OnPlayerCheat(%s, %03d, %d, %d)", GetPlayerNameEx(playerid), code, extra_id_1, extra_id_2);
@@ -21,7 +32,11 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
             format(reason, sizeof reason, "Maðinø teleportacija");
         }
         case CHEAT_VEH_SPEED: {
-            format(reason, sizeof reason, "Speed-hack");
+            // format(reason, sizeof reason, "Speed-hack");
+            SetVehicleVelocity(extra_id_1, 0.0, 0.0, 0.0);
+
+            SendAdminMessage(0xC46085ff, false, "%s naudoja Speed-hack", GetPlayerNameEx(playerid));
+            return 1;
         }
         case CHEAT_NOPS: {
             format(reason, sizeof reason, "NOPs");
@@ -40,9 +55,11 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
         case CHEAT_GODMODE: {
             ban = true;
             format(reason, sizeof reason, "Godmode");
+            return 1;
         }
         case CHEAT_HEALTH: {
             format(reason, sizeof reason, "Gyvybiø cheat");
+            return 1;
         }
         case CHEAT_MONEY: {
         // Mirtis nuima -200, sprunk yra dalykai. Todel nekickinam
@@ -55,10 +72,12 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
         }
         case CHEAT_PICKUP_TP: {
             format(reason, sizeof reason, "Pickup teleport");
+            return 1;
         }
         case CHEAT_VEH_HEALTH: {
             format(reason, sizeof reason, "Transporto gyvybës cheat");
             ignore_if_admin = true;
+            return 1;
         }
         case CHEAT_AIMBOT: {
             format(reason, sizeof reason, "Aimbot");
@@ -82,7 +101,7 @@ public OnPlayerCheat(playerid, code, extra_id_1, extra_id_2)
     }
 
 
-    if(ban) {
+    if(ban && strlen(reason)) {
         // SendFormat(playerid, 0xff0000ff, "(BAN) Cheat: %s", reason);
         BanPlayer(playerid, "Sistema", reason);
     }

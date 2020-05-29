@@ -26,8 +26,8 @@ hook OnGameModeInit()
     SetDynamicObjectMaterial(tmpobjid, 0, 10856, "bakerybit_sfse", "ws_oldwarehouse10a", 0x00000000);
     tmpobjid = CreateDynamicObject(19362, 2055.074951, -1589.855590, 13.285922, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
     SetDynamicObjectMaterial(tmpobjid, 0, 5390, "glenpark7_lae", "ganggraf01_LA", 0x00000000);
-    tmpobjid = CreateDynamicObject(19362, 2055.084960, -1586.955688, 13.285922, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
-    SetDynamicObjectMaterial(tmpobjid, 0, 4227, "graffiti_lan01", "cleargraf01_LA", 0x00000000);
+    // tmpobjid = CreateDynamicObject(19362, 2055.084960, -1586.955688, 13.285922, 0.000000, 0.000000, 0.000000, -1, -1, -1, 300.00, 300.00); 
+    // SetDynamicObjectMaterial(tmpobjid, 0, 4227, "graffiti_lan01", "cleargraf01_LA", 0x00000000);
     tmpobjid = CreateDynamicObject(19435, 2062.229003, -1571.618896, 12.950401, 630.000000, 0.000000, 90.000000, -1, -1, -1, 300.00, 300.00); 
     SetDynamicObjectMaterial(tmpobjid, 0, 17511, "stadium_lae2", "grassdeep2", 0x00000000);
     SetDynamicObjectMaterial(tmpobjid, 1, 17511, "stadium_lae2", "grassdeep2", 0x00000000);

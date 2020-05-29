@@ -1,205 +1,342 @@
+#include <YSI_Coding\y_hooks>
+
 /*
- *  airbreak.inc - Airbreak detection!
- *  Created by Emmet of SA-MP forums.
- *
- *  Notes:
- *  This will need a lot of testing. This wasn't tested thoroughly.
- *  There is a callback that is called when a player airbreaks.
- *
- *  This Source Code Form is subject to the terms of the Mozilla Public
- *  License, v. 2.0. If a copy of the MPL was not distributed with this
- *  file, You can obtain one at [url]http://mozilla.org/MPL/2.0/[/url].
- *
- *  You may not sell this include.
- *  You may not claim this as your own.
- *  You may not redistribute without permission.
- *  You are free to do anything else with it.
+	OnPlayerAirbreak(playerid);
+
+	This include is one of the only accurate airbreak detecting
+	methods developed in SA-MP.
+
+	I do not guarantee positive results with this include.
+	There could be many false flags.
+
+	Created by Emmet on Wednesday, November 6, 2013.
+	Updated by Kar (bug fixes). Last update: February 12th, 2016.
 */
-#define MAX_VEHICLE_AIRBREAK  (200.0)
-#define MAX_AIRBREAK_DISTANCE (15.0)
 
-enum E_AIRBREAK_DATA
-{
-    Float:E_PLAYER_X[MAX_PLAYERS],
-    Float:E_PLAYER_Y[MAX_PLAYERS],
-    Float:E_PLAYER_Z[MAX_PLAYERS],
-    E_AIRBREAK_TIMER
-};
-new E_AIRBREAK_ENUM[E_AIRBREAK_DATA];
+#if defined ac_OnPlayerAirbreak
+	#endinput
+#else
+	#define ac_OnPlayerAirbreak
+#endif
 
-enum E_AIRBREAK_PLAYER_DATA
+// How many times should airbreak be detected before OnPlayerAirbreak is finally called?
+#if !defined MAX_FLAGGED_DETECTIONS
+	#define MAX_FLAGGED_DETECTIONS	3
+#endif
+
+// Maximum distance a player must travel in less than a second before being flagged for airbreak (onfoot).
+#if !defined ONFOOT_DISTANCE
+	#define ONFOOT_DISTANCE 75.0
+#endif
+
+// Maximum distance a player must travel in less than a second before being flagged for airbreak (driver).
+#if !defined VEHICLE_DISTANCE
+	#define VEHICLE_DISTANCE 50.0
+#endif
+
+static
+	// Last known coordinates of the player.
+	Float:s_AirbreakLastCoords[MAX_PLAYERS][3],
+
+	// Timestamp used to store the next second in a timestamp.
+	s_AirbreakUpdateTick[MAX_PLAYERS],
+
+	// Timestamp containing the next time to check for airbreak.
+	s_AirbreakDetectImmunity[MAX_PLAYERS],
+
+	// Timestamp containing the last detection.
+	s_AirbreakLastDetection[MAX_PLAYERS],
+
+	// Number of detections in the last 60 seconds.
+	s_AirbreakDetections[MAX_PLAYERS]
+;
+
+forward OnPlayerAirbreak(playerid);
+
+static AB_IsVehicleMoving(vehicleid)
 {
-    CheckDelay
+	new
+		Float:x,
+		Float:y,
+		Float:z;
+
+	GetVehicleVelocity(vehicleid, x, y, z);
+
+	return (!(floatabs(x) <= 0.001 && floatabs(y) <= 0.001 && floatabs(z) <= 0.005));
 }
-new AIRBREAK_DATA[MAX_PLAYERS][E_AIRBREAK_PLAYER_DATA];
 
-new stock airbreakIndexes[] =
+static AB_OnAirbreakDetected(playerid)
 {
-    1231, 1266, 1234, 1189,
-    1235, 1136, 1196, 1197,
-    1198, 1159, 1133, 1130,
-    1129, 1208, 1156
-};
+	// Called when the player is presumably airbreaking.
+	// If the amount of detections exceeds MAX_FLAGGED_DETECTIONS, they are most likely airbreaking.
 
-static  
-    airbrk_count[MAX_PLAYERS];
+	new
+		timestamp = gettime();
 
-stock Float:GetVehicleSpeed_MPH(playerid)
-{
-    if (!IsPlayerInAnyVehicle(playerid)) return 0.0;
-    new
-        Float:vX,
-        Float:vY,
-        Float:vZ
-    ;
-    GetVehicleVelocity(GetPlayerVehicleID(playerid), vX, vY, vZ);
-    return floatsqroot(floatpower(vX, 2) + floatpower(vY, 2) + floatpower(vZ, 2)) * 100;
-}
-
-forward AirbreakCheck();
-public AirbreakCheck()
-{
-    new Float:x, Float:y, Float:z, index, Float:dist[4];
-    foreach(new i : Player)
-    {
-        if(AIRBREAK_DATA[i][CheckDelay])
-        {
-            AIRBREAK_DATA[i][CheckDelay]--;
-            continue;
-        }
-        if(airbrk_count[i])
-        {
-            airbrk_count[i]--;   
-        }
-        if(IsPlayerInAnyVehicle(i))
-        {
-            GetVehiclePos(GetPlayerVehicleID(i), x, y, z);
-        }
-        else GetPlayerPos(i, x, y, z);
-        index = GetPlayerAnimationIndex(i);
-
-        dist[0] = (E_AIRBREAK_ENUM[E_PLAYER_X][i] < x) ? E_AIRBREAK_ENUM[E_PLAYER_X][i] - x : x - E_AIRBREAK_ENUM[E_PLAYER_X][i];
-        dist[1] = (E_AIRBREAK_ENUM[E_PLAYER_Y][i] < y) ? E_AIRBREAK_ENUM[E_PLAYER_Y][i] - y : y - E_AIRBREAK_ENUM[E_PLAYER_Y][i];
-        dist[2] = (E_AIRBREAK_ENUM[E_PLAYER_Z][i] < z) ? E_AIRBREAK_ENUM[E_PLAYER_Z][i] - z : z - E_AIRBREAK_ENUM[E_PLAYER_Z][i];
-        dist[3] = floatsqroot(floatpower(dist[0], 2.0) + floatpower(dist[1], 2.0) + floatpower(dist[2], 2.0));
-
-        if (x == E_AIRBREAK_ENUM[E_PLAYER_X][i] && y == E_AIRBREAK_ENUM[E_PLAYER_Y][i] && z == E_AIRBREAK_ENUM[E_PLAYER_Z][i])
-        {
-            // AFK
-            continue;
-        }
-        if (dist[3] > MAX_AIRBREAK_DISTANCE && !IsPlayerInAnyVehicle(i))
-        {
-            if (GetPlayerState(i) == PLAYER_STATE_ONFOOT)
-            {
-                for (new l = 0; l < sizeof(airbreakIndexes); l ++)
-                {
-                    if (index == airbreakIndexes[l])
-                    {
-                        if (!floatcmp(E_AIRBREAK_ENUM[E_PLAYER_Z][i], z))
-                        {
-                            OnPlayerAirbreak(i);
-                        }
-                    }
-                }
-            }
-        }
-        else if (dist[3] > MAX_VEHICLE_AIRBREAK && IsPlayerInAnyVehicle(i))
-        {
-            if (GetPlayerState(i) == PLAYER_STATE_DRIVER)
-            {
-                if (GetVehicleSpeed_MPH(i) >= 0.02 && GetVehicleSpeed_MPH(i) <= 0.15)
-                {
-                    OnPlayerAirbreak(i);
-                }
-            }
-        }
-        E_AIRBREAK_ENUM[E_PLAYER_X][i] = x;
-        E_AIRBREAK_ENUM[E_PLAYER_Y][i] = y;
-        E_AIRBREAK_ENUM[E_PLAYER_Z][i] = z;
-    }
-    return 1;
+	if((++ s_AirbreakDetections[playerid]) >= MAX_FLAGGED_DETECTIONS && (timestamp - s_AirbreakLastDetection[playerid]) < 60)
+	{
+		CallLocalFunction("OnPlayerAirbreak", "i", playerid);
+	}
+	s_AirbreakLastDetection[playerid] = timestamp;
 }
 
 hook OnPlayerConnect(playerid)
 {
-    airbrk_count[playerid] = 0;
+	s_AirbreakDetections[playerid] = 0;
+	s_AirbreakLastDetection[playerid] = 0;
+	s_AirbreakDetectImmunity[playerid] = 0;
+	s_AirbreakUpdateTick[playerid] = gettime();
     return 1;
 }
 
-hook OnEnterExitModShop(playerid, enterexit)
+hook OnPlayerSpawn(playerid)
 {
-    if (enterexit)
-    {
-        AIRBREAK_DATA[playerid][CheckDelay] = 2;
-    }
-    else AIRBREAK_DATA[playerid][CheckDelay] = 0;
+	s_AirbreakDetectImmunity[playerid] = gettime() + 3;
 
-    return 1;
+	GetPlayerPos(playerid, s_AirbreakLastCoords[playerid][0], s_AirbreakLastCoords[playerid][1], s_AirbreakLastCoords[playerid][2]);
+
+	return 1;
 }
 
-#if defined _ALS_OnEnterExitModShop
-    #undef OnEnterExitModShop
+hook OnPlayerDeath(playerid, killerid, reason)
+{
+	s_AirbreakDetectImmunity[playerid] = gettime() + 3;
+
+	return 1;
+}
+
+hook OnPlayerUpdate(playerid)
+{
+	if(!IsPlayerNPC(playerid))
+	{
+		new
+			vehicleid = GetPlayerVehicleID(playerid),
+			timestamp = gettime(),
+			Float:x,
+			Float:y,
+			Float:z,
+			Float:distance;
+
+		if(timestamp > s_AirbreakUpdateTick[playerid])
+		{
+			if(timestamp > s_AirbreakDetectImmunity[playerid] && GetPlayerSurfingVehicleID(playerid) == INVALID_VEHICLE_ID && GetPlayerSurfingObjectID(playerid) == INVALID_OBJECT_ID && GetPlayerSpecialAction(playerid) != SPECIAL_ACTION_ENTER_VEHICLE && GetPlayerSpecialAction(playerid) != SPECIAL_ACTION_EXIT_VEHICLE)
+			{
+				if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
+				{
+					distance = GetPlayerDistanceFromPoint(playerid, s_AirbreakLastCoords[playerid][0], s_AirbreakLastCoords[playerid][1], s_AirbreakLastCoords[playerid][2]);
+
+					GetPlayerPos(playerid, x, y, z);
+
+					if((floatabs(s_AirbreakLastCoords[playerid][2] - z) < 1.0 && floatabs(distance) >= ONFOOT_DISTANCE) && (floatabs(s_AirbreakLastCoords[playerid][1] - y) >= 50.0 || floatabs(s_AirbreakLastCoords[playerid][0] - x) >= 50.0))
+					{
+						AB_OnAirbreakDetected(playerid);
+					}
+				}
+				else if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+				{
+					distance = GetVehicleDistanceFromPoint(vehicleid, s_AirbreakLastCoords[playerid][0], s_AirbreakLastCoords[playerid][1], s_AirbreakLastCoords[playerid][2]);
+
+					GetVehiclePos(vehicleid, x, y, z);
+
+					if((!AB_IsVehicleMoving(vehicleid) && floatabs(distance) >= VEHICLE_DISTANCE) && (floatabs(s_AirbreakLastCoords[playerid][1] - y) >= 40.0 || floatabs(s_AirbreakLastCoords[playerid][0] - x) >= 40.0))
+					{
+						AB_OnAirbreakDetected(playerid);
+					}
+				}
+			}
+
+			if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+			{
+				GetVehiclePos(vehicleid, s_AirbreakLastCoords[playerid][0], s_AirbreakLastCoords[playerid][1], s_AirbreakLastCoords[playerid][2]);
+			}
+			else
+			{
+				GetPlayerPos(playerid, s_AirbreakLastCoords[playerid][0], s_AirbreakLastCoords[playerid][1], s_AirbreakLastCoords[playerid][2]);
+			}
+
+			s_AirbreakUpdateTick[playerid] = timestamp;
+		}
+	}
+	return 1;
+}
+
+stock AB_SetSpawnInfo(playerid, team, skin, Float:x, Float:y, Float:z, Float:rotation, weapon1, weapon1_ammo, weapon2, weapon2_ammo, weapon3, weapon3_ammo)
+{
+	new
+		ret = SetSpawnInfo(playerid, team, skin, x, y, z, rotation, weapon1, weapon1_ammo, weapon2, weapon2_ammo, weapon3, weapon3_ammo);
+
+	if(ret)
+	{
+		switch(GetPlayerState(playerid))
+		{
+			case PLAYER_STATE_NONE, PLAYER_STATE_WASTED:
+			{
+				s_AirbreakDetectImmunity[playerid] = gettime() + 3;
+
+				s_AirbreakLastCoords[playerid][0] = x;
+				s_AirbreakLastCoords[playerid][1] = y;
+				s_AirbreakLastCoords[playerid][2] = z;
+			}
+		}
+	}
+
+	return ret;
+}
+
+stock AB_SetPlayerPos(playerid, Float:x, Float:y, Float:z)
+{
+	new
+		ret = SetPlayerPos(playerid, x, y, z);
+
+	if(ret)
+	{
+		s_AirbreakDetectImmunity[playerid] = gettime() + 3;
+
+		s_AirbreakLastCoords[playerid][0] = x;
+		s_AirbreakLastCoords[playerid][1] = y;
+		s_AirbreakLastCoords[playerid][2] = z;
+	}
+
+	return ret;
+}
+
+stock AB_SetPlayerPosFindZ(playerid, Float:x, Float:y, Float:z)
+{
+	new
+		ret = SetPlayerPosFindZ(playerid, x, y, z);
+
+	if(ret)
+	{
+		s_AirbreakDetectImmunity[playerid] = gettime() + 3;
+
+		s_AirbreakLastCoords[playerid][0] = x;
+		s_AirbreakLastCoords[playerid][1] = y;
+		s_AirbreakLastCoords[playerid][2] = z;
+	}
+
+	return ret;
+}
+
+stock AB_PutPlayerInVehicle(playerid, vehicleid, seatid)
+{
+	new
+		ret = PutPlayerInVehicle(playerid, vehicleid, seatid);
+
+	if(ret)
+	{
+		s_AirbreakDetectImmunity[playerid] = gettime() + 3;
+	}
+
+	return ret;
+}
+
+stock AB_SetVehiclePos(vehicleid, Float:x, Float:y, Float:z)
+{
+	for(new i = 0, j = GetPlayerPoolSize(); i <= j; i ++)
+	{
+		if(IsPlayerInVehicle(i, vehicleid))
+		{
+			s_AirbreakDetectImmunity[i] = gettime() + 3;
+
+			s_AirbreakLastCoords[i][0] = x;
+			s_AirbreakLastCoords[i][1] = y;
+			s_AirbreakLastCoords[i][2] = z;
+
+			break;
+		}
+	}
+	return SetVehiclePos(vehicleid, x, y, z);
+}
+/*
+#if defined _ALS_OnPlayerConnect
+	#undef OnPlayerConnect
 #else
-    #define _ALS_OnEnterExitModShop
+	#define _ALS_OnPlayerConnect
 #endif
-#define OnEnterExitModShop ab_OnEnterExitModShop
 
-stock ab_SetPlayerPos(playerid, Float:x, Float:y, Float:z)
-{
-    E_AIRBREAK_ENUM[E_PLAYER_X][playerid] = x;
-    E_AIRBREAK_ENUM[E_PLAYER_Y][playerid] = y;
-    E_AIRBREAK_ENUM[E_PLAYER_Z][playerid] = z;
-    AIRBREAK_DATA[playerid][CheckDelay] = 2;
-    CancelEdit(playerid);
-    return SetPlayerPos(playerid, x, y, z);
-}
+#if defined _ALS_OnPlayerSpawn
+	#undef OnPlayerSpawn
+ #else
+	#define _ALS_OnPlayerSpawn
+#endif
 
-stock ab_SetVehiclePos(vehicleid, Float:x, Float:y, Float:z)
-{
-    for (new i = 0; i < MAX_PLAYERS; i ++)
-    {
-        if (IsPlayerConnected(i) && IsPlayerInVehicle(i, vehicleid))
-        {
-            E_AIRBREAK_ENUM[E_PLAYER_X][i] = x;
-            E_AIRBREAK_ENUM[E_PLAYER_Y][i] = y;
-            E_AIRBREAK_ENUM[E_PLAYER_Z][i] = z;
-            AIRBREAK_DATA[i][CheckDelay] = 2;
-        }
-    }
-    return SetVehiclePos(vehicleid, x, y, z);
-}
-
-stock ab_PutPlayerInVehicle(playerid, vehicleid, seatid)
-{
-    new Float:x, Float:y, Float:z;
-    GetVehiclePos(vehicleid, x, y, z);
-    E_AIRBREAK_ENUM[E_PLAYER_X][playerid] = x;
-    E_AIRBREAK_ENUM[E_PLAYER_Y][playerid] = y;
-    E_AIRBREAK_ENUM[E_PLAYER_Z][playerid] = z;
-    AIRBREAK_DATA[playerid][CheckDelay] = 2;
-    return PutPlayerInVehicle(playerid, vehicleid, seatid);
-}
-
-#if defined _ALS_PutPlayerInVehicle
-    #undef PutPlayerInVehicle
+#if defined _ALS_OnPlayerDeath
+	#undef OnPlayerDeath
 #else
-    #define _ALS_PutPlayerInVehicle
+	#define _ALS_OnPlayerDeath
 #endif
-#define PutPlayerInVehicle ab_PutPlayerInVehicle   
+
+#if defined _ALS_OnPlayerUpdate
+	#undef OnPlayerUpdate
+#else
+	#define _ALS_OnPlayerUpdate
+#endif
+
+#if defined _ALS_OnFilterScriptInit
+	#undef OnFilterScriptInit
+#else
+	#define _ALS_OnFilterScriptInit
+#endif
+*/
+
+#if defined _ALS_SetSpawnInfo
+	#undef SetSpawnInfo
+#else
+	#define _ALS_SetSpawnInfo
+#endif
 
 #if defined _ALS_SetPlayerPos
-    #undef SetPlayerPos
+	#undef SetPlayerPos
 #else
-    #define _ALS_SetPlayerPos
+	#define _ALS_SetPlayerPos
 #endif
-#define SetPlayerPos ab_SetPlayerPos   
 
 #if defined _ALS_SetVehiclePos
-    #undef SetVehiclePos
+	#undef SetVehiclePos
 #else
-    #define _ALS_SetVehiclePos
+	#define _ALS_SetVehiclePos
 #endif
-#define SetVehiclePos ab_SetVehiclePos   
 
-forward OnPlayerAirbreak(playerid);
+#if defined _ALS_SetPlayerPosFindZ
+	#undef SetPlayerPosFindZ
+#else
+	#define _ALS_SetPlayerPosFindZ
+#endif
+
+#if defined _ALS_PutPlayerInVehicle
+	#undef PutPlayerInVehicle
+#else
+	#define _ALS_PutPlayerInVehicle
+#endif
+
+/*#define OnPlayerConnect 	AB_OnPlayerConnect
+#define OnPlayerSpawn 		AB_OnPlayerSpawn
+#define OnPlayerDeath 		AB_OnPlayerDeath
+#define OnPlayerUpdate 		AB_OnPlayerUpdate
+#define OnFilterScriptInit  AB_OnFilterScriptInit*/
+
+#define SetSpawnInfo        AB_SetSpawnInfo
+#define SetPlayerPos        AB_SetPlayerPos
+#define SetPlayerPosFindZ   AB_SetPlayerPosFindZ
+#define PutPlayerInVehicle  AB_PutPlayerInVehicle
+#define SetVehiclePos       AB_SetVehiclePos
+/*
+#if defined AB_OnFilterScriptInit
+	forward AB_OnFilterScriptInit();
+#endif
+
+#if defined AB_OnPlayerConnect
+	forward AB_OnPlayerConnect(playerid);
+#endif
+
+#if defined AB_OnPlayerSpawn
+	forward AB_OnPlayerSpawn(playerid);
+#endif
+
+#if defined AB_OnPlayerUpdate
+	forward AB_OnPlayerUpdate(playerid);
+#endif
+
+#if defined AB_OnPlayerDeath
+	forward AB_OnPlayerDeath(playerid, killerid, reason);
+#endif*/

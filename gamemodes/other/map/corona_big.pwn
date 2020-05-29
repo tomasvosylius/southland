@@ -835,7 +835,7 @@ hook OnGameModeInit()
 
 	// graffiti
 	tmpobjid = CreateDynamicObject(17969,1994.342,-2056.964,14.527,0.000,0.000,0.000,-1,-1,-1,50.0,50.0);
-	tmpobjid = CreateDynamicObject(4227,2059.760,-2068.171,13.988,0.000,0.000,-90.000,-1,-1,-1,50.0,50.0);
+	// tmpobjid = CreateDynamicObject(4227,2059.760,-2068.171,13.988,0.000,0.000,-90.000,-1,-1,-1,50.0,50.0);
 	
 	// vandens boksteliai:
 	tmpobjid = CreateDynamicObject(1211,1967.195,-2011.706,12.894,0.000,0.000,0.000,-1,-1,-1,70.0,70.0);

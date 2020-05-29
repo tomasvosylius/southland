@@ -307,7 +307,7 @@ Settings
 	#define AC_INV_MAX_WARNINGS 				4
 #endif
 #if !defined AC_HIGH_PING_MARK
-	#define AC_HIGH_PING_MARK					300				
+	#define AC_HIGH_PING_MARK					1200				
 #endif
 #if !defined AC_IGNORE_PAYNSPRAY_VEHICLE_HP
 	#define AC_IGNORE_PAYNSPRAY_VEHICLE_HP		false
@@ -1654,6 +1654,8 @@ public t_ac__Health()
 	new 
 		now = gettime(),
 		tick = GetTickCount();
+		
+	#pragma unused now, tick
 
 	#if AC_ENABLE_AIRBREAK
 		if((
@@ -1977,7 +1979,7 @@ stock FAC_CheckVehicleHealth(vehicleid)
 					return 1;
 				}
 		#endif
-
+		
 		AC_playerloop(playerid)
 		{
 			if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER && IsPlayerInVehicle(playerid, vehicleid))
@@ -1987,10 +1989,10 @@ stock FAC_CheckVehicleHealth(vehicleid)
 			}
 		}
 	}
-	else if(ac__VehicleHealth[vehicleid] > health)
-	{
-		ac__VehicleHealth[vehicleid] = health;
-	}
+	else ac__VehicleHealth[vehicleid] = health;
+	// else if(ac__VehicleHealth[vehicleid] > health)
+	// {
+	// }
 	return 1;
 }
 static 

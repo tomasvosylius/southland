@@ -61,10 +61,43 @@
 
 native WP_Hash(bufferd[], len, const str[]);
 native gpci(playerid, serial[], len);
+
+
+#define AC_ENABLE_WEAPONS			true
+#define AC_ENABLE_MONEY				true
+#define AC_ENABLE_AIRBREAK			false
+#define AC_ENABLE_HEALTH			true
+#define AC_ENABLE_SPEED				true
+#define AC_ENABLE_INV				false
+#define AC_ENABLE_JETPACK			false
+#define AC_ENABLE_DIALOGS			false
+#define AC_ENABLE_FLOOD				false
+#define AC_ENABLE_NPC				false
+#define AC_ENABLE_FAKEKILL			false
+#define AC_ENABLE_RAPIDFIRE			false
+#define AC_ENABLE_WARP_INTO_CAR		true
+#define AC_ENABLE_AIMBOT			true
+#define AC_ENABLE_TROLLBOSS			true
+#define AC_ENABLE_ANTIMOD			true
+#define AC_ENABLE_PARACHUTE_DAMAGE	true
+#define AC_ENABLE_GOGGLES_FIX		true
+#define AC_ENABLE_SEAT_CHANGER		true
+#define AC_ENABLE_CAR_CHANGER		true
+#define AC_ENABLE_PICKUP_TELEPORT	false
+#define AC_ENABLE_TELEPORTER		false
+#define AC_ENABLE_VW_INT			false
+#define AC_WEAPONS_CHECK_ALWAYS		false
+
+#include "libraries/samp.pwn"
+#include "libraries/dialog.pwn"
+#include "libraries/airbreak.pwn"
+#include "libraries/anticheat.pwn"
+
+
 // ==============================================================================
 // Serveris
-#define CODE_VERSION 		1.2.3
-#define CODE_VERSION_P 		1223
+#define CODE_VERSION 		1.2.32
+#define CODE_VERSION_P 		1225
 #define SERVER_DEBUG_LEVEL 	3 		// [0:nieko] [1:errorai, gm klaidos] [2:visi callbackai] [3:funkcijos]
 //#define BETA_TEST_MODE 	// galima /reportbug naudot
 
@@ -106,7 +139,6 @@ native gpci(playerid, serial[], len);
 #define MAX_TEXTURE_SLOTS				6
 #define MAX_PLAYER_IP 					21
 #define MAX_SHELLS 						5
-#define MAX_WATER_AREAS 				303
 // Donators, remejai
 #define MAX_AFK_TIME_NO_DONATOR			8
 #define MAX_AFK_TIME_SILVER_USER		14	
@@ -762,32 +794,6 @@ native gpci(playerid, serial[], len);
 	#define MYSQL_LOG_PASSWORD ""
 	#define MYSQL_LOG_DATABASE "southland_logs"
 #endif
-
-#define AC_ENABLE_WEAPONS			true
-#define AC_ENABLE_MONEY				true
-#define AC_ENABLE_AIRBREAK			true
-#define AC_ENABLE_HEALTH			true
-#define AC_ENABLE_SPEED				true
-#define AC_ENABLE_INV				false
-#define AC_ENABLE_JETPACK			false
-#define AC_ENABLE_DIALOGS			false
-#define AC_ENABLE_FLOOD				false
-#define AC_ENABLE_NPC				false
-#define AC_ENABLE_FAKEKILL			false
-#define AC_ENABLE_RAPIDFIRE			false
-#define AC_ENABLE_WARP_INTO_CAR		true
-#define AC_ENABLE_AIMBOT			true
-#define AC_ENABLE_TROLLBOSS			true
-#define AC_ENABLE_ANTIMOD			true
-#define AC_ENABLE_PARACHUTE_DAMAGE	true
-#define AC_ENABLE_GOGGLES_FIX		true
-#define AC_ENABLE_SEAT_CHANGER		true
-#define AC_ENABLE_CAR_CHANGER		true
-#define AC_ENABLE_PICKUP_TELEPORT	false
-#define AC_ENABLE_TELEPORTER		false
-#define AC_ENABLE_VW_INT			false
-#define AC_WEAPONS_CHECK_ALWAYS		false
-
 // ==============================================================================
 // Projekto pavadinimas ir pns
 #define PROJECT_NAME								"southland"
@@ -1925,6 +1931,13 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other\map\used_cars.pwn"
 #include "other\map\misc.pwn"
 
+
+// Red County
+#include "other\map\rc\bb_mech.pwn"
+#include "other\map\rc\bb_truckers.pwn"
+#include "other\map\rc\dl_gas.pwn"
+#include "other\map\rc\dl_pd_fish.pwn"
+
 // Unused ones
 //#include "core\map\newbie.pwn"
 //#include "core\map\alhambra_replacement.pwn"
@@ -1954,7 +1967,7 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 
 /** Libraries */
 #include "hooks.pwn"
-#include "libraries/samp.pwn"
+// #include "libraries/samp.pwn"
 #include "libraries/macros.pwn"
 #include "libraries/chat.pwn"
 
@@ -1962,9 +1975,6 @@ new NewCharQuestions[3][E_NEW_CHAR_QUESTIONS] = {
 #include "other/clothes_list.pwn"
 #include "other/body_parts.pwn"
 
-
-#include "libraries/dialog.pwn"
-#include "libraries/anticheat.pwn"
 
 /** Managers */
 #include "modules\managers/server_vars.pwn"
@@ -3349,10 +3359,24 @@ hook OnPlayerDespawnChar(playerid, reason, changechar)
 		}
 	}
 
-	new string[126];
+	new string[126],
+		reason_str[24];
 	if(reason != 2)
 	{
-		format(string, sizeof string, "%s atsijungë (%s).", GetPlayerNameEx(playerid), changechar >= 1 ? ("pakeitë veikëjà") : (reason == 0 ? ("klaida") : ("atsijungë")));
+		if(changechar >= 1)
+		{
+			format(reason_str, 24, "pakeitë veikëjà");
+		}
+		else 
+		{
+			switch(reason)
+			{
+				case 0: format(reason_str, 24, "klaida");
+				case 1: format(reason_str, 24, "atsijungë");
+			}
+		}
+		format(string, sizeof string, "%s atsijungë (%s).", GetPlayerNameEx(playerid), reason_str);
+
 		ProxDetector(8.0, playerid, string, 0xD4D4D4FF, 0xD4D4D4FF, 0xD4D4D4FF, 0xD4D4D4FF, 0xD4D4D4FF);
 	}
 	new call_receiver;
@@ -4918,6 +4942,11 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	{
 		SetDynamicObjectPos(objectid, oldx, oldy, oldz);
 		SetDynamicObjectRot(objectid, oldrx, oldry, oldrz);
+	}
+	else if(response == EDIT_RESPONSE_FINAL)
+	{
+		SetDynamicObjectPos(objectid, x, y, z);
+		SetDynamicObjectRot(objectid, rx, ry, rz);
 	}
 	return 1;
 }
@@ -6720,8 +6749,16 @@ hook OnPlayerSubmitNewChar(playerid)
 
 		gpci(playerid, gpci_string, sizeof gpci_string);
 
-		mysql_format(chandler, string, sizeof string, "INSERT INTO `players_new` (`Name`,`UserId`,`Skin`,`Origin`,`Gender`,`Years`,`Answer1`,`Answer2`,`Answer3`,`gpci`) ");
-		mysql_format(chandler, string, sizeof string, "%sVALUES ('%e','%d','%d','%e','%d','%d','%e','%e','%e','%e')", string, player_CharName[playerid], PlayerInfo[playerid][pUserId], player_CharSkin[playerid], OriginsList[player_CharOrigin[playerid] - 1],  player_CharGender[playerid], player_CharDate[playerid], player_CharAnswers[playerid][0], player_CharAnswers[playerid][1], player_CharAnswers[playerid][2], gpci_string);
+		mysql_format(chandler, string, sizeof string, "\
+			INSERT INTO `players_new` (`Name`,`UserId`,`Skin`,`Origin`,`Gender`,`Years`,`Answer1`,`Answer2`,`Answer3`,`gpci`) ");
+
+		mysql_format(chandler, string, sizeof string, "%s\
+			VALUES ('%e','%d','%d','%e','%d','%d','%e','%e','%e','%e')", string,
+			player_CharName[playerid], PlayerInfo[playerid][pUserId],
+			player_CharSkin[playerid], OriginsList[player_CharOrigin[playerid] - 1],
+			player_CharGender[playerid], player_CharDate[playerid],
+			player_CharAnswers[playerid][0], player_CharAnswers[playerid][1], player_CharAnswers[playerid][2], gpci_string);
+
 		mysql_tquery(chandler, string, "InsertNewChar", "d", playerid);
 
 		// printf("InsertNewChar: %s", string);
@@ -16309,8 +16346,11 @@ stock CheckBan(playerid)
 	GetPlayerName(playerid, name, sizeof name);
 	GetPlayerIp(playerid, ip, sizeof ip);
 
-	new string[126];
-	mysql_format(chandler, string, sizeof string, "SELECT * FROM `players_bans` WHERE PlayerName = '%e' AND Valid = '1' OR PlayerIP = '%e' AND Valid = '1'", name, ip);
+	new string[256];
+	mysql_format(chandler, string, sizeof string, "\
+		SELECT * FROM `players_bans` WHERE PlayerName = '%e' AND Valid = '1' OR PlayerIP = '%e' AND Valid = '1'",
+		name, ip
+	);
 	new Cache:result = mysql_query(chandler, string, true);
 
 	if(cache_num_rows())
@@ -26595,7 +26635,8 @@ CMD:a(playerid, params[])
 }
 stock IsPlayerInMD(playerid)
 {
-	if(IsPlayerInRangeOfPoint(playerid, 190.0, -30.1, 151.6, 999.0)) return true;
+	if( IsPlayerInRangeOfPoint(playerid, 190.0, 1946.7, -3605.0, 103.7) ||
+		IsPlayerInRangeOfPoint(playerid, 190.0, -30.1, 151.6, 999.0)) return true;
 	return false;
 }
 stock IsPlayerInPD(playerid)

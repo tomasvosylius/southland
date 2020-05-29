@@ -17,18 +17,18 @@ stock CancelVehicleEnter(playerid)
 stock sd_DestroyDynamicObject(STREAMER_TAG_OBJECT objectid, called[] = "default", extra[] = "")
 {
 	#pragma unused called, extra
-	#if SERVER_DEBUG_LEVEL >= 5
-		//printf("[destroy] DestroyDynamicObject(%d, %d, %s[%s])", objectid, GetDynamicObjectModel(objectid), called, extra);
-		for(new i = 0; i < sizeof __furnitureObjects; i++)
-		{
-			if(__furnitureObjects[i] == objectid)
-			{
-				printf("[destroy] %d is on furniture! %s", objectid, !isequal(called, "furniture") ? ("not furniture function!") : (""));
-				__furnitureObjects[i] = 0;
-				break;
-			}
-		}
-	#endif
+	// #if SERVER_DEBUG_LEVEL >= 5
+	// 	//printf("[destroy] DestroyDynamicObject(%d, %d, %s[%s])", objectid, GetDynamicObjectModel(objectid), called, extra);
+	// 	for(new i = 0; i < sizeof __furnitureObjects; i++)
+	// 	{
+	// 		if(__furnitureObjects[i] == objectid)
+	// 		{
+	// 			printf("[destroy] %d is on furniture! %s", objectid, !isequal(called, "furniture") ? ("not furniture function!") : (""));
+	// 			__furnitureObjects[i] = 0;
+	// 			break;
+	// 		}
+	// 	}
+	// #endif
 	return DestroyDynamicObject(objectid);
 }
 
@@ -43,20 +43,20 @@ stock STREAMER_TAG_OBJECT sd_CreateDynamicObject(modelid, Float:x, Float:y, Floa
 {
 	new STREAMER_TAG_OBJECT id = CreateDynamicObject(modelid, x, y, z, rx, ry, rz, worldid, interiorid, playerid, streamdistance, drawdistance, areaid, priority);
 	#pragma unused called, extra
-	#if SERVER_DEBUG_LEVEL >= 5
-		if(isequal(called, "furniture"))
-		{
-			for(new i = 0; i < sizeof __furnitureObjects; i++)
-			{
-				if(__furnitureObjects[i] <= 0)
-				{
-					__furnitureObjects[i] = id;
-					break;
-				}
-			}
-		}
-		//printf("[create] CreateDynamicObject(%d, %d, %s[%s])", id, modelid, called, extra);
-	#endif
+	// #if SERVER_DEBUG_LEVEL >= 5
+	// 	if(isequal(called, "furniture"))
+	// 	{
+	// 		for(new i = 0; i < sizeof __furnitureObjects; i++)
+	// 		{
+	// 			if(__furnitureObjects[i] <= 0)
+	// 			{
+	// 				__furnitureObjects[i] = id;
+	// 				break;
+	// 			}
+	// 		}
+	// 	}
+	// 	//printf("[create] CreateDynamicObject(%d, %d, %s[%s])", id, modelid, called, extra);
+	// #endif
 	return id;
 }
 
@@ -190,6 +190,7 @@ stock strtolower(string[])
 
 
 
+#define MAX_WATER_AREAS 				303
 new Float:wAreas[MAX_WATER_AREAS][6] =
 {
         {-1584.00000, -1826.00000, -1360.00000, -1642.00000, -69.0, 0.0},
