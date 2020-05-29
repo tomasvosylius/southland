@@ -96,8 +96,8 @@ native gpci(playerid, serial[], len);
 
 // ==============================================================================
 // Serveris
-#define CODE_VERSION 		1.2.32
-#define CODE_VERSION_P 		1225
+#define CODE_VERSION 		1.2.33
+#define CODE_VERSION_P 		1226
 #define SERVER_DEBUG_LEVEL 	3 		// [0:nieko] [1:errorai, gm klaidos] [2:visi callbackai] [3:funkcijos]
 //#define BETA_TEST_MODE 	// galima /reportbug naudot
 
@@ -757,7 +757,7 @@ native gpci(playerid, serial[], len);
 #define IB_NOT_CLOSE_DOORS 				"NESATE","SALIA DURU"
 // ==============================================================================
 // MySQL prisijungimai
-// #define USING_VIRTUAL_PRIVATE_SERVER
+#define USING_VIRTUAL_PRIVATE_SERVER
 // #define VPS_TEST
 
 #if defined USING_VIRTUAL_PRIVATE_SERVER
